@@ -139,7 +139,7 @@ export default class IExecTaskModule extends IExecModule {
    */
   obsTask(
     taskid: Taskid,
-    optional?: { dealid?: Dealid }
+    optional?: { dealid?: Dealid },
   ): Promise<TaskObservable>;
   /**
    * **SIGNER REQUIRED**

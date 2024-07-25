@@ -55,7 +55,7 @@ export const deployAndGetApporder = async (
     workerpoolrestrict,
     requesterrestrict,
     tag,
-  } = {}
+  } = {},
 ) => {
   const appDeployRes = await deployRandomApp(iexec, { teeFramework });
   const app = appDeployRes.address;
@@ -70,7 +70,7 @@ export const deployAndGetApporder = async (
       requesterrestrict,
     })
     .then((order) =>
-      iexec.order.signApporder(order, { preflightCheck: false })
+      iexec.order.signApporder(order, { preflightCheck: false }),
     );
 };
 
@@ -83,7 +83,7 @@ export const deployAndGetDatasetorder = async (
     workerpoolrestrict,
     requesterrestrict,
     tag,
-  } = {}
+  } = {},
 ) => {
   const datasetDeployRes = await deployRandomDataset(iexec);
   const dataset = datasetDeployRes.address;
@@ -98,7 +98,7 @@ export const deployAndGetDatasetorder = async (
       requesterrestrict,
     })
     .then((order) =>
-      iexec.order.signDatasetorder(order, { preflightCheck: false })
+      iexec.order.signDatasetorder(order, { preflightCheck: false }),
     );
 };
 
@@ -113,7 +113,7 @@ export const deployAndGetWorkerpoolorder = async (
     datasetrestrict,
     requesterrestrict,
     tag,
-  } = {}
+  } = {},
 ) => {
   const workerpoolDeployRes = await deployRandomWorkerpool(iexec);
   const workerpool = workerpoolDeployRes.address;
@@ -134,7 +134,7 @@ export const deployAndGetWorkerpoolorder = async (
 
 export const getMatchableRequestorder = async (
   iexec,
-  { apporder, datasetorder, workerpoolorder } = {}
+  { apporder, datasetorder, workerpoolorder } = {},
 ) => {
   const address = await iexec.wallet.getAddress();
   return iexec.order
@@ -199,7 +199,7 @@ export const runObservableSubscribe = (observable) => {
 
 export const expectAsyncCustomError = async (
   executor,
-  { constructor, message }
+  { constructor, message },
 ) => {
   const didNotThrowError = Error('Did not throw');
   try {

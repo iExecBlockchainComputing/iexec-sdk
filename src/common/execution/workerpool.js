@@ -13,7 +13,7 @@ const debug = Debug('iexec:execution:workerpool');
 export const setWorkerpoolApiUrl = async (
   contracts = throwIfMissing(),
   workerpoolAddress,
-  url
+  url,
 ) => {
   try {
     const vAddress = await addressSchema({
@@ -30,7 +30,7 @@ export const setWorkerpoolApiUrl = async (
       contracts,
       name,
       WORKERPOOL_URL_TEXT_RECORD_KEY,
-      vUrl
+      vUrl,
     );
   } catch (e) {
     debug('setWorkerpoolApiUrl()', e);

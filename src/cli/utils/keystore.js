@@ -49,7 +49,7 @@ const decrypt = async (encryptedJSON, password) => {
   try {
     const { privateKey } = await Wallet.fromEncryptedJson(
       JSON.stringify(encryptedJSON),
-      password
+      password,
     );
     const { wallet } = walletFromPrivKey(privateKey);
     return wallet;
@@ -89,7 +89,7 @@ const saveWallet = async (userWallet, options) => {
   if (options.walletOptions && options.walletOptions.password) {
     const encryptedWallet = await encrypt(
       userWallet.privateKey,
-      options.walletOptions.password
+      options.walletOptions.password,
     );
     // Wallet name
     const now = new Date();
@@ -100,9 +100,9 @@ const saveWallet = async (userWallet, options) => {
       return number;
     };
     const creationDate = `${now.getUTCFullYear()}-${pad(
-      now.getUTCMonth() + 1
+      now.getUTCMonth() + 1,
     )}-${pad(now.getUTCDate())}T${pad(now.getUTCHours())}-${pad(
-      now.getUTCMinutes()
+      now.getUTCMinutes(),
     )}-${pad(now.getUTCSeconds())}.${(now.getUTCMilliseconds() / 1000)
       .toFixed(3)
       .slice(2, 5)}000000Z`;
@@ -181,7 +181,7 @@ export const Keystore = ({
       } catch (error) {
         debug('getWalletFileName()', error);
         throw Error(
-          `Missing keystore directory ${fileDir}, did you forget to run "iexec wallet create" ?`
+          `Missing keystore directory ${fileDir}, did you forget to run "iexec wallet create" ?`,
         );
       }
       const match = files
@@ -200,11 +200,11 @@ export const Keystore = ({
         return match;
       }
       throw Error(
-        `No wallet file matching address ${walletOptions.walletAddress} found in ${fileDir}`
+        `No wallet file matching address ${walletOptions.walletAddress} found in ${fileDir}`,
       );
     }
     const existsUnencrypted = await fsExtra.existsSync(
-      path.join(process.cwd(), 'wallet.json')
+      path.join(process.cwd(), 'wallet.json'),
     );
     if (existsUnencrypted) return null;
     return getMostRecentWalletFileName();
@@ -228,7 +228,7 @@ export const Keystore = ({
         throw Error(
           `Missing option ${option.walletAddress()[0]} or ${
             option.walletFileName()[0]
-          } and no wallet.json found in working directory`
+          } and no wallet.json found in working directory`,
         );
       }
     }
@@ -239,7 +239,7 @@ export const Keystore = ({
         const encryptedWallet = await loadEncryptedWalletConf(loadingOptions);
         if (!password) {
           password = await prompt.password(
-            `Using wallet ${fileName}\nPlease enter your password to unlock your wallet`
+            `Using wallet ${fileName}\nPlease enter your password to unlock your wallet`,
           );
         }
         const wallet = await decrypt(encryptedWallet, password);

@@ -39,7 +39,7 @@ describe('iexec result', () => {
   describe('generate-encryption-keypair', () => {
     test('iexec result generate-encryption-keypair', async () => {
       const raw = await execAsync(
-        `${iexecPath} result generate-encryption-keypair --force --raw`
+        `${iexecPath} result generate-encryption-keypair --force --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -51,7 +51,7 @@ describe('iexec result', () => {
 
     test('iexec result generate-keys (v4 legacy name)', async () => {
       const raw = await execAsync(
-        `${iexecPath} result generate-keys --force --raw`
+        `${iexecPath} result generate-keys --force --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -65,31 +65,31 @@ describe('iexec result', () => {
   describe('push-encryption-key', () => {
     test('iexec result push-encryption-key', async () => {
       await execAsync(
-        `${iexecPath} result generate-encryption-keypair --force`
+        `${iexecPath} result generate-encryption-keypair --force`,
       );
       const raw = await execAsync(
-        `${iexecPath} result push-encryption-key --raw`
+        `${iexecPath} result push-encryption-key --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.isPushed).toBe(true);
       expect(res.isUpdated).toBe(false);
       const rawAlreadyExists = await execAsync(
-        `${iexecPath} result push-encryption-key --raw`
+        `${iexecPath} result push-encryption-key --raw`,
       ).catch((e) => e.message);
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(false);
       const rawAlreadyExistsForTeeFramework = await execAsync(
-        `${iexecPath} result push-encryption-key --tee-framework scone --raw`
+        `${iexecPath} result push-encryption-key --tee-framework scone --raw`,
       ).catch((e) => e.message);
       const resAlreadyExistsForTeeFramework = JSON.parse(
-        rawAlreadyExistsForTeeFramework
+        rawAlreadyExistsForTeeFramework,
       );
       expect(resAlreadyExistsForTeeFramework.ok).toBe(false);
       const resNotExistsForTeeFramework = JSON.parse(
         await execAsync(
-          `${iexecPath} result push-encryption-key --tee-framework gramine --raw`
-        )
+          `${iexecPath} result push-encryption-key --tee-framework gramine --raw`,
+        ),
       );
       expect(resNotExistsForTeeFramework.ok).toBe(true);
       expect(resNotExistsForTeeFramework.isPushed).toBe(true);
@@ -98,17 +98,17 @@ describe('iexec result', () => {
 
     test('iexec result push-encryption-key --force-update', async () => {
       await execAsync(
-        `${iexecPath} result generate-encryption-keypair --force`
+        `${iexecPath} result generate-encryption-keypair --force`,
       );
       const raw = await execAsync(
-        `${iexecPath} result push-encryption-key --force-update --raw`
+        `${iexecPath} result push-encryption-key --force-update --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.isPushed).toBe(true);
       expect(res.isUpdated).toBe(false);
       const rawAlreadyExists = await execAsync(
-        `${iexecPath} result push-encryption-key --force-update --raw`
+        `${iexecPath} result push-encryption-key --force-update --raw`,
       );
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(true);
@@ -118,7 +118,7 @@ describe('iexec result', () => {
 
     test('push-secret (v4 legacy name)', async () => {
       await execAsync(
-        `${iexecPath} result generate-encryption-keypair --force`
+        `${iexecPath} result generate-encryption-keypair --force`,
       );
       const raw = await execAsync(`${iexecPath} result push-secret --raw`);
       const res = JSON.parse(raw);
@@ -129,31 +129,31 @@ describe('iexec result', () => {
   describe('check-encryption-key', () => {
     test('iexec result check-encryption-key', async () => {
       const rawUserKey = await execAsync(
-        `${iexecPath} result check-encryption-key ${getRandomAddress()} --raw`
+        `${iexecPath} result check-encryption-key ${getRandomAddress()} --raw`,
       );
       const resUserKey = JSON.parse(rawUserKey);
       expect(resUserKey.ok).toBe(true);
       expect(resUserKey.isEncryptionKeySet).toBe(false);
       await execAsync(
-        `${iexecPath} result generate-encryption-keypair --force`
+        `${iexecPath} result generate-encryption-keypair --force`,
       );
       await runIExecCliRaw(`${iexecPath} result push-secret`);
       const rawExists = await execAsync(
-        `${iexecPath} result check-encryption-key --raw`
+        `${iexecPath} result check-encryption-key --raw`,
       );
       const resExists = JSON.parse(rawExists);
       expect(resExists.ok).toBe(true);
       expect(resExists.isEncryptionKeySet).toBe(true);
 
       const rawExistsOnTeeFramework = await execAsync(
-        `${iexecPath} result check-encryption-key --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`
+        `${iexecPath} result check-encryption-key --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`,
       );
       const resExistsOnTeeFramework = JSON.parse(rawExistsOnTeeFramework);
       expect(resExistsOnTeeFramework.ok).toBe(true);
       expect(resExistsOnTeeFramework.isEncryptionKeySet).toBe(true);
 
       const rawNotExistsOnTeeFramework = await execAsync(
-        `${iexecPath} result check-encryption-key --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`
+        `${iexecPath} result check-encryption-key --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
       );
       const resNotExistsOnTeeFramework = JSON.parse(rawNotExistsOnTeeFramework);
       expect(resNotExistsOnTeeFramework.ok).toBe(true);
@@ -162,7 +162,7 @@ describe('iexec result', () => {
 
     test('check-secret (v4 legacy name)', async () => {
       const rawUserKey = await execAsync(
-        `${iexecPath} result check-secret ${getRandomAddress()} --raw`
+        `${iexecPath} result check-secret ${getRandomAddress()} --raw`,
       );
       const resUserKey = JSON.parse(rawUserKey);
       expect(resUserKey.ok).toBe(true);
@@ -174,10 +174,10 @@ describe('iexec result', () => {
     test('iexec result decrypt --force ', async () => {
       await execAsync('mkdir -p .secrets/beneficiary');
       await execAsync(
-        `cp ../../inputs/beneficiaryKeys/expected_key ./.secrets/beneficiary/${userWallet.address}_key`
+        `cp ../../inputs/beneficiaryKeys/expected_key ./.secrets/beneficiary/${userWallet.address}_key`,
       );
       const raw = await execAsync(
-        `${iexecPath} result decrypt ../../inputs/encryptedResults/encryptedResults.zip --force --raw`
+        `${iexecPath} result decrypt ../../inputs/encryptedResults/encryptedResults.zip --force --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -188,24 +188,24 @@ describe('iexec result', () => {
     test('iexec result decrypt --force (wrong beneficiary key)', async () => {
       await execAsync('mkdir -p .secrets/beneficiary');
       await execAsync(
-        `cp ../../inputs/beneficiaryKeys/unexpected_key ./.secrets/beneficiary/${userWallet.address}_key`
+        `cp ../../inputs/beneficiaryKeys/unexpected_key ./.secrets/beneficiary/${userWallet.address}_key`,
       );
       const raw = await execAsync(
-        `${iexecPath} result decrypt ../../inputs/encryptedResults/encryptedResults.zip --force --raw`
+        `${iexecPath} result decrypt ../../inputs/encryptedResults/encryptedResults.zip --force --raw`,
       ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.resultsPath).toBeUndefined();
       expect(res.error).toBeDefined();
       expect(
-        res.error.message.indexOf('Failed to decrypt results key')
+        res.error.message.indexOf('Failed to decrypt results key'),
       ).not.toBe(-1);
       expect(res.error.name).toBe('Error');
     });
 
     test('iexec result decrypt --beneficiary-keystoredir <path> --beneficiary-key-file <fileName> --force ', async () => {
       const raw = await execAsync(
-        `${iexecPath} result decrypt ../../inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir ../../inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key --force --raw`
+        `${iexecPath} result decrypt ../../inputs/encryptedResults/encryptedResults.zip --beneficiary-keystoredir ../../inputs/beneficiaryKeys/ --beneficiary-key-file 0xC08C3def622Af1476f2Db0E3CC8CcaeAd07BE3bB_key --force --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);

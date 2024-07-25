@@ -37,9 +37,9 @@ init.description(desc.initObj(objName)).action(async (opts) => {
     const { saved, fileName } = await initObj(objName);
     spinner.succeed(
       `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-        saved
+        saved,
       )}`,
-      { raw: { category: saved } }
+      { raw: { category: saved } },
     );
   } catch (error) {
     handleError(error, cli, opts);
@@ -67,14 +67,14 @@ create
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.creating('category'));
       const { catid, txHash } = await createCategory(
         chain.contracts,
-        iexecConf[objName]
+        iexecConf[objName],
       );
       spinner.succeed(`New category created with catid ${catid}`, {
         raw: { catid: catid.toString(), txHash },
@@ -99,7 +99,7 @@ show
       category.workClockTimeRef = category.workClockTimeRef.toString();
       spinner.succeed(
         `Category at index ${index} details:${pretty(category)}`,
-        { raw: { index, category } }
+        { raw: { index, category } },
       );
     } catch (error) {
       handleError(error, cli, opts);

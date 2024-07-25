@@ -49,7 +49,7 @@ describe('[positiveIntSchema]', () => {
   });
   test('BN', async () => {
     await expect(positiveIntSchema().validate(new BN(123456789))).resolves.toBe(
-      123456789
+      123456789,
     );
   });
   test('int 0', async () => {
@@ -57,40 +57,46 @@ describe('[positiveIntSchema]', () => {
   });
   test('throw with negative int', async () => {
     await expect(positiveIntSchema().validate(-1)).rejects.toThrow(
-      new ValidationError('this must be greater than or equal to 0')
+      new ValidationError('this must be greater than or equal to 0'),
     );
   });
   test('throw with negative string int', async () => {
     await expect(positiveIntSchema().validate('-1')).rejects.toThrow(
-      new ValidationError('this must be greater than or equal to 0')
+      new ValidationError('this must be greater than or equal to 0'),
     );
   });
   test('throw with int string > MAX_SAFE_INTEGER', async () => {
     await expect(
-      positiveIntSchema().validate('9007199254740992')
+      positiveIntSchema().validate('9007199254740992'),
     ).rejects.toThrow(
-      new ValidationError('this must be less than or equal to 9007199254740990')
+      new ValidationError(
+        'this must be less than or equal to 9007199254740990',
+      ),
     );
   });
   test('throw with hex string > MAX_SAFE_INTEGER', async () => {
     await expect(
-      positiveIntSchema().validate('0xffffffffffffffffffff')
+      positiveIntSchema().validate('0xffffffffffffffffffff'),
     ).rejects.toThrow(
-      new ValidationError('this must be less than or equal to 9007199254740990')
+      new ValidationError(
+        'this must be less than or equal to 9007199254740990',
+      ),
     );
   });
   test('throw with BN > MAX_SAFE_INTEGER', async () => {
     await expect(
-      positiveIntSchema().validate(new BN('9007199254740992'))
+      positiveIntSchema().validate(new BN('9007199254740992')),
     ).rejects.toThrow(
-      new ValidationError('this must be less than or equal to 9007199254740990')
+      new ValidationError(
+        'this must be less than or equal to 9007199254740990',
+      ),
     );
   });
   test('throw with invalid string', async () => {
     await expect(positiveIntSchema().validate('0xfg')).rejects.toThrow(
       new ValidationError(
-        'this must be a `number` type, but the final value was: `NaN` (cast from the value `"0xfg"`).'
-      )
+        'this must be a `number` type, but the final value was: `NaN` (cast from the value `"0xfg"`).',
+      ),
     );
   });
 });
@@ -101,7 +107,7 @@ describe('[positiveStrictIntSchema]', () => {
   });
   test('string int', async () => {
     await expect(
-      positiveStrictIntSchema().validate('9007199254740990')
+      positiveStrictIntSchema().validate('9007199254740990'),
     ).resolves.toBe(9007199254740990);
   });
   test('hex string', async () => {
@@ -109,65 +115,71 @@ describe('[positiveStrictIntSchema]', () => {
   });
   test('BN', async () => {
     await expect(
-      positiveStrictIntSchema().validate(new BN(123456789))
+      positiveStrictIntSchema().validate(new BN(123456789)),
     ).resolves.toBe(123456789);
   });
   test('throw with int 0', async () => {
     await expect(positiveStrictIntSchema().validate(0)).rejects.toThrow(
-      new ValidationError('this must be greater than or equal to 1')
+      new ValidationError('this must be greater than or equal to 1'),
     );
   });
   test("throw with string '0'", async () => {
     await expect(positiveStrictIntSchema().validate('0')).rejects.toThrow(
-      new ValidationError('this must be greater than or equal to 1')
+      new ValidationError('this must be greater than or equal to 1'),
     );
   });
   test('throw with hex string 0x0', async () => {
     await expect(positiveStrictIntSchema().validate('0x0')).rejects.toThrow(
-      new ValidationError('this must be greater than or equal to 1')
+      new ValidationError('this must be greater than or equal to 1'),
     );
   });
   test('throw with BN(0)', async () => {
     await expect(positiveStrictIntSchema().validate(new BN(0))).rejects.toThrow(
-      new ValidationError('this must be greater than or equal to 1')
+      new ValidationError('this must be greater than or equal to 1'),
     );
   });
   test('throw with negative int', async () => {
     await expect(positiveStrictIntSchema().validate(-1)).rejects.toThrow(
-      new ValidationError('this must be greater than or equal to 1')
+      new ValidationError('this must be greater than or equal to 1'),
     );
   });
   test('throw with negative string int', async () => {
     await expect(positiveStrictIntSchema().validate('-1')).rejects.toThrow(
-      new ValidationError('this must be greater than or equal to 1')
+      new ValidationError('this must be greater than or equal to 1'),
     );
   });
   test('throw with int string > MAX_SAFE_INTEGER', async () => {
     await expect(
-      positiveStrictIntSchema().validate('9007199254740992')
+      positiveStrictIntSchema().validate('9007199254740992'),
     ).rejects.toThrow(
-      new ValidationError('this must be less than or equal to 9007199254740990')
+      new ValidationError(
+        'this must be less than or equal to 9007199254740990',
+      ),
     );
   });
   test('throw with hex string > MAX_SAFE_INTEGER', async () => {
     await expect(
-      positiveStrictIntSchema().validate('0xffffffffffffffffffff')
+      positiveStrictIntSchema().validate('0xffffffffffffffffffff'),
     ).rejects.toThrow(
-      new ValidationError('this must be less than or equal to 9007199254740990')
+      new ValidationError(
+        'this must be less than or equal to 9007199254740990',
+      ),
     );
   });
   test('throw with BN > MAX_SAFE_INTEGER', async () => {
     await expect(
-      positiveStrictIntSchema().validate(new BN('9007199254740992'))
+      positiveStrictIntSchema().validate(new BN('9007199254740992')),
     ).rejects.toThrow(
-      new ValidationError('this must be less than or equal to 9007199254740990')
+      new ValidationError(
+        'this must be less than or equal to 9007199254740990',
+      ),
     );
   });
   test('throw with invalid string', async () => {
     await expect(positiveStrictIntSchema().validate('0xfg')).rejects.toThrow(
       new ValidationError(
-        'this must be a `number` type, but the final value was: `NaN` (cast from the value `"0xfg"`).'
-      )
+        'this must be a `number` type, but the final value was: `NaN` (cast from the value `"0xfg"`).',
+      ),
     );
   });
 });
@@ -178,17 +190,17 @@ describe('[uint256Schema]', () => {
   });
   test('string int', async () => {
     await expect(uint256Schema().validate('9007199254740990')).resolves.toBe(
-      '9007199254740990'
+      '9007199254740990',
     );
   });
   test('BN', async () => {
     await expect(
-      uint256Schema().validate(new BN('9007199254740990'))
+      uint256Schema().validate(new BN('9007199254740990')),
     ).resolves.toBe('9007199254740990');
   });
   test('string int > MAX_SAFE_INTEGER', async () => {
     await expect(uint256Schema().validate('9007199254740992')).resolves.toBe(
-      '9007199254740992'
+      '9007199254740992',
     );
   });
   test('int 0', async () => {
@@ -196,22 +208,22 @@ describe('[uint256Schema]', () => {
   });
   test('throw with hex string', async () => {
     await expect(uint256Schema().validate('0x01')).rejects.toThrow(
-      new ValidationError('0x01 is not a valid uint256')
+      new ValidationError('0x01 is not a valid uint256'),
     );
   });
   test('throw with negative int', async () => {
     await expect(uint256Schema().validate(-1)).rejects.toThrow(
-      new ValidationError('-1 is not a valid uint256')
+      new ValidationError('-1 is not a valid uint256'),
     );
   });
   test('throw with negative string int', async () => {
     await expect(uint256Schema().validate('-1')).rejects.toThrow(
-      new ValidationError('-1 is not a valid uint256')
+      new ValidationError('-1 is not a valid uint256'),
     );
   });
   test('throw with invalid string', async () => {
     await expect(uint256Schema().validate('0xfg')).rejects.toThrow(
-      new ValidationError('0xfg is not a valid uint256')
+      new ValidationError('0xfg is not a valid uint256'),
     );
   });
 });
@@ -222,12 +234,12 @@ describe('[nRlcAmountSchema]', () => {
   });
   test('string int', async () => {
     await expect(
-      nRlcAmountSchema().validate('00009007199254740990')
+      nRlcAmountSchema().validate('00009007199254740990'),
     ).resolves.toBe('9007199254740990');
   });
   test('defaultUnit RLC', async () => {
     await expect(
-      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate(48)
+      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate(48),
     ).resolves.toBe('48000000000');
   });
   test('0 unit', async () => {
@@ -235,32 +247,32 @@ describe('[nRlcAmountSchema]', () => {
   });
   test('specified unit', async () => {
     await expect(nRlcAmountSchema().validate('0048 RLC')).resolves.toBe(
-      '48000000000'
+      '48000000000',
     );
   });
   test('specified unit override defaultUnit', async () => {
     await expect(
-      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate('48 nRLC')
+      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate('48 nRLC'),
     ).resolves.toBe('48');
   });
   test('valid decimal string', async () => {
     await expect(nRlcAmountSchema().validate('00.48 RLC')).resolves.toBe(
-      '480000000'
+      '480000000',
     );
   });
   test('valid decimal number', async () => {
     await expect(
-      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate(0.48)
+      nRlcAmountSchema({ defaultUnit: 'RLC' }).validate(0.48),
     ).resolves.toBe('480000000');
   });
   test('BN', async () => {
     await expect(
-      nRlcAmountSchema().validate(new BN('9007199254740990'))
+      nRlcAmountSchema().validate(new BN('9007199254740990')),
     ).resolves.toBe('9007199254740990');
   });
   test('string int > MAX_SAFE_INTEGER', async () => {
     await expect(nRlcAmountSchema().validate('9007199254740992')).resolves.toBe(
-      '9007199254740992'
+      '9007199254740992',
     );
   });
   test('int 0', async () => {
@@ -271,42 +283,42 @@ describe('[nRlcAmountSchema]', () => {
   });
   test('[amount, unit]', async () => {
     await expect(
-      nRlcAmountSchema().validate([new BN(48), 'RLC'])
+      nRlcAmountSchema().validate([new BN(48), 'RLC']),
     ).resolves.toBe('48000000000');
   });
   test('throw with invalid unit', async () => {
     await expect(() => nRlcAmountSchema().validate('48 rlc')).rejects.toThrow(
-      new ValidationError('48 rlc is not a valid amount')
+      new ValidationError('48 rlc is not a valid amount'),
     );
   });
   test('throw with invalid decimal string', async () => {
     await expect(() => nRlcAmountSchema().validate('0.48')).rejects.toThrow(
-      new ValidationError('0.48 is not a valid amount')
+      new ValidationError('0.48 is not a valid amount'),
     );
   });
   test('throw with invalid decimal number', async () => {
     await expect(() => nRlcAmountSchema().validate(0.48)).rejects.toThrow(
-      new ValidationError('0.48 is not a valid amount')
+      new ValidationError('0.48 is not a valid amount'),
     );
   });
   test('throw with hex string', async () => {
     await expect(() => nRlcAmountSchema().validate('0x01')).rejects.toThrow(
-      new ValidationError('0x01 is not a valid amount')
+      new ValidationError('0x01 is not a valid amount'),
     );
   });
   test('throw with invalid array', async () => {
     await expect(() =>
-      nRlcAmountSchema().validate(['1', 'RLC', 'RLC'])
+      nRlcAmountSchema().validate(['1', 'RLC', 'RLC']),
     ).rejects.toThrow(new ValidationError('1 RLC RLC is not a valid amount'));
   });
   test('throw with negative int', async () => {
     await expect(nRlcAmountSchema().validate(-1)).rejects.toThrow(
-      new ValidationError('-1 is not a valid amount')
+      new ValidationError('-1 is not a valid amount'),
     );
   });
   test('throw with negative string int', async () => {
     await expect(nRlcAmountSchema().validate('-1')).rejects.toThrow(
-      new ValidationError('-1 is not a valid amount')
+      new ValidationError('-1 is not a valid amount'),
     );
   });
 });
@@ -317,12 +329,12 @@ describe('[weiAmountSchema]', () => {
   });
   test('string int', async () => {
     await expect(
-      weiAmountSchema().validate('00009007199254740990')
+      weiAmountSchema().validate('00009007199254740990'),
     ).resolves.toBe('9007199254740990');
   });
   test('defaultUnit ether', async () => {
     await expect(
-      weiAmountSchema({ defaultUnit: 'ether' }).validate(48)
+      weiAmountSchema({ defaultUnit: 'ether' }).validate(48),
     ).resolves.toBe('48000000000000000000');
   });
   test('0 unit', async () => {
@@ -333,62 +345,62 @@ describe('[weiAmountSchema]', () => {
   });
   test('specified unit kwei', async () => {
     await expect(weiAmountSchema().validate('0048 kwei')).resolves.toBe(
-      '48000'
+      '48000',
     );
   });
   test('specified unit mwei', async () => {
     await expect(weiAmountSchema().validate('0048 mwei')).resolves.toBe(
-      '48000000'
+      '48000000',
     );
   });
   test('specified unit gwei', async () => {
     await expect(weiAmountSchema().validate('0048 gwei')).resolves.toBe(
-      '48000000000'
+      '48000000000',
     );
   });
   test('specified unit szabo', async () => {
     await expect(weiAmountSchema().validate('0048 szabo')).resolves.toBe(
-      '48000000000000'
+      '48000000000000',
     );
   });
   test('specified unit finney', async () => {
     await expect(weiAmountSchema().validate('0048 finney')).resolves.toBe(
-      '48000000000000000'
+      '48000000000000000',
     );
   });
   test('specified unit ether', async () => {
     await expect(weiAmountSchema().validate('0048 ether')).resolves.toBe(
-      '48000000000000000000'
+      '48000000000000000000',
     );
   });
   test('specified unit eth', async () => {
     await expect(weiAmountSchema().validate('0048 eth')).resolves.toBe(
-      '48000000000000000000'
+      '48000000000000000000',
     );
   });
   test('specified unit override defaultUnit', async () => {
     await expect(
-      weiAmountSchema({ defaultUnit: 'ethers' }).validate('48 wei')
+      weiAmountSchema({ defaultUnit: 'ethers' }).validate('48 wei'),
     ).resolves.toBe('48');
   });
   test('valid decimal string', async () => {
     await expect(weiAmountSchema().validate('00.48 ether')).resolves.toBe(
-      '480000000000000000'
+      '480000000000000000',
     );
   });
   test('valid decimal number', async () => {
     await expect(
-      weiAmountSchema({ defaultUnit: 'ether' }).validate(0.48)
+      weiAmountSchema({ defaultUnit: 'ether' }).validate(0.48),
     ).resolves.toBe('480000000000000000');
   });
   test('BN', async () => {
     await expect(
-      weiAmountSchema().validate(new BN('9007199254740990'))
+      weiAmountSchema().validate(new BN('9007199254740990')),
     ).resolves.toBe('9007199254740990');
   });
   test('string int > MAX_SAFE_INTEGER', async () => {
     await expect(weiAmountSchema().validate('9007199254740992')).resolves.toBe(
-      '9007199254740992'
+      '9007199254740992',
     );
   });
   test('int 0', async () => {
@@ -399,42 +411,42 @@ describe('[weiAmountSchema]', () => {
   });
   test('[amount, unit]', async () => {
     await expect(
-      weiAmountSchema().validate([new BN(48), 'gwei'])
+      weiAmountSchema().validate([new BN(48), 'gwei']),
     ).resolves.toBe('48000000000');
   });
   test('throw with invalid unit', async () => {
     await expect(() =>
-      weiAmountSchema().validate('48 ethereum')
+      weiAmountSchema().validate('48 ethereum'),
     ).rejects.toThrow(new ValidationError('48 ethereum is not a valid amount'));
   });
   test('throw with invalid decimal string', async () => {
     await expect(() => weiAmountSchema().validate('0.48')).rejects.toThrow(
-      new ValidationError('0.48 is not a valid amount')
+      new ValidationError('0.48 is not a valid amount'),
     );
   });
   test('throw with invalid decimal number', async () => {
     await expect(() => weiAmountSchema().validate(0.48)).rejects.toThrow(
-      new ValidationError('0.48 is not a valid amount')
+      new ValidationError('0.48 is not a valid amount'),
     );
   });
   test('throw with hex string', async () => {
     await expect(() => weiAmountSchema().validate('0x01')).rejects.toThrow(
-      new ValidationError('0x01 is not a valid amount')
+      new ValidationError('0x01 is not a valid amount'),
     );
   });
   test('throw with invalid array', async () => {
     await expect(() =>
-      weiAmountSchema().validate(['1', 'eth', 'eth'])
+      weiAmountSchema().validate(['1', 'eth', 'eth']),
     ).rejects.toThrow(new ValidationError('1 eth eth is not a valid amount'));
   });
   test('throw with negative int', async () => {
     await expect(weiAmountSchema().validate(-1)).rejects.toThrow(
-      new ValidationError('-1 is not a valid amount')
+      new ValidationError('-1 is not a valid amount'),
     );
   });
   test('throw with negative string int', async () => {
     await expect(weiAmountSchema().validate('-1')).rejects.toThrow(
-      new ValidationError('-1 is not a valid amount')
+      new ValidationError('-1 is not a valid amount'),
     );
   });
 });
@@ -448,18 +460,18 @@ describe('[paramsSchema]', () => {
           'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
           'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
         ],
-      })
+      }),
     ).resolves.toBe(
-      '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}'
+      '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}',
     );
   });
   test('string', async () => {
     await expect(
       paramsSchema().validate(
-        '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}'
-      )
+        '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}',
+      ),
     ).resolves.toBe(
-      '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}'
+      '{"iexec_args":"test","iexec_input_files":["https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf","https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf"]}',
     );
   });
   test('number', async () => {
@@ -474,7 +486,7 @@ describe('[paramsInputFilesArraySchema]', () => {
         'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
         'http://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
         'http://docker-service:8080/uploads/pdf/iExec-WPv3.0-English.pdf',
-      ])
+      ]),
     ).resolves.toEqual([
       'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
       'http://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
@@ -484,8 +496,8 @@ describe('[paramsInputFilesArraySchema]', () => {
   test('string comma separated list of URL', async () => {
     await expect(
       paramsInputFilesArraySchema().validate(
-        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf,https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf'
-      )
+        'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf,https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+      ),
     ).resolves.toEqual([
       'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
       'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
@@ -493,24 +505,24 @@ describe('[paramsInputFilesArraySchema]', () => {
   });
   test('empty string', async () => {
     await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
-      new ValidationError('["0"] "" is not a valid URL')
+      new ValidationError('["0"] "" is not a valid URL'),
     );
   });
   test('string invalid URL', async () => {
     await expect(
-      paramsInputFilesArraySchema().validate('example.com/foo.txt')
+      paramsInputFilesArraySchema().validate('example.com/foo.txt'),
     ).rejects.toThrow(
-      new ValidationError('[0] "example.com/foo.txt" is not a valid URL')
+      new ValidationError('[0] "example.com/foo.txt" is not a valid URL'),
     );
   });
   test('empty array', async () => {
     await expect(paramsInputFilesArraySchema().validate([])).resolves.toEqual(
-      []
+      [],
     );
   });
   test('undefined', async () => {
     await expect(
-      paramsInputFilesArraySchema().validate(undefined)
+      paramsInputFilesArraySchema().validate(undefined),
     ).resolves.toEqual(undefined);
   });
 });
@@ -519,8 +531,8 @@ describe('[objParamsSchema]', () => {
   test('empty object', async () => {
     await expect(objParamsSchema().validate({})).rejects.toThrow(
       new ValidationError(
-        'iexec_result_storage_proxy is required field with "ipfs" storage'
-      )
+        'iexec_result_storage_proxy is required field with "ipfs" storage',
+      ),
     );
   });
 
@@ -528,8 +540,8 @@ describe('[objParamsSchema]', () => {
     await expect(
       objParamsSchema().validate(
         {},
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
@@ -538,11 +550,11 @@ describe('[objParamsSchema]', () => {
 
   test('dropbox not supported for non-tee', async () => {
     await expect(
-      objParamsSchema().validate({ iexec_result_storage_provider: 'dropbox' })
+      objParamsSchema().validate({ iexec_result_storage_provider: 'dropbox' }),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_result_storage_provider "dropbox" is not supported for non TEE tasks use supported storage provider ipfs'
-      )
+        'iexec_result_storage_provider "dropbox" is not supported for non TEE tasks use supported storage provider ipfs',
+      ),
     );
   });
 
@@ -550,8 +562,8 @@ describe('[objParamsSchema]', () => {
     await expect(
       objParamsSchema().validate(
         { iexec_result_storage_provider: 'dropbox' },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'dropbox',
     });
@@ -561,12 +573,12 @@ describe('[objParamsSchema]', () => {
     await expect(
       objParamsSchema().validate(
         { iexec_result_storage_provider: 'foo' },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_result_storage_provider "foo" is not a valid storage provider, use one of the supported providers (ipfs, dropbox)'
-      )
+        'iexec_result_storage_provider "foo" is not a valid storage provider, use one of the supported providers (ipfs, dropbox)',
+      ),
     );
   });
 
@@ -575,9 +587,9 @@ describe('[objParamsSchema]', () => {
       objParamsSchema().validate({
         iexec_secrets: {},
         iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-      })
+      }),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets is not supported for non TEE tasks')
+      new ValidationError('iexec_secrets is not supported for non TEE tasks'),
     );
   });
 
@@ -588,8 +600,8 @@ describe('[objParamsSchema]', () => {
           iexec_secrets: { 1: 'foo' },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).resolves.toEqual({
       iexec_secrets: { 1: 'foo' },
       iexec_result_storage_provider: 'ipfs',
@@ -604,8 +616,8 @@ describe('[objParamsSchema]', () => {
           iexec_secrets: null,
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).rejects.toThrow(new ValidationError('iexec_secrets cannot be null'));
   });
 
@@ -616,12 +628,12 @@ describe('[objParamsSchema]', () => {
           iexec_secrets: { '-1': 'foo' },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_secrets mapping keys must be strictly positive integers'
-      )
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
     );
     await expect(
       objParamsSchema().validate(
@@ -629,12 +641,12 @@ describe('[objParamsSchema]', () => {
           iexec_secrets: { 0: 'foo' },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_secrets mapping keys must be strictly positive integers'
-      )
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
     );
     await expect(
       objParamsSchema().validate(
@@ -642,12 +654,12 @@ describe('[objParamsSchema]', () => {
           iexec_secrets: { foo: 'foo' },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_secrets mapping keys must be strictly positive integers'
-      )
+        'iexec_secrets mapping keys must be strictly positive integers',
+      ),
     );
   });
 
@@ -658,10 +670,10 @@ describe('[objParamsSchema]', () => {
           iexec_secrets: { 1: { foo: 'bar' } },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets mapping names must be strings')
+      new ValidationError('iexec_secrets mapping names must be strings'),
     );
     await expect(
       objParamsSchema().validate(
@@ -669,10 +681,10 @@ describe('[objParamsSchema]', () => {
           iexec_secrets: { 1: 1 },
           iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
-        { context: { isTee: true } }
-      )
+        { context: { isTee: true } },
+      ),
     ).rejects.toThrow(
-      new ValidationError('iexec_secrets mapping names must be strings')
+      new ValidationError('iexec_secrets mapping names must be strings'),
     );
   });
 
@@ -682,8 +694,8 @@ describe('[objParamsSchema]', () => {
         {
           iexec_args: 'test',
         },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).resolves.toEqual({
       iexec_args: 'test',
       iexec_result_storage_provider: 'ipfs',
@@ -700,8 +712,8 @@ describe('[objParamsSchema]', () => {
             'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
           ],
         },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).resolves.toEqual({
       iexec_input_files: [
         'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
@@ -721,12 +733,12 @@ describe('[objParamsSchema]', () => {
             'iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
           ],
         },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_input_files[1] "iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf" is not a valid URL'
-      )
+        'iexec_input_files[1] "iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf" is not a valid URL',
+      ),
     );
   });
 
@@ -734,7 +746,7 @@ describe('[objParamsSchema]', () => {
     await expect(
       objParamsSchema().validate({
         iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
-      })
+      }),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
@@ -747,8 +759,8 @@ describe('[objParamsSchema]', () => {
         {
           iexec_result_encryption: true,
         },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).resolves.toEqual({
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
@@ -762,8 +774,8 @@ describe('[objParamsSchema]', () => {
         {
           iexec_result_encryption: 'true',
         },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).resolves.toEqual({
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
@@ -777,12 +789,12 @@ describe('[objParamsSchema]', () => {
         {
           iexec_result_encryption: 'foo',
         },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_result_encryption must be a `boolean` type, but the final value was: `"foo"`.'
-      )
+        'iexec_result_encryption must be a `boolean` type, but the final value was: `"foo"`.',
+      ),
     );
   });
 
@@ -792,8 +804,8 @@ describe('[objParamsSchema]', () => {
         {
           iexec_developer_logger: true,
         },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).resolves.toEqual({
       iexec_developer_logger: true,
       iexec_result_storage_provider: 'ipfs',
@@ -803,7 +815,7 @@ describe('[objParamsSchema]', () => {
 
   test('with isCallback in context, do not populate storage', async () => {
     await expect(
-      objParamsSchema().validate({}, { context: { isCallback: true } })
+      objParamsSchema().validate({}, { context: { isCallback: true } }),
     ).resolves.toEqual({});
   });
 
@@ -815,8 +827,8 @@ describe('[objParamsSchema]', () => {
           iexec_tee_post_compute_fingerprint: 'custom-fingerprint', // removed in in v6
           iexec_tee_post_compute_image: 'custom-image', // removed in in v6
         },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } }
-      )
+        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
+      ),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
       iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
@@ -828,99 +840,99 @@ describe('[tagSchema]', () => {
   test('bytes 32 tags', async () => {
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000103'
-      )
+        '0x0000000000000000000000000000000000000000000000000000000000000103',
+      ),
     ).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000103'
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('unknown bytes 32 tag is allowed', async () => {
     await expect(
       tagSchema().validate(
-        '0x1000000000000000000000000000000000000000000000000000000000000000'
-      )
+        '0x1000000000000000000000000000000000000000000000000000000000000000',
+      ),
     ).resolves.toBe(
-      '0x1000000000000000000000000000000000000000000000000000000000000000'
+      '0x1000000000000000000000000000000000000000000000000000000000000000',
     );
   });
   test('array of tags', async () => {
     await expect(tagSchema().validate(['tee', 'scone', 'gpu'])).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000103'
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('empty tag', async () => {
     await expect(tagSchema().validate('')).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000'
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
   });
   test('isolated tag', async () => {
     await expect(tagSchema().validate('gpu')).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000100'
+      '0x0000000000000000000000000000000000000000000000000000000000000100',
     );
   });
   test('comma separated tags', async () => {
     await expect(tagSchema().validate('gpu,tee,scone')).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000103'
+      '0x0000000000000000000000000000000000000000000000000000000000000103',
     );
   });
   test('unknown tag in array', async () => {
     await expect(tagSchema().validate(['tee', 'foo'])).rejects.toThrow(
-      new ValidationError('tee,foo is not a valid tag. Unknown tag foo')
+      new ValidationError('tee,foo is not a valid tag. Unknown tag foo'),
     );
   });
   test('unknown isolated tag', async () => {
     await expect(tagSchema().validate('foo')).rejects.toThrow(
-      new ValidationError('foo is not a valid tag. Unknown tag foo')
+      new ValidationError('foo is not a valid tag. Unknown tag foo'),
     );
   });
   test('invalid tee tag', async () => {
     await expect(tagSchema().validate('tee')).rejects.toThrow(
       new ValidationError(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')"
-      )
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
     );
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000001'
-      )
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')"
-      )
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
     );
     await expect(tagSchema().validate('scone')).rejects.toThrow(
-      new ValidationError("'scone' tag must be used with 'tee' tag")
+      new ValidationError("'scone' tag must be used with 'tee' tag"),
     );
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000002'
-      )
+        '0x0000000000000000000000000000000000000000000000000000000000000002',
+      ),
     ).rejects.toThrow(
-      new ValidationError("'scone' tag must be used with 'tee' tag")
+      new ValidationError("'scone' tag must be used with 'tee' tag"),
     );
     await expect(tagSchema().validate('gramine')).rejects.toThrow(
-      new ValidationError("'gramine' tag must be used with 'tee' tag")
+      new ValidationError("'gramine' tag must be used with 'tee' tag"),
     );
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000004'
-      )
+        '0x0000000000000000000000000000000000000000000000000000000000000004',
+      ),
     ).rejects.toThrow(
-      new ValidationError("'gramine' tag must be used with 'tee' tag")
+      new ValidationError("'gramine' tag must be used with 'tee' tag"),
     );
     await expect(tagSchema().validate('tee,gramine,scone')).rejects.toThrow(
       new ValidationError(
-        "tee framework tags are exclusive ('scone'|'gramine')"
-      )
+        "tee framework tags are exclusive ('scone'|'gramine')",
+      ),
     );
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000007'
-      )
+        '0x0000000000000000000000000000000000000000000000000000000000000007',
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        "tee framework tags are exclusive ('scone'|'gramine')"
-      )
+        "tee framework tags are exclusive ('scone'|'gramine')",
+      ),
     );
   });
 });
@@ -928,58 +940,58 @@ describe('[tagSchema]', () => {
 describe('[addressSchema]', () => {
   test('address', async () => {
     await expect(
-      addressSchema().validate('0x607F4C5BB672230e8672085532f7e901544a7375')
+      addressSchema().validate('0x607F4C5BB672230e8672085532f7e901544a7375'),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
   test('address 0x stripped', async () => {
     await expect(
-      addressSchema().validate('607F4C5BB672230e8672085532f7e901544a7375')
+      addressSchema().validate('607F4C5BB672230e8672085532f7e901544a7375'),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
   test('address (with ethProvider)', async () => {
     await expect(
       addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
-        '0x607F4C5BB672230e8672085532f7e901544a7375'
-      )
+        '0x607F4C5BB672230e8672085532f7e901544a7375',
+      ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
   test('invalid address', async () => {
     await expect(
-      addressSchema().validate('0x07F4C5BB672230e8672085532f7e901544a7375')
+      addressSchema().validate('0x07F4C5BB672230e8672085532f7e901544a7375'),
     ).rejects.toThrow(
       new ValidationError(
-        '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address'
-      )
+        '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address',
+      ),
     );
   });
   test('address undefined (throw)', async () => {
     await expect(
       addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
-        undefined
-      )
+        undefined,
+      ),
     ).rejects.toThrow(
-      new ValidationError('undefined is not a valid ethereum address')
+      new ValidationError('undefined is not a valid ethereum address'),
     );
   });
   test('ens (resolve ENS with ethProvider)', async () => {
     await expect(
       addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
-        'rlc.iexec.eth'
-      )
+        'rlc.iexec.eth',
+      ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   }, 10000);
   test('invalid ens (throw when ens is missing)', async () => {
     await expect(
       addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
-        'pierre.iexec.eth'
-      )
+        'pierre.iexec.eth',
+      ),
     ).rejects.toThrow(
-      new ValidationError('Unable to resolve ENS pierre.iexec.eth')
+      new ValidationError('Unable to resolve ENS pierre.iexec.eth'),
     );
   });
   test('ens (throw when ethProvider is missing)', async () => {
     await expect(addressSchema().validate('rlc.iexec.eth')).rejects.toThrow(
-      new ValidationError('Unable to resolve ENS rlc.iexec.eth')
+      new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
     );
   });
 });
@@ -991,61 +1003,63 @@ describe('[addressOrAnySchema]', () => {
   test('address', async () => {
     await expect(
       addressOrAnySchema().validate(
-        '0x607F4C5BB672230e8672085532f7e901544a7375'
-      )
+        '0x607F4C5BB672230e8672085532f7e901544a7375',
+      ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
   test('address 0x stripped', async () => {
     await expect(
-      addressOrAnySchema().validate('607F4C5BB672230e8672085532f7e901544a7375')
+      addressOrAnySchema().validate('607F4C5BB672230e8672085532f7e901544a7375'),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
   test('address (with ethProvider)', async () => {
     await expect(
       addressOrAnySchema({
         ethProvider: getDefaultProvider(mainnetHost),
-      }).validate('0x607F4C5BB672230e8672085532f7e901544a7375')
+      }).validate('0x607F4C5BB672230e8672085532f7e901544a7375'),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
   test('invalid address', async () => {
     await expect(
-      addressOrAnySchema().validate('0x07F4C5BB672230e8672085532f7e901544a7375')
+      addressOrAnySchema().validate(
+        '0x07F4C5BB672230e8672085532f7e901544a7375',
+      ),
     ).rejects.toThrow(
       new ValidationError(
-        '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address'
-      )
+        '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address',
+      ),
     );
   });
   test('address undefined (throw)', async () => {
     await expect(
       addressOrAnySchema({
         ethProvider: getDefaultProvider(mainnetHost),
-      }).validate(undefined)
+      }).validate(undefined),
     ).rejects.toThrow(
-      new ValidationError('undefined is not a valid ethereum address')
+      new ValidationError('undefined is not a valid ethereum address'),
     );
   });
   test('ens (resolve ENS with ethProvider)', async () => {
     await expect(
       addressOrAnySchema({
         ethProvider: getDefaultProvider(mainnetHost),
-      }).validate('rlc.iexec.eth')
+      }).validate('rlc.iexec.eth'),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   }, 10000);
   test('invalid ens (throw when ens is missing)', async () => {
     await expect(
       addressOrAnySchema({
         ethProvider: getDefaultProvider(mainnetHost),
-      }).validate('pierre.iexec.eth')
+      }).validate('pierre.iexec.eth'),
     ).rejects.toThrow(
-      new ValidationError('Unable to resolve ENS pierre.iexec.eth')
+      new ValidationError('Unable to resolve ENS pierre.iexec.eth'),
     );
   });
   test('ens (throw when ethProvider is missing)', async () => {
     await expect(
-      addressOrAnySchema().validate('rlc.iexec.eth')
+      addressOrAnySchema().validate('rlc.iexec.eth'),
     ).rejects.toThrow(
-      new ValidationError('Unable to resolve ENS rlc.iexec.eth')
+      new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
     );
   });
 });
@@ -1054,31 +1068,31 @@ describe('[base64Encoded256bitsKeySchema]', () => {
   test('valid key', async () => {
     await expect(
       base64Encoded256bitsKeySchema().validate(
-        'm7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0='
-      )
+        'm7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=',
+      ),
     ).resolves.toBe('m7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=');
   });
   test('invalid base64', async () => {
     await expect(
       base64Encoded256bitsKeySchema().validate(
-        'b165f893c76df0bdde4a85ff2b6cb33e6f12babbeb612708374ff71ed516ce94'
-      )
+        'b165f893c76df0bdde4a85ff2b6cb33e6f12babbeb612708374ff71ed516ce94',
+      ),
     ).rejects.toThrow(
-      'b165f893c76df0bdde4a85ff2b6cb33e6f12babbeb612708374ff71ed516ce94 is not a valid encryption key (must be base64 encoded 256 bits key)'
+      'b165f893c76df0bdde4a85ff2b6cb33e6f12babbeb612708374ff71ed516ce94 is not a valid encryption key (must be base64 encoded 256 bits key)',
     );
   });
   test('invalid key length', async () => {
     await expect(
-      base64Encoded256bitsKeySchema().validate('UtmonCp7SKOWuOPpXyikHQ==')
+      base64Encoded256bitsKeySchema().validate('UtmonCp7SKOWuOPpXyikHQ=='),
     ).rejects.toThrow(
-      'UtmonCp7SKOWuOPpXyikHQ== is not a valid encryption key (must be base64 encoded 256 bits key)'
+      'UtmonCp7SKOWuOPpXyikHQ== is not a valid encryption key (must be base64 encoded 256 bits key)',
     );
   });
   test('buffer is not valid', async () => {
     await expect(
       base64Encoded256bitsKeySchema().validate(
-        Buffer.from('m7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=', 'base64')
-      )
+        Buffer.from('m7/kaM4WMTxHNPNAhaTAdC+8VJv8UdcsxPYpc94jls0=', 'base64'),
+      ),
     ).rejects.toThrow();
   });
 });
@@ -1086,20 +1100,20 @@ describe('[base64Encoded256bitsKeySchema]', () => {
 describe('[fileBufferSchema]', () => {
   test('file', async () => {
     const fileBuffer = await readFile(
-      join(process.cwd(), 'test/inputs/files/text.zip')
+      join(process.cwd(), 'test/inputs/files/text.zip'),
     );
     await expect(
-      fileBufferSchema().validate(fileBuffer)
+      fileBufferSchema().validate(fileBuffer),
     ).resolves.toBeInstanceOf(Buffer);
   });
   test('text', async () => {
     await expect(fileBufferSchema().validate('foo')).rejects.toThrow(
-      'Invalid file buffer, must be ArrayBuffer or Buffer'
+      'Invalid file buffer, must be ArrayBuffer or Buffer',
     );
   });
   test('number', async () => {
     await expect(fileBufferSchema().validate(42)).rejects.toThrow(
-      'Invalid file buffer, must be ArrayBuffer or Buffer'
+      'Invalid file buffer, must be ArrayBuffer or Buffer',
     );
   });
 });
@@ -1113,7 +1127,7 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
-      Buffer.from(JSON.stringify(obj), 'utf8')
+      Buffer.from(JSON.stringify(obj), 'utf8'),
     );
   });
   test('valid SCONE obj', async () => {
@@ -1126,7 +1140,7 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
-      Buffer.from(JSON.stringify(obj), 'utf8')
+      Buffer.from(JSON.stringify(obj), 'utf8'),
     );
   });
   test('valid string', async () => {
@@ -1139,7 +1153,7 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     });
     await expect(mrenclaveSchema().validate(str)).resolves.toEqual(
-      Buffer.from(str, 'utf8')
+      Buffer.from(str, 'utf8'),
     );
   });
   test('valid bytes', async () => {
@@ -1152,26 +1166,26 @@ describe('[mrenclaveSchema]', () => {
         fingerprint:
           '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
       }),
-      'utf8'
+      'utf8',
     );
     await expect(mrenclaveSchema().validate(bytes)).resolves.toEqual(bytes);
   });
   test('allow empty string', async () => {
     await expect(mrenclaveSchema().validate('')).resolves.toEqual(
-      Buffer.from([])
+      Buffer.from([]),
     );
   });
   test('allow undefined', async () => {
     await expect(mrenclaveSchema().validate(undefined)).resolves.toEqual(
-      Buffer.from([])
+      Buffer.from([]),
     );
     await expect(
-      mrenclaveSchema().required().validate(undefined)
+      mrenclaveSchema().required().validate(undefined),
     ).resolves.toEqual(Buffer.from([]));
   });
   test('allow empty bytes', async () => {
     await expect(mrenclaveSchema().validate(Buffer.from([]))).resolves.toEqual(
-      Buffer.from([])
+      Buffer.from([]),
     );
   });
   test('throw when "entrypoint" is set for non SCONE framework', async () => {
@@ -1183,7 +1197,7 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('Unknown key "entrypoint" in mrenclave')
+      new ValidationError('Unknown key "entrypoint" in mrenclave'),
     );
   });
   test('throw when "heapSize" is set for non SCONE framework', async () => {
@@ -1195,22 +1209,22 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('Unknown key "heapSize" in mrenclave')
+      new ValidationError('Unknown key "heapSize" in mrenclave'),
     );
   });
   test('throw with null', async () => {
     await expect(mrenclaveSchema().validate(null)).rejects.toThrow(
-      new ValidationError('this is not a valid mrenclave')
+      new ValidationError('this is not a valid mrenclave'),
     );
   });
   test('throw with number', async () => {
     await expect(mrenclaveSchema().validate(42)).rejects.toThrow(
-      new ValidationError('this is not a valid mrenclave')
+      new ValidationError('this is not a valid mrenclave'),
     );
   });
   test('throw with boolean', async () => {
     await expect(mrenclaveSchema().validate(false)).rejects.toThrow(
-      new ValidationError('this is not a valid mrenclave')
+      new ValidationError('this is not a valid mrenclave'),
     );
   });
   test('throw when unexpected key is found in obj', async () => {
@@ -1224,7 +1238,7 @@ describe('[mrenclaveSchema]', () => {
       foo: 'bar',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('Unknown key "foo" in mrenclave')
+      new ValidationError('Unknown key "foo" in mrenclave'),
     );
   });
   test('throw when unexpected key is found in JSON string', async () => {
@@ -1238,7 +1252,7 @@ describe('[mrenclaveSchema]', () => {
       foo: 'bar',
     });
     await expect(mrenclaveSchema().validate(str)).rejects.toThrow(
-      new ValidationError('Unknown key "foo" in mrenclave')
+      new ValidationError('Unknown key "foo" in mrenclave'),
     );
   });
   test('throw when unexpected key is found in decoded bytes', async () => {
@@ -1252,10 +1266,10 @@ describe('[mrenclaveSchema]', () => {
           '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
         foo: 'bar',
       }),
-      'utf8'
+      'utf8',
     );
     await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
-      new ValidationError('Unknown key "foo" in mrenclave')
+      new ValidationError('Unknown key "foo" in mrenclave'),
     );
   });
   test('throw when a key is missing in obj', async () => {
@@ -1267,7 +1281,7 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('framework is a required field')
+      new ValidationError('framework is a required field'),
     );
   });
   test('throw when a key is missing in JSON string', async () => {
@@ -1279,7 +1293,7 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     });
     await expect(mrenclaveSchema().validate(str)).rejects.toThrow(
-      new ValidationError('version is a required field')
+      new ValidationError('version is a required field'),
     );
   });
   test('throw when a key is missing in decoded bytes', async () => {
@@ -1291,10 +1305,10 @@ describe('[mrenclaveSchema]', () => {
         fingerprint:
           '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
       }),
-      'utf8'
+      'utf8',
     );
     await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
-      new ValidationError('entrypoint is a required field')
+      new ValidationError('entrypoint is a required field'),
     );
   });
   test('throw when framework is not a valid TEE framework', async () => {
@@ -1307,7 +1321,7 @@ describe('[mrenclaveSchema]', () => {
         '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('framework is not a valid TEE framework')
+      new ValidationError('framework is not a valid TEE framework'),
     );
   });
 });
@@ -1320,20 +1334,20 @@ describe('[ensLabelSchema]', () => {
   });
   test('throw with uppercase', async () => {
     await expect(ensLabelSchema().validate('A')).rejects.toThrow(
-      'A is not a valid ENS label (label cannot contain uppercase characters)'
+      'A is not a valid ENS label (label cannot contain uppercase characters)',
     );
   });
   test('throw with unsupported characters', async () => {
     await expect(ensLabelSchema().validate('&')).rejects.toThrow(
-      '& is not a valid ENS label (label cannot contain unsupported characters)'
+      '& is not a valid ENS label (label cannot contain unsupported characters)',
     );
     await expect(ensLabelSchema().validate('@')).rejects.toThrow(
-      '@ is not a valid ENS label (label cannot contain unsupported characters)'
+      '@ is not a valid ENS label (label cannot contain unsupported characters)',
     );
   });
   test('throw with dot', async () => {
     await expect(ensLabelSchema().validate('foo.bar')).rejects.toThrow(
-      'foo.bar is not a valid ENS label (label cannot have `.`)'
+      'foo.bar is not a valid ENS label (label cannot have `.`)',
     );
   });
 });
@@ -1341,28 +1355,28 @@ describe('[ensLabelSchema]', () => {
 describe('[ensDomainSchema]', () => {
   test('valid', async () => {
     await expect(ensDomainSchema().validate('foo.a-b.bar.eth')).resolves.toBe(
-      'foo.a-b.bar.eth'
+      'foo.a-b.bar.eth',
     );
     await expect(
-      ensDomainSchema().validate('foo.🦄🦄🦄.bar.eth')
+      ensDomainSchema().validate('foo.🦄🦄🦄.bar.eth'),
     ).resolves.toBe('foo.🦄🦄🦄.bar.eth');
   });
   test('throw with uppercase', async () => {
     await expect(ensDomainSchema().validate('foo.Abc.bar.eth')).rejects.toThrow(
-      'foo.Abc.bar.eth is not a valid ENS domain (domain cannot contain uppercase characters)'
+      'foo.Abc.bar.eth is not a valid ENS domain (domain cannot contain uppercase characters)',
     );
   });
   test('throw with unsupported characters', async () => {
     await expect(ensDomainSchema().validate('foo.a&b.bar.eth')).rejects.toThrow(
-      'foo.a&b.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)'
+      'foo.a&b.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
     );
     await expect(ensDomainSchema().validate('foo.a@a.bar.eth')).rejects.toThrow(
-      'foo.a@a.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)'
+      'foo.a@a.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
     );
   });
   test('throw with empty labels', async () => {
     await expect(ensDomainSchema().validate('foo..bar.eth')).rejects.toThrow(
-      'foo..bar.eth is not a valid ENS domain (domain cannot have empty labels)'
+      'foo..bar.eth is not a valid ENS domain (domain cannot have empty labels)',
     );
   });
 });
@@ -1374,12 +1388,12 @@ describe('[textRecordKeySchema]', () => {
   });
   test('throw with empty string', async () => {
     await expect(textRecordKeySchema().validate('')).rejects.toThrow(
-      'this is a required field'
+      'this is a required field',
     );
   });
   test('throw with string coercible value', async () => {
     await expect(textRecordKeySchema().validate(1)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `1`.'
+      'this must be a `string` type, but the final value was: `1`.',
     );
   });
 });
@@ -1399,12 +1413,12 @@ describe('[textRecordValueSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
-      'this cannot be null'
+      'this cannot be null',
     );
   });
   test('throw with string coercible value', async () => {
     await expect(textRecordValueSchema().validate(1)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `1`.'
+      'this must be a `string` type, but the final value was: `1`.',
     );
   });
 });
@@ -1412,13 +1426,13 @@ describe('[textRecordValueSchema]', () => {
 describe('[workerpoolApiUrlSchema]', () => {
   test('allow IP with port', async () => {
     const res = await workerpoolApiUrlSchema().validate(
-      'http://192.168.0.1:8080'
+      'http://192.168.0.1:8080',
     );
     expect(res).toBe('http://192.168.0.1:8080');
   });
   test('allow url', async () => {
     const res = await workerpoolApiUrlSchema().validate(
-      'https://my-workerpool.com'
+      'https://my-workerpool.com',
     );
     expect(res).toBe('https://my-workerpool.com');
   });
@@ -1432,7 +1446,7 @@ describe('[workerpoolApiUrlSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(workerpoolApiUrlSchema().validate(null)).rejects.toThrow(
-      'this cannot be null'
+      'this cannot be null',
     );
   });
 });
@@ -1471,27 +1485,27 @@ describe('[smsUrlOrMapSchema]', () => {
   });
   test('throw with empty string', async () => {
     await expect(smsUrlOrMapSchema().validate('')).rejects.toThrow(
-      'this "" is not a valid URL'
+      'this "" is not a valid URL',
     );
   });
   test('throw with null', async () => {
     await expect(smsUrlOrMapSchema().validate(null)).rejects.toThrow(
-      'this cannot be null'
+      'this cannot be null',
     );
   });
   test('throw with invalid url', async () => {
     await expect(smsUrlOrMapSchema().validate('foo')).rejects.toThrow(
-      'this "foo" is not a valid URL'
+      'this "foo" is not a valid URL',
     );
   });
   test('throw with unknown TEE framework key', async () => {
     await expect(
-      smsUrlOrMapSchema().validate({ foo: 'https://my-sms.com' })
+      smsUrlOrMapSchema().validate({ foo: 'https://my-sms.com' }),
     ).rejects.toThrow('this field has unspecified keys: foo');
   });
   test('throw with invalid url on a TEE framework key', async () => {
     await expect(
-      smsUrlOrMapSchema().validate({ scone: 'foo' })
+      smsUrlOrMapSchema().validate({ scone: 'foo' }),
     ).rejects.toThrow('scone "foo" is not a valid URL');
   });
 });
@@ -1502,9 +1516,9 @@ describe('[teeFrameworkSchema]', () => {
       Object.values(TEE_FRAMEWORKS).map(async (name) => {
         await expect(teeFrameworkSchema().validate(name)).resolves.toBe(name);
         await expect(
-          teeFrameworkSchema().validate(name.toUpperCase())
+          teeFrameworkSchema().validate(name.toUpperCase()),
         ).resolves.toBe(name);
-      })
+      }),
     );
   });
   test('allow undefined', async () => {
@@ -1512,12 +1526,12 @@ describe('[teeFrameworkSchema]', () => {
   });
   test('throw with unknown TEE framework', async () => {
     await expect(teeFrameworkSchema().validate('foo')).rejects.toThrow(
-      'this is not a valid TEE framework'
+      'this is not a valid TEE framework',
     );
   });
   test('throw with empty string', async () => {
     await expect(teeFrameworkSchema().validate('')).rejects.toThrow(
-      'this is not a valid TEE framework'
+      'this is not a valid TEE framework',
     );
   });
 });

@@ -57,7 +57,7 @@ showTask
     try {
       const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
-        Object.assign(walletOptions, !opts.download && { isSigner: false })
+        Object.assign(walletOptions, !opts.download && { isSigner: false }),
       );
       const chain = await loadChain(opts.chain, { spinner });
       if (opts.download) {
@@ -77,7 +77,7 @@ showTask
             next: ({ task }) => {
               taskState = task;
               spinner.start(
-                `${info.showing(objName)}\nTask status ${task.statusName}`
+                `${info.showing(objName)}\nTask status ${task.statusName}`,
               );
             },
             error: (e) => reject(e),
@@ -101,7 +101,7 @@ showTask
             resultFileName.length > 4 &&
               resultFileName.substr(resultFileName.length - 4) === '.zip'
               ? resultFileName
-              : `${resultFileName}.zip`
+              : `${resultFileName}.zip`,
           );
 
           spinner.start(info.downloading());
@@ -114,21 +114,21 @@ showTask
             const exists = await pathExists(beneficiarySecretsFolderPath);
             if (!exists) {
               throw Error(
-                'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?'
+                'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
               );
             }
             let beneficiaryKeyPath;
             if (opts.beneficiaryKeyFile) {
               beneficiaryKeyPath = join(
                 beneficiarySecretsFolderPath,
-                opts.beneficiaryKeyFile
+                opts.beneficiaryKeyFile,
               );
             } else {
               const [address] = await keystore.accounts();
               spinner.info(`Using beneficiary key for wallet ${address}`);
               beneficiaryKeyPath = join(
                 beneficiarySecretsFolderPath,
-                privateKeyName(address)
+                privateKeyName(address),
               );
             }
             let beneficiaryKey;
@@ -137,12 +137,12 @@ showTask
             } catch (error) {
               debug(error);
               throw Error(
-                `Failed to load beneficiary key from "${beneficiaryKeyPath}"`
+                `Failed to load beneficiary key from "${beneficiaryKeyPath}"`,
               );
             }
             const result = await decryptResult(
               await res.arrayBuffer(),
-              beneficiaryKey
+              beneficiaryKey,
             );
             await writeFile(resultPath, result);
           } else {
@@ -153,7 +153,7 @@ showTask
           spinner.info(
             `Task status is not COMPLETED, option ${
               option.download()[0]
-            } will be ignored`
+            } will be ignored`,
           );
         }
       }
@@ -174,7 +174,7 @@ showTask
       }
       if (claimable) {
         spinner.info(
-          'Consensus deadline reached before consensus. You can claim the task to get a full refund using "iexec task claim"'
+          'Consensus deadline reached before consensus. You can claim the task to get a full refund using "iexec task claim"',
         );
       }
     } catch (error) {
@@ -206,7 +206,7 @@ debugTask
       const onchainData = await show(chain.contracts, taskid);
       const offchainData = await fetchTaskOffchainInfo(
         chain.contracts,
-        taskid
+        taskid,
       ).catch((e) => {
         spinner.warn(`Failed to fetch off-chain data: ${e.message}`);
       });

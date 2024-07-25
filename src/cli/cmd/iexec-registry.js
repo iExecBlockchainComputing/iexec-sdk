@@ -46,7 +46,7 @@ const addressListSchema = () =>
       Object.entries({ ...value }).map(async ([chainId, address]) => {
         await chainIdSchema().validate(chainId);
         await addressSchema().validate(address);
-      })
+      }),
     );
     return true;
   });
@@ -160,7 +160,7 @@ validate.description(desc.validateResource()).action(async (objName, opts) => {
   try {
     if (!objectNames.includes(objName)) {
       throw Error(
-        `Unknown object "${objName}". Must be one of [${objectNames}]`
+        `Unknown object "${objName}". Must be one of [${objectNames}]`,
       );
     }
     const objectName = objectMap[objName].name;
@@ -185,7 +185,7 @@ validate.description(desc.validateResource()).action(async (objName, opts) => {
       debug('logoSize', logoSize);
       if (!(logoSize.width === LOGO_SIDE && logoSize.height === LOGO_SIDE)) {
         throw Error(
-          `${iexecConf.logo} dimensions should be ${LOGO_SIDE}px by ${LOGO_SIDE}px, NOT ${logoSize.width} by ${logoSize.height}`
+          `${iexecConf.logo} dimensions should be ${LOGO_SIDE}px by ${LOGO_SIDE}px, NOT ${logoSize.width} by ${logoSize.height}`,
         );
       }
       const logoExt = extname(iexecConf.logo).substr(1);
@@ -206,7 +206,7 @@ validate.description(desc.validateResource()).action(async (objName, opts) => {
       const deployedObj = await loadDeployedConf();
       if (!(objectName in deployedObj)) {
         throw Error(
-          `Missing ${objectName} field. You should run "iexec ${objName} deploy"`
+          `Missing ${objectName} field. You should run "iexec ${objName} deploy"`,
         );
       }
       validated.push(DEPLOYED_FILE_NAME);
@@ -218,7 +218,7 @@ validate.description(desc.validateResource()).action(async (objName, opts) => {
         `${objName} description is valid. You can now submit it to the ${objName} registry: ${objectMap[objName].registry}`,
         {
           raw: { validated },
-        }
+        },
       );
     } else {
       spinner.fail(`Invalid files: ${pretty(failed)}`, {

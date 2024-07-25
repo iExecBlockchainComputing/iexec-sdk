@@ -8,7 +8,7 @@ const debug = Debug('iexec:voucher:info');
 
 export const getVoucherInfo = async (
   graphQLClient = throwIfMissing(),
-  voucherId
+  voucherId,
 ) => {
   const lowercaseVoucherId = voucherId.toLowerCase();
 
@@ -39,18 +39,18 @@ export const getVoucherInfo = async (
 
     const sponsoredApps = mapIds(
       voucherInfo?.voucherType?.eligibleAssets.filter(
-        ({ type }) => type === 'App'
-      )
+        ({ type }) => type === 'App',
+      ),
     );
     const sponsoredDatasets = mapIds(
       voucherInfo?.voucherType?.eligibleAssets.filter(
-        ({ type }) => type === 'Dataset'
-      )
+        ({ type }) => type === 'Dataset',
+      ),
     );
     const sponsoredWorkerpools = mapIds(
       voucherInfo?.voucherType?.eligibleAssets.filter(
-        ({ type }) => type === 'Workerpool'
-      )
+        ({ type }) => type === 'Workerpool',
+      ),
     );
     const authorizedAccounts = mapIds(voucherInfo?.authorizedAccounts);
 

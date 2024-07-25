@@ -28,7 +28,7 @@ const cacheSecretExists = ({ smsURL, kindOfSecret, secretId }) => {
 export const checkWeb3SecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
-  resourceAddress = throwIfMissing()
+  resourceAddress = throwIfMissing(),
 ) => {
   try {
     const vResourceAddress = await addressSchema({
@@ -56,7 +56,7 @@ export const checkWeb3SecretExists = async (
       return false;
     }
     throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
     debug('checkWeb3SecretExists()', error);
@@ -69,7 +69,7 @@ export const checkWeb2SecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   ownerAddress = throwIfMissing(),
-  secretName = throwIfMissing()
+  secretName = throwIfMissing(),
 ) => {
   try {
     const vOwnerAddress = await addressSchema({
@@ -98,7 +98,7 @@ export const checkWeb2SecretExists = async (
       return false;
     }
     throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
     debug('checkWeb2SecretExists()', error);
@@ -110,7 +110,7 @@ export const checkRequesterSecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
-  secretName = throwIfMissing()
+  secretName = throwIfMissing(),
 ) => {
   try {
     const vRequesterAddress = await addressSchema({
@@ -135,7 +135,7 @@ export const checkRequesterSecretExists = async (
       return false;
     }
     throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
     debug('checkRequesterSecretExists()', error);
@@ -147,7 +147,7 @@ export const checkAppSecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   appAddress = throwIfMissing(),
-  secretIndex = 1
+  secretIndex = 1,
 ) => {
   try {
     const vAppAddress = await addressSchema({
@@ -173,7 +173,7 @@ export const checkAppSecretExists = async (
       return false;
     }
     throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
     debug('checkRequesterSecretExists()', error);

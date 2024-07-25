@@ -68,7 +68,7 @@ export const checkRequestRequirements = async (
     contracts = throwIfMissing(),
     smsURL = throwIfMissing(),
   } = throwIfMissing(),
-  requestorder = throwIfMissing()
+  requestorder = throwIfMissing(),
 ) => {
   const vRequestorder = await requestorderSchema().validate(requestorder);
   const { tag, dataset, callback, params, requester, beneficiary } =
@@ -87,11 +87,11 @@ export const checkRequestRequirements = async (
       contracts,
       smsURL,
       beneficiary,
-      reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY
+      reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
     );
     if (!isEncryptionKeySet) {
       throw Error(
-        'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.'
+        'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
       );
     }
   }
@@ -106,14 +106,14 @@ export const checkRequestRequirements = async (
       smsURL,
       requester,
       getStorageTokenKeyName(
-        paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]
-      )
+        paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER],
+      ),
     );
     if (!isStorageTokenSet) {
       throw Error(
         `Requester storage token is not set for selected provider "${
           paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]
-        }". Result archive upload will fail.`
+        }". Result archive upload will fail.`,
       );
     }
   }
@@ -123,11 +123,11 @@ export const checkRequestRequirements = async (
     const isDatasetSecretSet = await checkWeb3SecretExists(
       contracts,
       smsURL,
-      dataset
+      dataset,
     );
     if (!isDatasetSecretSet) {
       throw Error(
-        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`
+        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
       );
     }
   }
@@ -140,15 +140,15 @@ export const checkRequestRequirements = async (
             contracts,
             smsURL,
             requester,
-            secretName
+            secretName,
           );
           if (!isSecretSet) {
             throw Error(
-              `Requester secret "${secretName}" is not set for requester ${requester} in the SMS. Requester secret provisioning will fail.`
+              `Requester secret "${secretName}" is not set for requester ${requester} in the SMS. Requester secret provisioning will fail.`,
             );
           }
-        }
-      )
+        },
+      ),
     );
   }
 };
@@ -159,24 +159,24 @@ export const checkDatasetRequirements = async (
     smsURL = throwIfMissing(),
   } = throwIfMissing(),
   datasetorder = throwIfMissing(),
-  { tagOverride } = {}
+  { tagOverride } = {},
 ) => {
   const vDatasetorder = await datasetorderSchema().validate(datasetorder);
   const { tag, dataset } = vDatasetorder;
   const isTee = checkActiveBitInTag(
     tagOverride ? await tagSchema().validate(tagOverride) : tag,
-    TAG_MAP.tee
+    TAG_MAP.tee,
   );
   // check tee dataset encryption key
   if (dataset && dataset !== NULL_ADDRESS && isTee) {
     const isDatasetSecretSet = await checkWeb3SecretExists(
       contracts,
       smsURL,
-      dataset
+      dataset,
     );
     if (!isDatasetSecretSet) {
       throw Error(
-        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`
+        `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
       );
     }
   }
@@ -185,15 +185,15 @@ export const checkDatasetRequirements = async (
 export const checkAppRequirements = async (
   { contracts = throwIfMissing() } = throwIfMissing(),
   apporder = throwIfMissing(),
-  { tagOverride } = {}
+  { tagOverride } = {},
 ) => {
   const vApporder = await apporderSchema().validate(apporder);
   const { tag, app } = vApporder;
   const tagTeeFramework = await resolveTeeFrameworkFromTag(
-    tagOverride ? await tagSchema().validate(tagOverride) : tag
+    tagOverride ? await tagSchema().validate(tagOverride) : tag,
   );
   const appTeeFramework = await showApp(contracts, app).then((res) =>
-    resolveTeeFrameworkFromApp(res.app, { strict: false })
+    resolveTeeFrameworkFromApp(res.app, { strict: false }),
   );
   if (appTeeFramework !== tagTeeFramework) {
     throw Error('Tag mismatch the TEE framework specified by app');

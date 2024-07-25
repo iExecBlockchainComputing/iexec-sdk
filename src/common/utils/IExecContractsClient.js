@@ -35,7 +35,7 @@ const getHubAddress = (chainId, flavour) => {
       return enterpriseHubMap[chainId];
     }
     throw Error(
-      `Missing iExec enterprise contract default address for chain ${chainId}`
+      `Missing iExec enterprise contract default address for chain ${chainId}`,
     );
   } else {
     if (
@@ -149,7 +149,7 @@ const createClient = ({
       const registryAddress = await fetchRegistryAddress(objName);
       return getContract(
         contractsDescMap[objName].registryName,
-        registryAddress
+        registryAddress,
       );
     } catch (error) {
       debug('fetchRegistryContract()', error);
@@ -244,7 +244,7 @@ class IExecContractsClient {
       const connectedSigner = ethSigner.connect(this.provider);
       Object.assign(
         this,
-        new IExecContractsClient({ ...this._args, signer: connectedSigner })
+        new IExecContractsClient({ ...this._args, signer: connectedSigner }),
       );
     };
 

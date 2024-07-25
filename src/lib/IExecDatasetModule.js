@@ -33,34 +33,34 @@ export default class IExecDatasetModule extends IExecModule {
       showUserDataset(
         await this.config.resolveContractsClient(),
         index,
-        userAddress
+        userAddress,
       );
     this.countUserDatasets = async (address) =>
       countUserDatasets(await this.config.resolveContractsClient(), address);
     this.checkDatasetSecretExists = async (
       datasetAddress,
-      { teeFramework } = {}
+      { teeFramework } = {},
     ) =>
       checkWeb3SecretExists(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL({ teeFramework }),
-        datasetAddress
+        datasetAddress,
       );
     this.pushDatasetSecret = async (
       datasetAddress,
       datasetSecret,
-      { teeFramework } = {}
+      { teeFramework } = {},
     ) =>
       pushWeb3Secret(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL({ teeFramework }),
         datasetAddress,
-        datasetSecret
+        datasetSecret,
       );
     this.predictDatasetAddress = async (dataset) =>
       predictDatasetAddress(
         await this.config.resolveContractsClient(),
-        dataset
+        dataset,
       );
     this.checkDeployedDataset = async (address) =>
       checkDeployedDataset(await this.config.resolveContractsClient(), address);

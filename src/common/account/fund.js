@@ -18,7 +18,7 @@ const debug = Debug('iexec:account:fund');
 
 export const deposit = async (
   contracts = throwIfMissing(),
-  amount = throwIfMissing()
+  amount = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -33,7 +33,7 @@ export const deposit = async (
     let txHash;
     const { nRLC } = await checkBalances(
       contracts,
-      await getAddress(contracts)
+      await getAddress(contracts),
     );
     if (nRLC.lt(new BN(vAmount)))
       throw Error('Deposit amount exceed wallet balance');
@@ -45,8 +45,8 @@ export const deposit = async (
           contracts.hubAddress,
           vAmount,
           NULL_BYTES,
-          contracts.txOptions
-        )
+          contracts.txOptions,
+        ),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       if (!checkEventFromLogs('Approval', txReceipt.logs))
@@ -60,7 +60,7 @@ export const deposit = async (
         iexecContract.deposit({
           value: weiAmount,
           ...contracts.txOptions,
-        })
+        }),
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       if (!checkEventFromLogs('Transfer', txReceipt.logs))
@@ -76,7 +76,7 @@ export const deposit = async (
 
 export const withdraw = async (
   contracts = throwIfMissing(),
-  amount = throwIfMissing()
+  amount = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -91,12 +91,12 @@ export const withdraw = async (
     const iexecContract = contracts.getIExecContract();
     const { stake } = await checkBalance(
       contracts,
-      await getAddress(contracts)
+      await getAddress(contracts),
     );
     if (stake.lt(new BN(vAmount)))
       throw Error('Withdraw amount exceed account balance');
     const tx = await wrapSend(
-      iexecContract.withdraw(vAmount, contracts.txOptions)
+      iexecContract.withdraw(vAmount, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEventFromLogs('Transfer', txReceipt.logs))

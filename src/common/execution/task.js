@@ -38,7 +38,7 @@ const decodeTaskResult = (results) => {
 
 export const show = async (
   contracts = throwIfMissing(),
-  taskid = throwIfMissing()
+  taskid = throwIfMissing(),
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
@@ -73,7 +73,7 @@ const obsTaskMessages = {
 export const obsTask = (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
-  { dealid } = {}
+  { dealid } = {},
 ) =>
   new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
@@ -93,7 +93,7 @@ export const obsTask = (
           getTimeoutRatio(contracts),
         ]);
         const finalTime = deal.startTime.add(
-          timeoutRatio.mul(workClockTimeRef)
+          timeoutRatio.mul(workClockTimeRef),
         );
         const now = Math.floor(Date.now() / 1000);
         const deadlineReached = now >= finalTime.toNumber();
@@ -118,7 +118,7 @@ export const obsTask = (
       try {
         const vTaskid = await bytes32Schema().validate(taskid);
         const newTask = await show(contracts, vTaskid).catch(
-          handleTaskNotFound
+          handleTaskNotFound,
         );
         if (!task || newTask.status !== task.status || newTask.taskTimedOut) {
           task = newTask;
@@ -173,7 +173,7 @@ export const obsTask = (
 
 export const claim = async (
   contracts = throwIfMissing(),
-  taskid = throwIfMissing()
+  taskid = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -185,21 +185,21 @@ export const claim = async (
       throw Error(
         `Cannot claim a task having status ${
           TASK_STATUS_MAP[taskStatus.toString()]
-        }`
+        }`,
       );
     }
 
     if (!task.taskTimedOut) {
       throw Error(
         `Cannot claim a task before reaching the consensus deadline date: ${new Date(
-          1000 * parseInt(task.finalDeadline, 10)
-        )}`
+          1000 * parseInt(task.finalDeadline, 10),
+        )}`,
       );
     }
 
     const iexecContract = contracts.getIExecContract();
     const claimTx = await wrapSend(
-      iexecContract.claim(taskid, contracts.txOptions)
+      iexecContract.claim(taskid, contracts.txOptions),
     );
 
     const claimTxReceipt = await wrapWait(claimTx.wait(contracts.confirms));

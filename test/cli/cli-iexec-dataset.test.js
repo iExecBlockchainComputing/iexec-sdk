@@ -62,7 +62,7 @@ describe('iexec dataset', () => {
 
     test('--encrypted --original-dataset-dir ./out/originals  --encrypted-dataset-dir ./out/encrypted --dataset-keystoredir ./out/dataset-secrets', async () => {
       const raw = await execAsync(
-        `${iexecPath} dataset init --encrypted  --original-dataset-dir ./out/originals  --encrypted-dataset-dir ./out/encrypted --dataset-keystoredir ./out/dataset-secrets --raw`
+        `${iexecPath} dataset init --encrypted  --original-dataset-dir ./out/originals  --encrypted-dataset-dir ./out/encrypted --dataset-keystoredir ./out/dataset-secrets --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -92,7 +92,7 @@ describe('iexec dataset', () => {
       await execAsync(`${iexecPath} dataset init`);
       await setDatasetUniqueName();
       const { address } = await execAsync(
-        `${iexecPath} dataset deploy --raw`
+        `${iexecPath} dataset deploy --raw`,
       ).then(JSON.parse);
       const raw = await execAsync(`${iexecPath} dataset show --raw`);
       const res = JSON.parse(raw);
@@ -113,7 +113,7 @@ describe('iexec dataset', () => {
 
     test('iexec dataset show [datasetAddress]', async () => {
       const raw = await execAsync(
-        `${iexecPath} dataset show ${userFirstDeployedDatasetAddress} --raw`
+        `${iexecPath} dataset show ${userFirstDeployedDatasetAddress} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -134,7 +134,7 @@ describe('iexec dataset', () => {
 
     test('iexec dataset count --user [address]', async () => {
       const raw = await execAsync(
-        `${iexecPath} dataset count --user ${getRandomAddress()} --raw`
+        `${iexecPath} dataset count --user ${getRandomAddress()} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -146,14 +146,14 @@ describe('iexec dataset', () => {
   describe('encrypt', () => {
     test('iexec dataset encrypt', async () => {
       const raw = await execAsync(
-        `${iexecPath} dataset encrypt --original-dataset-dir ../../inputs/originalDataset --force --raw`
+        `${iexecPath} dataset encrypt --original-dataset-dir ../../inputs/originalDataset --force --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.encryptedDatasetFolderPath).toBeDefined();
       expect(res.secretPath).toBeDefined();
       expect(
-        res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted')
+        res.encryptedDatasetFolderPath.indexOf('/datasets/encrypted'),
       ).not.toBe(-1);
       expect(res.secretPath.indexOf('/.secrets/datasets')).not.toBe(-1);
       expect(res.encryptedFiles).toBeDefined();
@@ -170,28 +170,28 @@ describe('iexec dataset', () => {
       expect(await checkExists('.secrets/datasets/dataset.txt.key')).toBe(true);
       expect(await checkExists('.secrets/datasets/dataset.zip.key')).toBe(true);
       expect(await checkExists('datasets/encrypted/dataset.txt.enc')).toBe(
-        true
+        true,
       );
       expect(await checkExists('datasets/encrypted/dataset.zip.enc')).toBe(
-        true
+        true,
       );
 
       // decrypt with openssl
       const decryptedFilePath = 'out/decrypted';
       await expect(
         execAsync(
-          `tail -c+17 "${res.encryptedFiles[0].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[1].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[0].encrypted}" | xxd -p -c 16)`
-        )
+          `tail -c+17 "${res.encryptedFiles[0].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[1].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[0].encrypted}" | xxd -p -c 16)`,
+        ),
       ).rejects.toBeInstanceOf(Error);
       await expect(
         execAsync(
-          `tail -c+17 "${res.encryptedFiles[0].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[0].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[0].encrypted}" | xxd -p -c 16)`
-        )
+          `tail -c+17 "${res.encryptedFiles[0].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[0].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[0].encrypted}" | xxd -p -c 16)`,
+        ),
       ).resolves.toBeDefined();
       await expect(
         execAsync(
-          `tail -c+17 "${res.encryptedFiles[1].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[1].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[1].encrypted}" | xxd -p -c 16)`
-        )
+          `tail -c+17 "${res.encryptedFiles[1].encrypted}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(cat "${res.encryptedFiles[1].key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${res.encryptedFiles[1].encrypted}" | xxd -p -c 16)`,
+        ),
       ).resolves.toBeDefined();
     });
   });
@@ -203,52 +203,52 @@ describe('iexec dataset', () => {
       const randomAddress = getRandomAddress();
       const resPushNotAllowed = JSON.parse(
         await execAsync(
-          `${iexecPath} dataset push-secret ${randomAddress} --raw`
-        ).catch((e) => e.message)
+          `${iexecPath} dataset push-secret ${randomAddress} --raw`,
+        ).catch((e) => e.message),
       );
       expect(resPushNotAllowed.ok).toBe(false);
       expect(resPushNotAllowed.error.message).toBe(
-        `Wallet ${userWallet.address} is not allowed to set secret for ${randomAddress}`
+        `Wallet ${userWallet.address} is not allowed to set secret for ${randomAddress}`,
       );
       await execAsync(`${iexecPath} dataset init`);
       await setDatasetUniqueName();
       const { address } = JSON.parse(
-        await execAsync(`${iexecPath} dataset deploy --raw`)
+        await execAsync(`${iexecPath} dataset deploy --raw`),
       );
       const resPush = JSON.parse(
-        await execAsync(`${iexecPath} dataset push-secret --raw`)
+        await execAsync(`${iexecPath} dataset push-secret --raw`),
       );
       expect(resPush.ok).toBe(true);
       const resAlreadyExists = JSON.parse(
         await execAsync(`${iexecPath} dataset push-secret --raw`).catch(
-          (e) => e.message
-        )
+          (e) => e.message,
+        ),
       );
       expect(resAlreadyExists.ok).toBe(false);
       expect(resAlreadyExists.error.message).toBe(
-        `Secret already exists for ${address} and can't be updated`
+        `Secret already exists for ${address} and can't be updated`,
       );
       // new dataset to push secret on another TEE framework
       await execAsync(`${iexecPath} dataset init`);
       await setDatasetUniqueName();
       const { address: address2 } = JSON.parse(
-        await execAsync(`${iexecPath} dataset deploy --raw`)
+        await execAsync(`${iexecPath} dataset deploy --raw`),
       );
       await expect(
         execAsync(
-          `${iexecPath} dataset push-secret ${address2} --tee-framework foo --raw`
-        )
+          `${iexecPath} dataset push-secret ${address2} --tee-framework foo --raw`,
+        ),
       ).rejects.toThrow();
       const resPush2 = JSON.parse(
         await execAsync(
-          `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`
-        )
+          `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`,
+        ),
       );
       expect(resPush2.ok).toBe(true);
       const resAlreadyExists2 = JSON.parse(
         await execAsync(
-          `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`
-        ).catch((e) => e.message)
+          `${iexecPath} dataset push-secret ${address2} --tee-framework gramine --raw`,
+        ).catch((e) => e.message),
       );
       expect(resAlreadyExists2.ok).toBe(false);
     });
@@ -260,19 +260,19 @@ describe('iexec dataset', () => {
       await setDatasetUniqueName();
       await execAsync(`${iexecPath} dataset deploy --raw`);
       const resMyDataset = JSON.parse(
-        await execAsync(`${iexecPath} dataset check-secret --raw`)
+        await execAsync(`${iexecPath} dataset check-secret --raw`),
       );
       expect(resMyDataset.ok).toBe(true);
       expect(resMyDataset.isSecretSet).toBe(false);
       await execAsync(`${iexecPath} dataset push-secret --raw`);
       const rawAlreadyExists = await execAsync(
-        `${iexecPath} dataset check-secret --raw`
+        `${iexecPath} dataset check-secret --raw`,
       );
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(true);
       expect(resAlreadyExists.isSecretSet).toBe(true);
       const rawRandomDataset = await execAsync(
-        `${iexecPath} dataset check-secret ${getRandomAddress()} --raw`
+        `${iexecPath} dataset check-secret ${getRandomAddress()} --raw`,
       );
       const resRandomDataset = JSON.parse(rawRandomDataset);
       expect(resRandomDataset.ok).toBe(true);
@@ -284,30 +284,30 @@ describe('iexec dataset', () => {
       await setDatasetUniqueName();
       await execAsync(`${iexecPath} dataset deploy --raw`);
       const resMyDataset2 = JSON.parse(
-        await execAsync(`${iexecPath} dataset check-secret --raw`)
+        await execAsync(`${iexecPath} dataset check-secret --raw`),
       );
       expect(resMyDataset2.ok).toBe(true);
       expect(resMyDataset2.isSecretSet).toBe(false);
 
       await execAsync(
-        `${iexecPath} dataset push-secret --tee-framework gramine --raw`
+        `${iexecPath} dataset push-secret --tee-framework gramine --raw`,
       );
       const rawWrongTee = await execAsync(
-        `${iexecPath} dataset check-secret --raw`
+        `${iexecPath} dataset check-secret --raw`,
       );
       const resWrongTee = JSON.parse(rawWrongTee);
       expect(resWrongTee.ok).toBe(true);
       expect(resWrongTee.isSecretSet).toBe(false);
 
       const rawGoodTee = await execAsync(
-        `${iexecPath} dataset check-secret --tee-framework gramine --raw`
+        `${iexecPath} dataset check-secret --tee-framework gramine --raw`,
       );
       const resGoodTee = JSON.parse(rawGoodTee);
       expect(resGoodTee.ok).toBe(true);
       expect(resGoodTee.isSecretSet).toBe(true);
 
       const rawRandomDataset2 = await execAsync(
-        `${iexecPath} dataset check-secret ${getRandomAddress()} --raw`
+        `${iexecPath} dataset check-secret ${getRandomAddress()} --raw`,
       );
       const resRandomDataset2 = JSON.parse(rawRandomDataset2);
       expect(resRandomDataset2.ok).toBe(true);
@@ -315,8 +315,8 @@ describe('iexec dataset', () => {
 
       await expect(
         execAsync(
-          `${iexecPath} dataset check-secret ${getRandomAddress()} --tee-framework foo --raw`
-        )
+          `${iexecPath} dataset check-secret ${getRandomAddress()} --tee-framework foo --raw`,
+        ),
       ).rejects.toThrow();
     });
   });
@@ -329,11 +329,11 @@ describe('iexec dataset', () => {
     test('transfers the dataset ownership to', async () => {
       await setDatasetUniqueName();
       const { address } = await execAsync(
-        `${iexecPath} dataset deploy --raw`
+        `${iexecPath} dataset deploy --raw`,
       ).then(JSON.parse);
       const receiverAddress = getRandomAddress();
       const res = await execAsync(
-        `${iexecPath} dataset transfer ${address} --to ${receiverAddress} --force --raw`
+        `${iexecPath} dataset transfer ${address} --to ${receiverAddress} --force --raw`,
       ).then(JSON.parse);
       expect(res.ok).toBe(true);
       expect(res.address).toBe(address);
@@ -351,8 +351,8 @@ describe('iexec dataset', () => {
       expect(res.orderHash).toBeDefined();
       const orderShowRes = JSON.parse(
         await execAsync(
-          `${iexecPath} order show --dataset ${res.orderHash} --raw`
-        )
+          `${iexecPath} order show --dataset ${res.orderHash} --raw`,
+        ),
       );
       expect(orderShowRes.datasetorder.order).toEqual({
         dataset: address,
@@ -371,20 +371,20 @@ describe('iexec dataset', () => {
       const appAddress = getRandomAddress();
       await expect(
         execAsync(
-          `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --tag tee,scone --app-restrict ${appAddress} --force`
-        )
+          `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --tag tee,scone --app-restrict ${appAddress} --force`,
+        ),
       ).rejects.toThrow(
-        `Dataset encryption key is not set for dataset ${userFirstDeployedDatasetAddress} in the SMS. Dataset decryption will fail.`
+        `Dataset encryption key is not set for dataset ${userFirstDeployedDatasetAddress} in the SMS. Dataset decryption will fail.`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --app-restrict ${appAddress} --force`
+        `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --app-restrict ${appAddress} --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.orderHash).toBeDefined();
       const orderShowRes = JSON.parse(
         await execAsync(
-          `${iexecPath} order show --dataset ${res.orderHash} --raw`
-        )
+          `${iexecPath} order show --dataset ${res.orderHash} --raw`,
+        ),
       );
       expect(orderShowRes.datasetorder.order).toEqual({
         dataset: userFirstDeployedDatasetAddress,
@@ -406,36 +406,36 @@ describe('iexec dataset', () => {
       await runIExecCliRaw(`${iexecPath} dataset deploy`);
       await runIExecCliRaw(`${iexecPath} dataset publish --force`);
       const { orderHash: lastOrderHash } = await runIExecCliRaw(
-        `${iexecPath} dataset publish --force`
+        `${iexecPath} dataset publish --force`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} dataset unpublish --force`
+        `${iexecPath} dataset unpublish --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.unpublished).toBe(lastOrderHash);
       await runIExecCliRaw(`${iexecPath} dataset unpublish --force`);
       const resErr = await runIExecCliRaw(
-        `${iexecPath} dataset unpublish --force`
+        `${iexecPath} dataset unpublish --force`,
       );
       expect(resErr.ok).toBe(false);
     });
 
     test('from dataset address --all', async () => {
       const { orderHash } = await runIExecCliRaw(
-        `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --force`
+        `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --force`,
       );
       const { orderHash: lastOrderHash } = await runIExecCliRaw(
-        `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --force`
+        `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --force`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} dataset unpublish ${userFirstDeployedDatasetAddress} --all --force`
+        `${iexecPath} dataset unpublish ${userFirstDeployedDatasetAddress} --all --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.unpublished).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash])
+        expect.arrayContaining([orderHash, lastOrderHash]),
       );
       const resErr = await runIExecCliRaw(
-        `${iexecPath} dataset unpublish --all --force --raw`
+        `${iexecPath} dataset unpublish --all --force --raw`,
       );
       expect(resErr.ok).toBe(false);
     });

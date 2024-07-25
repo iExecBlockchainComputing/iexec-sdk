@@ -18,13 +18,13 @@ export default class IExecAccountModule extends IExecModule {
       approve(
         await this.config.resolveContractsClient(),
         nRlcAmount,
-        spenderAddress
+        spenderAddress,
       );
     this.checkAllowance = async (ownerAddress, spenderAddress) =>
       checkAllowance(
         await this.config.resolveContractsClient(),
         ownerAddress,
-        spenderAddress
+        spenderAddress,
       );
     this.revokeApproval = async (spenderAddress) =>
       approve(await this.config.resolveContractsClient(), 0, spenderAddress);

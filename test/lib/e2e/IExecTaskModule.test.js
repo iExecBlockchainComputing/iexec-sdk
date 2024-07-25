@@ -41,7 +41,7 @@ describe('task', () => {
         {
           constructor: IpfsGatewayCallError,
           message: `IPFS gateway error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        }
+        },
       );
     });
 
@@ -57,7 +57,7 @@ describe('task', () => {
         {
           constructor: IpfsGatewayCallError,
           message: `IPFS gateway error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        }
+        },
       );
     });
 
@@ -66,7 +66,7 @@ describe('task', () => {
         readOnly: true,
       });
       const res = await iexecReadOnly.task.fetchResults(
-        BELLECOUR_COMPLETED_TASK_ID
+        BELLECOUR_COMPLETED_TASK_ID,
       );
       expect(res).toBeInstanceOf(Response);
     });
@@ -96,7 +96,7 @@ describe('task', () => {
           workerpoolorder,
           requestorder,
         },
-        { preflightCheck: false }
+        { preflightCheck: false },
       );
       const { tasks } = await iexec.deal.show(dealid);
       const taskid = tasks[0];
@@ -142,11 +142,11 @@ describe('task', () => {
                 },
                 error: () =>
                   reject(
-                    Error('obsTask unsub before next should not call error')
+                    Error('obsTask unsub before next should not call error'),
                   ),
                 complete: () =>
                   reject(
-                    Error('obsTask unsub before next should not call complete')
+                    Error('obsTask unsub before next should not call complete'),
                   ),
               });
               sleep(10000).then(resolve);
@@ -166,7 +166,7 @@ describe('task', () => {
                     reject(Error('obsTask after init should not call error')),
                   complete: () =>
                     reject(
-                      Error('obsTask after init should not call complete')
+                      Error('obsTask after init should not call complete'),
                     ),
                 });
                 sleep(5000).then(resolve);
@@ -242,7 +242,7 @@ describe('task', () => {
           workerpoolorder,
           requestorder,
         },
-        { preflightCheck: false }
+        { preflightCheck: false },
       );
       const { tasks } = await iexec.deal.show(dealid);
       const taskid = tasks[0];
@@ -287,7 +287,7 @@ describe('task', () => {
                 error: resolve,
                 complete: () =>
                   reject(
-                    Error('obsTask with wrong dealid should not call complete')
+                    Error('obsTask with wrong dealid should not call complete'),
                   ),
               });
             })
@@ -335,11 +335,11 @@ describe('task', () => {
                 },
                 error: () =>
                   reject(
-                    Error('obsTask unsubscribed should nol call complete')
+                    Error('obsTask unsubscribed should nol call complete'),
                   ),
                 complete: () =>
                   reject(
-                    Error('obsTask unsubscribed should nol call complete')
+                    Error('obsTask unsubscribed should nol call complete'),
                   ),
               });
               sleep(2000).then(resolve);
@@ -354,10 +354,10 @@ describe('task', () => {
 
       expect(obsTaskWithDealidComplete).toBeUndefined();
       expect(obsTaskWithWrongDealidError).toEqual(
-        new ObjectNotFoundError('deal', NULL_BYTES32, iexecTestChain.chainId)
+        new ObjectNotFoundError('deal', NULL_BYTES32, iexecTestChain.chainId),
       );
       expect(obsTaskBeforeInitError).toEqual(
-        new ObjectNotFoundError('task', taskid, iexecTestChain.chainId)
+        new ObjectNotFoundError('task', taskid, iexecTestChain.chainId),
       );
       expect(obsTaskAfterInitComplete).toBeUndefined();
 

@@ -36,15 +36,15 @@ describe('iexec storage', () => {
     expect(res.isInitialized).toBe(true);
     expect(res.isUpdated).toBe(false);
     const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage init --raw`
+      `${iexecPath} storage init --raw`,
     ).catch((e) => e.message);
     const resAlreadyExists = JSON.parse(rawAlreadyExists);
     expect(resAlreadyExists.ok).toBe(false);
     expect(resAlreadyExists.error.message).toBe(
-      'default storage is already initialized, use --force-update option to update your storage token'
+      'default storage is already initialized, use --force-update option to update your storage token',
     );
     const rawInitWithTeeFramework = await execAsync(
-      `${iexecPath} storage init --tee-framework gramine --raw`
+      `${iexecPath} storage init --tee-framework gramine --raw`,
     );
     const resInitWithTeeFramework = JSON.parse(rawInitWithTeeFramework);
     expect(resInitWithTeeFramework.ok).toBe(true);
@@ -54,14 +54,14 @@ describe('iexec storage', () => {
 
   test('iexec storage init --force-update', async () => {
     const raw = await execAsync(
-      `${iexecPath} storage init --force-update --raw`
+      `${iexecPath} storage init --force-update --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.isInitialized).toBe(true);
     expect(res.isUpdated).toBe(false);
     const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage init --force-update --raw`
+      `${iexecPath} storage init --force-update --raw`,
     );
     const resAlreadyExists = JSON.parse(rawAlreadyExists);
     expect(resAlreadyExists.ok).toBe(true);
@@ -71,25 +71,25 @@ describe('iexec storage', () => {
 
   test('iexec storage init dropbox', async () => {
     const raw = await execAsync(
-      `${iexecPath} storage init dropbox --token oops --raw`
+      `${iexecPath} storage init dropbox --token oops --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.isInitialized).toBe(true);
     expect(res.isUpdated).toBe(false);
     const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage init dropbox --token oops --raw`
+      `${iexecPath} storage init dropbox --token oops --raw`,
     ).catch((e) => e.message);
     const resAlreadyExists = JSON.parse(rawAlreadyExists);
     expect(resAlreadyExists.ok).toBe(false);
     expect(resAlreadyExists.error.message).toBe(
-      'dropbox storage is already initialized, use --force-update option to update your storage token'
+      'dropbox storage is already initialized, use --force-update option to update your storage token',
     );
   });
 
   test('iexec storage init unsupported', async () => {
     const raw = await execAsync(
-      `${iexecPath} storage init unsupported --token oops --raw`
+      `${iexecPath} storage init unsupported --token oops --raw`,
     ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
@@ -103,13 +103,13 @@ describe('iexec storage', () => {
     expect(res.isInitialized).toBe(false);
     await execAsync(`${iexecPath} storage init --raw`);
     const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage check --raw`
+      `${iexecPath} storage check --raw`,
     );
     const resAlreadyExists = JSON.parse(rawAlreadyExists);
     expect(resAlreadyExists.ok).toBe(true);
     expect(resAlreadyExists.isInitialized).toBe(true);
     const rawWithTeeFramework = await execAsync(
-      `${iexecPath} storage check --tee-framework gramine --raw`
+      `${iexecPath} storage check --tee-framework gramine --raw`,
     );
     const resWithTeeFramework = JSON.parse(rawWithTeeFramework);
     expect(resWithTeeFramework.ok).toBe(true);
@@ -119,14 +119,14 @@ describe('iexec storage', () => {
   test('iexec storage check --user', async () => {
     const randomAddress = getRandomAddress();
     const raw = await execAsync(
-      `${iexecPath} storage check --user ${randomAddress} --raw`
+      `${iexecPath} storage check --user ${randomAddress} --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
     expect(res.isInitialized).toBe(false);
     await execAsync(`${iexecPath} storage init --raw`);
     const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage check --user ${randomAddress} --raw`
+      `${iexecPath} storage check --user ${randomAddress} --raw`,
     );
     const resAlreadyExists = JSON.parse(rawAlreadyExists);
     expect(resAlreadyExists.ok).toBe(true);
@@ -140,7 +140,7 @@ describe('iexec storage', () => {
     expect(res.isInitialized).toBe(false);
     await execAsync(`${iexecPath} storage init dropbox --token oops --raw`);
     const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage check dropbox --raw`
+      `${iexecPath} storage check dropbox --raw`,
     );
     const resAlreadyExists = JSON.parse(rawAlreadyExists);
     expect(resAlreadyExists.ok).toBe(true);
@@ -149,7 +149,7 @@ describe('iexec storage', () => {
 
   test('iexec storage check unsupported', async () => {
     const raw = await execAsync(
-      `${iexecPath} storage check unsupported --raw`
+      `${iexecPath} storage check unsupported --raw`,
     ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);

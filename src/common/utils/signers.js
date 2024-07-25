@@ -94,7 +94,7 @@ export class BrowserProviderSigner extends AbstractSigner {
 export const getSignerFromPrivateKey = (
   host,
   privateKey,
-  { gasPrice, getTransactionCount, providers } = {}
+  { gasPrice, getTransactionCount, providers } = {},
 ) =>
   new EnhancedWallet(privateKey, getReadOnlyProvider(host, { providers }), {
     gasPrice,

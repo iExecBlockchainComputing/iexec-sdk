@@ -77,7 +77,7 @@ orderbookApp
           isDatasetStrict,
           isWorkerpoolStrict,
           isRequesterStrict,
-        }
+        },
       );
       const fetchMessage = info.showing(objName);
       const processResponse = (res) =>
@@ -96,7 +96,7 @@ orderbookApp
       const createResultsMessage = (
         callResults,
         initialResultsCount,
-        totalCount
+        totalCount,
       ) =>
         `Apporders details (${initialResultsCount + 1} to ${
           initialResultsCount + callResults.length
@@ -115,7 +115,7 @@ orderbookApp
             ...(e.requesterrestrict !== NULL_ADDRESS && {
               requesterrestrict: e.requesterrestrict,
             }),
-          }))
+          })),
         )}`;
 
       const { results, count } = await displayPaginableRequest({
@@ -192,7 +192,7 @@ orderbookDataset
           isAppStrict,
           isRequesterStrict,
           isWorkerpoolStrict,
-        }
+        },
       );
       const fetchMessage = info.showing(objName);
       const processResponse = (res) =>
@@ -211,7 +211,7 @@ orderbookDataset
       const createResultsMessage = (
         callResults,
         initialResultsCount,
-        totalCount
+        totalCount,
       ) =>
         `Datasetorders details (${initialResultsCount + 1} to ${
           initialResultsCount + callResults.length
@@ -230,7 +230,7 @@ orderbookDataset
             ...(e.requesterrestrict !== NULL_ADDRESS && {
               requesterrestrict: e.requesterrestrict,
             }),
-          }))
+          })),
         )}`;
 
       const { results, count } = await displayPaginableRequest({
@@ -313,7 +313,7 @@ orderbookWorkerpool
           isAppStrict,
           isRequesterStrict,
           isDatasetStrict,
-        }
+        },
       );
       const fetchMessage = info.showing(objName);
       const processResponse = (res) =>
@@ -334,7 +334,7 @@ orderbookWorkerpool
       const createResultsMessage = (
         callResults,
         initialResultsCount,
-        totalCount
+        totalCount,
       ) =>
         `Workerpoolorders details (${initialResultsCount + 1} to ${
           initialResultsCount + callResults.length
@@ -358,7 +358,7 @@ orderbookWorkerpool
             ...(e.requesterrestrict !== NULL_ADDRESS && {
               requesterrestrict: e.requesterrestrict,
             }),
-          }))
+          })),
         )}`;
 
       const { results, count } = await displayPaginableRequest({
@@ -438,7 +438,7 @@ orderbookRequester
           workerpool,
           beneficiary,
           isWorkerpoolStrict,
-        }
+        },
       );
       const fetchMessage = info.showing(objName);
       const processResponse = (res) =>
@@ -460,7 +460,7 @@ orderbookRequester
       const createResultsMessage = (
         callResults,
         initialResultsCount,
-        totalCount
+        totalCount,
       ) =>
         `Requestorders details (${initialResultsCount + 1} to ${
           initialResultsCount + callResults.length
@@ -479,7 +479,7 @@ orderbookRequester
             ...(e.workerpool !== NULL_ADDRESS && {
               workerpool: e.workerpool,
             }),
-          }))
+          })),
         )}`;
 
       const { results, count } = await displayPaginableRequest({

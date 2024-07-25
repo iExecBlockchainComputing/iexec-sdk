@@ -8,16 +8,16 @@ import { abi as voucherAbi } from '../voucher/abi/Voucher.js';
 
 export const getVoucherContract = (
   contracts = throwIfMissing(),
-  voucherAddress = throwIfMissing()
+  voucherAddress = throwIfMissing(),
 ) => new Contract(voucherAddress, voucherAbi, contracts.provider);
 
 export const getVoucherHubContract = (
   contracts = throwIfMissing(),
-  voucherHubAddress
+  voucherHubAddress,
 ) => {
   if (!voucherHubAddress) {
     throw new ConfigurationError(
-      `voucherHubAddress option not set and no default value for your chain ${contracts.chainId}`
+      `voucherHubAddress option not set and no default value for your chain ${contracts.chainId}`,
     );
   }
   return new Contract(voucherHubAddress, voucherHubAbi, contracts.provider);
@@ -25,11 +25,11 @@ export const getVoucherHubContract = (
 
 export const getVoucherSubgraphClient = (
   contracts = throwIfMissing(),
-  voucherSubgraphUrl
+  voucherSubgraphUrl,
 ) => {
   if (!voucherSubgraphUrl) {
     throw new ConfigurationError(
-      `voucherSubgraphURL option not set and no default value for your chain ${contracts.chainId}`
+      `voucherSubgraphURL option not set and no default value for your chain ${contracts.chainId}`,
     );
   }
   try {

@@ -16,7 +16,7 @@ const debug = Debug('iexec:wallet:enterprise');
 export const isInWhitelist = async (
   contracts = throwIfMissing(),
   address = throwIfMissing(),
-  { strict = true } = {}
+  { strict = true } = {},
 ) => {
   if (contracts.flavour !== 'enterprise') {
     throw Error('Cannot check authorized eRLC holders on current chain');
@@ -40,7 +40,7 @@ export const isInWhitelist = async (
 export const wrapEnterpriseRLC = async (
   contracts = throwIfMissing(),
   enterpriseContracts,
-  nRlcAmount = throwIfMissing()
+  nRlcAmount = throwIfMissing(),
 ) => {
   checkSigner(contracts);
   if (contracts.flavour !== 'standard' || contracts.isNative) {
@@ -65,8 +65,8 @@ export const wrapEnterpriseRLC = async (
         eRlcAddress,
         vAmount,
         NULL_BYTES,
-        contracts.txOptions
-      )
+        contracts.txOptions,
+      ),
     );
     await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
@@ -78,7 +78,7 @@ export const wrapEnterpriseRLC = async (
 
 export const unwrapEnterpriseRLC = async (
   contracts = throwIfMissing(),
-  nRlcAmount = throwIfMissing()
+  nRlcAmount = throwIfMissing(),
 ) => {
   checkSigner(contracts);
   if (contracts.flavour !== 'enterprise' || contracts.isNative) {

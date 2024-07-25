@@ -37,7 +37,7 @@ export default class IExecWalletModule extends IExecModule {
         {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
           sidechainBridgeAddress: await this.config.resolveBridgeBackAddress(),
-        }
+        },
       );
     this.bridgeToMainchain = async (nRlcAmount) =>
       bridgeToMainchain(
@@ -47,7 +47,7 @@ export default class IExecWalletModule extends IExecModule {
         {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
           mainchainBridgeAddress: await this.config.resolveBridgeBackAddress(),
-        }
+        },
       );
     this.obsBridgeToSidechain = async (nRlcAmount) =>
       obsBridgeToSidechain(
@@ -57,7 +57,7 @@ export default class IExecWalletModule extends IExecModule {
         {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
           sidechainBridgeAddress: await this.config.resolveBridgeBackAddress(),
-        }
+        },
       );
     this.obsBridgeToMainchain = async (nRlcAmount) =>
       obsBridgeToMainchain(
@@ -67,18 +67,18 @@ export default class IExecWalletModule extends IExecModule {
         {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
           mainchainBridgeAddress: await this.config.resolveBridgeBackAddress(),
-        }
+        },
       );
     this.wrapEnterpriseRLC = async (nRlcAmount) =>
       wrapEnterpriseRLC(
         await this.config.resolveStandardContractsClient(),
         await this.config.resolveEnterpriseContractsClient(),
-        nRlcAmount
+        nRlcAmount,
       );
     this.unwrapEnterpriseRLC = async (nRlcAmount) =>
       unwrapEnterpriseRLC(
         await this.config.resolveEnterpriseContractsClient(),
-        nRlcAmount
+        nRlcAmount,
       );
   }
 }

@@ -53,13 +53,13 @@ describe('iexec task', () => {
   describe('show', () => {
     test('iexec task show (not initialized)', async () => {
       const dealid = await runIExecCliRaw(
-        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`
+        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
       ).then((res) => res.deals[0].dealid);
       const taskid = await runIExecCliRaw(
-        `${iexecPath} deal show ${dealid}`
+        `${iexecPath} deal show ${dealid}`,
       ).then((res) => res.deal.tasks[0]);
       const res = await runIExecCliRaw(
-        `${iexecPath} task show ${taskid}`
+        `${iexecPath} task show ${taskid}`,
       ).catch((e) => e.message);
       expect(res.ok).toBe(false);
       expect(res.task).toBeUndefined();
@@ -67,10 +67,10 @@ describe('iexec task', () => {
 
     test('iexec task show (initialized)', async () => {
       const dealid = await runIExecCliRaw(
-        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category 0 --force`
+        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category 0 --force`,
       ).then((res) => res.deals[0].dealid);
       const taskid = await runIExecCliRaw(
-        `${iexecPath} deal show ${dealid}`
+        `${iexecPath} deal show ${dealid}`,
       ).then((res) => res.deal.tasks[0]);
       await initializeTask(testChain)(dealid, 0);
       const res = await runIExecCliRaw(`${iexecPath} task show ${taskid}`);
@@ -95,10 +95,10 @@ describe('iexec task', () => {
 
     test('iexec task show (claimable)', async () => {
       const dealid = await runIExecCliRaw(
-        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`
+        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
       ).then((res) => res.deals[0].dealid);
       const taskid = await runIExecCliRaw(
-        `${iexecPath} deal show ${dealid}`
+        `${iexecPath} deal show ${dealid}`,
       ).then((res) => res.deal.tasks[0]);
       await initializeTask(testChain)(dealid, 0);
       const res = await runIExecCliRaw(`${iexecPath} task show ${taskid}`);
@@ -123,10 +123,10 @@ describe('iexec task', () => {
 
     test('iexec task show (claimed)', async () => {
       const dealid = await runIExecCliRaw(
-        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`
+        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
       ).then((res) => res.deals[0].dealid);
       const taskid = await runIExecCliRaw(
-        `${iexecPath} deal show ${dealid}`
+        `${iexecPath} deal show ${dealid}`,
       ).then((res) => res.deal.tasks[0]);
       await runIExecCliRaw(`${iexecPath} deal claim ${dealid}`);
       const res = await runIExecCliRaw(`${iexecPath} task show ${taskid}`);
@@ -153,10 +153,10 @@ describe('iexec task', () => {
   describe('claim', () => {
     test('iexec task claim', async () => {
       const dealid = await runIExecCliRaw(
-        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`
+        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
       ).then((res) => res.deals[0].dealid);
       const taskid = await runIExecCliRaw(
-        `${iexecPath} deal show ${dealid}`
+        `${iexecPath} deal show ${dealid}`,
       ).then((res) => res.deal.tasks[0]);
       await initializeTask(testChain)(dealid, 0);
       const res = await runIExecCliRaw(`${iexecPath} task claim ${taskid}`);

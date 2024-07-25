@@ -20,7 +20,7 @@ const DOMAIN = 'IEXEC_SMS_DOMAIN';
 
 const concatenateAndHash = (...hexStringArray) => {
   const buffer = Buffer.concat(
-    hexStringArray.map((hexString) => Buffer.from(getBytes(hexString)))
+    hexStringArray.map((hexString) => Buffer.from(getBytes(hexString))),
   );
   return keccak256(buffer);
 };
@@ -29,7 +29,7 @@ const getChallengeForSetWeb3Secret = (secretAddress, secretValue) =>
   concatenateAndHash(
     keccak256(Buffer.from(DOMAIN, 'utf8')),
     secretAddress,
-    keccak256(Buffer.from(secretValue, 'utf8'))
+    keccak256(Buffer.from(secretValue, 'utf8')),
   );
 
 const getChallengeForSetWeb2Secret = (ownerAddress, secretKey, secretValue) =>
@@ -37,7 +37,7 @@ const getChallengeForSetWeb2Secret = (ownerAddress, secretKey, secretValue) =>
     keccak256(Buffer.from(DOMAIN, 'utf8')),
     ownerAddress,
     keccak256(Buffer.from(secretKey, 'utf8')),
-    keccak256(Buffer.from(secretValue, 'utf8'))
+    keccak256(Buffer.from(secretValue, 'utf8')),
   );
 
 const handleNonUpdatablePushSecret = ({
@@ -50,16 +50,16 @@ const handleNonUpdatablePushSecret = ({
   }
   if (response.status === 409) {
     throw Error(
-      `Secret already exists for ${targetAddress} and can't be updated`
+      `Secret already exists for ${targetAddress} and can't be updated`,
     );
   }
   if (response.status === 401) {
     throw Error(
-      `Wallet ${signerAddress} is not allowed to set secret for ${targetAddress}`
+      `Wallet ${signerAddress} is not allowed to set secret for ${targetAddress}`,
     );
   }
   throw Error(
-    `SMS answered with unexpected status: ${response.status} ${response.statusText}`
+    `SMS answered with unexpected status: ${response.status} ${response.statusText}`,
   );
 };
 
@@ -67,7 +67,7 @@ export const pushWeb3Secret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   resourceAddress = throwIfMissing(),
-  secretValue = throwIfMissing()
+  secretValue = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -78,11 +78,11 @@ export const pushWeb3Secret = async (
     await stringSchema().validate(secretValue, { strict: true });
     const challenge = getChallengeForSetWeb3Secret(
       vResourceAddress,
-      secretValue
+      secretValue,
     );
     const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
-      contracts.signer.signMessage(binaryChallenge)
+      contracts.signer.signMessage(binaryChallenge),
     );
     const res = await httpRequest('POST')({
       api: smsURL,
@@ -112,7 +112,7 @@ export const pushWeb2Secret = async (
   smsURL = throwIfMissing(),
   secretName = throwIfMissing(),
   secretValue = throwIfMissing(),
-  { forceUpdate = false } = {}
+  { forceUpdate = false } = {},
 ) => {
   try {
     checkSigner(contracts);
@@ -123,7 +123,7 @@ export const pushWeb2Secret = async (
       contracts,
       smsURL,
       ownerAddress,
-      secretName
+      secretName,
     );
     if (secretExists && !forceUpdate) {
       throw Error(`Secret "${secretName}" already exists for ${ownerAddress}`);
@@ -132,11 +132,11 @@ export const pushWeb2Secret = async (
     const challenge = getChallengeForSetWeb2Secret(
       ownerAddress,
       secretName,
-      secretValue
+      secretValue,
     );
     const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
-      contracts.signer.signMessage(binaryChallenge)
+      contracts.signer.signMessage(binaryChallenge),
     );
     const res = await httpRequest(update ? 'PUT' : 'POST')({
       api: smsURL,
@@ -158,7 +158,7 @@ export const pushWeb2Secret = async (
       };
     }
     throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
     debug('pushWeb2Secret()', error);
@@ -170,7 +170,7 @@ export const pushRequesterSecret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   secretName = throwIfMissing(),
-  secretValue = throwIfMissing()
+  secretValue = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -181,21 +181,21 @@ export const pushRequesterSecret = async (
       contracts,
       smsURL,
       requesterAddress,
-      secretName
+      secretName,
     );
     if (secretExists) {
       throw Error(
-        `Secret "${secretName}" already exists for ${requesterAddress}`
+        `Secret "${secretName}" already exists for ${requesterAddress}`,
       );
     }
     const challenge = getChallengeForSetWeb2Secret(
       requesterAddress,
       secretName,
-      secretValue
+      secretValue,
     );
     const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
-      contracts.signer.signMessage(binaryChallenge)
+      contracts.signer.signMessage(binaryChallenge),
     );
     const res = await httpRequest('POST')({
       api: smsURL,
@@ -212,7 +212,7 @@ export const pushRequesterSecret = async (
       };
     }
     throw Error(
-      `SMS answered with unexpected status: ${res.status} ${res.statusText}`
+      `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
     debug('pushRequesterSecret()', error);
@@ -225,7 +225,7 @@ export const pushAppSecret = async (
   smsURL = throwIfMissing(),
   appAddress = throwIfMissing(),
   secretValue = throwIfMissing(),
-  secretIndex = 1
+  secretIndex = 1,
 ) => {
   try {
     checkSigner(contracts);
@@ -238,11 +238,11 @@ export const pushAppSecret = async (
     const challenge = getChallengeForSetWeb2Secret(
       vAppAddress,
       vSecretIndex.toString(),
-      secretValue
+      secretValue,
     );
     const binaryChallenge = getBytes(challenge);
     const auth = await wrapPersonalSign(
-      contracts.signer.signMessage(binaryChallenge)
+      contracts.signer.signMessage(binaryChallenge),
     );
     const res = await httpRequest('POST')({
       api: smsURL,

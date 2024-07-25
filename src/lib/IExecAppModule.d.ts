@@ -134,7 +134,7 @@ export default class IExecAppModule extends IExecModule {
    * ```
    */
   deployApp(
-    app: AppDeploymentArgs
+    app: AppDeploymentArgs,
   ): Promise<{ address: Address; txHash: TxHash }>;
   /**
    * predict the app contract address given the app deployment arguments
@@ -193,7 +193,7 @@ export default class IExecAppModule extends IExecModule {
    */
   showUserApp(
     index: BNish,
-    address: Addressish
+    address: Addressish,
   ): Promise<{ objAddress: Address; app: App }>;
   /**
    * check if a secret exists for the app in the Secret Management Service
@@ -209,7 +209,7 @@ export default class IExecAppModule extends IExecModule {
    */
   checkAppSecretExists(
     appAddress: Addressish,
-    options?: { teeFramework?: TeeFramework }
+    options?: { teeFramework?: TeeFramework },
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY APP OWNER**
@@ -230,7 +230,7 @@ export default class IExecAppModule extends IExecModule {
   pushAppSecret(
     appAddress: Addressish,
     secretValue: String,
-    options?: { teeFramework?: TeeFramework }
+    options?: { teeFramework?: TeeFramework },
   ): Promise<boolean>;
   /**
    * **ONLY APP OWNER**
@@ -247,7 +247,7 @@ export default class IExecAppModule extends IExecModule {
    */
   transferApp(
     appAddress: Addressish,
-    to: Addressish
+    to: Addressish,
   ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
   /**
    * Create an IExecAppModule instance using an IExecConfig instance

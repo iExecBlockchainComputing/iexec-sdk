@@ -46,7 +46,7 @@ describe('iexec deal', () => {
     userDataset = await runIExecCliRaw(`${iexecPath} dataset deploy`);
     userWorkerpool = await runIExecCliRaw(`${iexecPath} workerpool deploy`);
     dealid = await runIExecCliRaw(
-      `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`
+      `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
     ).then((res) => res.deals[0].dealid);
   });
 
@@ -76,7 +76,7 @@ describe('iexec deal', () => {
 
     test('iexec deal show --watch (deal timeout)', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} deal show ${dealid} --watch`
+        `${iexecPath} deal show ${dealid} --watch`,
       );
       expect(res.ok).toBe(true);
       expect(res.deal).toBeDefined();
@@ -112,7 +112,7 @@ describe('iexec deal', () => {
       const fakeDealId =
         '0x194488f76903579d3a3acd89cb75420d52e31e03ab194a74b95247339cf2180f';
       const res = await runIExecCliRaw(
-        `${iexecPath} deal show ${fakeDealId}`
+        `${iexecPath} deal show ${fakeDealId}`,
       ).catch((e) => e.message);
       expect(res.ok).toBe(false);
       expect(res.deal).toBeUndefined();
@@ -122,10 +122,10 @@ describe('iexec deal', () => {
   describe('claim', () => {
     test('iexec deal claim (task not initialized)', async () => {
       const claimableDealid = await runIExecCliRaw(
-        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`
+        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
       ).then((res) => res.deals[0].dealid);
       const res = await runIExecCliRaw(
-        `${iexecPath} deal claim ${claimableDealid}`
+        `${iexecPath} deal claim ${claimableDealid}`,
       );
       expect(res.ok).toBe(true);
       expect(res.transactions).toBeDefined();
@@ -137,11 +137,11 @@ describe('iexec deal', () => {
 
     test('iexec deal claim (task initialized)', async () => {
       const claimableDealid = await runIExecCliRaw(
-        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`
+        `${iexecPath} app run ${userApp.address} --workerpool ${userWorkerpool.address} --dataset ${userDataset.address} --category ${noDurationCatid} --force`,
       ).then((res) => res.deals[0].dealid);
       await initializeTask(testChain)(claimableDealid, 0);
       const res = await runIExecCliRaw(
-        `${iexecPath} deal claim ${claimableDealid}`
+        `${iexecPath} deal claim ${claimableDealid}`,
       );
       expect(res.ok).toBe(true);
       expect(res.transactions).toBeDefined();

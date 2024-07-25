@@ -33,13 +33,13 @@ describe('iexec order', () => {
     await execAsync(`${iexecPath} dataset init`);
     await execAsync(`${iexecPath} workerpool init`);
     userApp = await execAsync(`${iexecPath} app deploy --raw`).then(
-      (res) => JSON.parse(res).address
+      (res) => JSON.parse(res).address,
     );
     userDataset = await execAsync(`${iexecPath} dataset deploy --raw`).then(
-      (res) => JSON.parse(res).address
+      (res) => JSON.parse(res).address,
     );
     userWorkerpool = await execAsync(
-      `${iexecPath} workerpool deploy --raw`
+      `${iexecPath} workerpool deploy --raw`,
     ).then((res) => JSON.parse(res).address);
   });
   afterAll(async () => {
@@ -117,7 +117,7 @@ describe('iexec order', () => {
       category: '0',
     });
     const raw = await execAsync(
-      `${iexecPath} order sign --raw --skip-preflight-check`
+      `${iexecPath} order sign --raw --skip-preflight-check`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -139,7 +139,7 @@ describe('iexec order', () => {
     await editApporder({ tag: ['tee', 'scone'] });
     await editDatasetorder({ tag: ['tee', 'scone'] });
     const failRes = await execAsync(`${iexecPath} order sign --raw`).then(
-      JSON.parse
+      JSON.parse,
     );
     expect(failRes.ok).toBe(false);
     expect(failRes.fail).toStrictEqual([
@@ -152,7 +152,7 @@ describe('iexec order', () => {
 
   test('iexec order fill', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-preflight-check --raw`
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -214,7 +214,7 @@ describe('iexec order', () => {
       volume: '5',
     });
     const raw = await execAsync(
-      `${iexecPath} order sign --request --skip-preflight-check --raw`
+      `${iexecPath} order sign --request --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -227,7 +227,7 @@ describe('iexec order', () => {
 
   test('iexec order fill (BoT 5)', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --skip-preflight-check --raw`
+      `${iexecPath} order fill --skip-preflight-check --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -238,7 +238,7 @@ describe('iexec order', () => {
 
   test('iexec order fill --params <params> --force', async () => {
     const raw = await execAsync(
-      `${iexecPath} order fill --params 'arg --option "multiple words"' --skip-preflight-check --force --raw`
+      `${iexecPath} order fill --params 'arg --option "multiple words"' --skip-preflight-check --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -250,7 +250,7 @@ describe('iexec order', () => {
   test('iexec order cancel --app', async () => {
     await execAsync(`${iexecPath} order sign --app --raw`);
     const raw = await execAsync(
-      `${iexecPath} order cancel --app --force --raw`
+      `${iexecPath} order cancel --app --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -268,7 +268,7 @@ describe('iexec order', () => {
   test('iexec order cancel --dataset', async () => {
     await execAsync(`${iexecPath} order sign --dataset --raw`);
     const raw = await execAsync(
-      `${iexecPath} order cancel --dataset --force --raw`
+      `${iexecPath} order cancel --dataset --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -288,7 +288,7 @@ describe('iexec order', () => {
   test('iexec order cancel --workerpool', async () => {
     await execAsync(`${iexecPath} order sign --workerpool --raw`);
     const raw = await execAsync(
-      `${iexecPath} order cancel --workerpool --force --raw`
+      `${iexecPath} order cancel --workerpool --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -307,10 +307,10 @@ describe('iexec order', () => {
 
   test('iexec order cancel --request', async () => {
     await execAsync(
-      `${iexecPath} order sign --request --skip-preflight-check --raw`
+      `${iexecPath} order sign --request --skip-preflight-check --raw`,
     );
     const raw = await execAsync(
-      `${iexecPath} order cancel --request --force --raw`
+      `${iexecPath} order cancel --request --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);

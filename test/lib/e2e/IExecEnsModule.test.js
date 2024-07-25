@@ -39,7 +39,7 @@ describe('ens', () => {
             infura: INFURA_PROJECT_ID,
             quorum: 1,
           },
-        }
+        },
       );
       const balance = await iexec.wallet.checkBalances('core.v5.iexec.eth');
       expect(balance.wei).toBeInstanceOf(BN);
@@ -66,7 +66,7 @@ describe('ens', () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       const res = await iexec.ens.resolveName('core.v5.iexec.eth');
       expect(res).toBe(
-        iexecTestChain.hubAddress || iexecTestChain.defaults.hubAddress
+        iexecTestChain.hubAddress || iexecTestChain.defaults.hubAddress,
       );
     });
 
@@ -118,7 +118,7 @@ describe('ens', () => {
         await iexecReadOnly.ens.getDefaultDomain(workerpoolAddress);
       expect(workerpoolDomain).toBe('pools.iexec.eth');
       const defaultDomain = await iexecReadOnly.ens.getDefaultDomain(
-        getRandomAddress()
+        getRandomAddress(),
       );
       expect(defaultDomain).toBe('users.iexec.eth');
     });
@@ -158,8 +158,8 @@ describe('ens', () => {
       const domain = 'iexec.eth';
       await expect(iexec.ens.claimName(label, domain)).rejects.toThrow(
         Error(
-          'users.iexec.eth is already owned by 0xc7b2336c1A8932Fb9414356E254edee6A87dd37d'
-        )
+          'users.iexec.eth is already owned by 0xc7b2336c1A8932Fb9414356E254edee6A87dd37d',
+        ),
       );
     });
 
@@ -169,8 +169,8 @@ describe('ens', () => {
       const domain = 'no-registrar.iexec.eth';
       await expect(iexec.ens.claimName(label, domain)).rejects.toThrow(
         Error(
-          'The base domain no-registrar.iexec.eth owner 0x0000000000000000000000000000000000000000 is not a contract'
-        )
+          'The base domain no-registrar.iexec.eth owner 0x0000000000000000000000000000000000000000 is not a contract',
+        ),
       );
     });
   });
@@ -207,7 +207,7 @@ describe('ens', () => {
 
       const configureRes = await iexec.ens.configureResolution(
         name,
-        app1.address
+        app1.address,
       );
       expect(configureRes.name).toBe(name);
       expect(configureRes.address).toBe(app1.address);
@@ -217,7 +217,7 @@ describe('ens', () => {
 
       const reconfigureSameRes = await iexec.ens.configureResolution(
         name,
-        app1.address
+        app1.address,
       );
       expect(reconfigureSameRes.name).toBe(name);
       expect(reconfigureSameRes.address).toBe(app1.address);
@@ -229,7 +229,7 @@ describe('ens', () => {
 
       const reconfigureRes = await iexec.ens.configureResolution(
         name,
-        app2.address
+        app2.address,
       );
       expect(reconfigureRes.name).toBe(name);
       expect(reconfigureRes.address).toBe(app2.address);
@@ -241,11 +241,11 @@ describe('ens', () => {
     test('fails if name is not owned', async () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       await expect(
-        iexec.ens.configureResolution('not-owned.eth', wallet.address)
+        iexec.ens.configureResolution('not-owned.eth', wallet.address),
       ).rejects.toThrow(
         Error(
-          `The current address ${wallet.address} is not owner of not-owned.eth`
-        )
+          `The current address ${wallet.address} is not owner of not-owned.eth`,
+        ),
       );
     });
 
@@ -257,11 +257,11 @@ describe('ens', () => {
       await iexec.ens.claimName(label);
 
       await expect(
-        iexec.ens.configureResolution(name, app.address)
+        iexec.ens.configureResolution(name, app.address),
       ).rejects.toThrow(
         Error(
-          `${wallet.address} is not the owner of ${app.address}, impossible to setup ENS resolution`
-        )
+          `${wallet.address} is not the owner of ${app.address}, impossible to setup ENS resolution`,
+        ),
       );
     });
 
@@ -273,11 +273,11 @@ describe('ens', () => {
       await iexec.ens.claimName(label);
 
       await expect(
-        iexec.ens.configureResolution(name, targetAddress)
+        iexec.ens.configureResolution(name, targetAddress),
       ).rejects.toThrow(
         Error(
-          `Target address ${targetAddress} is not a contract and don't match current wallet address ${wallet.address}, impossible to setup ENS resolution`
-        )
+          `Target address ${targetAddress} is not a contract and don't match current wallet address ${wallet.address}, impossible to setup ENS resolution`,
+        ),
       );
     });
   });
@@ -311,14 +311,14 @@ describe('ens', () => {
 
       const configureObs = await iexec.ens.obsConfigureResolution(
         name,
-        app1.address
+        app1.address,
       );
       const configureRes = await runObservableSubscribe(configureObs).wait();
 
       // reuse name for another app
       const reconfigureObs = await iexec.ens.obsConfigureResolution(
         name,
-        app2.address
+        app2.address,
       );
       const reconfigureRes =
         await runObservableSubscribe(reconfigureObs).wait();
@@ -335,7 +335,7 @@ describe('ens', () => {
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const configureObs = await iexec.ens.obsConfigureResolution(
         'not-owned.eth',
-        wallet.address
+        wallet.address,
       );
 
       const configureRes = await runObservableSubscribe(configureObs).wait();
@@ -344,8 +344,8 @@ describe('ens', () => {
       expect(configureRes.completed).toBe(false);
       expect(configureRes.error).toStrictEqual(
         Error(
-          `The current address ${wallet.address} is not owner of not-owned.eth`
-        )
+          `The current address ${wallet.address} is not owner of not-owned.eth`,
+        ),
       );
     });
 
@@ -360,7 +360,7 @@ describe('ens', () => {
 
       const configureObs = await iexec.ens.obsConfigureResolution(
         name,
-        app.address
+        app.address,
       );
 
       const configureRes = await runObservableSubscribe(configureObs).wait();
@@ -369,8 +369,8 @@ describe('ens', () => {
       expect(configureRes.completed).toBe(false);
       expect(configureRes.error).toStrictEqual(
         Error(
-          `${wallet.address} is not the owner of ${app.address}, impossible to setup ENS resolution`
-        )
+          `${wallet.address} is not the owner of ${app.address}, impossible to setup ENS resolution`,
+        ),
       );
     });
 
@@ -383,7 +383,7 @@ describe('ens', () => {
 
       const configureObs = await iexec.ens.obsConfigureResolution(
         name,
-        targetAddress
+        targetAddress,
       );
       const configureRes = await runObservableSubscribe(configureObs).wait();
 
@@ -391,8 +391,8 @@ describe('ens', () => {
       expect(configureRes.completed).toBe(false);
       expect(configureRes.error).toStrictEqual(
         Error(
-          `Target address ${targetAddress} is not a contract and don't match current wallet address ${wallet.address}, impossible to setup ENS resolution`
-        )
+          `Target address ${targetAddress} is not a contract and don't match current wallet address ${wallet.address}, impossible to setup ENS resolution`,
+        ),
       );
     });
   });
@@ -402,7 +402,7 @@ describe('ens', () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const name = `${getId()}.users.iexec.eth`;
       await expect(
-        iexec.ens.setTextRecord(name, 'key', 'value')
+        iexec.ens.setTextRecord(name, 'key', 'value'),
       ).rejects.toThrow(Error(`No resolver is configured for ${name}`));
     });
 
@@ -416,11 +416,11 @@ describe('ens', () => {
       const { iexec: iexecNotOwner, wallet: walletNotOwner } =
         getTestConfig(iexecTestChain)();
       await expect(
-        iexecNotOwner.ens.setTextRecord(name, 'key', 'value')
+        iexecNotOwner.ens.setTextRecord(name, 'key', 'value'),
       ).rejects.toThrow(
         Error(
-          `${walletNotOwner.address} is not authorised to set a text record for ${name}`
-        )
+          `${walletNotOwner.address} is not authorised to set a text record for ${name}`,
+        ),
       );
     });
 
@@ -459,7 +459,7 @@ describe('ens', () => {
       const label = `address-${address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
       await expect(iexec.ens.readTextRecord(name, 'key')).rejects.toThrow(
-        Error(`No resolver is configured for ${name}`)
+        Error(`No resolver is configured for ${name}`),
       );
     });
 

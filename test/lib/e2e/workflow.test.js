@@ -55,10 +55,10 @@ describe('[workflow]', () => {
     expect(appShowRes.app.appName).toBe(appName);
     expect(appShowRes.app.appType).toBe('DOCKER');
     expect(appShowRes.app.appMultiaddr).toBe(
-      'registry.hub.docker.com/iexechub/vanityeth:1.1.1'
+      'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
     );
     expect(appShowRes.app.appChecksum).toBe(
-      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14'
+      '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
     );
     expect(appShowRes.app.appMREnclave).toBe('');
 
@@ -89,16 +89,16 @@ describe('[workflow]', () => {
     expect(datasetDeployRes.txHash).toBeDefined();
 
     const datasetShowRes = await iexec.dataset.showDataset(
-      datasetDeployRes.address
+      datasetDeployRes.address,
     );
     expect(datasetShowRes.objAddress).toBe(datasetDeployRes.address);
     expect(datasetShowRes.dataset.owner).toBe(owner);
     expect(datasetShowRes.dataset.datasetName).toBe(datasetName);
     expect(datasetShowRes.dataset.datasetMultiaddr).toBe(
-      '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ'
+      '/p2p/QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ',
     );
     expect(datasetShowRes.dataset.datasetChecksum).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000'
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
 
     const order = await iexec.order.createDatasetorder({
@@ -127,16 +127,16 @@ describe('[workflow]', () => {
     expect(workerpoolDeployRes.txHash).toBeDefined();
 
     const workerpoolShowRes = await iexec.workerpool.showWorkerpool(
-      workerpoolDeployRes.address
+      workerpoolDeployRes.address,
     );
     expect(workerpoolShowRes.objAddress).toBe(workerpoolDeployRes.address);
     expect(workerpoolShowRes.workerpool.owner).toBe(owner);
     expect(workerpoolShowRes.workerpool.workerpoolDescription).toBe(desc);
     expect(workerpoolShowRes.workerpool.schedulerRewardRatioPolicy).not.toBe(
-      undefined
+      undefined,
     );
     expect(workerpoolShowRes.workerpool.workerStakeRatioPolicy).not.toBe(
-      undefined
+      undefined,
     );
 
     const order = await iexec.order.createWorkerpoolorder({
@@ -183,7 +183,7 @@ describe('[workflow]', () => {
           iexec_args: 'test',
         },
       },
-      { preflightCheck: false }
+      { preflightCheck: false },
     );
     const totalPrice = new BN(order.appmaxprice)
       .add(new BN(order.datasetmaxprice))
@@ -199,7 +199,7 @@ describe('[workflow]', () => {
         workerpoolorder,
         requestorder: signedorder,
       },
-      { preflightCheck: false }
+      { preflightCheck: false },
     );
     expect(matchOrdersRes).toBeDefined();
     expect(matchOrdersRes.dealid).toBeDefined();
@@ -236,7 +236,7 @@ describe('[workflow]', () => {
         workerpoolorder: workerpoolorderToClaim,
         requestorder: signedorder,
       },
-      { preflightCheck: false }
+      { preflightCheck: false },
     );
     expect(matchOrdersRes).toBeDefined();
     expect(matchOrdersRes.dealid).toBeDefined();
@@ -253,17 +253,17 @@ describe('[workflow]', () => {
     expect(showDealRes.dataset.pointer).toBe(datasetorder.dataset);
     expect(showDealRes.dataset.owner).toBeDefined();
     expect(
-      showDealRes.dataset.price.eq(new BN(datasetorder.datasetprice))
+      showDealRes.dataset.price.eq(new BN(datasetorder.datasetprice)),
     ).toBe(true);
     expect(showDealRes.workerpool).toBeDefined();
     expect(showDealRes.workerpool.pointer).toBe(
-      workerpoolorderToClaim.workerpool
+      workerpoolorderToClaim.workerpool,
     );
     expect(showDealRes.workerpool.owner).toBeDefined();
     expect(
       showDealRes.workerpool.price.eq(
-        new BN(workerpoolorderToClaim.workerpoolprice)
-      )
+        new BN(workerpoolorderToClaim.workerpoolprice),
+      ),
     ).toBe(true);
     expect(showDealRes.trust.eq(new BN(1))).toBe(true);
     expect(showDealRes.category.eq(new BN(signedorder.category))).toBe(true);
@@ -290,32 +290,32 @@ describe('[workflow]', () => {
       .catch((e) => e);
     expect(showTaskUnsetRes instanceof errors.ObjectNotFoundError).toBe(true);
     expect(showTaskUnsetRes.message).toBe(
-      `No task found for id ${showDealRes.tasks[0]} on chain ${iexecTestChain.chainId}`
+      `No task found for id ${showDealRes.tasks[0]} on chain ${iexecTestChain.chainId}`,
     );
 
     const taskIdxToInit = 1;
     await initializeTask(iexecTestChain)(matchOrdersRes.dealid, taskIdxToInit);
     const showTaskActiveRes = await iexec.task.show(
-      showDealRes.tasks[taskIdxToInit]
+      showDealRes.tasks[taskIdxToInit],
     );
     expect(showTaskActiveRes.status).toBe(1);
     expect(showTaskActiveRes.dealid).toBe(matchOrdersRes.dealid);
     expect(showTaskActiveRes.idx.eq(new BN(taskIdxToInit))).toBe(true);
     expect(showTaskActiveRes.timeref.eq(new BN(0))).toBe(true);
     expect(
-      showTaskActiveRes.contributionDeadline.eq(showDealRes.finalTime)
+      showTaskActiveRes.contributionDeadline.eq(showDealRes.finalTime),
     ).toBe(true);
     expect(showTaskActiveRes.finalDeadline.eq(showDealRes.finalTime)).toBe(
-      true
+      true,
     );
     expect(showTaskActiveRes.revealCounter.eq(new BN(0))).toBe(true);
     expect(showTaskActiveRes.winnerCounter.eq(new BN(0))).toBe(true);
     expect(showTaskActiveRes.contributors).toStrictEqual([]);
     expect(showTaskActiveRes.consensusValue).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000'
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
     expect(showTaskActiveRes.resultDigest).toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000000'
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
     expect(showTaskActiveRes.results).toStrictEqual({ storage: 'none' });
     expect(showTaskActiveRes.idx.eq(new BN(taskIdxToInit))).toBe(true);
@@ -325,7 +325,7 @@ describe('[workflow]', () => {
     const taskIdxToClaim = 2;
     await initializeTask(iexecTestChain)(matchOrdersRes.dealid, taskIdxToClaim);
     const claimTaskRes = await iexec.task.claim(
-      showDealRes.tasks[taskIdxToClaim]
+      showDealRes.tasks[taskIdxToClaim],
     );
     expect(claimTaskRes).toBeDefined();
 

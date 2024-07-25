@@ -57,13 +57,13 @@ initStorage
         contracts,
         smsURL,
         address,
-        tokenKeyName
+        tokenKeyName,
       );
       if (tokenExists && !opts.forceUpdate) {
         throw Error(
           `${providerName} storage is already initialized, use ${
             option.forceUpdateSecret()[0]
-          } option to update your storage token`
+          } option to update your storage token`,
         );
       }
 
@@ -84,11 +84,11 @@ initStorage
         smsURL,
         tokenKeyName,
         token,
-        { forceUpdate: !!opts.forceUpdate }
+        { forceUpdate: !!opts.forceUpdate },
       );
       if (isPushed) {
         spinner.info(
-          `${providerName} storage token ${isUpdated ? 'updated' : 'pushed'}`
+          `${providerName} storage token ${isUpdated ? 'updated' : 'pushed'}`,
         );
       } else {
         throw Error('Something went wrong');
@@ -127,13 +127,13 @@ checkStorage
       const tokenKeyName = getStorageTokenKeyName(providerName);
       const userAddress = opts.user || address;
       spinner.info(
-        `Checking ${providerName} storage token for user ${userAddress}`
+        `Checking ${providerName} storage token for user ${userAddress}`,
       );
       const tokenExists = await checkWeb2SecretExists(
         contracts,
         smsURL,
         userAddress,
-        tokenKeyName
+        tokenKeyName,
       );
       if (tokenExists) {
         spinner.succeed('Storage already initialized', {

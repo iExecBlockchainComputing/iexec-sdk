@@ -61,8 +61,8 @@ describe('dataset', () => {
         new errors.ObjectNotFoundError(
           'dataset',
           address,
-          iexecTestChain.chainId
-        )
+          iexecTestChain.chainId,
+        ),
       );
     });
   });
@@ -83,7 +83,7 @@ describe('dataset', () => {
       const { address } = await iexec.dataset.deployDataset(dataset);
       const res = await readOnlyIExec.dataset.showUserDataset(
         0,
-        wallet.address
+        wallet.address,
       );
       expect(res.objAddress).toBe(address);
       expect(res.dataset.owner).toBe(dataset.owner);
@@ -99,7 +99,7 @@ describe('dataset', () => {
       });
       const address = getRandomAddress();
       await expect(
-        readOnlyIExec.dataset.showUserDataset(0, address)
+        readOnlyIExec.dataset.showUserDataset(0, address),
       ).rejects.toThrow(Error('dataset not deployed'));
     });
   });
@@ -111,7 +111,7 @@ describe('dataset', () => {
       });
       const { iexec, wallet } = getTestConfig(iexecTestChain)();
       const resBeforeDeploy = await readOnlyIExec.dataset.countUserDatasets(
-        wallet.address
+        wallet.address,
       );
       await deployRandomDataset(iexec);
       const res = await readOnlyIExec.dataset.countUserDatasets(wallet.address);
@@ -133,8 +133,8 @@ describe('dataset', () => {
       };
       await expect(iexec.dataset.deployDataset(dataset)).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
@@ -163,7 +163,7 @@ describe('dataset', () => {
       };
       const deployed = await iexec.dataset.deployDataset(dataset);
       await expect(iexec.dataset.deployDataset(dataset)).rejects.toThrow(
-        Error(`Dataset already deployed at address ${deployed.address}`)
+        Error(`Dataset already deployed at address ${deployed.address}`),
       );
     });
   });
@@ -184,11 +184,11 @@ describe('dataset', () => {
       const predictedAddress =
         await readOnlyIExec.dataset.predictDatasetAddress(dataset);
       await expect(
-        readOnlyIExec.dataset.checkDeployedDataset(predictedAddress)
+        readOnlyIExec.dataset.checkDeployedDataset(predictedAddress),
       ).resolves.toBe(false);
       await iexec.dataset.deployDataset(dataset);
       await expect(
-        readOnlyIExec.dataset.checkDeployedDataset(predictedAddress)
+        readOnlyIExec.dataset.checkDeployedDataset(predictedAddress),
       ).resolves.toBe(true);
     });
   });
@@ -209,11 +209,11 @@ describe('dataset', () => {
       const predictedAddress =
         await readOnlyIExec.dataset.predictDatasetAddress(dataset);
       await expect(
-        readOnlyIExec.dataset.checkDeployedDataset(predictedAddress)
+        readOnlyIExec.dataset.checkDeployedDataset(predictedAddress),
       ).resolves.toBe(false);
       await iexec.dataset.deployDataset(dataset);
       await expect(
-        readOnlyIExec.dataset.checkDeployedDataset(predictedAddress)
+        readOnlyIExec.dataset.checkDeployedDataset(predictedAddress),
       ).resolves.toBe(true);
     });
   });
@@ -222,11 +222,11 @@ describe('dataset', () => {
     test('require a signer', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(
-        iexec.dataset.transferDataset(getRandomAddress(), getRandomAddress())
+        iexec.dataset.transferDataset(getRandomAddress(), getRandomAddress()),
       ).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
@@ -236,16 +236,19 @@ describe('dataset', () => {
       const { iexec: iexecRandom } = getTestConfig(iexecTestChain)();
       const { address } = await deployRandomDataset(iexecDatasetOwner);
       await expect(
-        iexecRandom.dataset.transferDataset(getRandomAddress(), receiverAddress)
+        iexecRandom.dataset.transferDataset(
+          getRandomAddress(),
+          receiverAddress,
+        ),
       ).rejects.toThrow(Error('Invalid dataset address'));
       await expect(
-        iexecRandom.dataset.transferDataset(address, receiverAddress)
+        iexecRandom.dataset.transferDataset(address, receiverAddress),
       ).rejects.toThrow(
-        Error('Only dataset owner can transfer dataset ownership')
+        Error('Only dataset owner can transfer dataset ownership'),
       );
       const res = await iexecDatasetOwner.dataset.transferDataset(
         address,
-        receiverAddress
+        receiverAddress,
       );
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
@@ -272,7 +275,7 @@ describe('dataset', () => {
       const key = iexec.dataset.generateEncryptionKey();
       const encryptedBytes = await iexec.dataset.encrypt(
         await readFile('test/inputs/files/text.zip'),
-        key
+        key,
       );
       expect(encryptedBytes).toBeInstanceOf(Buffer);
       expect(encryptedBytes.length).toBe(224);
@@ -280,22 +283,22 @@ describe('dataset', () => {
       // decrypt with openssl
       const outDirPath = join(
         process.cwd(),
-        'test/tests-working-dir/lib/IExecDatasetModule'
+        'test/tests-working-dir/lib/IExecDatasetModule',
       );
       await ensureDir(outDirPath).then(() =>
-        writeFile(join(outDirPath, 'dataset.enc'), encryptedBytes)
+        writeFile(join(outDirPath, 'dataset.enc'), encryptedBytes),
       );
       const encryptedFilePath = join(outDirPath, 'dataset.enc');
       const decryptedFilePath = join(outDirPath, 'decrypted.zip');
       await expect(
         execAsync(
-          `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${iexec.dataset.generateEncryptionKey()}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`
-        )
+          `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${iexec.dataset.generateEncryptionKey()}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`,
+        ),
       ).rejects.toBeInstanceOf(Error);
       await expect(
         execAsync(
-          `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`
-        )
+          `tail -c+17 "${encryptedFilePath}" | openssl enc -d -aes-256-cbc -out "${decryptedFilePath}" -K $(echo "${key}" | base64 -d | xxd -p -c 32) -iv $(head -c 16 "${encryptedFilePath}" | xxd -p -c 16)`,
+        ),
       ).resolves.toBeDefined();
     });
   });
@@ -307,13 +310,13 @@ describe('dataset', () => {
       });
       const key = iexec.dataset.generateEncryptionKey();
       const fileBytes = await readFile(
-        join(process.cwd(), 'test/inputs/files/text.zip')
+        join(process.cwd(), 'test/inputs/files/text.zip'),
       );
 
       const originalFileChecksum =
         await iexec.dataset.computeEncryptedFileChecksum(fileBytes);
       expect(originalFileChecksum).toBe(
-        '0x43836bca5914a130343c143d8146a4a75690fc08445fd391a2c6cf9b48694515'
+        '0x43836bca5914a130343c143d8146a4a75690fc08445fd391a2c6cf9b48694515',
       );
 
       const encryptedFileBytes = await iexec.dataset.encrypt(fileBytes, key);
@@ -343,7 +346,7 @@ describe('dataset', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        }
+        },
       );
     });
 
@@ -359,7 +362,7 @@ describe('dataset', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        }
+        },
       );
     });
 
@@ -370,16 +373,16 @@ describe('dataset', () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const { address } = await deployRandomDataset(iexec);
       await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address)
+        readOnlyIExec.dataset.checkDatasetSecretExists(address),
       ).resolves.toBe(false);
       await iexec.dataset.pushDatasetSecret(address, 'foo');
       await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address)
+        readOnlyIExec.dataset.checkDatasetSecretExists(address),
       ).resolves.toBe(true);
       await expect(
         readOnlyIExec.dataset.checkDatasetSecretExists(address, {
           teeFramework: TEE_FRAMEWORKS.SCONE,
-        })
+        }),
       ).resolves.toBe(true);
     });
 
@@ -395,18 +398,18 @@ describe('dataset', () => {
       await expect(
         readOnlyIExec.dataset.checkDatasetSecretExists(address, {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        })
+        }),
       ).resolves.toBe(true);
       await expect(
         readOnlyIExec.dataset.checkDatasetSecretExists(address, {
           teeFramework: TEE_FRAMEWORKS.SCONE,
-        })
+        }),
       ).resolves.toBe(false);
       // validate teeFramework
       await expect(
         readOnlyIExec.dataset.checkDatasetSecretExists(getRandomAddress(), {
           teeFramework: 'foo',
-        })
+        }),
       ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });
@@ -433,7 +436,7 @@ describe('dataset', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        }
+        },
       );
     });
 
@@ -449,7 +452,7 @@ describe('dataset', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        }
+        },
       );
     });
 
@@ -461,11 +464,11 @@ describe('dataset', () => {
         await deployRandomDataset(iexecDatasetOwner);
       // only owner can push secret
       await expect(
-        iexecRandom.dataset.pushDatasetSecret(datasetAddress, 'foo')
+        iexecRandom.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).rejects.toThrow(
         Error(
-          `Wallet ${randomWallet.address} is not allowed to set secret for ${datasetAddress}`
-        )
+          `Wallet ${randomWallet.address} is not allowed to set secret for ${datasetAddress}`,
+        ),
       );
     });
 
@@ -475,16 +478,16 @@ describe('dataset', () => {
         teeFramework: TEE_FRAMEWORKS.GRAMINE,
       });
       await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo')
+        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).resolves.toBe(true);
       await expect(
         iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
           teeFramework: TEE_FRAMEWORKS.SCONE,
-        })
+        }),
       ).rejects.toThrow(
         Error(
-          `Secret already exists for ${datasetAddress} and can't be updated`
-        )
+          `Secret already exists for ${datasetAddress} and can't be updated`,
+        ),
       );
     });
 
@@ -494,15 +497,15 @@ describe('dataset', () => {
         await deployRandomDataset(iexecDatasetOwner);
 
       await expect(
-        iexecDatasetOwner.dataset.pushDatasetSecret(datasetAddress, 'foo')
+        iexecDatasetOwner.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).resolves.toBe(true);
       // can't update existing secret
       await expect(
-        iexecDatasetOwner.dataset.pushDatasetSecret(datasetAddress, 'foo')
+        iexecDatasetOwner.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).rejects.toThrow(
         Error(
-          `Secret already exists for ${datasetAddress} and can't be updated`
-        )
+          `Secret already exists for ${datasetAddress} and can't be updated`,
+        ),
       );
     });
 
@@ -510,29 +513,29 @@ describe('dataset', () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const { address: datasetAddress } = await deployRandomDataset(iexec);
       await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo')
+        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).resolves.toBe(true);
       await expect(
         iexec.dataset.checkDatasetSecretExists(datasetAddress, {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        })
+        }),
       ).resolves.toBe(false);
       await expect(
         iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        })
+        }),
       ).resolves.toBe(true);
       await expect(
         iexec.dataset.checkDatasetSecretExists(datasetAddress, {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        })
+        }),
       ).resolves.toBe(true);
 
       // validate teeFramework
       await expect(
         iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
           teeFramework: 'foo',
-        })
+        }),
       ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });

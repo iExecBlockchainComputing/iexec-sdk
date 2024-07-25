@@ -37,13 +37,13 @@ describe('workerpool', () => {
       });
       const address = getRandomAddress();
       await expect(
-        readOnlyIExec.workerpool.showWorkerpool(address)
+        readOnlyIExec.workerpool.showWorkerpool(address),
       ).rejects.toThrow(
         new errors.ObjectNotFoundError(
           'workerpool',
           address,
-          iexecTestChain.chainId
-        )
+          iexecTestChain.chainId,
+        ),
       );
     });
   });
@@ -61,7 +61,7 @@ describe('workerpool', () => {
       const { address } = await iexec.workerpool.deployWorkerpool(workerpool);
       const res = await readOnlyIExec.workerpool.showUserWorkerpool(
         0,
-        wallet.address
+        wallet.address,
       );
       expect(res.objAddress).toBe(address);
       expect(res.workerpool.owner).toBe(workerpool.owner);
@@ -77,7 +77,7 @@ describe('workerpool', () => {
       });
       const address = getRandomAddress();
       await expect(
-        readOnlyIExec.workerpool.showUserWorkerpool(0, address)
+        readOnlyIExec.workerpool.showUserWorkerpool(0, address),
       ).rejects.toThrow(Error('workerpool not deployed'));
     });
   });
@@ -92,7 +92,7 @@ describe('workerpool', () => {
         await readOnlyIExec.workerpool.countUserWorkerpools(wallet.address);
       await deployRandomWorkerpool(iexec);
       const res = await readOnlyIExec.workerpool.countUserWorkerpools(
-        wallet.address
+        wallet.address,
       );
       expect(resBeforeDeploy).toBeInstanceOf(BN);
       expect(res).toBeInstanceOf(BN);
@@ -110,11 +110,11 @@ describe('workerpool', () => {
         description: `workerpool${getId()}`,
       };
       await expect(
-        iexec.workerpool.deployWorkerpool(workerpool)
+        iexec.workerpool.deployWorkerpool(workerpool),
       ).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
@@ -137,9 +137,9 @@ describe('workerpool', () => {
       };
       const deployed = await iexec.workerpool.deployWorkerpool(workerpool);
       await expect(
-        iexec.workerpool.deployWorkerpool(workerpool)
+        iexec.workerpool.deployWorkerpool(workerpool),
       ).rejects.toThrow(
-        Error(`Workerpool already deployed at address ${deployed.address}`)
+        Error(`Workerpool already deployed at address ${deployed.address}`),
       );
     });
   });
@@ -157,11 +157,11 @@ describe('workerpool', () => {
       const predictedAddress =
         await readOnlyIExec.workerpool.predictWorkerpoolAddress(workerpool);
       await expect(
-        readOnlyIExec.workerpool.checkDeployedWorkerpool(predictedAddress)
+        readOnlyIExec.workerpool.checkDeployedWorkerpool(predictedAddress),
       ).resolves.toBe(false);
       await iexec.workerpool.deployWorkerpool(workerpool);
       await expect(
-        readOnlyIExec.workerpool.checkDeployedWorkerpool(predictedAddress)
+        readOnlyIExec.workerpool.checkDeployedWorkerpool(predictedAddress),
       ).resolves.toBe(true);
     });
   });
@@ -179,11 +179,11 @@ describe('workerpool', () => {
       const predictedAddress =
         await readOnlyIExec.workerpool.predictWorkerpoolAddress(workerpool);
       await expect(
-        readOnlyIExec.workerpool.checkDeployedWorkerpool(predictedAddress)
+        readOnlyIExec.workerpool.checkDeployedWorkerpool(predictedAddress),
       ).resolves.toBe(false);
       await iexec.workerpool.deployWorkerpool(workerpool);
       await expect(
-        readOnlyIExec.workerpool.checkDeployedWorkerpool(predictedAddress)
+        readOnlyIExec.workerpool.checkDeployedWorkerpool(predictedAddress),
       ).resolves.toBe(true);
     });
   });
@@ -194,12 +194,12 @@ describe('workerpool', () => {
       await expect(
         iexec.workerpool.transferWorkerpool(
           getRandomAddress(),
-          getRandomAddress()
-        )
+          getRandomAddress(),
+        ),
       ).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
@@ -211,17 +211,17 @@ describe('workerpool', () => {
       await expect(
         iexecRandom.workerpool.transferWorkerpool(
           getRandomAddress(),
-          receiverAddress
-        )
+          receiverAddress,
+        ),
       ).rejects.toThrow(Error('Invalid workerpool address'));
       await expect(
-        iexecRandom.workerpool.transferWorkerpool(address, receiverAddress)
+        iexecRandom.workerpool.transferWorkerpool(address, receiverAddress),
       ).rejects.toThrow(
-        Error('Only workerpool owner can transfer workerpool ownership')
+        Error('Only workerpool owner can transfer workerpool ownership'),
       );
       const res = await iexecWorkerpoolOwner.workerpool.transferWorkerpool(
         address,
-        receiverAddress
+        receiverAddress,
       );
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
@@ -262,10 +262,10 @@ describe('workerpool', () => {
       await expect(
         iexec.workerpool.setWorkerpoolApiUrl(
           address,
-          'https://my-workerpool.com'
-        )
+          'https://my-workerpool.com',
+        ),
       ).rejects.toThrow(
-        Error(`No ENS name reverse resolution configured for ${address}`)
+        Error(`No ENS name reverse resolution configured for ${address}`),
       );
     });
 
@@ -279,7 +279,7 @@ describe('workerpool', () => {
       await iexec.ens.configureResolution(name, address);
       const res = await iexec.workerpool.setWorkerpoolApiUrl(
         address,
-        'https://my-workerpool.com'
+        'https://my-workerpool.com',
       );
       expect(res).toBeTxHash();
     });

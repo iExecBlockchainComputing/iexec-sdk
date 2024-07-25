@@ -46,7 +46,7 @@ export const finalizeCli = (cli) => {
           usage: getUsage(x),
           options: processOptions(x.options),
         })),
-      })
+      }),
     );
     process.exit(0);
   }
@@ -54,7 +54,7 @@ export const finalizeCli = (cli) => {
   cli.showHelpAfterError();
   cli.addHelpText(
     'afterAll',
-    '\nLinks:\n  doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n  bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n'
+    '\nLinks:\n  doc: https://github.com/iExecBlockchainComputing/iexec-sdk#iexec-sdk-cli-api\n  bugs: https://github.com/iExecBlockchainComputing/iexec-sdk/issues\n',
   );
   cli.parse();
 };
@@ -62,7 +62,7 @@ export const finalizeCli = (cli) => {
 const listOfChoices = (arrayOfChoices, init = '') =>
   arrayOfChoices.reduce(
     (acc, curr) => (acc ? `${acc}|"${curr}"` : `"${curr}"`),
-    init
+    init,
   );
 
 export const info = {
@@ -388,7 +388,7 @@ export const optionCreator = {
   teeFramework: () =>
     new Option(
       `--tee-framework <name>`,
-      'specify the TEE framework to use'
+      'specify the TEE framework to use',
     ).choices(Object.values(TEE_FRAMEWORKS)),
 };
 
@@ -513,7 +513,7 @@ export const addWalletLoadOptions = (cli) => {
 
 const question = async (
   message,
-  { error = info.userAborted(), rejectDefault = false, strict = true } = {}
+  { error = info.userAborted(), rejectDefault = false, strict = true } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
@@ -530,7 +530,7 @@ const question = async (
 
 const promptPassword = async (
   message,
-  { error = info.userAborted(), strict = true, useMask = false } = {}
+  { error = info.userAborted(), strict = true, useMask = false } = {},
 ) => {
   const answer = await inquirer.prompt([
     {
@@ -547,7 +547,7 @@ const promptPassword = async (
 
 const promptConfirmedPassword = async (
   message,
-  confirmation = 'Please confirm your password'
+  confirmation = 'Please confirm your password',
 ) => {
   const pw1 = await promptPassword(message, { strict: false });
   const pw2 = await promptPassword(confirmation, {
@@ -568,25 +568,25 @@ export const prompt = {
   dirNotEmpty: (dir, options) =>
     question(
       `Directory ${dir} is not empty, continue and replace content?`,
-      options
+      options,
     ),
   fileExists: (filePath, options) =>
     question(`File ${filePath} already exists, continue and replace?`, options),
   transfer: (currency, amount, chainName, to, chainId) =>
     question(
-      `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`
+      `Do you want to send ${amount} ${chainName} ${currency} to ${to} [chainId: ${chainId}]`,
     ),
   transferObj: (objName, objAddress, to, chainId) =>
     question(
-      `Do you want to transfer the ownership of the ${objName} ${objAddress} to ${to} [chainId: ${chainId}]`
+      `Do you want to transfer the ownership of the ${objName} ${objAddress} to ${to} [chainId: ${chainId}]`,
     ),
   wrap: (amount, chainId) =>
     question(
-      `Do you want to swap ${amount} RLC for eRLC (1 RLC = 1 eRLC) [chainId: ${chainId}]`
+      `Do you want to swap ${amount} RLC for eRLC (1 RLC = 1 eRLC) [chainId: ${chainId}]`,
     ),
   unwrap: (amount, chainId) =>
     question(
-      `Do you want to swap ${amount} eRLC for RLC (1 eRLC = 1 RLC) [chainId: ${chainId}]`
+      `Do you want to swap ${amount} eRLC for RLC (1 eRLC = 1 RLC) [chainId: ${chainId}]`,
     ),
   cancelOrder: (orderName, order) =>
     question(`Do you want to cancel the following ${orderName}? ${order}`),
@@ -596,15 +596,15 @@ export const prompt = {
     question(
       `Do you want to unpublish ${
         all ? 'all your' : 'your last'
-      } ${objName}order${all ? 's' : ''} for ${objName} ${address}?`
+      } ${objName}order${all ? 's' : ''} for ${objName} ${address}?`,
     ),
   signGeneratedOrder: (orderName, order) =>
     question(
-      `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`
+      `the following ${orderName} has been created, do you want to sign it and complete your purchase? ${order}`,
     ),
   limitedVolume: (available, ask) =>
     question(
-      `Your user order is valid for ${ask} work executions but other orders allow only ${available} work executions, do you want to continue?`
+      `Your user order is valid for ${ask} work executions but other orders allow only ${available} work executions, do you want to continue?`,
     ),
   unpublishFromJsonFile: (orderName, order) =>
     question(`Do you want to unpublish the following ${orderName}? ${order}`),
@@ -709,13 +709,13 @@ export const checkUpdate = async (opts) => {
     const NODEJS_UPGRADE_CMD = 'npm -g i iexec';
     const DOCKER_UPGRADE_CMD = 'docker pull iexechub/iexec-sdk';
     const update = await checkForUpdate(packageJSON, { interval: 10 }).catch(
-      debug
+      debug,
     );
     if (update) {
       const upgradeCMD = isDocker() ? DOCKER_UPGRADE_CMD : NODEJS_UPGRADE_CMD;
       const spin = Spinner(opts);
       spin.info(
-        `iExec SDK update available ${version} →  ${update.latest}, Run "${upgradeCMD}" to update ("--quiet" or "--raw" disable update notification)\n`
+        `iExec SDK update available ${version} →  ${update.latest}, Run "${upgradeCMD}" to update ("--quiet" or "--raw" disable update notification)\n`,
       );
     }
   }
@@ -728,11 +728,11 @@ export const computeWalletCreateOptions = async (opts) => {
     if (opts.password) {
       pw = opts.password;
       spinner.warn(
-        'Option --password may be unsafe, make sure to know what you do'
+        'Option --password may be unsafe, make sure to know what you do',
       );
     } else if (!opts.unencrypted) {
       pw = await prompt.confirmedPassword(
-        'Please choose a password for wallet encryption'
+        'Please choose a password for wallet encryption',
       );
     }
     if (!pw && !opts.unencrypted) {
@@ -743,7 +743,7 @@ export const computeWalletCreateOptions = async (opts) => {
     }
     if (opts.unencrypted) {
       spinner.warn(
-        'Using --unencrypted will generate unprotected unencrypted wallet, this is unsafe, make sure to know what you do'
+        'Using --unencrypted will generate unprotected unencrypted wallet, this is unsafe, make sure to know what you do',
       );
     }
 
@@ -872,7 +872,7 @@ export const computeTxOptions = async (opts) => {
 export const getPropertyFormChain = (
   chain,
   property,
-  { strict = true } = {}
+  { strict = true } = {},
 ) => {
   const value = chain[property];
   if (value === undefined && strict)
@@ -886,7 +886,7 @@ export const getDefaultTeeFrameworkFromChain = (chain) =>
 
 export const getSmsUrlFromChain = (
   chain,
-  { teeFramework, strict = true } = {}
+  { teeFramework, strict = true } = {},
 ) => {
   const selectedTeeFramework =
     teeFramework || getDefaultTeeFrameworkFromChain(chain);
@@ -902,7 +902,7 @@ export const getSmsUrlFromChain = (
   }
   if (smsUrl === undefined && strict)
     throw Error(
-      `Missing sms for tee framework ${selectedTeeFramework} in "chain.json" for chain ${chain.id}`
+      `Missing sms for tee framework ${selectedTeeFramework} in "chain.json" for chain ${chain.id}`,
     );
   return smsUrl;
 };
@@ -984,7 +984,7 @@ export const displayPaginableRequest = async (
     spinner,
     raw = false,
   },
-  { results = [], count } = {}
+  { results = [], count } = {},
 ) => {
   spinner.start(fetchMessage);
   const res = await request;
@@ -1009,7 +1009,7 @@ export const displayPaginableRequest = async (
             spinner,
             raw,
           },
-          { results, count }
+          { results, count },
         );
       }
       return { results, count: totalCount };
@@ -1023,11 +1023,11 @@ export const displayPaginableRequest = async (
 
 export const renderTasksStatus = (
   tasksStatusMap,
-  { detailed = false } = {}
+  { detailed = false } = {},
 ) => {
   const tasksArray = Object.values(tasksStatusMap);
   const runningTasksArray = tasksArray.filter(
-    (task) => task.status !== 3 && !task.taskTimedOut
+    (task) => task.status !== 3 && !task.taskTimedOut,
   );
   const completedTasksArray = tasksArray.filter((task) => task.status === 3);
   const timedoutTasksArray = tasksArray.filter((task) => task.taskTimedOut);
@@ -1037,8 +1037,8 @@ export const renderTasksStatus = (
           detailed
             ? `:${pretty(
                 completedTasksArray.map(
-                  ({ idx, taskid }) => `Task idx ${idx} (${taskid})`
-                )
+                  ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+                ),
               )}`
             : '\n'
         }`
@@ -1049,8 +1049,8 @@ export const renderTasksStatus = (
           detailed
             ? `:${pretty(
                 timedoutTasksArray.map(
-                  ({ idx, taskid }) => `Task idx ${idx} (${taskid})`
-                )
+                  ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+                ),
               )}`
             : '\n'
         }`
@@ -1062,8 +1062,8 @@ export const renderTasksStatus = (
         } tasks running:${pretty(
           runningTasksArray.map(
             ({ idx, taskid, statusName }) =>
-              `Task idx ${idx} (${taskid}) status ${statusName}`
-          )
+              `Task idx ${idx} (${taskid}) status ${statusName}`,
+          ),
         )}`
       : '';
   return `${completedMsg}${failedMsg}${statusMsg}`;

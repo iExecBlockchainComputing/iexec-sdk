@@ -51,7 +51,7 @@ resolve
           raw: {
             address,
           },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -79,7 +79,7 @@ lookup
           raw: {
             name,
           },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -121,14 +121,14 @@ register
     '--domain <domain>',
     `use the specified ENS domain (default \`users.iexec.eth\`)
  - if the ENS name (label.domain) is not owned by the user, the domain must be controlled by a FIFS registrar
- - if the ENS name (label.domain) is already owned by the user, the registration will be skipped`
+ - if the ENS name (label.domain) is already owned by the user, the registration will be skipped`,
   )
   .option(
     '--for <address>',
-    'register for an owned iExec app, dataset or workerpool'
+    'register for an owned iExec app, dataset or workerpool',
   )
   .description(
-    'register an ENS if needed and setup both ENS resolution and reverse resolution'
+    'register an ENS if needed and setup both ENS resolution and reverse resolution',
   )
   .action(async (label, opts) => {
     await checkUpdate(opts);
@@ -151,7 +151,7 @@ register
         if (currentEns) {
           await prompt.custom(
             `An ENS (${currentEns}) is already configured for address ${targetAddress}, this configuration will be replaced, do you want to continue?`,
-            { strict: true }
+            { strict: true },
           );
         }
       }
@@ -163,12 +163,12 @@ register
       const { registerTxHash, name } = await registerFifsEns(
         chain.contracts,
         label,
-        domain
+        domain,
       );
       spinner.info(
         registerTxHash
           ? `Registered new ENS ${name}`
-          : `ENS ${name} already owned`
+          : `ENS ${name} already owned`,
       );
 
       spinner.start('Configuring ENS resolution');
@@ -181,7 +181,7 @@ register
         chain.contracts,
         getPropertyFormChain(chain, 'ensPublicResolver'),
         name,
-        targetAddress
+        targetAddress,
       );
       spinner.succeed(
         `ENS ${name} successfully registered and configured for ${targetAddress}`,
@@ -195,7 +195,7 @@ register
             claimReverseTxHash,
             setNameTxHash,
           },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);

@@ -55,7 +55,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * ```
    */
   deployWorkerpool(
-    workerpool: WorkerpoolDeploymentArgs
+    workerpool: WorkerpoolDeploymentArgs,
   ): Promise<{ address: Address; txHash: TxHash }>;
   /**
    * predict the workerpool contract address given the workerpool deployment arguments
@@ -70,7 +70,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * ```
    */
   predictWorkerpoolAddress(
-    workerpool: WorkerpoolDeploymentArgs
+    workerpool: WorkerpoolDeploymentArgs,
   ): Promise<Address>;
   /**
    * check if an workerpool is deployed at a given address
@@ -92,7 +92,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * ```
    */
   showWorkerpool(
-    workerpoolAddress: Addressish
+    workerpoolAddress: Addressish,
   ): Promise<{ objAddress: Address; workerpool: Workerpool }>;
   /**
    * count the workerpools owned by an address.
@@ -115,7 +115,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    */
   showUserWorkerpool(
     index: BNish,
-    address: Addressish
+    address: Addressish,
   ): Promise<{ objAddress: Address; workerpool: Workerpool }>;
   /**
    * **ONLY WORKERPOOL ENS NAME OWNER**
@@ -132,7 +132,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    */
   setWorkerpoolApiUrl(
     workerpoolAddress: Addressish,
-    url: string
+    url: string,
   ): Promise<TxHash>;
   /**
    * read the workerpool API url on the blockchain
@@ -147,7 +147,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    */
   getWorkerpoolApiUrl(
     workerpoolAddress: Addressish,
-    url: string
+    url: string,
   ): Promise<string | undefined>;
   /**
    * **ONLY WORKERPOOL OWNER**
@@ -164,7 +164,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    */
   transferWorkerpool(
     workerpoolAddress: Addressish,
-    to: Addressish
+    to: Addressish,
   ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
   /**
    * Create an IExecWorkerpoolModule instance using an IExecConfig instance

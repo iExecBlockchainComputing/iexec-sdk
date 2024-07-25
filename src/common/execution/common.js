@@ -9,7 +9,7 @@ const debug = Debug('iexec:execution:common');
 
 export const viewDeal = async (
   contracts = throwIfMissing(),
-  dealid = throwIfMissing()
+  dealid = throwIfMissing(),
 ) => {
   try {
     const vDealid = await bytes32Schema().validate(dealid);
@@ -32,14 +32,14 @@ export const viewDeal = async (
 export const viewTask = async (
   contracts = throwIfMissing(),
   taskid = throwIfMissing(),
-  { strict = true } = {}
+  { strict = true } = {},
 ) => {
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
     const { chainId } = contracts;
     const iexecContract = contracts.getIExecContract();
     const task = formatEthersResult(
-      await wrapCall(iexecContract.viewTask(vTaskId))
+      await wrapCall(iexecContract.viewTask(vTaskId)),
     );
     // cast BN to number to keep view task interface
     task.status = task.status.toNumber();
