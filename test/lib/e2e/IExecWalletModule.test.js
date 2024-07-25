@@ -29,7 +29,7 @@ describe('wallet', () => {
         readOnly: true,
       });
       await expect(iexec.wallet.getAddress()).rejects.toThrow(
-        Error('Missing Signer')
+        Error('Missing Signer'),
       );
     });
   });
@@ -67,7 +67,7 @@ describe('wallet', () => {
       test('expose bridged balances (mainnet) on bellecour', async () => {
         const iexec = new IExec(
           { ethProvider: 'bellecour' },
-          { providerOptions: { infura: INFURA_PROJECT_ID } }
+          { providerOptions: { infura: INFURA_PROJECT_ID } },
         );
         const address = getRandomAddress();
         const balance = await iexec.wallet.checkBridgedBalances(address);
@@ -92,11 +92,11 @@ describe('wallet', () => {
     test('require a signer', async () => {
       const { iexec } = getTestConfig(tokenTestChain)({ readOnly: true });
       await expect(
-        iexec.wallet.sendETH(10, getRandomAddress())
+        iexec.wallet.sendETH(10, getRandomAddress()),
       ).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
@@ -114,14 +114,16 @@ describe('wallet', () => {
           await iexec.wallet.checkBalances(receiverAddress);
         expect(txHash).toBeTxHash();
         expect(finalBalance.wei.add(new BN(5)).lt(initialBalance.wei)).toBe(
-          true
+          true,
         );
         expect(finalBalance.nRLC.eq(initialBalance.nRLC)).toBe(true);
         expect(
-          receiverFinalBalance.wei.eq(receiverInitialBalance.wei.add(new BN(5)))
+          receiverFinalBalance.wei.eq(
+            receiverInitialBalance.wei.add(new BN(5)),
+          ),
         ).toBe(true);
         expect(receiverFinalBalance.nRLC.eq(receiverInitialBalance.nRLC)).toBe(
-          true
+          true,
         );
       });
 
@@ -138,16 +140,16 @@ describe('wallet', () => {
           await iexec.wallet.checkBalances(receiverAddress);
         expect(txHash).toBeTxHash();
         expect(
-          finalBalance.wei.add(new BN('500000000')).lt(initialBalance.wei)
+          finalBalance.wei.add(new BN('500000000')).lt(initialBalance.wei),
         ).toBe(true);
         expect(finalBalance.nRLC.eq(initialBalance.nRLC)).toBe(true);
         expect(
           receiverFinalBalance.wei.eq(
-            receiverInitialBalance.wei.add(new BN('500000000'))
-          )
+            receiverInitialBalance.wei.add(new BN('500000000')),
+          ),
         ).toBe(true);
         expect(receiverFinalBalance.nRLC.eq(receiverInitialBalance.nRLC)).toBe(
-          true
+          true,
         );
       });
     });
@@ -157,7 +159,7 @@ describe('wallet', () => {
         const receiverAddress = getRandomAddress();
         const { iexec } = getTestConfig(iexecTestChain)();
         await expect(iexec.wallet.sendETH(10, receiverAddress)).rejects.toThrow(
-          Error('sendETH() is disabled on sidechain, use sendRLC()')
+          Error('sendETH() is disabled on sidechain, use sendRLC()'),
         );
       });
     });
@@ -167,11 +169,11 @@ describe('wallet', () => {
     test('require a signer', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(
-        iexec.wallet.sendRLC(10, getRandomAddress())
+        iexec.wallet.sendRLC(10, getRandomAddress()),
       ).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
@@ -189,22 +191,22 @@ describe('wallet', () => {
           await iexec.wallet.checkBalances(receiverAddress);
         expect(txHash).toBeTxHash();
         expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(
-          true
+          true,
         );
         expect(
           finalBalance.wei
             .add(new BN(5).mul(new BN(1000000000)))
-            .eq(initialBalance.wei)
+            .eq(initialBalance.wei),
         ).toBe(true);
         expect(
           receiverFinalBalance.nRLC
             .sub(new BN(5))
-            .eq(receiverInitialBalance.nRLC)
+            .eq(receiverInitialBalance.nRLC),
         ).toBe(true);
         expect(
           receiverFinalBalance.wei
             .sub(new BN(5).mul(new BN(1000000000)))
-            .eq(receiverInitialBalance.wei)
+            .eq(receiverInitialBalance.wei),
         ).toBe(true);
       });
 
@@ -217,29 +219,29 @@ describe('wallet', () => {
           await iexec.wallet.checkBalances(receiverAddress);
         const txHash = await iexec.wallet.sendRLC(
           '0.000005 RLC',
-          receiverAddress
+          receiverAddress,
         );
         const finalBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverFinalBalance =
           await iexec.wallet.checkBalances(receiverAddress);
         expect(txHash).toBeTxHash();
         expect(
-          finalBalance.nRLC.add(new BN(5000)).eq(initialBalance.nRLC)
+          finalBalance.nRLC.add(new BN(5000)).eq(initialBalance.nRLC),
         ).toBe(true);
         expect(
           finalBalance.wei
             .add(new BN(5000).mul(new BN(1000000000)))
-            .eq(initialBalance.wei)
+            .eq(initialBalance.wei),
         ).toBe(true);
         expect(
           receiverFinalBalance.nRLC
             .sub(new BN(5000))
-            .eq(receiverInitialBalance.nRLC)
+            .eq(receiverInitialBalance.nRLC),
         ).toBe(true);
         expect(
           receiverFinalBalance.wei
             .sub(new BN(5000).mul(new BN(1000000000)))
-            .eq(receiverInitialBalance.wei)
+            .eq(receiverInitialBalance.wei),
         ).toBe(true);
       });
     });
@@ -260,15 +262,15 @@ describe('wallet', () => {
         expect(txHash).toBeTxHash();
         expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
         expect(finalBalance.nRLC.add(new BN(5)).eq(initialBalance.nRLC)).toBe(
-          true
+          true,
         );
         expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(
-          true
+          true,
         );
         expect(
           receiverFinalBalance.nRLC.eq(
-            receiverInitialBalance.nRLC.add(new BN(5))
-          )
+            receiverInitialBalance.nRLC.add(new BN(5)),
+          ),
         ).toBe(true);
       });
 
@@ -287,15 +289,15 @@ describe('wallet', () => {
         expect(txHash).toBeTxHash();
         expect(finalBalance.wei.lt(initialBalance.wei)).toBe(true);
         expect(
-          finalBalance.nRLC.add(new BN('500000000')).eq(initialBalance.nRLC)
+          finalBalance.nRLC.add(new BN('500000000')).eq(initialBalance.nRLC),
         ).toBe(true);
         expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(
-          true
+          true,
         );
         expect(
           receiverFinalBalance.nRLC.eq(
-            receiverInitialBalance.nRLC.add(new BN('500000000'))
-          )
+            receiverInitialBalance.nRLC.add(new BN('500000000')),
+          ),
         ).toBe(true);
       });
     });
@@ -309,17 +311,17 @@ describe('wallet', () => {
         await setBalance(iexecTestChain)(sweeperWallet.address, ONE_ETH);
         await setNRlcBalance(iexecTestChain)(sweeperWallet.address, ONE_RLC);
         const initialBalance = await iexec.wallet.checkBalances(
-          sweeperWallet.address
+          sweeperWallet.address,
         );
         const receiverInitialBalance = await iexec.wallet.checkBalances(
-          receiverWallet.address
+          receiverWallet.address,
         );
         const res = await iexec.wallet.sweep(receiverWallet.address);
         const finalBalance = await iexec.wallet.checkBalances(
-          sweeperWallet.address
+          sweeperWallet.address,
         );
         const receiverFinalBalance = await iexec.wallet.checkBalances(
-          receiverWallet.address
+          receiverWallet.address,
         );
         expect(res.sendNativeTxHash).toBeTxHash();
         expect(res.sendERC20TxHash).toBeUndefined();
@@ -330,12 +332,12 @@ describe('wallet', () => {
         expect(
           receiverFinalBalance.wei
             .sub(initialBalance.wei)
-            .eq(receiverInitialBalance.wei)
+            .eq(receiverInitialBalance.wei),
         ).toBe(true);
         expect(
           receiverFinalBalance.nRLC
             .sub(initialBalance.nRLC)
-            .eq(receiverInitialBalance.nRLC)
+            .eq(receiverInitialBalance.nRLC),
         ).toBe(true);
       });
     });
@@ -349,17 +351,17 @@ describe('wallet', () => {
         await setNRlcBalance(tokenTestChain)(sweeperWallet.address, ONE_RLC);
 
         const initialBalance = await iexec.wallet.checkBalances(
-          sweeperWallet.address
+          sweeperWallet.address,
         );
         const receiverInitialBalance = await iexec.wallet.checkBalances(
-          receiverWallet.address
+          receiverWallet.address,
         );
         const res = await iexec.wallet.sweep(receiverWallet.address);
         const finalBalance = await iexec.wallet.checkBalances(
-          sweeperWallet.address
+          sweeperWallet.address,
         );
         const receiverFinalBalance = await iexec.wallet.checkBalances(
-          receiverWallet.address
+          receiverWallet.address,
         );
         expect(res.sendNativeTxHash).toBeTxHash();
         expect(res.sendERC20TxHash).toBeTxHash();
@@ -368,12 +370,12 @@ describe('wallet', () => {
         expect(finalBalance.wei.eq(new BN(0))).toBe(true);
         expect(finalBalance.nRLC.eq(new BN(0))).toBe(true);
         expect(receiverFinalBalance.wei.gt(receiverInitialBalance.wei)).toBe(
-          true
+          true,
         );
         expect(
           receiverFinalBalance.nRLC
             .sub(initialBalance.nRLC)
-            .eq(receiverInitialBalance.nRLC)
+            .eq(receiverInitialBalance.nRLC),
         ).toBe(true);
       });
 
@@ -384,31 +386,31 @@ describe('wallet', () => {
         await setNRlcBalance(tokenTestChain)(sweeperWallet.address, ONE_RLC);
         await setBalance(tokenTestChain)(sweeperWallet.address, 1);
         const initialBalance = await iexec.wallet.checkBalances(
-          sweeperWallet.address
+          sweeperWallet.address,
         );
         const receiverInitialBalance = await iexec.wallet.checkBalances(
-          receiverWallet.address
+          receiverWallet.address,
         );
         await expect(
-          iexec.wallet.sweep(receiverWallet.address)
+          iexec.wallet.sweep(receiverWallet.address),
         ).rejects.toThrow(
-          'Failed to sweep ERC20, sweep aborted. errors: Failed to transfer ERC20: ' // reason message exposed may differ from a ethereum client to another
+          'Failed to sweep ERC20, sweep aborted. errors: Failed to transfer ERC20: ', // reason message exposed may differ from a ethereum client to another
         );
         const finalBalance = await iexec.wallet.checkBalances(
-          sweeperWallet.address
+          sweeperWallet.address,
         );
         const receiverFinalBalance = await iexec.wallet.checkBalances(
-          receiverWallet.address
+          receiverWallet.address,
         );
         expect(initialBalance.wei.gt(new BN(0))).toBe(true);
         expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
         expect(finalBalance.wei.eq(initialBalance.wei)).toBe(true);
         expect(finalBalance.nRLC.eq(initialBalance.nRLC)).toBe(true);
         expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(
-          true
+          true,
         );
         expect(receiverFinalBalance.nRLC.eq(receiverInitialBalance.nRLC)).toBe(
-          true
+          true,
         );
       });
 
@@ -418,39 +420,39 @@ describe('wallet', () => {
           getTestConfig(tokenTestChain)();
         await setBalance(tokenTestChain)(
           sweeperWallet.address,
-          55000000000000n
+          55000000000000n,
         ); // enough for erc20 transfer only
         await setNRlcBalance(tokenTestChain)(sweeperWallet.address, ONE_RLC);
         const initialBalance = await iexec.wallet.checkBalances(
-          sweeperWallet.address
+          sweeperWallet.address,
         );
         const receiverInitialBalance = await iexec.wallet.checkBalances(
-          receiverWallet.address
+          receiverWallet.address,
         );
         const res = await iexec.wallet.sweep(receiverWallet.address);
         const finalBalance = await iexec.wallet.checkBalances(
-          sweeperWallet.address
+          sweeperWallet.address,
         );
         const receiverFinalBalance = await iexec.wallet.checkBalances(
-          receiverWallet.address
+          receiverWallet.address,
         );
         expect(res.sendNativeTxHash).toBeUndefined();
         expect(res.sendERC20TxHash).toBeTxHash();
         expect(res.errors.length).toBe(1);
         expect(res.errors[0]).toBe(
-          "Failed to transfer native token': Tx fees are greater than wallet balance"
+          "Failed to transfer native token': Tx fees are greater than wallet balance",
         );
         expect(initialBalance.wei.gt(new BN(0))).toBe(true);
         expect(initialBalance.nRLC.gt(new BN(0))).toBe(true);
         expect(finalBalance.wei.gt(new BN(0))).toBe(true);
         expect(finalBalance.nRLC.eq(new BN(0))).toBe(true);
         expect(receiverFinalBalance.wei.eq(receiverInitialBalance.wei)).toBe(
-          true
+          true,
         );
         expect(
           receiverFinalBalance.nRLC
             .sub(initialBalance.nRLC)
-            .eq(receiverInitialBalance.nRLC)
+            .eq(receiverInitialBalance.nRLC),
         ).toBe(true);
       });
     });

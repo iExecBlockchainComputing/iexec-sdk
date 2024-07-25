@@ -34,7 +34,7 @@ const ENTERPRISE_SWAP_MAP = {
 const createChainFromConf = (
   chainName,
   chainConf,
-  { bridgeConf, enterpriseSwapConf, providerOptions, txOptions = {} } = {}
+  { bridgeConf, enterpriseSwapConf, providerOptions, txOptions = {} } = {},
 ) => {
   try {
     const chain = { ...chainConf };
@@ -100,7 +100,7 @@ const createChainFromConf = (
 
 export const loadChain = async (
   chainName,
-  { txOptions, spinner = Spinner() } = {}
+  { txOptions, spinner = Spinner() } = {},
 ) => {
   try {
     const chainsConf = await loadChainConf();
@@ -146,7 +146,7 @@ export const loadChain = async (
     debug('conf', conf);
     if (!conf.host) {
       throw Error(
-        `Missing RPC host, no "host" key in "chain.json" and no default value for chain ${conf.id}`
+        `Missing RPC host, no "host" key in "chain.json" and no default value for chain ${conf.id}`,
       );
     }
 
@@ -179,7 +179,7 @@ export const loadChain = async (
       };
       if (!bridgeConf.host) {
         throw Error(
-          `Missing RPC host for bridged chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`
+          `Missing RPC host for bridged chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`,
         );
       }
     }
@@ -203,7 +203,7 @@ export const loadChain = async (
         flavour: enterpriseSwapFlavour,
       };
       const enterpriseSwapDefaultConf = getChainDefaults(
-        enterpriseSwapIdAndFlavour
+        enterpriseSwapIdAndFlavour,
       );
       debug('enterpriseSwapLoadedConf', enterpriseSwapLoadedConf);
       debug('enterpriseSwapDefaultConf', defaultConf);
@@ -215,7 +215,7 @@ export const loadChain = async (
       };
       if (!enterpriseSwapConf.host) {
         throw Error(
-          `Missing RPC host for enterprise bound chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`
+          `Missing RPC host for enterprise bound chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`,
         );
       }
     }
@@ -237,11 +237,11 @@ export const loadChain = async (
 export const connectKeystore = async (
   chain,
   keystore,
-  { txOptions = {} } = {}
+  { txOptions = {} } = {},
 ) => {
   const { privateKey } = await keystore.load();
   const keystoreOptions = { gasPrice: txOptions.gasPrice };
   chain.contracts.setSigner(
-    new EnhancedWallet(privateKey, undefined, keystoreOptions)
+    new EnhancedWallet(privateKey, undefined, keystoreOptions),
   );
 };

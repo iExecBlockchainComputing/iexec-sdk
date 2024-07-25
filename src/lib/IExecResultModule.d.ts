@@ -20,7 +20,7 @@ export default class IExecResultModule extends IExecModule {
    */
   checkResultEncryptionKeyExists(
     beneficiaryAddress: Addressish,
-    options: { teeFramework?: TeeFramework }
+    options: { teeFramework?: TeeFramework },
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY BENEFICIARY**
@@ -72,7 +72,7 @@ export default class IExecResultModule extends IExecModule {
     options?: {
       forceUpdate?: boolean;
       teeFramework?: TeeFramework;
-    }
+    },
   ): Promise<{ isPushed: boolean; isUpdated: boolean }>;
   /**
    * Create an IExecResultModule instance using an IExecConfig instance

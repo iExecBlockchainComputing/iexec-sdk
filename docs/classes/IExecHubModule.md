@@ -38,10 +38,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name           | Type                                                                                     |
-| :------------- | :--------------------------------------------------------------------------------------- |
+| Name | Type |
+| :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
@@ -72,7 +72,6 @@ current IExecConfig
 count the created categories.
 
 example:
-
 ```js
 const count = await countCategory();
 console.log('category count:', count);
@@ -82,41 +81,40 @@ console.log('category count:', count);
 
 `Promise`<[`BN`](utils.BN.md)\>
 
----
+___
 
 ### createCategory
 
-▸ **createCategory**(`category`): `Promise`<{ `catid`: [`BN`](utils.BN.md) ; `txHash`: `string` }\>
+▸ **createCategory**(`category`): `Promise`<{ `catid`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED, ONLY IEXEC OWNER**
 
 create a computation category on the iExec contract
 
 example:
-
 ```js
 const { catid } = await createCategory({
-  name: 'Small',
-  description: '5 min',
-  workClockTimeRef: 300,
+ name: 'Small',
+ description: '5 min',
+ workClockTimeRef: 300,
 });
 console.log('deployed with catid', catid);
 ```
 
 #### Parameters
 
-| Name                        | Type                           |
-| :-------------------------- | :----------------------------- |
-| `category`                  | `Object`                       |
-| `category.description`      | `string`                       |
-| `category.name`             | `string`                       |
+| Name | Type |
+| :------ | :------ |
+| `category` | `Object` |
+| `category.description` | `string` |
+| `category.name` | `string` |
 | `category.workClockTimeRef` | [`BNish`](../modules.md#bnish) |
 
 #### Returns
 
-`Promise`<{ `catid`: [`BN`](utils.BN.md) ; `txHash`: `string` }\>
+`Promise`<{ `catid`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
----
+___
 
 ### getTimeoutRatio
 
@@ -124,10 +122,9 @@ console.log('deployed with catid', catid);
 
 get the current `TimeoutRatio`
 
-`TimeoutRatio` is used with the category `workClockTimeRef` to determine the tasks duration (task max duration = TimeoutRatio \* workClockTimeRef)
+`TimeoutRatio` is used with the category `workClockTimeRef` to determine the tasks duration (task max duration = TimeoutRatio * workClockTimeRef)
 
 example:
-
 ```js
 const timeoutRatio = await getTimeoutRatio();
 console.log('timeoutRatio:', timeoutRatio);
@@ -137,7 +134,7 @@ console.log('timeoutRatio:', timeoutRatio);
 
 `Promise`<[`BN`](utils.BN.md)\>
 
----
+___
 
 ### showCategory
 
@@ -146,7 +143,6 @@ console.log('timeoutRatio:', timeoutRatio);
 show category with specified catid.
 
 example:
-
 ```js
 const category = await showCategory(0);
 console.log('category:', category);
@@ -154,15 +150,15 @@ console.log('category:', category);
 
 #### Parameters
 
-| Name    | Type                           |
-| :------ | :----------------------------- |
+| Name | Type |
+| :------ | :------ |
 | `catid` | [`BNish`](../modules.md#bnish) |
 
 #### Returns
 
 `Promise`<[`Category`](../interfaces/internal_.Category.md)\>
 
----
+___
 
 ### fromConfig
 
@@ -172,8 +168,8 @@ Create an IExecHubModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name     | Type                            |
-| :------- | :------------------------------ |
+| Name | Type |
+| :------ | :------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

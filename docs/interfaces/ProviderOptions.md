@@ -22,7 +22,7 @@
 
 [Alchemy](https://alchemyapi.io/) API key
 
----
+___
 
 ### cloudflare
 
@@ -30,7 +30,7 @@
 
 allow Cloudflare provider
 
----
+___
 
 ### etherscan
 
@@ -38,15 +38,15 @@ allow Cloudflare provider
 
 [Etherscan](https://etherscan.io/) API key
 
----
+___
 
 ### infura
 
-• `Optional` **infura**: `string` \| { `projectId`: `string` ; `projectSecret`: `string` }
+• `Optional` **infura**: `string` \| { `projectId`: `string` ; `projectSecret`: `string`  }
 
 [INFURA](https://infura.io/) Project ID or { projectId, projectSecret }
 
----
+___
 
 ### quorum
 

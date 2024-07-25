@@ -293,8 +293,8 @@ iexec [command] [options]
 
 Options:
 
-| option        | description               |
-| ------------- | ------------------------- |
+| option | description |
+| --- | --- |
 | -V, --version | output the version number |
 
 Commands:
@@ -329,15 +329,15 @@ iexec init [options]
 
 Options:
 
-| option                  | description                                                                               |
-| ----------------------- | ----------------------------------------------------------------------------------------- |
-| --raw                   | use raw output                                                                            |
-| --quiet                 | stop prompting updates                                                                    |
-| --password \<password\> | password used to encrypt the wallet (unsafe)                                              |
-| --unencrypted           | generate unsafe unencrypted wallet in working directory (--keystoredir option is ignored) |
-| --keystoredir \<path\>  | specify the wallet directory \<"global"\|"local"\|custom\>                                |
-| --force                 | force perform action without prompting user                                               |
-| --skip-wallet           | skip creating a new wallet                                                                |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --unencrypted | generate unsafe unencrypted wallet in working directory (--keystoredir option is ignored) |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --force | force perform action without prompting user |
+| --skip-wallet | skip creating a new wallet |
 
 ### iexec wallet
 
@@ -375,14 +375,14 @@ iexec wallet create [options]
 
 Options:
 
-| option                  | description                                                                               |
-| ----------------------- | ----------------------------------------------------------------------------------------- |
-| --raw                   | use raw output                                                                            |
-| --quiet                 | stop prompting updates                                                                    |
-| --password \<password\> | password used to encrypt the wallet (unsafe)                                              |
-| --unencrypted           | generate unsafe unencrypted wallet in working directory (--keystoredir option is ignored) |
-| --keystoredir \<path\>  | specify the wallet directory \<"global"\|"local"\|custom\>                                |
-| --force                 | force wallet creation even if old wallet exists                                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --unencrypted | generate unsafe unencrypted wallet in working directory (--keystoredir option is ignored) |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --force | force wallet creation even if old wallet exists |
 
 #### iexec wallet import
 
@@ -396,14 +396,14 @@ iexec wallet import <privateKey> [options]
 
 Options:
 
-| option                  | description                                                                               |
-| ----------------------- | ----------------------------------------------------------------------------------------- |
-| --raw                   | use raw output                                                                            |
-| --quiet                 | stop prompting updates                                                                    |
-| --password \<password\> | password used to encrypt the wallet (unsafe)                                              |
-| --unencrypted           | generate unsafe unencrypted wallet in working directory (--keystoredir option is ignored) |
-| --keystoredir \<path\>  | specify the wallet directory \<"global"\|"local"\|custom\>                                |
-| --force                 | force wallet creation even if old wallet exists                                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --unencrypted | generate unsafe unencrypted wallet in working directory (--keystoredir option is ignored) |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --force | force wallet creation even if old wallet exists |
 
 #### iexec wallet show
 
@@ -417,16 +417,16 @@ iexec wallet show [address] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --show-private-key                 | allow displaying wallet private key                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --show-private-key | allow displaying wallet private key |
 
 #### iexec wallet send-ether
 
@@ -442,19 +442,19 @@ iexec wallet send-ether <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
-| --to \<address\>                   | receiver address                                                               |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
 
 #### iexec wallet send-RLC
 
@@ -468,19 +468,19 @@ iexec wallet send-RLC <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
-| --to \<address\>                   | receiver address                                                               |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
 
 #### iexec wallet sweep
 
@@ -494,19 +494,19 @@ iexec wallet sweep [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
-| --to \<address\>                   | receiver address                                                               |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
 
 #### iexec wallet bridge-to-sidechain
 
@@ -520,18 +520,18 @@ iexec wallet bridge-to-sidechain <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
 
 #### iexec wallet bridge-to-mainchain
 
@@ -545,18 +545,18 @@ iexec wallet bridge-to-mainchain <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
 
 #### iexec wallet swap-RLC-for-eRLC
 
@@ -570,18 +570,18 @@ iexec wallet swap-RLC-for-eRLC <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
 
 #### iexec wallet swap-eRLC-for-RLC
 
@@ -595,18 +595,18 @@ iexec wallet swap-eRLC-for-RLC <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
 
 #### iexec wallet sendRLC
 
@@ -620,19 +620,19 @@ iexec wallet sendRLC <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
-| --to \<address\>                   | receiver address                                                               |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
 
 ### iexec account
 
@@ -662,17 +662,17 @@ iexec account deposit <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec account withdraw
 
@@ -686,17 +686,17 @@ iexec account withdraw <amount> [unit] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec account show
 
@@ -710,15 +710,15 @@ iexec account show [address] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
 
 ### iexec app
 
@@ -756,16 +756,16 @@ iexec app init [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --tee                              | use the Trusted Execution Environment template             |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --tee | use the Trusted Execution Environment template |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec app deploy
 
@@ -779,17 +779,17 @@ iexec app deploy [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec app show
 
@@ -803,16 +803,16 @@ iexec app show [addressOrIndex] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --user \<address\>                 | custom user address                                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --user \<address\> | custom user address |
 
 #### iexec app count
 
@@ -826,16 +826,16 @@ iexec app count [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --user \<address\>                 | custom user address                                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --user \<address\> | custom user address |
 
 #### iexec app check-secret
 
@@ -849,11 +849,11 @@ iexec app check-secret [appAddress] [options]
 
 Options:
 
-| option                   | description                      |
-| ------------------------ | -------------------------------- |
-| --raw                    | use raw output                   |
-| --quiet                  | stop prompting updates           |
-| --chain \<name\>         | chain name from "chain.json"     |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --chain \<name\> | chain name from "chain.json" |
 | --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec app push-secret
@@ -868,17 +868,17 @@ iexec app push-secret [appAddress] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --secret-value \<secretValue\>     | secret value (unsafe)                                      |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --secret-value \<secretValue\> | secret value (unsafe) |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec app publish
 
@@ -892,23 +892,23 @@ iexec app publish [appAddress] [options]
 
 Options:
 
-| option                             | description                                                  |
-| ---------------------------------- | ------------------------------------------------------------ |
-| --raw                              | use raw output                                               |
-| --quiet                            | stop prompting updates                                       |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                 |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                   |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                     |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>   |
-| --chain \<name\>                   | chain name from "chain.json"                                 |
-| --force                            | force perform action without prompting user                  |
-| --price \<amount unit...\>         | price per task (default unit nRLC)                           |
-| --volume \<volume\>                | number of run                                                |
-| --tag \<tag\>                      | specify tags<br/>\* usage: --tag tag1,tag2                   |
-| --dataset-restrict \<address\>     | restrict usage to specific dataset                           |
-| --workerpool-restrict \<address\>  | restrict usage to specific workerpool                        |
-| --requester-restrict \<address\>   | restrict usage to specific requester                         |
-| --skip-preflight-check             | skip preflight check, this may result in task execution fail |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --price \<amount unit...\> | price per task (default unit nRLC) |
+| --volume \<volume\> | number of run |
+| --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
+| --dataset-restrict \<address\> | restrict usage to specific dataset |
+| --workerpool-restrict \<address\> | restrict usage to specific workerpool |
+| --requester-restrict \<address\> | restrict usage to specific requester |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec app unpublish
 
@@ -922,17 +922,17 @@ iexec app unpublish [appAddress] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --force                            | force perform action without prompting user                |
-| --all                              | unpublish all orders                                       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --all | unpublish all orders |
 
 #### iexec app run
 
@@ -946,33 +946,33 @@ iexec app run [appAddress] [options]
 
 Options:
 
-| option                                   | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| --raw                                    | use raw output                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| --quiet                                  | stop prompting updates                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --password \<password\>                  | password used to encrypt the wallet (unsafe)                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --wallet-file \<walletFileName\>         | specify the name of the wallet file to use                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --wallet-address \<walletAddress\>       | specify the address of the wallet to use                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --keystoredir \<path\>                   | specify the wallet directory \<"global"\|"local"\|custom\>                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --chain \<name\>                         | chain name from "chain.json"                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --gas-price \<amount unit...\>           | set custom gas price for transactions (default unit wei)                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --confirms \<blockCount\>                | set custom block count to wait for transactions confirmation (default 1 block)                                                                                                                                                                                                                                                                                                                                                                                                              |
-| --force                                  | force perform action without prompting user                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| --watch                                  | watch execution status changes                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| --dataset \<address\|"deployed"\>        | dataset address, use "deployed" to use last deployed from "deployed.json"                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| --workerpool \<address\|"deployed"\>     | workerpool address, use "deployed" to use last deployed from "deployed.json"                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --args \<string\>                        | specify the arguments to pass to the app                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --input-files \<fileUrl\>                | specify the URL of input files to be used by the app<br/>\* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip                                                                                                                                                                                                                                                                                                                                                    |
-| --secret \<secretMapping...\>            | specify the requester secrets mappings (\<appSecretKey\>=\<requesterSecretName\>) to use in the app (only available for TEE tasks, use with --tag tee)<br/>\* usage: <br/> \* \[command\] \[args\] --secret 1=login 2=password<br/> \* \[command\] \[args\] --secret 1=login --secret 2=password<br/> \* \[command\] --secret 1=login --secret 2=password -- \[args\]<br/>\* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list<br/> |
-| --category \<id\>                        | id of the task category                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| --tag \<tag\>                            | specify tags<br/>\* usage: --tag tag1,tag2                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --storage-provider \<"ipfs"\|"dropbox"\> | specify the storage to use to store the result archive                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --callback \<address\>                   | specify the callback address of the request                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| --encrypt-result                         | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)                                                                                                                                                                                                                                                                                                                                                                               |
-| --trust \<integer\>                      | trust level                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| --beneficiary \<address\>                | specify the beneficiary of the request (default user address)                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --params \<json\>                        | specify the params of the request<br/>\* usage: --params '{"iexec_args":"do stuff","iexec_input_files":\["https://example.com/file.zip"\]}'                                                                                                                                                                                                                                                                                                                                                 |
-| --skip-preflight-check                   | skip preflight check, this may result in task execution fail                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --watch | watch execution status changes |
+| --dataset \<address\|"deployed"\> | dataset address, use "deployed" to use last deployed from "deployed.json" |
+| --workerpool \<address\|"deployed"\> | workerpool address, use "deployed" to use last deployed from "deployed.json" |
+| --args \<string\> | specify the arguments to pass to the app |
+| --input-files \<fileUrl\> | specify the URL of input files to be used by the app<br/>\* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip |
+| --secret \<secretMapping...\> | specify the requester secrets mappings (\<appSecretKey\>=\<requesterSecretName\>) to use in the app (only available for TEE tasks, use with --tag tee)<br/>\* usage: <br/>  \* \[command\] \[args\] --secret 1=login 2=password<br/>  \* \[command\] \[args\] --secret 1=login --secret 2=password<br/>  \* \[command\] --secret 1=login --secret 2=password -- \[args\]<br/>\* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list<br/> |
+| --category \<id\> | id of the task category |
+| --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
+| --storage-provider \<"ipfs"\|"dropbox"\> | specify the storage to use to store the result archive |
+| --callback \<address\> | specify the callback address of the request |
+| --encrypt-result | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee) |
+| --trust \<integer\> | trust level |
+| --beneficiary \<address\> | specify the beneficiary of the request (default user address) |
+| --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec app request-execution
 
@@ -986,34 +986,34 @@ iexec app request-execution <appAddress> [options]
 
 Options:
 
-| option                                   | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| --raw                                    | use raw output                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| --quiet                                  | stop prompting updates                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --password \<password\>                  | password used to encrypt the wallet (unsafe)                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --wallet-file \<walletFileName\>         | specify the name of the wallet file to use                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --wallet-address \<walletAddress\>       | specify the address of the wallet to use                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --keystoredir \<path\>                   | specify the wallet directory \<"global"\|"local"\|custom\>                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --chain \<name\>                         | chain name from "chain.json"                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --force                                  | force perform action without prompting user                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| --dataset \<address\>                    | dataset address                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| --workerpool \<address\>                 | workerpool address                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| --app-price \<amount unit...\>           | app price per task (default unit nRLC)                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --dataset-price \<amount unit...\>       | dataset price per task (default unit nRLC)                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --workerpool-price \<amount unit...\>    | workerpool price per task (default unit nRLC)                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --args \<string\>                        | specify the arguments to pass to the app                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --input-files \<fileUrl\>                | specify the URL of input files to be used by the app<br/>\* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip                                                                                                                                                                                                                                                                                                                                                    |
-| --secret \<secretMapping...\>            | specify the requester secrets mappings (\<appSecretKey\>=\<requesterSecretName\>) to use in the app (only available for TEE tasks, use with --tag tee)<br/>\* usage: <br/> \* \[command\] \[args\] --secret 1=login 2=password<br/> \* \[command\] \[args\] --secret 1=login --secret 2=password<br/> \* \[command\] --secret 1=login --secret 2=password -- \[args\]<br/>\* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list<br/> |
-| --category \<id\>                        | id of the task category                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| --tag \<tag\>                            | specify tags<br/>\* usage: --tag tag1,tag2                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --volume \<volume\>                      | number of run                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --storage-provider \<"ipfs"\|"dropbox"\> | specify the storage to use to store the result archive                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --callback \<address\>                   | specify the callback address of the request                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| --encrypt-result                         | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee)                                                                                                                                                                                                                                                                                                                                                                               |
-| --trust \<integer\>                      | trust level                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| --beneficiary \<address\>                | specify the beneficiary of the request (default user address)                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --params \<json\>                        | specify the params of the request<br/>\* usage: --params '{"iexec_args":"do stuff","iexec_input_files":\["https://example.com/file.zip"\]}'                                                                                                                                                                                                                                                                                                                                                 |
-| --skip-preflight-check                   | skip preflight check, this may result in task execution fail                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --dataset \<address\> | dataset address |
+| --workerpool \<address\> | workerpool address |
+| --app-price \<amount unit...\> | app price per task (default unit nRLC) |
+| --dataset-price \<amount unit...\> | dataset price per task (default unit nRLC) |
+| --workerpool-price \<amount unit...\> | workerpool price per task (default unit nRLC) |
+| --args \<string\> | specify the arguments to pass to the app |
+| --input-files \<fileUrl\> | specify the URL of input files to be used by the app<br/>\* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip |
+| --secret \<secretMapping...\> | specify the requester secrets mappings (\<appSecretKey\>=\<requesterSecretName\>) to use in the app (only available for TEE tasks, use with --tag tee)<br/>\* usage: <br/>  \* \[command\] \[args\] --secret 1=login 2=password<br/>  \* \[command\] \[args\] --secret 1=login --secret 2=password<br/>  \* \[command\] --secret 1=login --secret 2=password -- \[args\]<br/>\* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list<br/> |
+| --category \<id\> | id of the task category |
+| --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
+| --volume \<volume\> | number of run |
+| --storage-provider \<"ipfs"\|"dropbox"\> | specify the storage to use to store the result archive |
+| --callback \<address\> | specify the callback address of the request |
+| --encrypt-result | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee) |
+| --trust \<integer\> | trust level |
+| --beneficiary \<address\> | specify the beneficiary of the request (default user address) |
+| --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec app transfer
 
@@ -1027,19 +1027,19 @@ iexec app transfer <appAddress> [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
-| --to \<address\>                   | receiver address                                                               |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
 
 ### iexec dataset
 
@@ -1076,19 +1076,19 @@ iexec dataset init [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --encrypted                        | init datasets folder tree for dataset encryption           |
-| --tee                              | use the Trusted Execution Environment template             |
-| --dataset-keystoredir \<path\>     | specify dataset TEE key directory                          |
-| --original-dataset-dir \<path\>    | specify the original dataset directory                     |
-| --encrypted-dataset-dir \<path\>   | specify the encrypted dataset directory                    |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --encrypted | init datasets folder tree for dataset encryption |
+| --tee | use the Trusted Execution Environment template |
+| --dataset-keystoredir \<path\> | specify dataset TEE key directory |
+| --original-dataset-dir \<path\> | specify the original dataset directory |
+| --encrypted-dataset-dir \<path\> | specify the encrypted dataset directory |
 
 #### iexec dataset deploy
 
@@ -1102,17 +1102,17 @@ iexec dataset deploy [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec dataset show
 
@@ -1126,16 +1126,16 @@ iexec dataset show [addressOrIndex] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --user \<address\>                 | custom user address                                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --user \<address\> | custom user address |
 
 #### iexec dataset count
 
@@ -1149,16 +1149,16 @@ iexec dataset count [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --user \<address\>                 | custom user address                                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --user \<address\> | custom user address |
 
 #### iexec dataset encrypt
 
@@ -1172,14 +1172,14 @@ iexec dataset encrypt [options]
 
 Options:
 
-| option                           | description                                 |
-| -------------------------------- | ------------------------------------------- |
-| --raw                            | use raw output                              |
-| --quiet                          | stop prompting updates                      |
-| --force                          | force perform action without prompting user |
-| --dataset-keystoredir \<path\>   | specify dataset TEE key directory           |
-| --original-dataset-dir \<path\>  | specify the original dataset directory      |
-| --encrypted-dataset-dir \<path\> | specify the encrypted dataset directory     |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --force | force perform action without prompting user |
+| --dataset-keystoredir \<path\> | specify dataset TEE key directory |
+| --original-dataset-dir \<path\> | specify the original dataset directory |
+| --encrypted-dataset-dir \<path\> | specify the encrypted dataset directory |
 
 #### iexec dataset push-secret
 
@@ -1193,17 +1193,17 @@ iexec dataset push-secret [datasetAddress] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --secret-path \<secretPath\>       | push the secret from a file                                |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --secret-path \<secretPath\> | push the secret from a file |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec dataset check-secret
 
@@ -1217,11 +1217,11 @@ iexec dataset check-secret [datasetAddress] [options]
 
 Options:
 
-| option                   | description                      |
-| ------------------------ | -------------------------------- |
-| --raw                    | use raw output                   |
-| --quiet                  | stop prompting updates           |
-| --chain \<name\>         | chain name from "chain.json"     |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --chain \<name\> | chain name from "chain.json" |
 | --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec dataset publish
@@ -1236,23 +1236,23 @@ iexec dataset publish [datasetAddress] [options]
 
 Options:
 
-| option                             | description                                                  |
-| ---------------------------------- | ------------------------------------------------------------ |
-| --raw                              | use raw output                                               |
-| --quiet                            | stop prompting updates                                       |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                 |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                   |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                     |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>   |
-| --chain \<name\>                   | chain name from "chain.json"                                 |
-| --force                            | force perform action without prompting user                  |
-| --price \<amount unit...\>         | price per task (default unit nRLC)                           |
-| --volume \<volume\>                | number of run                                                |
-| --tag \<tag\>                      | specify tags<br/>\* usage: --tag tag1,tag2                   |
-| --app-restrict \<address\>         | restrict usage to specific app                               |
-| --workerpool-restrict \<address\>  | restrict usage to specific workerpool                        |
-| --requester-restrict \<address\>   | restrict usage to specific requester                         |
-| --skip-preflight-check             | skip preflight check, this may result in task execution fail |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --price \<amount unit...\> | price per task (default unit nRLC) |
+| --volume \<volume\> | number of run |
+| --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
+| --app-restrict \<address\> | restrict usage to specific app |
+| --workerpool-restrict \<address\> | restrict usage to specific workerpool |
+| --requester-restrict \<address\> | restrict usage to specific requester |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec dataset unpublish
 
@@ -1266,17 +1266,17 @@ iexec dataset unpublish [datasetAddress] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --force                            | force perform action without prompting user                |
-| --all                              | unpublish all orders                                       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --all | unpublish all orders |
 
 #### iexec dataset transfer
 
@@ -1290,19 +1290,19 @@ iexec dataset transfer <datasetAddress> [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
-| --to \<address\>                   | receiver address                                                               |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
 
 ### iexec workerpool
 
@@ -1337,14 +1337,14 @@ iexec workerpool init [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 
 #### iexec workerpool deploy
 
@@ -1358,17 +1358,17 @@ iexec workerpool deploy [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec workerpool set-api-url
 
@@ -1382,17 +1382,17 @@ iexec workerpool set-api-url <apiUrl> [workerpoolAddress] [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec workerpool show
 
@@ -1406,16 +1406,16 @@ iexec workerpool show [addressOrIndex] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --user \<address\>                 | custom user address                                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --user \<address\> | custom user address |
 
 #### iexec workerpool count
 
@@ -1429,16 +1429,16 @@ iexec workerpool count [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --user \<address\>                 | custom user address                                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --user \<address\> | custom user address |
 
 #### iexec workerpool publish
 
@@ -1452,24 +1452,24 @@ iexec workerpool publish [workerpoolAddress] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --force                            | force perform action without prompting user                |
-| --category \<id\>                  | id of the task category                                    |
-| --price \<amount unit...\>         | price per task (default unit nRLC)                         |
-| --volume \<volume\>                | number of run                                              |
-| --tag \<tag\>                      | specify tags<br/>\* usage: --tag tag1,tag2                 |
-| --trust \<integer\>                | trust level                                                |
-| --app-restrict \<address\>         | restrict usage to specific app                             |
-| --dataset-restrict \<address\>     | restrict usage to specific dataset                         |
-| --requester-restrict \<address\>   | restrict usage to specific requester                       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --category \<id\> | id of the task category |
+| --price \<amount unit...\> | price per task (default unit nRLC) |
+| --volume \<volume\> | number of run |
+| --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
+| --trust \<integer\> | trust level |
+| --app-restrict \<address\> | restrict usage to specific app |
+| --dataset-restrict \<address\> | restrict usage to specific dataset |
+| --requester-restrict \<address\> | restrict usage to specific requester |
 
 #### iexec workerpool unpublish
 
@@ -1483,17 +1483,17 @@ iexec workerpool unpublish [workerpoolAddress] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --force                            | force perform action without prompting user                |
-| --all                              | unpublish all orders                                       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --all | unpublish all orders |
 
 #### iexec workerpool transfer
 
@@ -1507,19 +1507,19 @@ iexec workerpool transfer <workerpoolAddress> [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
-| --to \<address\>                   | receiver address                                                               |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --to \<address\> | receiver address |
 
 ### iexec requester
 
@@ -1548,17 +1548,17 @@ iexec requester push-secret <secretName> [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --secret-value \<secretValue\>     | secret value (unsafe)                                      |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --secret-value \<secretValue\> | secret value (unsafe) |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec requester check-secret
 
@@ -1572,16 +1572,16 @@ iexec requester check-secret <secretName> [requesterAddress] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 ### iexec order
 
@@ -1615,19 +1615,19 @@ iexec order init [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --app                              | init an app sell order                                     |
-| --dataset                          | init a dataset sell order                                  |
-| --workerpool                       | init a workerpool sell order                               |
-| --request                          | init a buy request order                                   |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --app | init an app sell order |
+| --dataset | init a dataset sell order |
+| --workerpool | init a workerpool sell order |
+| --request | init a buy request order |
 
 #### iexec order sign
 
@@ -1641,21 +1641,21 @@ iexec order sign [options]
 
 Options:
 
-| option                             | description                                                  |
-| ---------------------------------- | ------------------------------------------------------------ |
-| --raw                              | use raw output                                               |
-| --quiet                            | stop prompting updates                                       |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                 |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                   |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                     |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>   |
-| --chain \<name\>                   | chain name from "chain.json"                                 |
-| --force                            | force perform action without prompting user                  |
-| --app                              | sign an selling apporder                                     |
-| --dataset                          | sign a selling datasetorder                                  |
-| --workerpool                       | sign a selling workerpoolorder                               |
-| --request                          | sign a buying requestorder                                   |
-| --skip-preflight-check             | skip preflight check, this may result in task execution fail |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --app | sign an selling apporder |
+| --dataset | sign a selling datasetorder |
+| --workerpool | sign a selling workerpoolorder |
+| --request | sign a buying requestorder |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec order fill
 
@@ -1669,24 +1669,24 @@ iexec order fill [options]
 
 Options:
 
-| option                             | description                                                                                                                                                                         |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| --raw                              | use raw output                                                                                                                                                                      |
-| --quiet                            | stop prompting updates                                                                                                                                                              |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                                                                                                                        |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                                                                                                                          |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                                                                                                                            |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                                                                                                                          |
-| --chain \<name\>                   | chain name from "chain.json"                                                                                                                                                        |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                                                                                                                            |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block)                                                                                                      |
-| --force                            | force perform action without prompting user                                                                                                                                         |
-| --app \<orderHash\>                | specify the app order from the marketplace to fill                                                                                                                                  |
-| --dataset \<orderHash\>            | specify the dataset order from the marketplace to fill                                                                                                                              |
-| --workerpool \<orderHash\>         | specify the workerpool order from the marketplace to fill                                                                                                                           |
-| --request \<orderHash\>            | specify the requestorder from the marketplace to fill                                                                                                                               |
-| --params \<json\>                  | specify the params of the request, existing request order will be ignored<br/>\* usage: --params '{"iexec_args":"do stuff","iexec_input_files":\["https://example.com/file.zip"\]}' |
-| --skip-preflight-check             | skip preflight check, this may result in task execution fail                                                                                                                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --app \<orderHash\> | specify the app order from the marketplace to fill |
+| --dataset \<orderHash\> | specify the dataset order from the marketplace to fill |
+| --workerpool \<orderHash\> | specify the workerpool order from the marketplace to fill |
+| --request \<orderHash\> | specify the requestorder from the marketplace to fill |
+| --params \<json\> | specify the params of the request, existing request order will be ignored<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec order publish
 
@@ -1700,21 +1700,21 @@ iexec order publish [options]
 
 Options:
 
-| option                             | description                                                  |
-| ---------------------------------- | ------------------------------------------------------------ |
-| --raw                              | use raw output                                               |
-| --quiet                            | stop prompting updates                                       |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                 |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                   |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                     |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>   |
-| --chain \<name\>                   | chain name from "chain.json"                                 |
-| --force                            | force perform action without prompting user                  |
-| --app                              | publish a signed apporder on iExec marketplace               |
-| --dataset                          | publish a signed datasetorder on iExec marketplace           |
-| --workerpool                       | publish a signed workerpoolorder on iExec marketplace        |
-| --request                          | publish a signed requestorder on iExec marketplace           |
-| --skip-preflight-check             | skip preflight check, this may result in task execution fail |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --app | publish a signed apporder on iExec marketplace |
+| --dataset | publish a signed datasetorder on iExec marketplace |
+| --workerpool | publish a signed workerpoolorder on iExec marketplace |
+| --request | publish a signed requestorder on iExec marketplace |
+| --skip-preflight-check | skip preflight check, this may result in task execution fail |
 
 #### iexec order unpublish
 
@@ -1728,20 +1728,20 @@ iexec order unpublish [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --force                            | force perform action without prompting user                |
-| --app \[orderHash\]                | unpublish a signed apporder from iExec marketplace         |
-| --dataset \[orderHash\]            | unpublish a signed datasetorder from iExec marketplace     |
-| --workerpool \[orderHash\]         | unpublish a signed workerpoolorder from iExec marketplace  |
-| --request \[orderHash\]            | unpublish a signed requestorder from iExec marketplace     |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --app \[orderHash\] | unpublish a signed apporder from iExec marketplace |
+| --dataset \[orderHash\] | unpublish a signed datasetorder from iExec marketplace |
+| --workerpool \[orderHash\] | unpublish a signed workerpoolorder from iExec marketplace |
+| --request \[orderHash\] | unpublish a signed requestorder from iExec marketplace |
 
 #### iexec order cancel
 
@@ -1755,22 +1755,22 @@ iexec order cancel [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force                            | force perform action without prompting user                                    |
-| --app                              | cancel a signed apporder                                                       |
-| --dataset                          | cancel a signed datasetorder                                                   |
-| --workerpool                       | cancel a signed workerpoolorder                                                |
-| --request                          | cancel a signed requestorder                                                   |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --force | force perform action without prompting user |
+| --app | cancel a signed apporder |
+| --dataset | cancel a signed datasetorder |
+| --workerpool | cancel a signed workerpoolorder |
+| --request | cancel a signed requestorder |
 
 #### iexec order show
 
@@ -1784,16 +1784,16 @@ iexec order show [options]
 
 Options:
 
-| option                     | description                          |
-| -------------------------- | ------------------------------------ |
-| --raw                      | use raw output                       |
-| --quiet                    | stop prompting updates               |
-| --chain \<name\>           | chain name from "chain.json"         |
-| --app \[orderHash\]        | show an apporder                     |
-| --dataset \[orderHash\]    | show a datasetorder                  |
-| --workerpool \[orderHash\] | show a workerpoolorder               |
-| --request \[orderHash\]    | show a requestorder                  |
-| --deals                    | show the deals produced by the order |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --chain \<name\> | chain name from "chain.json" |
+| --app \[orderHash\] | show an apporder |
+| --dataset \[orderHash\] | show a datasetorder |
+| --workerpool \[orderHash\] | show a workerpoolorder |
+| --request \[orderHash\] | show a requestorder |
+| --deals | show the deals produced by the order |
 
 ### iexec orderbook
 
@@ -1824,21 +1824,21 @@ iexec orderbook app <address> [options]
 
 Options:
 
-| option                   | description                                                                      |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| --raw                    | use raw output                                                                   |
-| --quiet                  | stop prompting updates                                                           |
-| --chain \<name\>         | chain name from "chain.json"                                                     |
-| --tag \<tag\>            | specify exact tags<br/>\* usage: --tag tag1,tag2                                 |
-| --require-tag \<tag\>    | specify minimum required tags<br/>\* usage: --require-tag tag1,tag2              |
-| --max-tag \<tag\>        | specify maximum tags (exclude not listed tags)<br/>\* usage: --max-tag tag1,tag2 |
-| --min-volume \<integer\> | specify minimum volume                                                           |
-| --dataset \<address\>    | include private orders for specified dataset                                     |
-| --workerpool \<address\> | include private orders for specified workerpool                                  |
-| --requester \<address\>  | include private orders for specified requester                                   |
-| --dataset-strict         | fetch orders created strictly for the specified dataset                          |
-| --workerpool-strict      | fetch orders created strictly for the specified workerpool                       |
-| --requester-strict       | fetch orders created strictly for the specified requester                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --chain \<name\> | chain name from "chain.json" |
+| --tag \<tag\> | specify exact tags<br/>\* usage: --tag tag1,tag2 |
+| --require-tag \<tag\> | specify minimum required tags<br/>\* usage: --require-tag tag1,tag2 |
+| --max-tag \<tag\> | specify maximum tags (exclude not listed tags)<br/>\* usage: --max-tag tag1,tag2 |
+| --min-volume \<integer\> | specify minimum volume |
+| --dataset \<address\> | include private orders for specified dataset |
+| --workerpool \<address\> | include private orders for specified workerpool |
+| --requester \<address\> | include private orders for specified requester |
+| --dataset-strict | fetch orders created strictly for the specified dataset |
+| --workerpool-strict | fetch orders created strictly for the specified workerpool |
+| --requester-strict | fetch orders created strictly for the specified requester |
 
 #### iexec orderbook dataset
 
@@ -1852,21 +1852,21 @@ iexec orderbook dataset <address> [options]
 
 Options:
 
-| option                   | description                                                                      |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| --raw                    | use raw output                                                                   |
-| --quiet                  | stop prompting updates                                                           |
-| --chain \<name\>         | chain name from "chain.json"                                                     |
-| --tag \<tag\>            | specify exact tags<br/>\* usage: --tag tag1,tag2                                 |
-| --require-tag \<tag\>    | specify minimum required tags<br/>\* usage: --require-tag tag1,tag2              |
-| --max-tag \<tag\>        | specify maximum tags (exclude not listed tags)<br/>\* usage: --max-tag tag1,tag2 |
-| --min-volume \<integer\> | specify minimum volume                                                           |
-| --app \<address\>        | include private orders for specified app                                         |
-| --workerpool \<address\> | include private orders for specified workerpool                                  |
-| --requester \<address\>  | include private orders for specified requester                                   |
-| --app-strict             | fetch orders created strictly for the specified app                              |
-| --requester-strict       | fetch orders created strictly for the specified requester                        |
-| --workerpool-strict      | fetch orders created strictly for the specified workerpool                       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --chain \<name\> | chain name from "chain.json" |
+| --tag \<tag\> | specify exact tags<br/>\* usage: --tag tag1,tag2 |
+| --require-tag \<tag\> | specify minimum required tags<br/>\* usage: --require-tag tag1,tag2 |
+| --max-tag \<tag\> | specify maximum tags (exclude not listed tags)<br/>\* usage: --max-tag tag1,tag2 |
+| --min-volume \<integer\> | specify minimum volume |
+| --app \<address\> | include private orders for specified app |
+| --workerpool \<address\> | include private orders for specified workerpool |
+| --requester \<address\> | include private orders for specified requester |
+| --app-strict | fetch orders created strictly for the specified app |
+| --requester-strict | fetch orders created strictly for the specified requester |
+| --workerpool-strict | fetch orders created strictly for the specified workerpool |
 
 #### iexec orderbook workerpool
 
@@ -1880,23 +1880,23 @@ iexec orderbook workerpool [address] [options]
 
 Options:
 
-| option                   | description                                                                      |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| --raw                    | use raw output                                                                   |
-| --quiet                  | stop prompting updates                                                           |
-| --chain \<name\>         | chain name from "chain.json"                                                     |
-| --category \<id\>        | specify the work category                                                        |
-| --tag \<tag\>            | specify exact tags<br/>\* usage: --tag tag1,tag2                                 |
-| --require-tag \<tag\>    | specify minimum required tags<br/>\* usage: --require-tag tag1,tag2              |
-| --max-tag \<tag\>        | specify maximum tags (exclude not listed tags)<br/>\* usage: --max-tag tag1,tag2 |
-| --min-volume \<integer\> | specify minimum volume                                                           |
-| --min-trust \<integer\>  | specify minimum trust                                                            |
-| --app \<address\>        | include private orders for specified app                                         |
-| --dataset \<address\>    | include private orders for specified dataset                                     |
-| --requester \<address\>  | include private orders for specified requester                                   |
-| --dataset-strict         | fetch orders created strictly for the specified dataset                          |
-| --app-strict             | fetch orders created strictly for the specified app                              |
-| --requester-strict       | fetch orders created strictly for the specified requester                        |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --chain \<name\> | chain name from "chain.json" |
+| --category \<id\> | specify the work category |
+| --tag \<tag\> | specify exact tags<br/>\* usage: --tag tag1,tag2 |
+| --require-tag \<tag\> | specify minimum required tags<br/>\* usage: --require-tag tag1,tag2 |
+| --max-tag \<tag\> | specify maximum tags (exclude not listed tags)<br/>\* usage: --max-tag tag1,tag2 |
+| --min-volume \<integer\> | specify minimum volume |
+| --min-trust \<integer\> | specify minimum trust |
+| --app \<address\> | include private orders for specified app |
+| --dataset \<address\> | include private orders for specified dataset |
+| --requester \<address\> | include private orders for specified requester |
+| --dataset-strict | fetch orders created strictly for the specified dataset |
+| --app-strict | fetch orders created strictly for the specified app |
+| --requester-strict | fetch orders created strictly for the specified requester |
 
 #### iexec orderbook requester
 
@@ -1910,22 +1910,22 @@ iexec orderbook requester [address] [options]
 
 Options:
 
-| option                    | description                                                                      |
-| ------------------------- | -------------------------------------------------------------------------------- |
-| --raw                     | use raw output                                                                   |
-| --quiet                   | stop prompting updates                                                           |
-| --chain \<name\>          | chain name from "chain.json"                                                     |
-| --category \<id\>         | specify the work category                                                        |
-| --tag \<tag\>             | specify exact tags<br/>\* usage: --tag tag1,tag2                                 |
-| --require-tag \<tag\>     | specify minimum required tags<br/>\* usage: --require-tag tag1,tag2              |
-| --max-tag \<tag\>         | specify maximum tags (exclude not listed tags)<br/>\* usage: --max-tag tag1,tag2 |
-| --min-volume \<integer\>  | specify minimum volume                                                           |
-| --max-trust \<integer\>   | specify maximum trust                                                            |
-| --app \<address\>         | filter by app                                                                    |
-| --dataset \<address\>     | filter by dataset                                                                |
-| --beneficiary \<address\> | filter by beneficiary                                                            |
-| --workerpool \<address\>  | include private orders for specified workerpool                                  |
-| --workerpool-strict       | fetch orders created strictly for the specified workerpool                       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --chain \<name\> | chain name from "chain.json" |
+| --category \<id\> | specify the work category |
+| --tag \<tag\> | specify exact tags<br/>\* usage: --tag tag1,tag2 |
+| --require-tag \<tag\> | specify minimum required tags<br/>\* usage: --require-tag tag1,tag2 |
+| --max-tag \<tag\> | specify maximum tags (exclude not listed tags)<br/>\* usage: --max-tag tag1,tag2 |
+| --min-volume \<integer\> | specify minimum volume |
+| --max-trust \<integer\> | specify maximum trust |
+| --app \<address\> | filter by app |
+| --dataset \<address\> | filter by dataset |
+| --beneficiary \<address\> | filter by beneficiary |
+| --workerpool \<address\> | include private orders for specified workerpool |
+| --workerpool-strict | fetch orders created strictly for the specified workerpool |
 
 ### iexec deal
 
@@ -1954,16 +1954,16 @@ iexec deal show <dealid> [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --watch                            | watch execution status changes                             |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --watch | watch execution status changes |
 
 #### iexec deal claim
 
@@ -1977,17 +1977,17 @@ iexec deal claim <dealid> [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 ### iexec task
 
@@ -2017,20 +2017,20 @@ iexec task show <taskid> [options]
 
 Options:
 
-| option                              | description                                                   |
-| ----------------------------------- | ------------------------------------------------------------- |
-| --raw                               | use raw output                                                |
-| --quiet                             | stop prompting updates                                        |
-| --password \<password\>             | password used to encrypt the wallet (unsafe)                  |
-| --wallet-file \<walletFileName\>    | specify the name of the wallet file to use                    |
-| --wallet-address \<walletAddress\>  | specify the address of the wallet to use                      |
-| --keystoredir \<path\>              | specify the wallet directory \<"global"\|"local"\|custom\>    |
-| --chain \<name\>                    | chain name from "chain.json"                                  |
-| --watch                             | watch execution status changes                                |
-| --download \[fileName\]             | download a task result data to local filesystem, if completed |
-| --decrypt                           | decrypt an encrypted result                                   |
-| --beneficiary-keystoredir \<path\>  | specify beneficiary TEE keys directory                        |
-| --beneficiary-key-file \<fileName\> | specify beneficiary TEE key file to use                       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --watch | watch execution status changes |
+| --download \[fileName\] | download a task result data to local filesystem, if completed |
+| --decrypt | decrypt an encrypted result |
+| --beneficiary-keystoredir \<path\> | specify beneficiary TEE keys directory |
+| --beneficiary-key-file \<fileName\> | specify beneficiary TEE key file to use |
 
 #### iexec task debug
 
@@ -2044,16 +2044,16 @@ iexec task debug <taskid> [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --logs                             | show application logs                                      |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --logs | show application logs |
 
 #### iexec task claim
 
@@ -2067,17 +2067,17 @@ iexec task claim <taskid> [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 ### iexec storage
 
@@ -2106,18 +2106,18 @@ iexec storage init [provider] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --force-update                     | update if already exists                                   |
-| --token \<token\>                  | storage provider authorization token (unsafe)              |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force-update | update if already exists |
+| --token \<token\> | storage provider authorization token (unsafe) |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec storage check
 
@@ -2131,17 +2131,17 @@ iexec storage check [provider] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --user \<address\>                 | custom user address                                        |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --user \<address\> | custom user address |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 ### iexec result
 
@@ -2174,16 +2174,16 @@ iexec result generate-encryption-keypair [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --force                            | force perform action without prompting user                |
-| --beneficiary-keystoredir \<path\> | specify beneficiary TEE keys directory                     |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --force | force perform action without prompting user |
+| --beneficiary-keystoredir \<path\> | specify beneficiary TEE keys directory |
 
 #### iexec result decrypt
 
@@ -2197,17 +2197,17 @@ iexec result decrypt [encryptedResultsPath] [options]
 
 Options:
 
-| option                              | description                                                |
-| ----------------------------------- | ---------------------------------------------------------- |
-| --raw                               | use raw output                                             |
-| --quiet                             | stop prompting updates                                     |
-| --password \<password\>             | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>    | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\>  | specify the address of the wallet to use                   |
-| --keystoredir \<path\>              | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --force                             | force perform action without prompting user                |
-| --beneficiary-keystoredir \<path\>  | specify beneficiary TEE keys directory                     |
-| --beneficiary-key-file \<fileName\> | specify beneficiary TEE key file to use                    |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --force | force perform action without prompting user |
+| --beneficiary-keystoredir \<path\> | specify beneficiary TEE keys directory |
+| --beneficiary-key-file \<fileName\> | specify beneficiary TEE key file to use |
 
 #### iexec result push-encryption-key
 
@@ -2223,18 +2223,18 @@ iexec result push-encryption-key [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --force-update                     | update if already exists                                   |
-| --secret-path \<secretPath\>       | push the secret from a file                                |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force-update | update if already exists |
+| --secret-path \<secretPath\> | push the secret from a file |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec result check-encryption-key
 
@@ -2250,16 +2250,16 @@ iexec result check-encryption-key [address] [options]
 
 Options:
 
-| option                             | description                                                |
-| ---------------------------------- | ---------------------------------------------------------- |
-| --raw                              | use raw output                                             |
-| --quiet                            | stop prompting updates                                     |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)               |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                 |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                   |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\>                   | chain name from "chain.json"                               |
-| --tee-framework \<name\>           | specify the TEE framework to use                           |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --tee-framework \<name\> | specify the TEE framework to use |
 
 ### iexec ens
 
@@ -2290,10 +2290,10 @@ iexec ens resolve <name> [options]
 
 Options:
 
-| option           | description                  |
-| ---------------- | ---------------------------- |
-| --raw            | use raw output               |
-| --quiet          | stop prompting updates       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
 
 #### iexec ens lookup
@@ -2308,10 +2308,10 @@ iexec ens lookup <address> [options]
 
 Options:
 
-| option           | description                  |
-| ---------------- | ---------------------------- |
-| --raw            | use raw output               |
-| --quiet          | stop prompting updates       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
 
 #### iexec ens get-owner
@@ -2326,10 +2326,10 @@ iexec ens get-owner <name> [options]
 
 Options:
 
-| option           | description                  |
-| ---------------- | ---------------------------- |
-| --raw            | use raw output               |
-| --quiet          | stop prompting updates       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
 
 #### iexec ens register
@@ -2344,20 +2344,20 @@ iexec ens register <label> [options]
 
 Options:
 
-| option                             | description                                                                                                                                                                                                                                                                     |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| --raw                              | use raw output                                                                                                                                                                                                                                                                  |
-| --quiet                            | stop prompting updates                                                                                                                                                                                                                                                          |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                                                                                                                                                                                                                    |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                                                                                                                                                                                                                      |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                                                                                                                                                                                                                        |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                                                                                                                                                                                                                      |
-| --chain \<name\>                   | chain name from "chain.json"                                                                                                                                                                                                                                                    |
-| --force                            | force perform action without prompting user                                                                                                                                                                                                                                     |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                                                                                                                                                                                                                        |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block)                                                                                                                                                                                                  |
-| --domain \<domain\>                | use the specified ENS domain (default `users.iexec.eth`)<br/> - if the ENS name (label.domain) is not owned by the user, the domain must be controlled by a FIFS registrar<br/> - if the ENS name (label.domain) is already owned by the user, the registration will be skipped |
-| --for \<address\>                  | register for an owned iExec app, dataset or workerpool                                                                                                                                                                                                                          |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --force | force perform action without prompting user |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+| --domain \<domain\> | use the specified ENS domain (default `users.iexec.eth`)<br/> - if the ENS name (label.domain) is not owned by the user, the domain must be controlled by a FIFS registrar<br/> - if the ENS name (label.domain) is already owned by the user, the registration will be skipped |
+| --for \<address\> | register for an owned iExec app, dataset or workerpool |
 
 ### iexec category
 
@@ -2388,9 +2388,9 @@ iexec category init [options]
 
 Options:
 
-| option  | description            |
-| ------- | ---------------------- |
-| --raw   | use raw output         |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
 | --quiet | stop prompting updates |
 
 #### iexec category create
@@ -2405,17 +2405,17 @@ iexec category create [options]
 
 Options:
 
-| option                             | description                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| --raw                              | use raw output                                                                 |
-| --quiet                            | stop prompting updates                                                         |
-| --password \<password\>            | password used to encrypt the wallet (unsafe)                                   |
-| --wallet-file \<walletFileName\>   | specify the name of the wallet file to use                                     |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use                                       |
-| --keystoredir \<path\>             | specify the wallet directory \<"global"\|"local"\|custom\>                     |
-| --chain \<name\>                   | chain name from "chain.json"                                                   |
-| --gas-price \<amount unit...\>     | set custom gas price for transactions (default unit wei)                       |
-| --confirms \<blockCount\>          | set custom block count to wait for transactions confirmation (default 1 block) |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec category show
 
@@ -2429,10 +2429,10 @@ iexec category show <index> [options]
 
 Options:
 
-| option           | description                  |
-| ---------------- | ---------------------------- |
-| --raw            | use raw output               |
-| --quiet          | stop prompting updates       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
 
 #### iexec category count
@@ -2447,10 +2447,10 @@ iexec category count [options]
 
 Options:
 
-| option           | description                  |
-| ---------------- | ---------------------------- |
-| --raw            | use raw output               |
-| --quiet          | stop prompting updates       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
 
 ### iexec registry
@@ -2479,9 +2479,9 @@ iexec registry validate <object> [options]
 
 Options:
 
-| option  | description            |
-| ------- | ---------------------- |
-| --raw   | use raw output         |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
 | --quiet | stop prompting updates |
 
 ### iexec info
@@ -2496,11 +2496,13 @@ iexec info [options]
 
 Options:
 
-| option           | description                  |
-| ---------------- | ---------------------------- |
-| --raw            | use raw output               |
-| --quiet          | stop prompting updates       |
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
 | --chain \<name\> | chain name from "chain.json" |
+
+
 
 ---
 

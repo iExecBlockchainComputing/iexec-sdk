@@ -39,7 +39,7 @@ export const getReadOnlyProvider = (host, options = {}) => {
     'quicknode',
   ];
   const nonConfiguredProviders = apiProvidersList.filter(
-    (apiProvider) => !Object.keys(providersOptionsRest).includes(apiProvider)
+    (apiProvider) => !Object.keys(providersOptionsRest).includes(apiProvider),
   );
   return getDefaultProvider(resolvedNetwork || resolvedHost, {
     quorum: quorum || 1,

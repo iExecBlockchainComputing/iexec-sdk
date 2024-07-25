@@ -41,7 +41,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[app](internal_.SignableRequestorder.md#app)
 
----
+___
 
 ### appmaxprice
 
@@ -51,7 +51,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[appmaxprice](internal_.SignableRequestorder.md#appmaxprice)
 
----
+___
 
 ### beneficiary
 
@@ -61,7 +61,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[beneficiary](internal_.SignableRequestorder.md#beneficiary)
 
----
+___
 
 ### callback
 
@@ -71,7 +71,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[callback](internal_.SignableRequestorder.md#callback)
 
----
+___
 
 ### category
 
@@ -81,7 +81,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[category](internal_.SignableRequestorder.md#category)
 
----
+___
 
 ### dataset
 
@@ -91,7 +91,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[dataset](internal_.SignableRequestorder.md#dataset)
 
----
+___
 
 ### datasetmaxprice
 
@@ -101,7 +101,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[datasetmaxprice](internal_.SignableRequestorder.md#datasetmaxprice)
 
----
+___
 
 ### params
 
@@ -111,13 +111,13 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[params](internal_.SignableRequestorder.md#params)
 
----
+___
 
 ### salt
 
 • **salt**: `string`
 
----
+___
 
 ### tag
 
@@ -127,7 +127,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[tag](internal_.SignableRequestorder.md#tag)
 
----
+___
 
 ### trust
 
@@ -137,7 +137,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[trust](internal_.SignableRequestorder.md#trust)
 
----
+___
 
 ### volume
 
@@ -147,7 +147,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[volume](internal_.SignableRequestorder.md#volume)
 
----
+___
 
 ### workerpool
 
@@ -157,7 +157,7 @@ buy order for computing tasks
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[workerpool](internal_.SignableRequestorder.md#workerpool)
 
----
+___
 
 ### workerpoolmaxprice
 

@@ -116,9 +116,9 @@ init
       }
       spinner.succeed(
         `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-          saved
+          saved,
         )}`,
-        { raw: { dataset: saved } }
+        { raw: { dataset: saved } },
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -146,14 +146,14 @@ deploy
       ]);
       if (!iexecConf[objName]) {
         throw Error(
-          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`
+          `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.deploying(objName));
       const { address, txHash } = await deployDataset(
         chain.contracts,
-        iexecConf[objName]
+        iexecConf[objName],
       );
       spinner.succeed(`Deployed new ${objName} at address ${address}`, {
         raw: { address, txHash },
@@ -184,7 +184,7 @@ show
       const addressOrIndex =
         cliAddressOrIndex ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id]
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
 
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
@@ -192,8 +192,7 @@ show
       if (!isAddress && !userAddress)
         throw Error(`Missing option ${option.user()[0]} or wallet`);
 
-      if (!addressOrIndex)
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+      if (!addressOrIndex) throw Error(info.missingAddressOrDeployed(objName, chain.id));
 
       spinner.start(info.showing(objName));
 
@@ -214,7 +213,7 @@ show
         res = await showUserDataset(
           chain.contracts,
           addressOrIndex,
-          userAddress
+          userAddress,
         );
         ens = await lookupAddress(chain.contracts, res.objAddress).catch(
           (e) => {
@@ -223,7 +222,7 @@ show
             } else {
               throw e;
             }
-          }
+          },
         );
       }
       const { dataset, objAddress } = res;
@@ -234,7 +233,7 @@ show
         })}`,
         {
           raw: { address: objAddress, ens, dataset },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -267,7 +266,7 @@ count
       const objCountBN = await countUserDatasets(chain.contracts, userAddress);
       spinner.succeed(
         `User ${userAddress} has a total of ${objCountBN} ${objName}`,
-        { raw: { count: objCountBN.toString() } }
+        { raw: { count: objCountBN.toString() } },
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -301,14 +300,14 @@ encryptDataset
 
       if (!eDSF || !eODF || !eEDF) {
         throw Error(
-          'Folders for dataset encryption are missing, did you forget to run "iexec dataset init --encrypted"?'
+          'Folders for dataset encryption are missing, did you forget to run "iexec dataset init --encrypted"?',
         );
       }
 
       const isDatasetFolderEmpty = await isEmptyDir(originalDatasetFolderPath);
       if (isDatasetFolderEmpty) {
         throw Error(
-          `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`
+          `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
         );
       }
 
@@ -318,7 +317,7 @@ encryptDataset
 
         const originalFilePath = join(
           originalDatasetFolderPath,
-          datasetFileName
+          datasetFileName,
         );
         const fileBuffer = await readFile(originalFilePath);
         const encryptedFileBuffer = await encryptAes256Cbc(fileBuffer, key);
@@ -330,14 +329,14 @@ encryptDataset
           {
             fileDir: datasetSecretsFolderPath,
             force: opts.force,
-          }
+          },
         );
         await saveTextToFile(`${defaultKeyFileName}`, key, {
           fileDir: datasetSecretsFolderPath,
           force: opts.force,
         });
         spinner.info(
-          `Generated dataset encryption key for ${datasetFileName} in ${keyFilePath}`
+          `Generated dataset encryption key for ${datasetFileName} in ${keyFilePath}`,
         );
 
         const encryptedFilePath = await saveToFile(
@@ -346,10 +345,10 @@ encryptDataset
           {
             fileDir: encryptedDatasetFolderPath,
             force: opts.force,
-          }
+          },
         );
         spinner.info(
-          `Generated encrypted dataset for ${datasetFileName} in ${encryptedFilePath}`
+          `Generated encrypted dataset for ${datasetFileName} in ${encryptedFilePath}`,
         );
         spinner.info(`Dataset checksum is ${encryptedFileChecksum}\n`);
 
@@ -364,15 +363,15 @@ encryptDataset
       const recursiveEncryptDatasets = async (
         filesNames,
         index = 0,
-        encryptedFiles = []
+        encryptedFiles = [],
       ) => {
         if (index >= filesNames.length) return encryptedFiles;
         const stats = await lstat(
-          join(originalDatasetFolderPath, filesNames[index])
+          join(originalDatasetFolderPath, filesNames[index]),
         );
         if (!stats.isFile()) {
           spinner.info(
-            `Datasets must be single file, skipping ${filesNames[index]}\n`
+            `Datasets must be single file, skipping ${filesNames[index]}\n`,
           );
         } else {
           const paths = await encryptDatasetFile(filesNames[index]);
@@ -393,7 +392,7 @@ encryptDataset
             secretPath: datasetSecretsFolderPath,
             encryptedFiles: encrypted,
           },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -424,11 +423,11 @@ pushSecret
       const resourceAddress =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id]
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!resourceAddress) {
         throw Error(
-          'Missing datasetAddress argument and no dataset found in "deployed.json"'
+          'Missing datasetAddress argument and no dataset found in "deployed.json"',
         );
       }
       spinner.info(`Dataset ${resourceAddress}`);
@@ -440,7 +439,7 @@ pushSecret
         const { datasetSecretsFolderPath } = createEncFolderPaths();
         secretFilePath = join(datasetSecretsFolderPath, defaultKeyFileName);
         spinner.info(
-          `No --secret-path <path> option, using default ${secretFilePath}`
+          `No --secret-path <path> option, using default ${secretFilePath}`,
         );
       }
 
@@ -452,7 +451,7 @@ pushSecret
         contracts,
         sms,
         resourceAddress,
-        secretToPush
+        secretToPush,
       );
       if (isPushed) {
         spinner.succeed('Secret successfully pushed', {
@@ -480,11 +479,11 @@ checkSecret
       const resourceAddress =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id]
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!resourceAddress) {
         throw Error(
-          'Missing datasetAddress argument and no dataset found in "deployed.json"'
+          'Missing datasetAddress argument and no dataset found in "deployed.json"',
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
@@ -494,7 +493,7 @@ checkSecret
       const secretIsSet = await checkWeb3SecretExists(
         chain.contracts,
         sms,
-        resourceAddress
+        resourceAddress,
       );
       if (secretIsSet) {
         spinner.succeed(`Secret found for dataset ${resourceAddress}`, {
@@ -535,7 +534,7 @@ publish
       const address =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id]
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
         throw Error(info.missingAddressOrDeployed(objName, chain.id));
@@ -543,7 +542,7 @@ publish
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
         spinner.info(
-          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
         );
       }
       spinner.info(`Creating ${objName}order for ${objName} ${address}`);
@@ -566,7 +565,7 @@ publish
         });
         await checkDatasetRequirements(
           { contracts: chain.contracts, smsURL: sms },
-          orderToSign
+          orderToSign,
         );
       }
       if (!opts.force) {
@@ -577,7 +576,7 @@ publish
       const orderHash = await publishDatasetorder(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
-        signedOrder
+        signedOrder,
       );
       spinner.succeed(
         `Successfully published ${objName}order with orderHash ${orderHash}\nRun "iexec orderbook ${objName} ${address}" to show published ${objName}orders`,
@@ -585,7 +584,7 @@ publish
           raw: {
             orderHash,
           },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -611,7 +610,7 @@ unpublish
       const address =
         objAddress ||
         (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id]
+          (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
         throw Error(info.missingAddressOrDeployed(objName, chain.id));
@@ -619,7 +618,7 @@ unpublish
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
         spinner.info(
-          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`
+          `No ${objName} specified, using last ${objName} deployed from "deployed.json"`,
         );
       }
       const all = !!opts.all;
@@ -631,12 +630,12 @@ unpublish
         ? await unpublishAllDatasetorders(
             chain.contracts,
             getPropertyFormChain(chain, 'iexecGateway'),
-            address
+            address,
           )
         : await unpublishLastDatasetorder(
             chain.contracts,
             getPropertyFormChain(chain, 'iexecGateway'),
-            address
+            address,
           );
       spinner.succeed(
         `Successfully unpublished ${all ? 'all' : 'last'} ${objName}order${
@@ -646,7 +645,7 @@ unpublish
           raw: {
             unpublished,
           },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -680,7 +679,7 @@ transfer
       const { txHash, address, to } = await transferDataset(
         chain.contracts,
         objAddress,
-        opts.to
+        opts.to,
       );
       spinner.succeed(
         `Successfully transferred ${objName} ${address} ownership to ${to}`,
@@ -690,7 +689,7 @@ transfer
             to,
             txHash,
           },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);

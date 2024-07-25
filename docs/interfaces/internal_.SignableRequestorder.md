@@ -36,73 +36,73 @@ buy order for computing tasks
 
 • **app**: `string`
 
----
+___
 
 ### appmaxprice
 
 • **appmaxprice**: [`BNish`](../modules.md#bnish)
 
----
+___
 
 ### beneficiary
 
 • **beneficiary**: `string`
 
----
+___
 
 ### callback
 
 • **callback**: `string`
 
----
+___
 
 ### category
 
 • **category**: [`BNish`](../modules.md#bnish)
 
----
+___
 
 ### dataset
 
 • **dataset**: `string`
 
----
+___
 
 ### datasetmaxprice
 
 • **datasetmaxprice**: [`BNish`](../modules.md#bnish)
 
----
+___
 
 ### params
 
 • **params**: `string` \| [`RequestorderParams`](internal_.RequestorderParams.md)
 
----
+___
 
 ### tag
 
 • **tag**: [`Tag`](../modules.md#tag)
 
----
+___
 
 ### trust
 
 • **trust**: [`BNish`](../modules.md#bnish)
 
----
+___
 
 ### volume
 
 • **volume**: [`BNish`](../modules.md#bnish)
 
----
+___
 
 ### workerpool
 
 • **workerpool**: `string`
 
----
+___
 
 ### workerpoolmaxprice
 

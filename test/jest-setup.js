@@ -22,13 +22,13 @@ expect.extend({
     return {
       pass: this.equals(
         stringifyNestedNumbers(received),
-        stringifyNestedNumbers(target)
+        stringifyNestedNumbers(target),
       ),
       message: () =>
         `not loosely equal \nreceived: ${JSON.stringify(
           received,
           null,
-          2
+          2,
         )}\nexpected: ${JSON.stringify(target, null, 2)}`,
     };
   },

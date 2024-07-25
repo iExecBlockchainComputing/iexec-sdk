@@ -16,13 +16,13 @@ const debug = Debug('iexec:voucher:voucher');
 export const fetchVoucherContract = async (
   contracts = throwIfMissing(),
   voucherHubAddress = throwIfMissing(),
-  owner
+  owner,
 ) => {
   try {
     const voucherAddress = await fetchVoucherAddress(
       contracts,
       voucherHubAddress,
-      owner
+      owner,
     );
     if (voucherAddress) {
       return getVoucherContract(contracts, voucherAddress);
@@ -38,7 +38,7 @@ export const showUserVoucher = async (
   contracts = throwIfMissing(),
   voucherSubgraphURL,
   voucherHubAddress,
-  owner = throwIfMissing()
+  owner = throwIfMissing(),
 ) => {
   try {
     const vOwner = await addressSchema({
@@ -49,12 +49,12 @@ export const showUserVoucher = async (
       .validate(owner);
     const graphQLClient = getVoucherSubgraphClient(
       contracts,
-      voucherSubgraphURL
+      voucherSubgraphURL,
     );
     const voucherAddress = await fetchVoucherAddress(
       contracts,
       voucherHubAddress,
-      vOwner
+      vOwner,
     );
     if (!voucherAddress) {
       throw Error(`No Voucher found for address ${vOwner}`);
@@ -62,7 +62,7 @@ export const showUserVoucher = async (
     const voucherContract = await fetchVoucherContract(
       contracts,
       voucherHubAddress,
-      vOwner
+      vOwner,
     );
     const fetchType = voucherContract.getType();
     const fetchBalance = voucherContract.getBalance();
@@ -70,7 +70,7 @@ export const showUserVoucher = async (
     const fetchAllowanceAmount = checkAllowance(
       contracts,
       vOwner,
-      voucherAddress
+      voucherAddress,
     );
     const fetchVoucherInfo = getVoucherInfo(graphQLClient, voucherAddress);
     const [type, balance, expirationTimestamp, allowanceAmount, voucherInfo] =
@@ -99,7 +99,7 @@ export const showUserVoucher = async (
 export const authorizeRequester = async (
   contracts = throwIfMissing(),
   voucherHubAddress = throwIfMissing(),
-  requester
+  requester,
 ) => {
   try {
     checkSigner(contracts);
@@ -113,13 +113,13 @@ export const authorizeRequester = async (
     const voucherContract = await fetchVoucherContract(
       contracts,
       voucherHubAddress,
-      userAddress
+      userAddress,
     );
     if (!voucherContract) {
       throw Error(`No Voucher found for address ${userAddress}`);
     }
     const isAuthorized = await wrapCall(
-      voucherContract.isAccountAuthorized(vRequester)
+      voucherContract.isAccountAuthorized(vRequester),
     );
     if (isAuthorized) {
       throw Error(`${vRequester} is already authorized`);
@@ -127,7 +127,7 @@ export const authorizeRequester = async (
     const tx = await wrapSend(
       voucherContract
         .connect(contracts.signer)
-        .authorizeAccount(vRequester, contracts.txOptions)
+        .authorizeAccount(vRequester, contracts.txOptions),
     );
     await tx.wait();
     return tx.hash;
@@ -140,7 +140,7 @@ export const authorizeRequester = async (
 export const revokeRequesterAuthorization = async (
   contracts = throwIfMissing(),
   voucherHubAddress = throwIfMissing(),
-  requester
+  requester,
 ) => {
   try {
     checkSigner(contracts);
@@ -154,13 +154,13 @@ export const revokeRequesterAuthorization = async (
     const voucherContract = await fetchVoucherContract(
       contracts,
       voucherHubAddress,
-      userAddress
+      userAddress,
     );
     if (!voucherContract) {
       throw Error(`No Voucher found for address ${userAddress}`);
     }
     const isAuthorized = await wrapCall(
-      voucherContract.isAccountAuthorized(vRequester)
+      voucherContract.isAccountAuthorized(vRequester),
     );
     if (!isAuthorized) {
       throw Error(`${vRequester} is not authorized`);
@@ -168,7 +168,7 @@ export const revokeRequesterAuthorization = async (
     const tx = await wrapSend(
       voucherContract
         .connect(contracts.signer)
-        .unauthorizeAccount(vRequester, contracts.txOptions)
+        .unauthorizeAccount(vRequester, contracts.txOptions),
     );
     await tx.wait();
     return tx.hash;

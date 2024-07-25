@@ -43,10 +43,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name           | Type                                                                                     |
-| :------------- | :--------------------------------------------------------------------------------------- |
+| Name | Type |
+| :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
@@ -77,7 +77,6 @@ current IExecConfig
 check if an workerpool is deployed at a given address
 
 example:
-
 ```js
 const isDeployed = await checkDeployedWorkerpool(address);
 console.log('workerpool deployed', isDeployed);
@@ -85,15 +84,15 @@ console.log('workerpool deployed', isDeployed);
 
 #### Parameters
 
-| Name                | Type     |
-| :------------------ | :------- |
+| Name | Type |
+| :------ | :------ |
 | `workerpoolAddress` | `string` |
 
 #### Returns
 
 `Promise`<`Boolean`\>
 
----
+___
 
 ### countUserWorkerpools
 
@@ -102,7 +101,6 @@ console.log('workerpool deployed', isDeployed);
 count the workerpools owned by an address.
 
 example:
-
 ```js
 const count = await countUserWorkerpools(userAddress);
 console.log('workerpool count:', count);
@@ -110,45 +108,44 @@ console.log('workerpool count:', count);
 
 #### Parameters
 
-| Name          | Type     |
-| :------------ | :------- |
+| Name | Type |
+| :------ | :------ |
 | `userAddress` | `string` |
 
 #### Returns
 
 `Promise`<[`BN`](utils.BN.md)\>
 
----
+___
 
 ### deployWorkerpool
 
-▸ **deployWorkerpool**(`workerpool`): `Promise`<{ `address`: `string` ; `txHash`: `string` }\>
+▸ **deployWorkerpool**(`workerpool`): `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED**
 
 deploy a workerpool contract on the blockchain
 
 example:
-
 ```js
 const { address } = await deployWorkerpool({
-  owner: address,
-  description: 'My workerpool',
+ owner: address,
+ description: 'My workerpool',
 });
 console.log('deployed at', address);
 ```
 
 #### Parameters
 
-| Name         | Type                                                                              |
-| :----------- | :-------------------------------------------------------------------------------- |
+| Name | Type |
+| :------ | :------ |
 | `workerpool` | [`WorkerpoolDeploymentArgs`](../interfaces/internal_.WorkerpoolDeploymentArgs.md) |
 
 #### Returns
 
-`Promise`<{ `address`: `string` ; `txHash`: `string` }\>
+`Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
----
+___
 
 ### getWorkerpoolApiUrl
 
@@ -159,7 +156,6 @@ read the workerpool API url on the blockchain
 _NB_: resolve to `undefined` if the workerpool API url was not declared.
 
 example:
-
 ```js
 const url = await getWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
 console.log('workerpool API url:', url);
@@ -167,16 +163,16 @@ console.log('workerpool API url:', url);
 
 #### Parameters
 
-| Name                | Type     |
-| :------------------ | :------- |
+| Name | Type |
+| :------ | :------ |
 | `workerpoolAddress` | `string` |
-| `url`               | `string` |
+| `url` | `string` |
 
 #### Returns
 
 `Promise`<`undefined` \| `string`\>
 
----
+___
 
 ### predictWorkerpoolAddress
 
@@ -185,26 +181,25 @@ console.log('workerpool API url:', url);
 predict the workerpool contract address given the workerpool deployment arguments
 
 example:
-
 ```js
 const address = await predictWorkerpoolAddress({
-  owner: address,
-  description: 'My workerpool',
+ owner: address,
+ description: 'My workerpool',
 });
 console.log('address', address);
 ```
 
 #### Parameters
 
-| Name         | Type                                                                              |
-| :----------- | :-------------------------------------------------------------------------------- |
+| Name | Type |
+| :------ | :------ |
 | `workerpool` | [`WorkerpoolDeploymentArgs`](../interfaces/internal_.WorkerpoolDeploymentArgs.md) |
 
 #### Returns
 
 `Promise`<`string`\>
 
----
+___
 
 ### setWorkerpoolApiUrl
 
@@ -217,36 +212,31 @@ declare the workerpool API url on the blockchain
 _NB_: declaring the workerpool API url require an ENS name with a configured reverse resolution on the workerpool address (see: IExecENSModule obsConfigureResolution/configureResolution)
 
 example:
-
 ```js
-const txHash = await setWorkerpoolApiUrl(
-  'my-workerpool.eth',
-  'my-workerpool.com'
-);
+const txHash = await setWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
 console.log('txHash:', txHash);
 ```
 
 #### Parameters
 
-| Name                | Type     |
-| :------------------ | :------- |
+| Name | Type |
+| :------ | :------ |
 | `workerpoolAddress` | `string` |
-| `url`               | `string` |
+| `url` | `string` |
 
 #### Returns
 
 `Promise`<`string`\>
 
----
+___
 
 ### showUserWorkerpool
 
-▸ **showUserWorkerpool**(`index`, `address`): `Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md) }\>
+▸ **showUserWorkerpool**(`index`, `address`): `Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
 
 show deployed workerpool details by index for specified user user
 
 example:
-
 ```js
 const { workerpool } = await showUserWorkerpool(0, userAddress);
 console.log('workerpool:', workerpool);
@@ -254,47 +244,44 @@ console.log('workerpool:', workerpool);
 
 #### Parameters
 
-| Name      | Type                           |
-| :-------- | :----------------------------- |
-| `index`   | [`BNish`](../modules.md#bnish) |
-| `address` | `string`                       |
+| Name | Type |
+| :------ | :------ |
+| `index` | [`BNish`](../modules.md#bnish) |
+| `address` | `string` |
 
 #### Returns
 
-`Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md) }\>
+`Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
 
----
+___
 
 ### showWorkerpool
 
-▸ **showWorkerpool**(`workerpoolAddress`): `Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md) }\>
+▸ **showWorkerpool**(`workerpoolAddress`): `Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
 
 show a deployed workerpool details
 
 example:
-
 ```js
-const { workerpool } = await showWorkerpool(
-  '0x86F2102532d9d01DA8084c96c1D1Bdb90e12Bf07'
-);
+const { workerpool } = await showWorkerpool('0x86F2102532d9d01DA8084c96c1D1Bdb90e12Bf07');
 console.log('workerpool:', workerpool);
 ```
 
 #### Parameters
 
-| Name                | Type     |
-| :------------------ | :------- |
+| Name | Type |
+| :------ | :------ |
 | `workerpoolAddress` | `string` |
 
 #### Returns
 
-`Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md) }\>
+`Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
 
----
+___
 
 ### transferWorkerpool
 
-▸ **transferWorkerpool**(`workerpoolAddress`, `to`): `Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string` }\>
+▸ **transferWorkerpool**(`workerpoolAddress`, `to`): `Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
 **ONLY WORKERPOOL OWNER**
 
@@ -303,29 +290,23 @@ transfer the ownership of a workerpool to the specified address
 _NB_: when transferring the ownership to a contract, the receiver contract must implement the ERC721 token receiver interface
 
 example:
-
 ```js
-const { address, to, txHash } = await transferWorkerpool(
-  workerpoolAddress,
-  receiverAddress
-);
-console.log(
-  `workerpool ${address} ownership transferred to ${address} in tx ${txHash}`
-);
+const { address, to, txHash } = await transferWorkerpool(workerpoolAddress, receiverAddress);
+console.log(`workerpool ${address} ownership transferred to ${address} in tx ${txHash}`);
 ```
 
 #### Parameters
 
-| Name                | Type     |
-| :------------------ | :------- |
+| Name | Type |
+| :------ | :------ |
 | `workerpoolAddress` | `string` |
-| `to`                | `string` |
+| `to` | `string` |
 
 #### Returns
 
-`Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string` }\>
+`Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
----
+___
 
 ### fromConfig
 
@@ -335,8 +316,8 @@ Create an IExecWorkerpoolModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name     | Type                            |
-| :------- | :------------------------------ |
+| Name | Type |
+| :------ | :------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

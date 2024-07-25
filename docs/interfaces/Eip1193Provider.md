@@ -16,10 +16,10 @@
 
 #### Parameters
 
-| Name              | Type                                  |
-| :---------------- | :------------------------------------ |
-| `request`         | `Object`                              |
-| `request.method`  | `string`                              |
+| Name | Type |
+| :------ | :------ |
+| `request` | `Object` |
+| `request.method` | `string` |
 | `request.params?` | `any`[] \| `Record`<`string`, `any`\> |
 
 #### Returns

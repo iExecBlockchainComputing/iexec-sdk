@@ -24,37 +24,37 @@ sell order for an app
 
 • **app**: `string`
 
----
+___
 
 ### appprice
 
 • **appprice**: `string`
 
----
+___
 
 ### datasetrestrict
 
 • **datasetrestrict**: `string`
 
----
+___
 
 ### requesterrestrict
 
 • **requesterrestrict**: `string`
 
----
+___
 
 ### tag
 
 • **tag**: `string`
 
----
+___
 
 ### volume
 
 • **volume**: `string`
 
----
+___
 
 ### workerpoolrestrict
 

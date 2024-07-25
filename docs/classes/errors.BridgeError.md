@@ -32,10 +32,10 @@ BridgeError is thrown when bridging RLC between mainchain and sidechain fail bef
 
 #### Parameters
 
-| Name            | Type     | Description                                                       |
-| :-------------- | :------- | :---------------------------------------------------------------- |
-| `originalError` | `Error`  | The original Error object that caused this API call error.        |
-| `sendTxHash`    | `string` | Hash of the transaction sending the value to the bridge contract. |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `originalError` | `Error` | The original Error object that caused this API call error. |
+| `sendTxHash` | `string` | Hash of the transaction sending the value to the bridge contract. |
 
 #### Returns
 
@@ -53,7 +53,7 @@ Error.constructor
 
 The original Error object that caused this API call error.
 
----
+___
 
 ### originalError
 
@@ -63,7 +63,7 @@ The original Error object that caused this API call error.
 
 use Error cause instead
 
----
+___
 
 ### sendTxHash
 

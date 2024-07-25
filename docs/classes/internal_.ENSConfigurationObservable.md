@@ -60,12 +60,12 @@ data:
 
 #### Parameters
 
-| Name                  | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| :-------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `callbacks`           | `Object`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `callbacks.complete?` | () => `any`                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `callbacks.error?`    | (`error`: `Error`) => `any`                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `callbacks.next?`     | (`data`: { `address?`: `string` ; `addressType?`: `string` ; `message`: `"DESCRIBE_WORKFLOW"` \| `"SET_RESOLVER_TX_REQUEST"` \| `"SET_RESOLVER_TX_SENT"` \| `"SET_RESOLVER_SUCCESS"` \| `"SET_ADDR_TX_REQUEST"` \| `"SET_ADDR_TX_SENT"` \| `"SET_ADDR_SUCCESS"` \| `"SET_NAME_TX_REQUEST"` \| `"SET_NAME_TX_SENT"` \| `"SET_NAME_SUCCESS"` ; `name?`: `string` ; `resolverAddress?`: `string` ; `steps?`: `string`[] ; `txHash?`: `string` }) => `any` |
+| Name | Type |
+| :------ | :------ |
+| `callbacks` | `Object` |
+| `callbacks.complete?` | () => `any` |
+| `callbacks.error?` | (`error`: `Error`) => `any` |
+| `callbacks.next?` | (`data`: { `address?`: `string` ; `addressType?`: `string` ; `message`: ``"DESCRIBE_WORKFLOW"`` \| ``"SET_RESOLVER_TX_REQUEST"`` \| ``"SET_RESOLVER_TX_SENT"`` \| ``"SET_RESOLVER_SUCCESS"`` \| ``"SET_ADDR_TX_REQUEST"`` \| ``"SET_ADDR_TX_SENT"`` \| ``"SET_ADDR_SUCCESS"`` \| ``"SET_NAME_TX_REQUEST"`` \| ``"SET_NAME_TX_SENT"`` \| ``"SET_NAME_SUCCESS"`` ; `name?`: `string` ; `resolverAddress?`: `string` ; `steps?`: `string`[] ; `txHash?`: `string`  }) => `any` |
 
 #### Returns
 

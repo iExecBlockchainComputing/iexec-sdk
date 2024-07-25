@@ -108,7 +108,7 @@ show
           }
         } catch (error) {
           throw Error(
-            `Failed to load wallet address from keystore: ${error.message}`
+            `Failed to load wallet address from keystore: ${error.message}`,
           );
         }
       } else {
@@ -128,7 +128,7 @@ show
         })}`,
         {
           raw: { balance: cleanBalance },
-        }
+        },
       );
     } catch (error) {
       handleError(error, cli, opts);

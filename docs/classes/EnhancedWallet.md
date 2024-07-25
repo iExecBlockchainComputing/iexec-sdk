@@ -22,12 +22,12 @@
 
 #### Parameters
 
-| Name                           | Type                                              |
-| :----------------------------- | :------------------------------------------------ |
-| `privateKey`                   | `string` \| `SigningKey`                          |
-| `provider?`                    | `Provider`                                        |
-| `options?`                     | `Object`                                          |
-| `options.gasPrice?`            | `string`                                          |
+| Name | Type |
+| :------ | :------ |
+| `privateKey` | `string` \| `SigningKey` |
+| `provider?` | `Provider` |
+| `options?` | `Object` |
+| `options.gasPrice?` | `string` |
 | `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> |
 
 #### Returns

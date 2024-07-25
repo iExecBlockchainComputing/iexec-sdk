@@ -29,13 +29,13 @@ describe('iexec ens', () => {
     await execAsync(`${iexecPath} dataset init`);
     await execAsync(`${iexecPath} workerpool init`);
     app = await execAsync(`${iexecPath} app deploy --raw`).then(
-      (res) => JSON.parse(res).address
+      (res) => JSON.parse(res).address,
     );
     dataset = await execAsync(`${iexecPath} dataset deploy --raw`).then(
-      (res) => JSON.parse(res).address
+      (res) => JSON.parse(res).address,
     );
     workerpool = await execAsync(`${iexecPath} workerpool deploy --raw`).then(
-      (res) => JSON.parse(res).address
+      (res) => JSON.parse(res).address,
     );
   });
 
@@ -47,7 +47,7 @@ describe('iexec ens', () => {
     test('iexec ens register <name> (for self)', async () => {
       const expectedEns = `${userWallet.address.toLowerCase()}.users.iexec.eth`;
       const res = await runIExecCliRaw(
-        `${iexecPath} ens register ${userWallet.address.toLowerCase()}`
+        `${iexecPath} ens register ${userWallet.address.toLowerCase()}`,
       );
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
@@ -75,7 +75,7 @@ describe('iexec ens', () => {
       expect(showAddressRes.ens).toBe(expectedEns);
 
       const showEnsRes = await runIExecCliRaw(
-        `${iexecPath} wallet show ${expectedEns}`
+        `${iexecPath} wallet show ${expectedEns}`,
       );
       expect(showEnsRes.ens).toBe(expectedEns);
     });
@@ -83,7 +83,7 @@ describe('iexec ens', () => {
     test('iexec ens register <name> --for <app>', async () => {
       const expectedEns = `${app.toLowerCase()}.apps.iexec.eth`;
       const res = await runIExecCliRaw(
-        `${iexecPath} ens register ${app.toLowerCase()} --for ${app}`
+        `${iexecPath} ens register ${app.toLowerCase()} --for ${app}`,
       );
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
@@ -94,12 +94,12 @@ describe('iexec ens', () => {
       expect(res.setNameTxHash).toBeTxHash();
 
       const showAddressRes = await runIExecCliRaw(
-        `${iexecPath} app show ${app}`
+        `${iexecPath} app show ${app}`,
       );
       expect(showAddressRes.ens).toBe(expectedEns);
 
       const showEnsRes = await runIExecCliRaw(
-        `${iexecPath} app show ${expectedEns}`
+        `${iexecPath} app show ${expectedEns}`,
       );
       expect(showEnsRes.address).toBe(app);
     });
@@ -107,7 +107,7 @@ describe('iexec ens', () => {
     test('iexec ens register <name> --for <dataset>', async () => {
       const expectedEns = `${dataset.toLowerCase()}.datasets.iexec.eth`;
       const res = await runIExecCliRaw(
-        `${iexecPath} ens register ${dataset.toLowerCase()} --for ${dataset} --raw`
+        `${iexecPath} ens register ${dataset.toLowerCase()} --for ${dataset} --raw`,
       );
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
@@ -117,12 +117,12 @@ describe('iexec ens', () => {
       expect(res.setAddrTxHash).toBeTxHash();
       expect(res.setNameTxHash).toBeTxHash();
       const showAddressRes = await runIExecCliRaw(
-        `${iexecPath} dataset show ${dataset}`
+        `${iexecPath} dataset show ${dataset}`,
       );
       expect(showAddressRes.ens).toBe(expectedEns);
 
       const showEnsRes = await runIExecCliRaw(
-        `${iexecPath} dataset show ${expectedEns}`
+        `${iexecPath} dataset show ${expectedEns}`,
       );
       expect(showEnsRes.address).toBe(dataset);
     });
@@ -130,7 +130,7 @@ describe('iexec ens', () => {
     test('iexec ens register <name> --for <workerpool>', async () => {
       const expectedEns = `${workerpool.toLowerCase()}.pools.iexec.eth`;
       const res = await runIExecCliRaw(
-        `${iexecPath} ens register ${workerpool.toLowerCase()} --for ${workerpool} --raw`
+        `${iexecPath} ens register ${workerpool.toLowerCase()} --for ${workerpool} --raw`,
       );
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
@@ -140,12 +140,12 @@ describe('iexec ens', () => {
       expect(res.setAddrTxHash).toBeTxHash();
       expect(res.setNameTxHash).toBeTxHash();
       const showAddressRes = await runIExecCliRaw(
-        `${iexecPath} workerpool show ${workerpool}`
+        `${iexecPath} workerpool show ${workerpool}`,
       );
       expect(showAddressRes.ens).toBe(expectedEns);
 
       const showEnsRes = await runIExecCliRaw(
-        `${iexecPath} workerpool show ${expectedEns}`
+        `${iexecPath} workerpool show ${expectedEns}`,
       );
       expect(showEnsRes.address).toBe(workerpool);
     });

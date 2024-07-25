@@ -28,7 +28,7 @@ describe('iexec init', () => {
     await execAsync('rm -rf datasets').catch(() => {});
     await execAsync('rm -rf .secrets').catch(() => {});
     const raw = await execAsync(
-      `${iexecPath} init --password test --force --raw`
+      `${iexecPath} init --password test --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -46,7 +46,7 @@ describe('iexec init', () => {
     await execAsync('rm -rf datasets').catch(() => {});
     await execAsync('rm -rf .secrets').catch(() => {});
     const raw = await execAsync(
-      `${iexecPath} init --skip-wallet --force --raw`
+      `${iexecPath} init --skip-wallet --force --raw`,
     );
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);

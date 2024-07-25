@@ -40,10 +40,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name           | Type                                                                                     |
-| :------------- | :--------------------------------------------------------------------------------------- |
+| Name | Type |
+| :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
@@ -76,7 +76,6 @@ current IExecConfig
 authorize a requester to use the voucher
 
 example:
-
 ```js
 const txHash = await authorizeRequester(requesterAddress);
 console.log('tx:', txHash);
@@ -84,24 +83,23 @@ console.log('tx:', txHash);
 
 #### Parameters
 
-| Name        | Type     |
-| :---------- | :------- |
+| Name | Type |
+| :------ | :------ |
 | `requester` | `string` |
 
 #### Returns
 
 `Promise`<`string`\>
 
----
+___
 
 ### getVoucherAddress
 
-▸ **getVoucherAddress**(`owner`): `Promise`<`null` \| `string`\>
+▸ **getVoucherAddress**(`owner`): `Promise`<``null`` \| `string`\>
 
 returns the address of the voucher contract for the specified address if the address owns a voucher
 
 example:
-
 ```js
 const voucherAddress = await getVoucherAddress(ownerAddress);
 console.log('voucher contract address:', voucherAddress);
@@ -109,15 +107,15 @@ console.log('voucher contract address:', voucherAddress);
 
 #### Parameters
 
-| Name    | Type     |
-| :------ | :------- |
+| Name | Type |
+| :------ | :------ |
 | `owner` | `string` |
 
 #### Returns
 
-`Promise`<`null` \| `string`\>
+`Promise`<``null`` \| `string`\>
 
----
+___
 
 ### revokeRequesterAuthorization
 
@@ -125,15 +123,15 @@ console.log('voucher contract address:', voucherAddress);
 
 #### Parameters
 
-| Name        | Type     |
-| :---------- | :------- |
+| Name | Type |
+| :------ | :------ |
 | `requester` | `string` |
 
 #### Returns
 
 `Promise`<`string`\>
 
----
+___
 
 ### showUserVoucher
 
@@ -142,7 +140,6 @@ console.log('voucher contract address:', voucherAddress);
 returns the user voucher information
 
 example:
-
 ```js
 const userVoucher = await showUserVoucher(userAddress);
 console.log('address:', userVoucher.address);
@@ -151,15 +148,15 @@ console.log('balance:', userVoucher.balance);
 
 #### Parameters
 
-| Name    | Type     |
-| :------ | :------- |
+| Name | Type |
+| :------ | :------ |
 | `owner` | `string` |
 
 #### Returns
 
 `Promise`<[`VoucherInfo`](../interfaces/internal_.VoucherInfo.md)\>
 
----
+___
 
 ### fromConfig
 
@@ -169,8 +166,8 @@ Create an IExecVoucherModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name     | Type                            |
-| :------- | :------------------------------ |
+| Name | Type |
+| :------ | :------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

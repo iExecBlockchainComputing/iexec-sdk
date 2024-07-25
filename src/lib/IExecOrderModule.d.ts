@@ -617,7 +617,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   signApporder(
     apporder: SignableApporder,
-    options?: { preflightCheck?: boolean }
+    options?: { preflightCheck?: boolean },
   ): Promise<SignedApporder>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
@@ -634,7 +634,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   signDatasetorder(
     datasetorder: SignableDatasetorder,
-    options?: { preflightCheck?: boolean }
+    options?: { preflightCheck?: boolean },
   ): Promise<SignedDatasetorder>;
   /**
    * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
@@ -647,7 +647,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   signWorkerpoolorder(
-    workerpoolorder: SignableWorkerpoolorder
+    workerpoolorder: SignableWorkerpoolorder,
   ): Promise<SignedWorkerpoolorder>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
@@ -668,7 +668,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   signRequestorder(
     requestorder: SignableRequestorder,
-    options?: { preflightCheck?: boolean }
+    options?: { preflightCheck?: boolean },
   ): Promise<SignedRequestorder>;
   /**
    * compute the hash of an apporder
@@ -700,7 +700,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   hashWorkerpoolorder(
-    workerpoolorder: HashableWorkerpoolorder
+    workerpoolorder: HashableWorkerpoolorder,
   ): Promise<OrderHash>;
   /**
    * compute the hash of a requestorder
@@ -724,7 +724,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   cancelApporder(
-    apporder: ConsumableApporder
+    apporder: ConsumableApporder,
   ): Promise<{ txHash: TxHash; order: SignedApporder }>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
@@ -738,7 +738,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   cancelDatasetorder(
-    datasetorder: ConsumableDatasetorder
+    datasetorder: ConsumableDatasetorder,
   ): Promise<{ txHash: TxHash; order: SignedDatasetorder }>;
   /**
    * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
@@ -752,7 +752,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   cancelWorkerpoolorder(
-    workerpoolorder: ConsumableWorkerpoolorder
+    workerpoolorder: ConsumableWorkerpoolorder,
   ): Promise<{ txHash: TxHash; order: SignedWorkerpoolorder }>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
@@ -766,7 +766,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   cancelRequestorder(
-    requestorder: ConsumableRequestorder
+    requestorder: ConsumableRequestorder,
   ): Promise<{ txHash: TxHash; order: SignedRequestorder }>;
   /**
    * **SIGNER REQUIRED, ONLY APP OWNER**
@@ -785,7 +785,7 @@ export default class IExecOrderModule extends IExecModule {
     apporder: ConsumableApporder,
     options?: {
       preflightCheck?: boolean;
-    }
+    },
   ): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
@@ -804,7 +804,7 @@ export default class IExecOrderModule extends IExecModule {
     datasetorder: ConsumableDatasetorder,
     options?: {
       preflightCheck?: boolean;
-    }
+    },
   ): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
@@ -818,7 +818,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   publishWorkerpoolorder(
-    workerpoolorder: ConsumableWorkerpoolorder
+    workerpoolorder: ConsumableWorkerpoolorder,
   ): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
@@ -835,7 +835,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   publishRequestorder(
     requestorder: ConsumableRequestorder,
-    options?: { preflightCheck?: boolean }
+    options?: { preflightCheck?: boolean },
   ): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY APPORDER SIGNER**
@@ -935,7 +935,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   unpublishLastWorkerpoolorder(
-    workerpoolAddress: Addressish
+    workerpoolAddress: Addressish,
   ): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
@@ -993,7 +993,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   unpublishAllWorkerpoolorders(
-    workerpoolAddress: Addressish
+    workerpoolAddress: Addressish,
   ): Promise<OrderHash[]>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
@@ -1035,7 +1035,7 @@ export default class IExecOrderModule extends IExecModule {
     options?: {
       preflightCheck?: boolean;
       useVoucher?: boolean;
-    }
+    },
   ): Promise<{ dealid: Dealid; volume: BN; txHash: TxHash }>;
   /**
    * estimates the cost of matching the provided orders
@@ -1062,7 +1062,7 @@ export default class IExecOrderModule extends IExecModule {
     },
     options?: {
       useVoucher?: boolean;
-    }
+    },
   ): Promise<{ total: NRlcAmount; sponsored: NRlcAmount }>;
   /**
    * Create an IExecOrderModule instance using an IExecConfig instance

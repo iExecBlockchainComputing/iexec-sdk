@@ -24,7 +24,7 @@ IExec dataset
 
 sha256sum of the file
 
----
+___
 
 ### datasetMultiaddr
 
@@ -32,7 +32,7 @@ sha256sum of the file
 
 dataset file download address
 
----
+___
 
 ### datasetName
 
@@ -40,7 +40,7 @@ dataset file download address
 
 a name for the dataset
 
----
+___
 
 ### owner
 
@@ -48,7 +48,7 @@ a name for the dataset
 
 the dataset owner
 
----
+___
 
 ### registry
 

@@ -35,10 +35,10 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Parameters
 
-| Name           | Type                                                                                     |
-| :------------- | :--------------------------------------------------------------------------------------- |
+| Name | Type |
+| :------ | :------ |
 | `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?`     | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)                              |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
@@ -64,14 +64,13 @@ current IExecConfig
 
 ### getNetwork
 
-▸ **getNetwork**(): `Promise`<{ `chainId`: `number` ; `isNative`: `boolean` }\>
+▸ **getNetwork**(): `Promise`<{ `chainId`: `number` ; `isNative`: `boolean`  }\>
 
 get info about the current iExec network
 
 _NB_: `isNative` is true when the iExec instance use the chain's native token for payment (otherwise the payment token is an ERC20)
 
 example:
-
 ```js
 const { chainId, isNative } = await getNetwork();
 console.log(`working on chain ${chainId}, using native token: ${isNative}`);
@@ -79,9 +78,9 @@ console.log(`working on chain ${chainId}, using native token: ${isNative}`);
 
 #### Returns
 
-`Promise`<{ `chainId`: `number` ; `isNative`: `boolean` }\>
+`Promise`<{ `chainId`: `number` ; `isNative`: `boolean`  }\>
 
----
+___
 
 ### fromConfig
 
@@ -91,8 +90,8 @@ Create an IExecNetworkModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name     | Type                            |
-| :------- | :------------------------------ |
+| Name | Type |
+| :------ | :------ |
 | `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns

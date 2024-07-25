@@ -7,7 +7,7 @@ const debug = Debug('iexec:account:balance');
 
 export const checkBalance = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing()
+  address = throwIfMissing(),
 ) => {
   try {
     const vAddress = await addressSchema({
@@ -15,7 +15,7 @@ export const checkBalance = async (
     }).validate(address);
     const iexecContract = contracts.getIExecContract();
     const { stake, locked } = await wrapCall(
-      iexecContract.viewAccount(vAddress)
+      iexecContract.viewAccount(vAddress),
     );
     return {
       stake: bigIntToBn(stake),

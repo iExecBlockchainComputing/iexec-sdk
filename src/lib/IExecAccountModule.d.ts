@@ -32,7 +32,7 @@ export default class IExecAccountModule extends IExecModule {
    */
   checkAllowance(
     ownerAddress: Addressish,
-    spenderAddress: Addressish
+    spenderAddress: Addressish,
   ): Promise<NRLCAmount>;
   /**
    * **SIGNER REQUIRED**

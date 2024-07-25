@@ -18,13 +18,13 @@ fetch(forkUrl, {
     if (process.env.DRONE) {
       const LOCAL_STACK_ENV_DIR = 'local-stack-env';
       console.log(
-        `Creating ${LOCAL_STACK_ENV_DIR} directory for drone test-stack`
+        `Creating ${LOCAL_STACK_ENV_DIR} directory for drone test-stack`,
       );
       mkdirSync(LOCAL_STACK_ENV_DIR, { recursive: true });
       writeFileSync(join(LOCAL_STACK_ENV_DIR, 'BELLECOUR_FORK_URL'), forkUrl);
       writeFileSync(
         join(LOCAL_STACK_ENV_DIR, 'BELLECOUR_FORK_BLOCK'),
-        `${forkBlockNumber}`
+        `${forkBlockNumber}`,
       );
     } else {
       console.log('Creating .env file for docker-compose test-stack');
@@ -37,7 +37,7 @@ fetch(forkUrl, {
 # blockchain node to use as the reference for the local fork
 BELLECOUR_FORK_URL=${forkUrl}
 # block number to fork from
-BELLECOUR_FORK_BLOCK=${forkBlockNumber}`
+BELLECOUR_FORK_BLOCK=${forkBlockNumber}`,
       );
     }
   })

@@ -25,18 +25,18 @@ describe('account', () => {
         readOnly: true,
       });
       const initialBalance = await readOnlyIExec.account.checkBalance(
-        wallet.address
+        wallet.address,
       );
       expect(initialBalance.stake).toBeInstanceOf(BN);
       expect(initialBalance.locked).toBeInstanceOf(BN);
       await iexec.account.deposit(5);
       const finalBalance = await readOnlyIExec.account.checkBalance(
-        wallet.address
+        wallet.address,
       );
       expect(finalBalance.stake).toBeInstanceOf(BN);
       expect(finalBalance.locked).toBeInstanceOf(BN);
       expect(finalBalance.stake.sub(new BN(5)).eq(initialBalance.stake)).toBe(
-        true
+        true,
       );
       expect(finalBalance.locked.eq(initialBalance.locked)).toBe(true);
     });
@@ -47,7 +47,7 @@ describe('account', () => {
       test('expose bridged balances (mainnet) on bellecour', async () => {
         const iexec = new IExec(
           { ethProvider: 'bellecour' },
-          { providerOptions: { infura: INFURA_PROJECT_ID } }
+          { providerOptions: { infura: INFURA_PROJECT_ID } },
         );
         const res = await iexec.account.checkBridgedBalance(getRandomAddress());
         expect(res.stake).toBeInstanceOf(BN);
@@ -58,7 +58,7 @@ describe('account', () => {
         test('expose bridged balances (bellecour) on mainnet', async () => {
           const iexec = new IExec({ ethProvider: 'mainnet' });
           const res = await iexec.account.checkBridgedBalance(
-            getRandomAddress()
+            getRandomAddress(),
           );
           expect(res.stake).toBeInstanceOf(BN);
           expect(res.locked).toBeInstanceOf(BN);
@@ -73,8 +73,8 @@ describe('account', () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.account.approve(10, spenderAddress)).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
@@ -84,9 +84,9 @@ describe('account', () => {
       const amount = 10;
 
       await expect(
-        iexec.account.approve(amount, spenderAddress)
+        iexec.account.approve(amount, spenderAddress),
       ).rejects.toThrow(
-        Error(`${spenderAddress} is not a valid ethereum address`)
+        Error(`${spenderAddress} is not a valid ethereum address`),
       );
     });
 
@@ -96,7 +96,7 @@ describe('account', () => {
       const amount = 'invalid_amount';
 
       await expect(
-        iexec.account.approve(amount, spenderAddress)
+        iexec.account.approve(amount, spenderAddress),
       ).rejects.toThrow(Error(`${amount} is not a valid amount`));
     });
 
@@ -105,7 +105,7 @@ describe('account', () => {
       const spenderAddress = wallet.address;
       const negativeAmount = -999;
       await expect(
-        iexec.account.approve(negativeAmount, spenderAddress)
+        iexec.account.approve(negativeAmount, spenderAddress),
       ).rejects.toThrow(Error(`${negativeAmount} is not a valid amount`));
     });
 
@@ -124,9 +124,9 @@ describe('account', () => {
       const spenderAddress = getRandomAddress();
 
       await expect(
-        iexec.account.checkAllowance(ownerAddress, spenderAddress)
+        iexec.account.checkAllowance(ownerAddress, spenderAddress),
       ).rejects.toThrow(
-        Error(`${ownerAddress} is not a valid ethereum address`)
+        Error(`${ownerAddress} is not a valid ethereum address`),
       );
     });
 
@@ -136,9 +136,9 @@ describe('account', () => {
       const spenderAddress = "'invalid_address'";
 
       await expect(
-        iexec.account.checkAllowance(ownerAddress, spenderAddress)
+        iexec.account.checkAllowance(ownerAddress, spenderAddress),
       ).rejects.toThrow(
-        Error(`${spenderAddress} is not a valid ethereum address`)
+        Error(`${spenderAddress} is not a valid ethereum address`),
       );
     });
 
@@ -149,7 +149,7 @@ describe('account', () => {
 
       const result = await iexec.account.checkAllowance(
         ownerAddress,
-        spenderAddress
+        spenderAddress,
       );
 
       expect(result).toEqual(new BN(0));
@@ -163,13 +163,13 @@ describe('account', () => {
 
       const txHash = await iexec.account.approve(
         allowanceValue,
-        spenderAddress
+        spenderAddress,
       );
       expect(txHash).toBeDefined();
 
       const result = await iexec.account.checkAllowance(
         ownerAddress,
-        spenderAddress
+        spenderAddress,
       );
 
       expect(result).toBeInstanceOf(BN);
@@ -182,11 +182,11 @@ describe('account', () => {
       const spenderAddress = getRandomAddress();
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(
-        iexec.account.revokeApproval(spenderAddress)
+        iexec.account.revokeApproval(spenderAddress),
       ).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
@@ -195,9 +195,9 @@ describe('account', () => {
       const spenderAddress = 'invalid_address';
 
       await expect(
-        iexec.account.revokeApproval(spenderAddress)
+        iexec.account.revokeApproval(spenderAddress),
       ).rejects.toThrow(
-        Error(`${spenderAddress} is not a valid ethereum address`)
+        Error(`${spenderAddress} is not a valid ethereum address`),
       );
     });
 
@@ -211,7 +211,7 @@ describe('account', () => {
       expect(revocationTxHash).toBeDefined();
       const amountAfterRevocation = await iexec.account.checkAllowance(
         wallet.address,
-        spenderAddress
+        spenderAddress,
       );
       expect(amountAfterRevocation).toBeInstanceOf(BN);
       expect(amountAfterRevocation.toString()).toBe('0');
@@ -223,15 +223,15 @@ describe('account', () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.account.deposit(10)).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
     test('prevents deposit 0', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       await expect(iexec.account.deposit(0)).rejects.toThrow(
-        Error('Deposit amount must be greater than 0')
+        Error('Deposit amount must be greater than 0'),
       );
     });
 
@@ -240,30 +240,30 @@ describe('account', () => {
         const { iexec, wallet } = getTestConfig(iexecTestChain)();
         await setNRlcBalance(iexecTestChain)(wallet.address, 10);
         const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         const res = await iexec.account.deposit(5);
         const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         expect(res.txHash).toBeTxHash();
         expect(res.amount).toBe('5');
         expect(
           accountFinalBalance.stake
             .sub(new BN(5))
-            .eq(accountInitialBalance.stake)
+            .eq(accountInitialBalance.stake),
         ).toBe(true);
         expect(
-          walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC)
+          walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC),
         ).toBe(true);
         expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked)
+          accountFinalBalance.locked.eq(accountInitialBalance.locked),
         ).toBe(true);
       });
 
@@ -271,60 +271,60 @@ describe('account', () => {
         const { iexec, wallet } = getTestConfig(iexecTestChain)();
         await setNRlcBalance(iexecTestChain)(wallet.address, ONE_RLC);
         const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         const res = await iexec.account.deposit('0.005 RLC');
         const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         expect(res.txHash).toBeTxHash();
         expect(res.amount).toBe('5000000');
         expect(
           accountFinalBalance.stake
             .sub(new BN('5000000'))
-            .eq(accountInitialBalance.stake)
+            .eq(accountInitialBalance.stake),
         ).toBe(true);
         expect(
           walletFinalBalance.nRLC
             .add(new BN('5000000'))
-            .eq(walletInitialBalance.nRLC)
+            .eq(walletInitialBalance.nRLC),
         ).toBe(true);
         expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked)
+          accountFinalBalance.locked.eq(accountInitialBalance.locked),
         ).toBe(true);
       });
 
       test('fails if amount exceed wallet balance', async () => {
         const { iexec, wallet } = getTestConfig(iexecTestChain)();
         const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         await expect(iexec.account.deposit(100)).rejects.toThrow(
-          Error('Deposit amount exceed wallet balance')
+          Error('Deposit amount exceed wallet balance'),
         );
         const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
-          true
+          true,
         );
         expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(
-          true
+          true,
         );
         expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked)
+          accountFinalBalance.locked.eq(accountInitialBalance.locked),
         ).toBe(true);
       });
     });
@@ -335,30 +335,30 @@ describe('account', () => {
         await setNRlcBalance(tokenTestChain)(wallet.address, 10);
         await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
         const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         const res = await iexec.account.deposit(5);
         const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         expect(res.txHash).toBeTxHash();
         expect(res.amount).toBe('5');
         expect(
           accountFinalBalance.stake
             .sub(new BN(5))
-            .eq(accountInitialBalance.stake)
+            .eq(accountInitialBalance.stake),
         ).toBe(true);
         expect(
-          walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC)
+          walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC),
         ).toBe(true);
         expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked)
+          accountFinalBalance.locked.eq(accountInitialBalance.locked),
         ).toBe(true);
       });
 
@@ -367,28 +367,28 @@ describe('account', () => {
         await setNRlcBalance(tokenTestChain)(wallet.address, 10);
         await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
         const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         await expect(iexec.account.deposit(100)).rejects.toThrow(
-          Error('Deposit amount exceed wallet balance')
+          Error('Deposit amount exceed wallet balance'),
         );
         const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address
+          wallet.address,
         );
         const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address
+          wallet.address,
         );
         expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
-          true
+          true,
         );
         expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(
-          true
+          true,
         );
         expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked)
+          accountFinalBalance.locked.eq(accountInitialBalance.locked),
         ).toBe(true);
       });
     });
@@ -399,15 +399,15 @@ describe('account', () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.account.withdraw(10)).rejects.toThrow(
         Error(
-          'The current provider is not a signer, impossible to sign messages or transactions'
-        )
+          'The current provider is not a signer, impossible to sign messages or transactions',
+        ),
       );
     });
 
     test('prevents withdraw 0', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       await expect(iexec.account.withdraw(0)).rejects.toThrow(
-        Error('Withdraw amount must be greater than 0')
+        Error('Withdraw amount must be greater than 0'),
       );
     });
 
@@ -416,28 +416,30 @@ describe('account', () => {
       await setNRlcBalance(iexecTestChain)(wallet.address, 10);
       await iexec.account.deposit(10);
       const accountInitialBalance = await iexec.account.checkBalance(
-        wallet.address
+        wallet.address,
       );
       const walletInitialBalance = await iexec.wallet.checkBalances(
-        wallet.address
+        wallet.address,
       );
       const res = await iexec.account.withdraw(5);
       const accountFinalBalance = await iexec.account.checkBalance(
-        wallet.address
+        wallet.address,
       );
       const walletFinalBalance = await iexec.wallet.checkBalances(
-        wallet.address
+        wallet.address,
       );
       expect(res.txHash).toBeTxHash();
       expect(res.amount).toBe('5');
       expect(
-        accountFinalBalance.stake.add(new BN(5)).eq(accountInitialBalance.stake)
+        accountFinalBalance.stake
+          .add(new BN(5))
+          .eq(accountInitialBalance.stake),
       ).toBe(true);
       expect(
-        walletFinalBalance.nRLC.sub(new BN(5)).eq(walletInitialBalance.nRLC)
+        walletFinalBalance.nRLC.sub(new BN(5)).eq(walletInitialBalance.nRLC),
       ).toBe(true);
       expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
-        true
+        true,
       );
     });
 
@@ -446,30 +448,30 @@ describe('account', () => {
       await setNRlcBalance(iexecTestChain)(wallet.address, 10000);
       await iexec.account.deposit(10000);
       const accountInitialBalance = await iexec.account.checkBalance(
-        wallet.address
+        wallet.address,
       );
       const walletInitialBalance = await iexec.wallet.checkBalances(
-        wallet.address
+        wallet.address,
       );
       const res = await iexec.account.withdraw('0.000005 RLC');
       const accountFinalBalance = await iexec.account.checkBalance(
-        wallet.address
+        wallet.address,
       );
       const walletFinalBalance = await iexec.wallet.checkBalances(
-        wallet.address
+        wallet.address,
       );
       expect(res.txHash).toBeTxHash();
       expect(res.amount).toBe('5000');
       expect(
         accountFinalBalance.stake
           .add(new BN(5000))
-          .eq(accountInitialBalance.stake)
+          .eq(accountInitialBalance.stake),
       ).toBe(true);
       expect(
-        walletFinalBalance.nRLC.sub(new BN(5000)).eq(walletInitialBalance.nRLC)
+        walletFinalBalance.nRLC.sub(new BN(5000)).eq(walletInitialBalance.nRLC),
       ).toBe(true);
       expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
-        true
+        true,
       );
     });
 
@@ -478,26 +480,26 @@ describe('account', () => {
       await setNRlcBalance(iexecTestChain)(wallet.address, 10);
       await iexec.account.deposit(10);
       const accountInitialBalance = await iexec.account.checkBalance(
-        wallet.address
+        wallet.address,
       );
       const walletInitialBalance = await iexec.wallet.checkBalances(
-        wallet.address
+        wallet.address,
       );
       await expect(iexec.account.withdraw(100)).rejects.toThrow(
-        Error('Withdraw amount exceed account balance')
+        Error('Withdraw amount exceed account balance'),
       );
       const accountFinalBalance = await iexec.account.checkBalance(
-        wallet.address
+        wallet.address,
       );
       const walletFinalBalance = await iexec.wallet.checkBalances(
-        wallet.address
+        wallet.address,
       );
       expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
-        true
+        true,
       );
       expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(true);
       expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
-        true
+        true,
       );
     });
   });

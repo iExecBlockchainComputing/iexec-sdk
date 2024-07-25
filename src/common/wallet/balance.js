@@ -7,7 +7,7 @@ const debug = Debug('iexec:wallet:balance');
 
 export const getRlcBalance = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing()
+  address = throwIfMissing(),
 ) => {
   const vAddress = await addressSchema({
     ethProvider: contracts.provider,
@@ -24,7 +24,7 @@ export const getRlcBalance = async (
 
 export const getEthBalance = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing()
+  address = throwIfMissing(),
 ) => {
   const vAddress = await addressSchema({
     ethProvider: contracts.provider,
@@ -35,7 +35,7 @@ export const getEthBalance = async (
 
 export const checkBalances = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing()
+  address = throwIfMissing(),
 ) => {
   try {
     const vAddress = await addressSchema({

@@ -35,7 +35,7 @@ sell order for an app
 
 [SignableApporder](internal_.SignableApporder.md).[app](internal_.SignableApporder.md#app)
 
----
+___
 
 ### appprice
 
@@ -45,7 +45,7 @@ sell order for an app
 
 [SignableApporder](internal_.SignableApporder.md).[appprice](internal_.SignableApporder.md#appprice)
 
----
+___
 
 ### datasetrestrict
 
@@ -55,7 +55,7 @@ sell order for an app
 
 [SignableApporder](internal_.SignableApporder.md).[datasetrestrict](internal_.SignableApporder.md#datasetrestrict)
 
----
+___
 
 ### requesterrestrict
 
@@ -65,13 +65,13 @@ sell order for an app
 
 [SignableApporder](internal_.SignableApporder.md).[requesterrestrict](internal_.SignableApporder.md#requesterrestrict)
 
----
+___
 
 ### salt
 
 • **salt**: `string`
 
----
+___
 
 ### tag
 
@@ -81,7 +81,7 @@ sell order for an app
 
 [SignableApporder](internal_.SignableApporder.md).[tag](internal_.SignableApporder.md#tag)
 
----
+___
 
 ### volume
 
@@ -91,7 +91,7 @@ sell order for an app
 
 [SignableApporder](internal_.SignableApporder.md).[volume](internal_.SignableApporder.md#volume)
 
----
+___
 
 ### workerpoolrestrict
 

@@ -23,7 +23,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
       showUserWorkerpool(
         await this.config.resolveContractsClient(),
         index,
-        userAddress
+        userAddress,
       );
     this.countUserWorkerpools = async (address) =>
       countUserWorkerpools(await this.config.resolveContractsClient(), address);
@@ -31,28 +31,28 @@ export default class IExecWorkerpoolModule extends IExecModule {
       setWorkerpoolApiUrl(
         await this.config.resolveContractsClient(),
         workerpoolAddress,
-        url
+        url,
       );
     this.getWorkerpoolApiUrl = async (workerpoolAddress) =>
       getWorkerpoolApiUrl(
         await this.config.resolveContractsClient(),
-        workerpoolAddress
+        workerpoolAddress,
       );
     this.predictWorkerpoolAddress = async (workerpool) =>
       predictWorkerpoolAddress(
         await this.config.resolveContractsClient(),
-        workerpool
+        workerpool,
       );
     this.checkDeployedWorkerpool = async (address) =>
       checkDeployedWorkerpool(
         await this.config.resolveContractsClient(),
-        address
+        address,
       );
     this.transferWorkerpool = async (address, to) =>
       transferWorkerpool(
         await this.config.resolveContractsClient(),
         address,
-        to
+        to,
       );
   }
 }

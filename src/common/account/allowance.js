@@ -13,7 +13,7 @@ const debug = Debug('iexec:account:allowance');
 export const approve = async (
   contracts = throwIfMissing(),
   amount = throwIfMissing(),
-  spenderAddress = throwIfMissing()
+  spenderAddress = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -25,7 +25,7 @@ export const approve = async (
     }).validate(spenderAddress);
     const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
-      iexecContract.approve(vSpenderAddress, vAmount, contracts.txOptions)
+      iexecContract.approve(vSpenderAddress, vAmount, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
 
@@ -42,7 +42,7 @@ export const approve = async (
 export const checkAllowance = async (
   contracts = throwIfMissing(),
   ownerAddress = throwIfMissing(),
-  spenderAddress = throwIfMissing()
+  spenderAddress = throwIfMissing(),
 ) => {
   try {
     const vOwnerAddress = await addressSchema({
@@ -54,7 +54,7 @@ export const checkAllowance = async (
 
     const iexecContract = contracts.getIExecContract();
     const amount = await wrapCall(
-      iexecContract.allowance(vOwnerAddress, vSpenderAddress)
+      iexecContract.allowance(vOwnerAddress, vSpenderAddress),
     );
     return bigIntToBn(amount);
   } catch (error) {

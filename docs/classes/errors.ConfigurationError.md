@@ -26,8 +26,8 @@ ValidationError is thrown when the current configuration does not allow to perfo
 
 #### Parameters
 
-| Name       | Type     |
-| :--------- | :------- |
+| Name | Type |
+| :------ | :------ |
 | `message?` | `string` |
 
 #### Returns

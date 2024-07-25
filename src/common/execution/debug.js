@@ -19,7 +19,7 @@ const debug = Debug('iexec:execution:debug');
 
 export const getWorkerpoolApiUrl = async (
   contracts = throwIfMissing(),
-  workerpoolAddress
+  workerpoolAddress,
 ) => {
   try {
     const vAddress = await addressSchema({
@@ -36,7 +36,7 @@ export const getWorkerpoolApiUrl = async (
     const url = await readTextRecord(
       contracts,
       name,
-      WORKERPOOL_URL_TEXT_RECORD_KEY
+      WORKERPOOL_URL_TEXT_RECORD_KEY,
     );
     return await workerpoolApiUrlSchema()
       .required()
@@ -52,7 +52,7 @@ export const getWorkerpoolApiUrl = async (
 
 const getTaskOffchainApiUrl = async (
   contracts = throwIfMissing(),
-  taskid = throwIfMissing()
+  taskid = throwIfMissing(),
 ) => {
   try {
     const vTaskid = await bytes32Schema().validate(taskid);
@@ -75,7 +75,7 @@ const getTaskOffchainApiUrl = async (
 
 export const fetchTaskOffchainInfo = async (
   contracts = throwIfMissing(),
-  taskid = throwIfMissing()
+  taskid = throwIfMissing(),
 ) => {
   try {
     const vTaskid = await bytes32Schema().validate(taskid);
@@ -93,7 +93,7 @@ export const fetchTaskOffchainInfo = async (
 
 export const fetchAllReplicatesLogs = async (
   contracts = throwIfMissing(),
-  taskid = throwIfMissing()
+  taskid = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -104,7 +104,7 @@ export const fetchAllReplicatesLogs = async (
     const userAddress = await getAddress(contracts);
     if (requester !== userAddress) {
       throw Error(
-        `Only task requester ${requester} can access replicates logs`
+        `Only task requester ${requester} can access replicates logs`,
       );
     }
     const authorization = await getAuthorization({

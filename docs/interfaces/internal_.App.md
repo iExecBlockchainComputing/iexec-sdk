@@ -26,7 +26,7 @@ IExec app
 
 app image digest
 
----
+___
 
 ### appMREnclave
 
@@ -34,7 +34,7 @@ app image digest
 
 for TEE apps only, specify the TEE protocol to use
 
----
+___
 
 ### appMultiaddr
 
@@ -42,7 +42,7 @@ for TEE apps only, specify the TEE protocol to use
 
 app image address
 
----
+___
 
 ### appName
 
@@ -50,7 +50,7 @@ app image address
 
 a name for the app
 
----
+___
 
 ### appType
 
@@ -58,7 +58,7 @@ a name for the app
 
 only 'DOCKER' is supported
 
----
+___
 
 ### owner
 
@@ -66,7 +66,7 @@ only 'DOCKER' is supported
 
 the app owner
 
----
+___
 
 ### registry
 

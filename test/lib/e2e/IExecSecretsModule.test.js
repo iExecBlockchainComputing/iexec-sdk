@@ -29,7 +29,7 @@ describe('secrets', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        }
+        },
       );
     });
 
@@ -44,7 +44,7 @@ describe('secrets', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        }
+        },
       );
     });
 
@@ -53,14 +53,14 @@ describe('secrets', () => {
       const pushRes = await iexec.secrets.pushRequesterSecret('foo', 'oops');
       expect(pushRes.isPushed).toBe(true);
       await expect(
-        iexec.secrets.pushRequesterSecret('foo', 'oops')
+        iexec.secrets.pushRequesterSecret('foo', 'oops'),
       ).rejects.toThrow(
-        Error(`Secret "foo" already exists for ${wallet.address}`)
+        Error(`Secret "foo" already exists for ${wallet.address}`),
       );
       const pushForTeeFrameworkRes = await iexec.secrets.pushRequesterSecret(
         'foo',
         'oops',
-        { teeFramework: TEE_FRAMEWORKS.GRAMINE }
+        { teeFramework: TEE_FRAMEWORKS.GRAMINE },
       );
       expect(pushForTeeFrameworkRes.isPushed).toBe(true);
     });
@@ -76,12 +76,12 @@ describe('secrets', () => {
       await expectAsyncCustomError(
         iexecReadOnly.secrets.checkRequesterSecretExists(
           getRandomAddress(),
-          'foo'
+          'foo',
         ),
         {
           constructor: SmsCallError,
           message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        }
+        },
       );
     });
 
@@ -94,12 +94,12 @@ describe('secrets', () => {
       await expectAsyncCustomError(
         iexecReadOnly.secrets.checkRequesterSecretExists(
           getRandomAddress(),
-          'foo'
+          'foo',
         ),
         {
           constructor: SmsCallError,
           message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        }
+        },
       );
     });
 
@@ -109,11 +109,11 @@ describe('secrets', () => {
         readOnly: true,
       });
       await expect(
-        iexecReadOnly.secrets.checkRequesterSecretExists(wallet.address, 'foo')
+        iexecReadOnly.secrets.checkRequesterSecretExists(wallet.address, 'foo'),
       ).resolves.toBe(false);
       await iexec.secrets.pushRequesterSecret('foo', 'oops');
       await expect(
-        iexecReadOnly.secrets.checkRequesterSecretExists(wallet.address, 'foo')
+        iexecReadOnly.secrets.checkRequesterSecretExists(wallet.address, 'foo'),
       ).resolves.toBe(true);
       await expect(
         iexecReadOnly.secrets.checkRequesterSecretExists(
@@ -121,8 +121,8 @@ describe('secrets', () => {
           'foo',
           {
             teeFramework: TEE_FRAMEWORKS.GRAMINE,
-          }
-        )
+          },
+        ),
       ).resolves.toBe(false);
     });
   });

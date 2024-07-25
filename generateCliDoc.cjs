@@ -22,7 +22,7 @@ const execPromise = (command) =>
 const getJsonDoc = async (cmd) => {
   const cmdArray = cmd.split(' ');
   const cmdObj = await execPromise(
-    `GENERATE_DOC=1 node src/cli/cmd/${cmdArray.join('-')}.js`
+    `GENERATE_DOC=1 node src/cli/cmd/${cmdArray.join('-')}.js`,
   )
     .then((stdout) => JSON.parse(stdout))
     .catch(() => ({}));
@@ -35,7 +35,7 @@ const getJsonDoc = async (cmd) => {
         const subCommandName = [cmdObj.fullName, sub.name].join(' ');
         const subCmdObj = await getJsonDoc(subCommandName);
         return { ...sub, ...subCmdObj };
-      })
+      }),
     ));
   return cmdObj;
 };
@@ -77,7 +77,7 @@ const jsonDocToMd = (jsonDoc) => {
   const getCommandsList = (commandsArray) =>
     `${commandsArray
       .map(
-        ({ name, fullName }) => `- ${getMdInternalLink(name, fullName)}${EOL}`
+        ({ name, fullName }) => `- ${getMdInternalLink(name, fullName)}${EOL}`,
       )
       .join('')}${EOL}`;
 

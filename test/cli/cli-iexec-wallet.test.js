@@ -35,7 +35,7 @@ describe('iexec wallet', () => {
     userWallet = await setRandomWallet();
     importedWallet = getRandomWallet();
     const { fileName } = await runIExecCliRaw(
-      `${iexecPath} wallet import ${importedWallet.privateKey} --password test --force`
+      `${iexecPath} wallet import ${importedWallet.privateKey} --password test --force`,
     );
     importedWalletName = fileName.split('/')[fileName.split('/').length - 1];
   });
@@ -53,7 +53,7 @@ describe('iexec wallet', () => {
     test('iexec wallet import', async () => {
       const wallet = getRandomWallet();
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet import ${wallet.privateKey} --password test --force`
+        `${iexecPath} wallet import ${wallet.privateKey} --password test --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -65,7 +65,7 @@ describe('iexec wallet', () => {
     test('--unencrypted', async () => {
       const wallet = getRandomWallet();
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet import ${wallet.privateKey} --unencrypted --force`
+        `${iexecPath} wallet import ${wallet.privateKey} --unencrypted --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -78,7 +78,7 @@ describe('iexec wallet', () => {
 
     test('--keystoredir <path>', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet import ${userWallet.privateKey} --password customPath --keystoredir ./out/keystore`
+        `${iexecPath} wallet import ${userWallet.privateKey} --password customPath --keystoredir ./out/keystore`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -89,7 +89,7 @@ describe('iexec wallet', () => {
 
     test('--keystoredir local', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet import ${userWallet.privateKey} --password 'my local pass phrase' --keystoredir local`
+        `${iexecPath} wallet import ${userWallet.privateKey} --password 'my local pass phrase' --keystoredir local`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -102,7 +102,7 @@ describe('iexec wallet', () => {
   describe('create', () => {
     test('iexec wallet create', async () => {
       const raw = await execAsync(
-        `${iexecPath} wallet create --password test --force --raw`
+        `${iexecPath} wallet create --password test --force --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -112,7 +112,7 @@ describe('iexec wallet', () => {
 
     test('--unencrypted', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet create --unencrypted --force`
+        `${iexecPath} wallet create --unencrypted --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -125,7 +125,7 @@ describe('iexec wallet', () => {
 
     test('--keystoredir <path>', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet create --password customPath --keystoredir ./out/keystore`
+        `${iexecPath} wallet create --password customPath --keystoredir ./out/keystore`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -136,7 +136,7 @@ describe('iexec wallet', () => {
 
     test('--keystoredir local', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet create --password 'my local pass phrase' --keystoredir local`
+        `${iexecPath} wallet create --password 'my local pass phrase' --keystoredir local`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -164,7 +164,7 @@ describe('iexec wallet', () => {
 
     test('iexec wallet show --show-private-key (user wallet)', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet show --show-private-key`
+        `${iexecPath} wallet show --show-private-key`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet.address).toBe(userWallet.address);
@@ -177,7 +177,7 @@ describe('iexec wallet', () => {
 
     test('iexec wallet show [address]', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet show ${getRandomAddress()}`
+        `${iexecPath} wallet show ${getRandomAddress()}`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeUndefined();
@@ -189,7 +189,7 @@ describe('iexec wallet', () => {
 
     test('--wallet-address <address>', async () => {
       const raw = await execAsync(
-        `${iexecPath} wallet show --password test --wallet-address ${importedWallet.address} --raw`
+        `${iexecPath} wallet show --password test --wallet-address ${importedWallet.address} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -203,7 +203,7 @@ describe('iexec wallet', () => {
 
     test('--wallet-address <address> --show-private-key', async () => {
       const raw = await execAsync(
-        `${iexecPath} wallet show --show-private-key --password test --wallet-address ${importedWallet.address} --raw`
+        `${iexecPath} wallet show --show-private-key --password test --wallet-address ${importedWallet.address} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -216,7 +216,7 @@ describe('iexec wallet', () => {
 
     test('--wallet-file <fileName>', async () => {
       const raw = await execAsync(
-        `${iexecPath} wallet show --password test --wallet-file ${importedWalletName} --raw`
+        `${iexecPath} wallet show --password test --wallet-file ${importedWalletName} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -229,7 +229,7 @@ describe('iexec wallet', () => {
 
     test('--show-private-key --wallet-address <address> (wrong password)', async () => {
       const raw = await execAsync(
-        `${iexecPath} wallet show --show-private-key --password fail --wallet-address ${importedWallet.address} --raw`
+        `${iexecPath} wallet show --show-private-key --password fail --wallet-address ${importedWallet.address} --raw`,
       ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
@@ -241,12 +241,12 @@ describe('iexec wallet', () => {
 
     test('--wallet-address <address> (missing wallet file)', async () => {
       const raw = await execAsync(
-        `${iexecPath}  wallet show --wallet-address ${getRandomAddress()} --raw`
+        `${iexecPath}  wallet show --wallet-address ${getRandomAddress()} --raw`,
       ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.error.message).toBe(
-        'Failed to load wallet address from keystore: Wallet file not found'
+        'Failed to load wallet address from keystore: Wallet file not found',
       );
       expect(res.error.name).toBe('Error');
       expect(res.wallet).toBeUndefined();
@@ -255,10 +255,10 @@ describe('iexec wallet', () => {
 
     test('--keystoredir <path>', async () => {
       const { address } = await runIExecCliRaw(
-        `${iexecPath} wallet create --password customPath --keystoredir ./out/keystore`
+        `${iexecPath} wallet create --password customPath --keystoredir ./out/keystore`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet show --password customPath --keystoredir ./out/keystore --wallet-address ${address} --show-private-key`
+        `${iexecPath} wallet show --password customPath --keystoredir ./out/keystore --wallet-address ${address} --show-private-key`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -268,10 +268,10 @@ describe('iexec wallet', () => {
 
     test('--keystoredir local', async () => {
       const { address } = await runIExecCliRaw(
-        `${iexecPath} wallet create --password 'my local pass phrase' --keystoredir local`
+        `${iexecPath} wallet create --password 'my local pass phrase' --keystoredir local`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet show --password 'my local pass phrase' --keystoredir local --wallet-address ${address} --show-private-key`
+        `${iexecPath} wallet show --password 'my local pass phrase' --keystoredir local --wallet-address ${address} --show-private-key`,
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeDefined();
@@ -285,11 +285,11 @@ describe('iexec wallet', () => {
       await setBalance(testChain)(userWallet.address, 10n * 10n ** 18n);
       const to = getRandomAddress();
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet send-ether 1 gwei --to ${to} --force`
+        `${iexecPath} wallet send-ether 1 gwei --to ${to} --force`,
       );
       expect(res.ok).toBe(false);
       expect(res.error.message).toBe(
-        'sendETH() is disabled on sidechain, use sendRLC()'
+        'sendETH() is disabled on sidechain, use sendRLC()',
       );
     });
   });
@@ -303,7 +303,7 @@ describe('iexec wallet', () => {
       await setBalance(testChain)(userWallet.address, 10n * 10n ** 18n);
       const to = getRandomAddress();
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet send-RLC 0.5 --to ${to} --force`
+        `${iexecPath} wallet send-RLC 0.5 --to ${to} --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.from).toBe(userWallet.address);
@@ -311,7 +311,7 @@ describe('iexec wallet', () => {
       expect(res.amount).toBe('500000000');
       expect(res.txHash).toBeDefined();
       const { balance } = await runIExecCliRaw(
-        `${iexecPath} wallet show ${to}`
+        `${iexecPath} wallet show ${to}`,
       );
       expect(balance.RLC).toBe('0.5');
       await testChain.provider.getTransaction(res.txHash).then((tx) => {
@@ -322,7 +322,7 @@ describe('iexec wallet', () => {
     test('iexec wallet send-RLC 1000000000 nRLC', async () => {
       const to = getRandomAddress();
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet send-RLC 1000000000 nRLC --to ${to} --force`
+        `${iexecPath} wallet send-RLC 1000000000 nRLC --to ${to} --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.from).toBe(userWallet.address);
@@ -330,7 +330,7 @@ describe('iexec wallet', () => {
       expect(res.amount).toBe('1000000000');
       expect(res.txHash).toBeDefined();
       const { balance } = await runIExecCliRaw(
-        `${iexecPath} wallet show ${to}`
+        `${iexecPath} wallet show ${to}`,
       );
       expect(balance.nRLC).toBe('1000000000');
     });
@@ -342,14 +342,14 @@ describe('iexec wallet', () => {
       const rlcBalance = 10n;
       await setBalance(testChain)(
         walletToSweep.address,
-        rlcBalance * 10n ** 18n
+        rlcBalance * 10n ** 18n,
       );
       const to = getRandomAddress();
       await runIExecCliRaw(
-        `${iexecPath} wallet import ${walletToSweep.privateKey} --password test`
+        `${iexecPath} wallet import ${walletToSweep.privateKey} --password test`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} wallet sweep --to ${to} --wallet-address ${walletToSweep.address} --password test --force`
+        `${iexecPath} wallet sweep --to ${to} --wallet-address ${walletToSweep.address} --password test --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.from).toBe(walletToSweep.address);
@@ -358,7 +358,7 @@ describe('iexec wallet', () => {
       expect(res.sendNativeTxHash).toBeDefined();
       expect(res.errors).toBeUndefined();
       const { balance } = await runIExecCliRaw(
-        `${iexecPath} wallet show ${to}`
+        `${iexecPath} wallet show ${to}`,
       );
       expect(balance.RLC).toBe(`${rlcBalance}.0`);
       await testChain.provider

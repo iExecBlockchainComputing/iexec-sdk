@@ -33,7 +33,7 @@ describe('iexec workerpool', () => {
     userWallet = await setRandomWallet();
     await execAsync(`${iexecPath} workerpool init`);
     const deployed = await execAsync(
-      `${iexecPath} workerpool deploy --raw`
+      `${iexecPath} workerpool deploy --raw`,
     ).then(JSON.parse);
     userFirstDeployedWorkerpoolAddress = deployed.address;
   });
@@ -69,10 +69,10 @@ describe('iexec workerpool', () => {
   describe('set-api-url', () => {
     test('iexec workerpool set-api-url', async () => {
       await execAsync(
-        `${iexecPath} ens register ${userFirstDeployedWorkerpoolAddress.toLowerCase()} --for ${userFirstDeployedWorkerpoolAddress}`
+        `${iexecPath} ens register ${userFirstDeployedWorkerpoolAddress.toLowerCase()} --for ${userFirstDeployedWorkerpoolAddress}`,
       );
       const raw = await execAsync(
-        `${iexecPath} workerpool set-api-url https://my-workerpool.com ${userFirstDeployedWorkerpoolAddress} --raw`
+        `${iexecPath} workerpool set-api-url https://my-workerpool.com ${userFirstDeployedWorkerpoolAddress} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -84,7 +84,7 @@ describe('iexec workerpool', () => {
       });
 
       const showRes = await runIExecCliRaw(
-        `${iexecPath} workerpool show ${userFirstDeployedWorkerpoolAddress}`
+        `${iexecPath} workerpool show ${userFirstDeployedWorkerpoolAddress}`,
       );
       expect(showRes.apiUrl).toBe('https://my-workerpool.com');
     });
@@ -92,16 +92,16 @@ describe('iexec workerpool', () => {
     test('iexec workerpool set-api-url (fail no ENS)', async () => {
       await setWorkerpoolUniqueDescription();
       const { address } = await runIExecCliRaw(
-        `${iexecPath} workerpool deploy`
+        `${iexecPath} workerpool deploy`,
       );
       const raw = await execAsync(
-        `${iexecPath} workerpool set-api-url https://my-workerpool.com --raw`
+        `${iexecPath} workerpool set-api-url https://my-workerpool.com --raw`,
       ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.error.name).toBe('Error');
       expect(res.error.message).toBe(
-        `Missing ENS for workerpool ${address}. You probably forgot to run "iexec ens register <name> --for ${address}"`
+        `Missing ENS for workerpool ${address}. You probably forgot to run "iexec ens register <name> --for ${address}"`,
       );
     });
   });
@@ -118,7 +118,7 @@ describe('iexec workerpool', () => {
 
     test('iexec workerpool show [workerpoolAddress]', async () => {
       const raw = await execAsync(
-        `${iexecPath} workerpool show ${userFirstDeployedWorkerpoolAddress} --raw`
+        `${iexecPath} workerpool show ${userFirstDeployedWorkerpoolAddress} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -129,7 +129,7 @@ describe('iexec workerpool', () => {
 
     test('iexec workerpool show 0 --user [address]', async () => {
       const raw = await execAsync(
-        `${iexecPath} workerpool show 0 --user ${userWallet.address} --raw`
+        `${iexecPath} workerpool show 0 --user ${userWallet.address} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -150,7 +150,7 @@ describe('iexec workerpool', () => {
 
     test('iexec workerpool count --user [address]', async () => {
       const raw = await execAsync(
-        `${iexecPath} workerpool count --user ${getRandomAddress()} --raw`
+        `${iexecPath} workerpool count --user ${getRandomAddress()} --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -163,11 +163,11 @@ describe('iexec workerpool', () => {
     test('transfers the workerpool ownership to', async () => {
       await setWorkerpoolUniqueDescription();
       const { address } = await execAsync(
-        `${iexecPath} workerpool deploy --raw`
+        `${iexecPath} workerpool deploy --raw`,
       ).then(JSON.parse);
       const receiverAddress = getRandomAddress();
       const res = await execAsync(
-        `${iexecPath} workerpool transfer ${address} --to ${receiverAddress} --force --raw`
+        `${iexecPath} workerpool transfer ${address} --to ${receiverAddress} --force --raw`,
       ).then(JSON.parse);
       expect(res.ok).toBe(true);
       expect(res.address).toBe(address);
@@ -183,17 +183,17 @@ describe('iexec workerpool', () => {
     test('from deployed', async () => {
       await setWorkerpoolUniqueDescription();
       const { address } = await runIExecCliRaw(
-        `${iexecPath} workerpool deploy`
+        `${iexecPath} workerpool deploy`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} workerpool publish --force`
+        `${iexecPath} workerpool publish --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.orderHash).toBeDefined();
       const orderShowRes = JSON.parse(
         await execAsync(
-          `${iexecPath} order show --workerpool ${res.orderHash} --raw`
-        )
+          `${iexecPath} order show --workerpool ${res.orderHash} --raw`,
+        ),
       );
       expect(orderShowRes.workerpoolorder.order).toEqual({
         workerpool: address,
@@ -212,14 +212,14 @@ describe('iexec workerpool', () => {
 
     test('from workerpool address with options', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} workerpool publish ${userFirstDeployedWorkerpoolAddress} --price 0.000000002 RLC --volume 5 --tag tee,scone --trust 20 --category 1 --force`
+        `${iexecPath} workerpool publish ${userFirstDeployedWorkerpoolAddress} --price 0.000000002 RLC --volume 5 --tag tee,scone --trust 20 --category 1 --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.orderHash).toBeDefined();
       const orderShowRes = JSON.parse(
         await execAsync(
-          `${iexecPath} order show --workerpool ${res.orderHash} --raw`
-        )
+          `${iexecPath} order show --workerpool ${res.orderHash} --raw`,
+        ),
       );
       expect(orderShowRes.workerpoolorder.order).toEqual({
         workerpool: userFirstDeployedWorkerpoolAddress,
@@ -243,36 +243,36 @@ describe('iexec workerpool', () => {
       await runIExecCliRaw(`${iexecPath} workerpool deploy`);
       await runIExecCliRaw(`${iexecPath} workerpool publish --force`);
       const { orderHash: lastOrderHash } = await runIExecCliRaw(
-        `${iexecPath} workerpool publish --force`
+        `${iexecPath} workerpool publish --force`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} workerpool unpublish --force`
+        `${iexecPath} workerpool unpublish --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.unpublished).toBe(lastOrderHash);
       await runIExecCliRaw(`${iexecPath} workerpool unpublish --force`);
       const resErr = await runIExecCliRaw(
-        `${iexecPath} workerpool unpublish --force`
+        `${iexecPath} workerpool unpublish --force`,
       );
       expect(resErr.ok).toBe(false);
     });
 
     test('from workerpool address --all', async () => {
       const { orderHash } = await runIExecCliRaw(
-        `${iexecPath} workerpool publish ${userFirstDeployedWorkerpoolAddress} --force`
+        `${iexecPath} workerpool publish ${userFirstDeployedWorkerpoolAddress} --force`,
       );
       const { orderHash: lastOrderHash } = await runIExecCliRaw(
-        `${iexecPath} workerpool publish ${userFirstDeployedWorkerpoolAddress} --force`
+        `${iexecPath} workerpool publish ${userFirstDeployedWorkerpoolAddress} --force`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} workerpool unpublish ${userFirstDeployedWorkerpoolAddress} --all --force`
+        `${iexecPath} workerpool unpublish ${userFirstDeployedWorkerpoolAddress} --all --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.unpublished).toEqual(
-        expect.arrayContaining([orderHash, lastOrderHash])
+        expect.arrayContaining([orderHash, lastOrderHash]),
       );
       const resErr = await runIExecCliRaw(
-        `${iexecPath} workerpool unpublish --all --force --raw`
+        `${iexecPath} workerpool unpublish --all --force --raw`,
       );
       expect(resErr.ok).toBe(false);
     });

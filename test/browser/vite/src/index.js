@@ -12,7 +12,7 @@ const accountDepositButton = document.getElementById('account-deposit-button');
 const accountDepositError = document.getElementById('account-deposit-error');
 const accountWithdrawInput = document.getElementById('account-withdraw-input');
 const accountWithdrawButton = document.getElementById(
-  'account-withdraw-button'
+  'account-withdraw-button',
 );
 const accountWithdrawError = document.getElementById('account-withdraw-error');
 const walletBTMInput = document.getElementById('wallet-btm-input');
@@ -26,20 +26,20 @@ const storageInitError = document.getElementById('storage-init-error');
 const storageCheckOutput = document.getElementById('storage-check-output');
 const storageCheckError = document.getElementById('storage-check-error');
 const requesterSecretCheckNameInput = document.getElementById(
-  'secret-check-name-input'
+  'secret-check-name-input',
 );
 const requesterSecretCheckButton = document.getElementById(
-  'secret-check-button'
+  'secret-check-button',
 );
 const requesterSecretCheckOutput = document.getElementById(
-  'secret-check-output'
+  'secret-check-output',
 );
 const requesterSecretCheckError = document.getElementById('secret-check-error');
 const requesterSecretPushNameInput = document.getElementById(
-  'secret-push-name-input'
+  'secret-push-name-input',
 );
 const requesterSecretPushValueInput = document.getElementById(
-  'secret-push-value-input'
+  'secret-push-value-input',
 );
 const requesterSecretPushButton = document.getElementById('secret-push-button');
 const requesterSecretPushOutput = document.getElementById('secret-push-output');
@@ -60,23 +60,23 @@ const previousDealsError = document.getElementById('previous-deals-error');
 const previousDealsOutput = document.getElementById('previous-deals-output');
 const resultsDealidInput = document.getElementById('results-dealid-input');
 const resultsShowDealButton = document.getElementById(
-  'results-showdeal-button'
+  'results-showdeal-button',
 );
 const resultsShowDealError = document.getElementById('results-showdeal-error');
 const resultsShowDealOutput = document.getElementById(
-  'results-dealdetails-output'
+  'results-dealdetails-output',
 );
 const resultsTaskidInput = document.getElementById('results-taskid-input');
 const resultsShowTaskButton = document.getElementById(
-  'results-showtask-button'
+  'results-showtask-button',
 );
 const resultsShowTaskError = document.getElementById('results-showtask-error');
 const resultsShowTaskOutput = document.getElementById(
-  'results-taskdetails-output'
+  'results-taskdetails-output',
 );
 const resultsDownloadInput = document.getElementById('results-download-input');
 const resultsDownloadButton = document.getElementById(
-  'results-download-button'
+  'results-download-button',
 );
 const resultsDownloadError = document.getElementById('results-download-error');
 
@@ -89,46 +89,46 @@ const datasetsCountError = document.getElementById('datasets-count-error');
 const datasetsCountOutput = document.getElementById('datasets-count-output');
 const datasetsIndexInput = document.getElementById('datasets-index-input');
 const datasetsShowIndexButton = document.getElementById(
-  'datasets-showindex-button'
+  'datasets-showindex-button',
 );
 const datasetsShowIndexError = document.getElementById(
-  'datasets-showindex-error'
+  'datasets-showindex-error',
 );
 const datasetsShowIndexOutput = document.getElementById(
-  'datasets-showindex-output'
+  'datasets-showindex-output',
 );
 
 const datasetsGenerateKeyButton = document.getElementById(
-  'datasets-generatekey-button'
+  'datasets-generatekey-button',
 );
 const datasetsGenerateKeyError = document.getElementById(
-  'datasets-generatekey-error'
+  'datasets-generatekey-error',
 );
 const datasetsGenerateKeyOutput = document.getElementById(
-  'datasets-generatekey-output'
+  'datasets-generatekey-output',
 );
 const datasetsEncryptKeyInput = document.getElementById(
-  'datasets-encryptkey-input'
+  'datasets-encryptkey-input',
 );
 const datasetsEncryptFileInput = document.getElementById(
-  'datasets-encryptfile-input'
+  'datasets-encryptfile-input',
 );
 const datasetsEncryptButton = document.getElementById(
-  'datasets-encrypt-button'
+  'datasets-encrypt-button',
 );
 const datasetsEncryptError = document.getElementById('datasets-encrypt-error');
 const datasetsEncryptOutput = document.getElementById(
-  'datasets-encrypt-output'
+  'datasets-encrypt-output',
 );
 
 const datasetsDeployNameInput = document.getElementById(
-  'datasets-deployname-input'
+  'datasets-deployname-input',
 );
 const datasetsDeployMultiaddrInput = document.getElementById(
-  'datasets-deploymultiaddr-input'
+  'datasets-deploymultiaddr-input',
 );
 const datasetsDeployChecksumInput = document.getElementById(
-  'datasets-deploychecksum-input'
+  'datasets-deploychecksum-input',
 );
 const datasetsDeployButton = document.getElementById('datasets-deploy-button');
 const datasetsDeployError = document.getElementById('datasets-deploy-error');
@@ -136,7 +136,7 @@ const datasetsDeployOutput = document.getElementById('datasets-deploy-output');
 
 const pushSecretKeyInput = document.getElementById('pushsecret-key-input');
 const pushSecretAddressInput = document.getElementById(
-  'pushsecret-address-input'
+  'pushsecret-address-input',
 );
 const pushSecretButton = document.getElementById('push-secret-button');
 const pushSecretError = document.getElementById('push-secret-error');
@@ -144,7 +144,7 @@ const pushSecretOutput = document.getElementById('push-secret-output');
 
 const resultsDecryptKey = document.getElementById('results-decrypt-key-file');
 const resultsDecryptEncrypted = document.getElementById(
-  'results-decrypt-encrypted-file'
+  'results-decrypt-encrypted-file',
 );
 const resultsDecryptButton = document.getElementById('results-decrypt-button');
 const resultsDecryptError = document.getElementById('results-decrypt-error');
@@ -161,7 +161,7 @@ const refreshUser = (iexec) => async () => {
   rlcWalletOutput.innerHTML = rlcWalletText;
   nativeWalletOutput.innerHTML = nativeWalletText;
   accountOutput.innerText = `${utils.formatRLC(
-    account.stake
+    account.stake,
   )} RLC (+ ${utils.formatRLC(account.locked)} RLC locked)`;
 };
 
@@ -226,7 +226,7 @@ const checkStorage = (iexec) => async () => {
     storageCheckOutput.innerText = '';
     storageCheckError.innerText = '';
     const isStorageInitialized = await iexec.storage.checkStorageTokenExists(
-      await iexec.wallet.getAddress()
+      await iexec.wallet.getAddress(),
     );
     storageCheckOutput.innerText = isStorageInitialized
       ? 'initialized'
@@ -258,7 +258,7 @@ const checkRequesterSecret = (iexec) => async () => {
     const secretName = requesterSecretCheckNameInput.value;
     const isSecretSet = await iexec.secrets.checkRequesterSecretExists(
       await iexec.wallet.getAddress(),
-      secretName
+      secretName,
     );
     requesterSecretCheckOutput.innerText = isSecretSet
       ? `secret "${secretName}" set`
@@ -308,8 +308,9 @@ const buyComputation = (iexec) => async () => {
     const appAddress = buyAppAddressInput.value;
     const category = buyCategoryInput.value;
     const params = buyParamsInput.value;
-    const { orders: appOrders } =
-      await iexec.orderbook.fetchAppOrderbook(appAddress);
+    const { orders: appOrders } = await iexec.orderbook.fetchAppOrderbook(
+      appAddress,
+    );
     const appOrder = appOrders && appOrders[0] && appOrders[0].order;
     if (!appOrder) throw Error(`no apporder found for app ${appAddress}`);
     const { orders: workerpoolOrders } =
@@ -449,7 +450,7 @@ const showDatasetByIndex = (iexec) => async () => {
     const datasetIndex = datasetsIndexInput.value;
     const res = await iexec.dataset.showUserDataset(
       datasetIndex,
-      await iexec.wallet.getAddress()
+      await iexec.wallet.getAddress(),
     );
     datasetsShowIndexOutput.innerText = JSON.stringify(res, null, 2);
   } catch (error) {
@@ -465,7 +466,7 @@ const countDatasets = (iexec) => async () => {
     datasetsCountError.innerText = '';
     datasetsCountOutput.innerText = '';
     const count = await iexec.dataset.countUserDatasets(
-      await iexec.wallet.getAddress()
+      await iexec.wallet.getAddress(),
     );
     datasetsCountOutput.innerText = `total deployed datasets ${count}`;
   } catch (error) {
@@ -500,7 +501,7 @@ const encryptDataset = (iexec) => async () => {
     }
     if (file.size > 500) {
       throw Error(
-        'File too large, this is a demo, please use small files (>=500 bytes)'
+        'File too large, this is a demo, please use small files (>=500 bytes)',
       );
     }
 
@@ -518,8 +519,9 @@ const encryptDataset = (iexec) => async () => {
 
     datasetsEncryptOutput.innerText = `Encrypting ${file.name}`;
     const encrypted = await iexec.dataset.encrypt(fileBytes, key);
-    const checksum =
-      await iexec.dataset.computeEncryptedFileChecksum(encrypted);
+    const checksum = await iexec.dataset.computeEncryptedFileChecksum(
+      encrypted,
+    );
 
     datasetsEncryptOutput.innerText = 'Uploading encrypted file to IPFS';
     const ipfs = window.KuboRpcClient.create('/dns4/ipfs-upload.iex.ec/https/');
@@ -615,7 +617,7 @@ const decryptResults = () => async () => {
 
     const decryptedBuffer = await utils.decryptResult(
       encryptedBuffer,
-      keyBuffer
+      keyBuffer,
     );
 
     const file = new Blob([decryptedBuffer]);
@@ -650,7 +652,7 @@ const init = async () => {
       throw Error('Missing window.ethereum');
     }
 
-    await ethProvider.request({ method: 'eth_requestAccounts' });
+    await ethProvider.request({ method: "eth_requestAccounts" });
 
     console.log('Initialize iExec SDK...');
     const iexec = new IExec({
@@ -675,11 +677,11 @@ const init = async () => {
     storageInitButton.addEventListener('click', initStorage(iexec));
     requesterSecretCheckButton.addEventListener(
       'click',
-      checkRequesterSecret(iexec)
+      checkRequesterSecret(iexec),
     );
     requesterSecretPushButton.addEventListener(
       'click',
-      pushRequesterSecret(iexec)
+      pushRequesterSecret(iexec),
     );
     appsShowButton.addEventListener('click', showApp(iexec));
     buyBuyButton.addEventListener('click', buyComputation(iexec));
@@ -692,11 +694,11 @@ const init = async () => {
     datasetsCountButton.addEventListener('click', countDatasets(iexec));
     datasetsShowIndexButton.addEventListener(
       'click',
-      showDatasetByIndex(iexec)
+      showDatasetByIndex(iexec),
     );
     datasetsGenerateKeyButton.addEventListener(
       'click',
-      generateDatasetKey(iexec)
+      generateDatasetKey(iexec),
     );
     datasetsEncryptButton.addEventListener('click', encryptDataset(iexec));
     datasetsDeployButton.addEventListener('click', deployDataset(iexec));

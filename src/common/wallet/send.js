@@ -24,7 +24,7 @@ const sendNativeToken = async (
   contracts = throwIfMissing(),
   value = throwIfMissing(),
   to = throwIfMissing(),
-  { gasFees = {} } = {}
+  { gasFees = {} } = {},
 ) => {
   try {
     checkSigner(contracts);
@@ -39,7 +39,7 @@ const sendNativeToken = async (
         value: BigInt(vValue),
         ...contracts.txOptions,
         ...gasFees,
-      })
+      }),
     );
     await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
@@ -52,7 +52,7 @@ const sendNativeToken = async (
 const sendERC20 = async (
   contracts = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
-  to = throwIfMissing()
+  to = throwIfMissing(),
 ) => {
   checkSigner(contracts);
   const vAddress = await addressSchema({
@@ -62,7 +62,7 @@ const sendERC20 = async (
   try {
     const rlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(
-      rlcContract.transfer(vAddress, bnToBigInt(vAmount), contracts.txOptions)
+      rlcContract.transfer(vAddress, bnToBigInt(vAmount), contracts.txOptions),
     );
     await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
@@ -75,7 +75,7 @@ const sendERC20 = async (
 export const sendETH = async (
   contracts = throwIfMissing(),
   amount = throwIfMissing(),
-  to = throwIfMissing()
+  to = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -99,7 +99,7 @@ export const sendETH = async (
 export const sendRLC = async (
   contracts = throwIfMissing(),
   nRlcAmount = throwIfMissing(),
-  to = throwIfMissing()
+  to = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -132,7 +132,7 @@ export const sendRLC = async (
 
 export const sweep = async (
   contracts = throwIfMissing(),
-  to = throwIfMissing()
+  to = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
@@ -158,7 +158,7 @@ export const sweep = async (
         const sendERC20TxHash = await sendERC20(
           contracts,
           balances.nRLC,
-          vAddressTo
+          vAddressTo,
         );
         Object.assign(res, { sendERC20TxHash });
       } catch (error) {
@@ -199,7 +199,7 @@ export const sweep = async (
           contracts,
           sweepNativeBn,
           vAddressTo,
-          { gasFees }
+          { gasFees },
         );
         Object.assign(res, { sendNativeTxHash });
       } catch (error) {

@@ -37,7 +37,7 @@ export const fetchRequesterDeals = async (
     workerpoolAddress,
     page = 0,
     pageSize = 20,
-  } = {}
+  } = {},
 ) => {
   try {
     const vRequesterAddress = await addressSchema({
@@ -100,7 +100,7 @@ export const fetchRequesterDeals = async (
 
 export const computeTaskId = async (
   dealid = throwIfMissing(),
-  taskIdx = throwIfMissing()
+  taskIdx = throwIfMissing(),
 ) => {
   try {
     const encodedTypes = ['bytes32', 'uint256'];
@@ -119,7 +119,7 @@ export const computeTaskId = async (
 const computeTaskIdsArray = async (
   dealid = throwIfMissing(),
   firstTaskIdx = throwIfMissing(),
-  botSize = throwIfMissing()
+  botSize = throwIfMissing(),
 ) => {
   const vDealid = await bytes32Schema().validate(dealid);
   const vFirstTaskIdx = await positiveIntSchema().validate(firstTaskIdx);
@@ -130,7 +130,7 @@ const computeTaskIdsArray = async (
 
 export const show = async (
   contracts = throwIfMissing(),
-  dealid = throwIfMissing()
+  dealid = throwIfMissing(),
 ) => {
   try {
     const vDealid = await bytes32Schema().validate(dealid);
@@ -146,7 +146,7 @@ export const show = async (
     const tasks = await computeTaskIdsArray(
       dealid,
       deal.botFirst.toString(),
-      deal.botSize.toString()
+      deal.botSize.toString(),
     );
     return {
       dealid: vDealid,
@@ -169,7 +169,7 @@ const obsDealMessages = {
 
 export const obsDeal = (
   contracts = throwIfMissing(),
-  dealid = throwIfMissing()
+  dealid = throwIfMissing(),
 ) =>
   new Observable((observer) => {
     const safeObserver = new SafeObserver(observer);
@@ -183,7 +183,7 @@ export const obsDeal = (
             acc[idx] = { idx, taskid };
             return acc;
           },
-          {}
+          {},
         );
 
         const callNext = () => {
@@ -193,10 +193,10 @@ export const obsDeal = (
             let complete = false;
             const tasksCount = tasksArray.length;
             const completedTasksCount = tasksArray.filter(
-              (task) => task.status === 3
+              (task) => task.status === 3,
             ).length;
             const failedTasksCount = tasksArray.filter(
-              (task) => task.taskTimedOut === true
+              (task) => task.taskTimedOut === true,
             ).length;
             let message;
             if (completedTasksCount === tasksCount) {
@@ -232,7 +232,7 @@ export const obsDeal = (
               safeObserver.error(e);
               taskWatchers.forEach((unsub) => unsub());
             },
-          })
+          }),
         );
       } catch (e) {
         safeObserver.error(e);
@@ -251,7 +251,7 @@ const numericStringPropAscSort = (propName) => (a, b) =>
 
 export const claim = async (
   contracts = throwIfMissing(),
-  dealid = throwIfMissing()
+  dealid = throwIfMissing(),
 ) => {
   const transactions = [];
   const claimed = {};
@@ -262,8 +262,8 @@ export const claim = async (
     if (!deal.deadlineReached) {
       throw Error(
         `Cannot claim a deal before reaching the final time: ${new Date(
-          1000 * deal.finalTime
-        )}`
+          1000 * deal.finalTime,
+        )}`,
       );
     }
     const { tasks } = deal;
@@ -279,7 +279,7 @@ export const claim = async (
         } else if (taskStatus < 3) {
           initialized.push({ idx, taskid });
         }
-      })
+      }),
     );
     if (initialized.length === 0 && notInitialized.length === 0)
       throw Error('Nothing to claim');
@@ -297,13 +297,13 @@ export const claim = async (
         if (!initialized.length) return;
         const initializedToProcess = initialized.splice(
           0,
-          maxClaimPerTx.toNumber()
+          maxClaimPerTx.toNumber(),
         );
         const taskidToProcess = initializedToProcess.map(
-          ({ taskid }) => taskid
+          ({ taskid }) => taskid,
         );
         const tx = await wrapSend(
-          iexecContract.claimArray(taskidToProcess, contracts.txOptions)
+          iexecContract.claimArray(taskidToProcess, contracts.txOptions),
         );
         debug(`claimArray ${tx.hash} (${initializedToProcess.length} tasks)`);
         await wrapWait(tx.wait(contracts.confirms));
@@ -313,7 +313,7 @@ export const claim = async (
         });
         Object.assign(
           claimed,
-          ...initializedToProcess.map((e) => ({ [e.idx]: e.taskid }))
+          ...initializedToProcess.map((e) => ({ [e.idx]: e.taskid })),
         );
         await processClaims();
       };
@@ -327,7 +327,7 @@ export const claim = async (
         if (!notInitialized.length) return;
         const notInitializedToProcess = notInitialized.splice(
           0,
-          maxClaimPerTx.toNumber()
+          maxClaimPerTx.toNumber(),
         );
         const idxToProcess = notInitializedToProcess.map(({ idx }) => idx);
         const dealidArray = new Array(idxToProcess.length).fill(vDealid);
@@ -335,11 +335,11 @@ export const claim = async (
           iexecContract.initializeAndClaimArray(
             dealidArray,
             idxToProcess,
-            contracts.txOptions
-          )
+            contracts.txOptions,
+          ),
         );
         debug(
-          `initializeAndClaimArray ${tx.hash} (${notInitializedToProcess.length} tasks)`
+          `initializeAndClaimArray ${tx.hash} (${notInitializedToProcess.length} tasks)`,
         );
         await wrapWait(tx.wait(contracts.confirms));
         transactions.push({
@@ -348,7 +348,7 @@ export const claim = async (
         });
         Object.assign(
           claimed,
-          ...notInitializedToProcess.map((e) => ({ [e.idx]: e.taskid }))
+          ...notInitializedToProcess.map((e) => ({ [e.idx]: e.taskid })),
         );
         await processInitAndClaims();
       };
@@ -373,7 +373,7 @@ export const fetchDealsByOrderHash = async (
   orderName = throwIfMissing(),
   chainId = throwIfMissing(),
   orderHash = throwIfMissing(),
-  { page = 0, pageSize = 20 } = {}
+  { page = 0, pageSize = 20 } = {},
 ) => {
   try {
     const vChainId = await chainIdSchema().validate(chainId);

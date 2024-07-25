@@ -25,7 +25,7 @@ export default class IExecDealModule extends IExecModule {
     this.computeTaskId = (dealid, taskIdx) => computeTaskId(dealid, taskIdx);
     this.fetchRequesterDeals = async (
       requesterAddress,
-      { appAddress, datasetAddress, workerpoolAddress, page, pageSize } = {}
+      { appAddress, datasetAddress, workerpoolAddress, page, pageSize } = {},
     ) =>
       fetchRequesterDeals(
         await this.config.resolveContractsClient(),
@@ -37,7 +37,7 @@ export default class IExecDealModule extends IExecModule {
           workerpoolAddress,
           page,
           pageSize,
-        }
+        },
       );
     this.claim = async (dealid) =>
       claim(await this.config.resolveContractsClient(), dealid);
@@ -47,40 +47,40 @@ export default class IExecDealModule extends IExecModule {
         APP_ORDER,
         await this.config.resolveChainId(),
         apporderHash,
-        { page, pageSize }
+        { page, pageSize },
       );
     this.fetchDealsByDatasetorder = async (
       datasetorderHash,
-      { page, pageSize } = {}
+      { page, pageSize } = {},
     ) =>
       fetchDealsByOrderHash(
         await this.config.resolveIexecGatewayURL(),
         DATASET_ORDER,
         await this.config.resolveChainId(),
         datasetorderHash,
-        { page, pageSize }
+        { page, pageSize },
       );
     this.fetchDealsByWorkerpoolorder = async (
       workerpoolorderHash,
-      { page, pageSize } = {}
+      { page, pageSize } = {},
     ) =>
       fetchDealsByOrderHash(
         await this.config.resolveIexecGatewayURL(),
         WORKERPOOL_ORDER,
         await this.config.resolveChainId(),
         workerpoolorderHash,
-        { page, pageSize }
+        { page, pageSize },
       );
     this.fetchDealsByRequestorder = async (
       requestorderHash,
-      { page, pageSize } = {}
+      { page, pageSize } = {},
     ) =>
       fetchDealsByOrderHash(
         await this.config.resolveIexecGatewayURL(),
         REQUEST_ORDER,
         await this.config.resolveChainId(),
         requestorderHash,
-        { page, pageSize }
+        { page, pageSize },
       );
   }
 }

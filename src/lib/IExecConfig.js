@@ -41,7 +41,7 @@ export default class IExecConfig {
       voucherSubgraphURL,
       defaultTeeFramework,
       providerOptions,
-    } = {}
+    } = {},
   ) {
     if (
       ethProvider === undefined ||
@@ -87,7 +87,7 @@ export default class IExecConfig {
         teeFrameworkSchema().validateSync(defaultTeeFramework);
     } catch (err) {
       throw new ConfigurationError(
-        `Invalid defaultTeeFramework: ${err.message}`
+        `Invalid defaultTeeFramework: ${err.message}`,
       );
     }
 
@@ -131,14 +131,14 @@ export default class IExecConfig {
             new JsonRpcProvider(
               // eslint-disable-next-line no-underscore-dangle
               ethProvider.provider._getConnection().url,
-              networkOverride
-            )
+              networkOverride,
+            ),
           );
         } else {
           // case FallbackProvider can not override
           if (ensRegistryAddress) {
             console.warn(
-              'IExec: ensRegistryAddress option is not supported when using a default provider'
+              'IExec: ensRegistryAddress option is not supported when using a default provider',
             );
           }
           signer = ethProvider;
@@ -152,7 +152,7 @@ export default class IExecConfig {
       } else {
         const browserSigner = new BrowserProviderSigner(
           ethProvider,
-          networkOverride
+          networkOverride,
         );
         signer = browserSigner;
         provider = browserSigner.provider;
@@ -180,7 +180,7 @@ export default class IExecConfig {
         });
       } catch (err) {
         throw new ConfigurationError(
-          `Failed to create contracts client: ${err.message}`
+          `Failed to create contracts client: ${err.message}`,
         );
       }
     })();
@@ -196,7 +196,7 @@ export default class IExecConfig {
         enterpriseSwapConf.hubAddress || isEnterpriseEnabled(chainId);
       if (!hasEnterpriseConf) {
         throw new ConfigurationError(
-          `enterpriseSwapConf option not set and no default value for your chain ${chainId}`
+          `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
         );
       }
       const enterpriseSwapFlavour =
@@ -220,7 +220,7 @@ export default class IExecConfig {
         });
       } catch (err) {
         throw new ConfigurationError(
-          `Failed to create enterprise swap contracts client: ${err.message}`
+          `Failed to create enterprise swap contracts client: ${err.message}`,
         );
       }
     })();
@@ -237,7 +237,7 @@ export default class IExecConfig {
         chainConfDefaults.bridge;
       if (!isBridged) {
         throw new ConfigurationError(
-          `bridgedNetworkConf option not set and no default value for your chain ${chainId}`
+          `bridgedNetworkConf option not set and no default value for your chain ${chainId}`,
         );
       }
       const bridgedChainId =
@@ -246,7 +246,7 @@ export default class IExecConfig {
           : chainConfDefaults.bridge && chainConfDefaults.bridge.bridgedChainId;
       if (!bridgedChainId) {
         throw new ConfigurationError(
-          `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`
+          `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
         );
       }
       const bridgedChainConfDefaults = getChainDefaults({
@@ -259,7 +259,7 @@ export default class IExecConfig {
           : bridgedChainConfDefaults.host;
       if (!bridgedRpcUrl) {
         throw new ConfigurationError(
-          `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`
+          `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
         );
       }
       const bridgedBridgeAddress =
@@ -269,7 +269,7 @@ export default class IExecConfig {
             bridgedChainConfDefaults.bridge.contract;
       if (!bridgedBridgeAddress) {
         throw new ConfigurationError(
-          `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`
+          `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
         );
       }
       const contracts = await contractsPromise;
@@ -304,7 +304,7 @@ export default class IExecConfig {
         });
       } catch (err) {
         throw new ConfigurationError(
-          `Failed to create bridged contracts client: ${err.message}`
+          `Failed to create bridged contracts client: ${err.message}`,
         );
       }
     })();
@@ -350,7 +350,7 @@ export default class IExecConfig {
         return value;
       }
       throw new ConfigurationError(
-        `smsURL option not set and no default value for your chain ${chainId}`
+        `smsURL option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -362,7 +362,7 @@ export default class IExecConfig {
         return value;
       }
       throw new ConfigurationError(
-        `resultProxyURL option not set and no default value for your chain ${chainId}`
+        `resultProxyURL option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -374,7 +374,7 @@ export default class IExecConfig {
         return value;
       }
       throw new ConfigurationError(
-        `iexecGatewayURL option not set and no default value for your chain ${chainId}`
+        `iexecGatewayURL option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -386,7 +386,7 @@ export default class IExecConfig {
         return value;
       }
       throw new ConfigurationError(
-        `ipfsGatewayURL option not set and no default value for your chain ${chainId}`
+        `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -398,7 +398,7 @@ export default class IExecConfig {
         return value;
       }
       throw new ConfigurationError(
-        `pocoSubgraphURL option not set and no default value for your chain ${chainId}`
+        `pocoSubgraphURL option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -421,7 +421,7 @@ export default class IExecConfig {
         return value;
       }
       throw new ConfigurationError(
-        `bridgeAddress option not set and no default value for your chain ${chainId}`
+        `bridgeAddress option not set and no default value for your chain ${chainId}`,
       );
     };
 
@@ -439,7 +439,7 @@ export default class IExecConfig {
         return value;
       }
       throw new ConfigurationError(
-        `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`
+        `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`,
       );
     };
 
