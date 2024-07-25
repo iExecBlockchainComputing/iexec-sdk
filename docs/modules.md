@@ -19,7 +19,7 @@
 
 ### Classes
 
-- [BrowserProviderSigner](classes/BrowserProviderSigner.md)
+- [BrowserProviderSignerAdapter](classes/BrowserProviderSignerAdapter.md)
 - [EnhancedWallet](classes/EnhancedWallet.md)
 - [IExec](classes/IExec.md)
 - [IExecAccountModule](classes/IExecAccountModule.md)

@@ -14,7 +14,9 @@ const TARGET_FAUCET_WALLET = '0xdFa2585C16cAf9c853086F36d2A37e9b8d1eab87';
 
 const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545';
 
-const provider = new JsonRpcProvider(rpcURL);
+const provider = new JsonRpcProvider(rpcURL, undefined, {
+  pollingInterval: 100, // fast polling for tests
+});
 
 const setBalance = async (address, weiAmount) => {
   fetch(rpcURL, {

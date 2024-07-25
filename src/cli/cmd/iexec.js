@@ -109,8 +109,6 @@ cli.command('ens', 'manage ENS names');
 
 cli.command('category', 'manage iExec categories');
 
-cli.command('registry', 'interact with iExec registry');
-
 const infoCmd = cli.command('info');
 addGlobalOptions(infoCmd);
 infoCmd

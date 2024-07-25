@@ -124,8 +124,6 @@ export const desc = {
     '[DEPRECATED see send-RLC] send RLC to an address (WARNING! default unit nRLC)',
   sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
-  validateResource: () =>
-    'validate an app/dataset/workerpool description before submitting it to the iExec registry',
   decrypt: () => 'decrypt work result',
   sign: () => 'sign orders from "iexec.json" and store them into "orders.json"',
   cancelOrder: (objName) => `cancel a signed ${objName}`,

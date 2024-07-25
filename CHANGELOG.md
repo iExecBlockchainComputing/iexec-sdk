@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.10.0] 2024-07-24
+
+### Added
+
+- added support for ethers `AbstractProvider`, `AbstractSigner` and `BrowserProvider` to instantiate modules
+
+### Changed
+
+- reduced default polling interval for faster tx confirmation
+- more permissive url validation for `iexec_input_files`
+
+### Removed
+
+- removed `ensRegistryAddress` option (use ethers `Network.register()` to configure custom networks supporting ENS)
+- CLI removed `iexec registry` commands
+
 ## [8.9.1] 2024-06-19
 
 ### Changed

@@ -6,10 +6,9 @@ import {
   AbstractSigner,
   Signer,
   TransactionRequest,
-  Eip1193Provider,
-  Networkish,
   TypedDataDomain,
   TypedDataField,
+  BrowserProvider,
 } from 'ethers';
 
 export class EnhancedWallet extends Wallet {
@@ -23,8 +22,11 @@ export class EnhancedWallet extends Wallet {
   );
 }
 
-export class BrowserProviderSigner extends AbstractSigner {
-  constructor(ethereum: Eip1193Provider, network?: Networkish);
+/**
+ * BrowserProvider wrapped in an AbstractSigner
+ */
+export class BrowserProviderSignerAdapter extends AbstractSigner {
+  constructor(browserProvider: BrowserProvider);
   getAddress(): Promise<string>;
   connect(provider: Provider | null): Signer;
   signMessage(message: string | Uint8Array): Promise<string>;

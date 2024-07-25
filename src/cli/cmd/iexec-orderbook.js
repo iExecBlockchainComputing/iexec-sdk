@@ -136,7 +136,6 @@ orderbookApp
           appOrders: results,
         },
       });
-      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, opts);
     }
@@ -251,7 +250,6 @@ orderbookDataset
           datasetOrders: results,
         },
       });
-      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, opts);
     }
@@ -379,7 +377,6 @@ orderbookWorkerpool
           workerpoolOrders: results,
         },
       });
-      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, opts);
     }
@@ -500,7 +497,6 @@ orderbookRequester
           requestOrders: results,
         },
       });
-      spinner.info('Trade in the browser at https://market.iex.ec');
     } catch (error) {
       handleError(error, cli, opts);
     }
