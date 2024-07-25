@@ -61,7 +61,7 @@ export const hexnumberSchema = () =>
     .lowercase()
     .matches(
       /^(0x)([0-9a-f]{2})*$/,
-      '${originalValue} is not a valid hex number',
+      '${originalValue} is not a valid hex number'
     );
 
 export const uint256Schema = () =>
@@ -199,12 +199,12 @@ export const addressSchema = ({ ethProvider } = {}) =>
   mixed()
     .transform((value) => transformAddressOrEns(ethProvider)(value))
     .test('resolve-ens', 'Unable to resolve ENS ${originalValue}', (value) =>
-      testResolveEnsPromise(value),
+      testResolveEnsPromise(value)
     )
     .test(
       'is-address',
       '${originalValue} is not a valid ethereum address',
-      (value) => testAddressOrAddressPromise(value),
+      (value) => testAddressOrAddressPromise(value)
     );
 
 export const addressOrAnySchema = ({ ethProvider } = {}) =>
@@ -229,7 +229,7 @@ export const addressOrAnySchema = ({ ethProvider } = {}) =>
           return true;
         }
         return testAddressOrAddressPromise(value);
-      },
+      }
     );
 
 export const bytes32Schema = () =>
@@ -240,7 +240,7 @@ export const bytes32Schema = () =>
 export const orderSignSchema = () =>
   string().matches(
     /^(0x)([0-9a-f]{2})*/,
-    '${originalValue} is not a valid signature',
+    '${originalValue} is not a valid signature'
   );
 
 const salted = () => ({
@@ -273,7 +273,7 @@ export const paramsEncryptResultSchema = () => boolean();
 const addAllStorageProviders = (schema) =>
   schema.oneOf(
     Object.values(STORAGE_PROVIDERS),
-    '${path} "${value}" is not a valid storage provider, use one of the supported providers (${values})',
+    '${path} "${value}" is not a valid storage provider, use one of the supported providers (${values})'
   );
 
 export const paramsStorageProviderSchema = () =>
@@ -289,7 +289,7 @@ export const paramsRequesterSecretsSchema = () =>
           value !== undefined &&
           value !== null &&
           Object.keys(value).find((key) => !posStrictIntRegex.test(key))
-        ),
+        )
     )
     .test(
       'values-are-string',
@@ -299,9 +299,9 @@ export const paramsRequesterSecretsSchema = () =>
           value !== undefined &&
           value !== null &&
           Object.values(value).find(
-            (val) => typeof val !== 'string' || val.length === 0,
+            (val) => typeof val !== 'string' || val.length === 0
           )
-        ),
+        )
     )
     .nonNullable();
 
@@ -322,10 +322,10 @@ export const objParamsSchema = () =>
                   ? addAllStorageProviders(archiveStorageSchema)
                   : archiveStorageSchema.oneOf(
                       [STORAGE_PROVIDERS.IPFS],
-                      '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}',
-                    ),
+                      '${path} "${value}" is not supported for non TEE tasks use supported storage provider ${values}'
+                    )
               )
-              .required(),
+              .required()
     ),
     [IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]: mixed().when('$isTee', ([isTee]) =>
       isTee === true
@@ -333,8 +333,8 @@ export const objParamsSchema = () =>
         : mixed().test(
             'is-not-defined',
             '${path} is not supported for non TEE tasks',
-            (value) => value === undefined,
-          ),
+            (value) => value === undefined
+          )
     ),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
       `${IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER}`,
@@ -342,12 +342,12 @@ export const objParamsSchema = () =>
         provider === STORAGE_PROVIDERS.IPFS
           ? providerSchema
               .when('$resultProxyURL', ([resultProxyURL], schema) =>
-                schema.default(resultProxyURL),
+                schema.default(resultProxyURL)
               )
               .required(
-                `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`,
+                `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`
               )
-          : providerSchema.notRequired(),
+          : providerSchema.notRequired()
     ),
     [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
   })
@@ -375,7 +375,7 @@ export const paramsSchema = () =>
         } catch (e) {
           return false;
         }
-      },
+      }
     );
 
 export const tagSchema = () =>
@@ -403,7 +403,7 @@ export const tagSchema = () =>
       'no-transform-error',
       ({ originalValue, value }) =>
         `${originalValue} is not a valid tag. ${value.message}`,
-      (value) => !(value instanceof Error),
+      (value) => !(value instanceof Error)
     )
     .test(
       'is-bytes32',
@@ -418,7 +418,7 @@ export const tagSchema = () =>
         } catch (e) {
           return false;
         }
-      },
+      }
     )
     .test(
       'is-valid-tee-tag',
@@ -429,38 +429,38 @@ export const tagSchema = () =>
         }
         const isTee = checkActiveBitInTag(value, TAG_MAP.tee);
         const teeFrameworks = Object.values(TEE_FRAMEWORKS).filter(
-          (teeFramework) => checkActiveBitInTag(value, TAG_MAP[teeFramework]),
+          (teeFramework) => checkActiveBitInTag(value, TAG_MAP[teeFramework])
         );
         try {
           if (isTee) {
             if (teeFrameworks.length < 1) {
               throw Error(
                 `'tee' tag must be used with a tee framework (${Object.values(
-                  TEE_FRAMEWORKS,
+                  TEE_FRAMEWORKS
                 )
                   .map((name) => `'${name}'`)
-                  .join('|')})`,
+                  .join('|')})`
               );
             }
             if (teeFrameworks.length > 1) {
               throw Error(
                 `tee framework tags are exclusive (${Object.values(
-                  TEE_FRAMEWORKS,
+                  TEE_FRAMEWORKS
                 )
                   .map((name) => `'${name}'`)
-                  .join('|')})`,
+                  .join('|')})`
               );
             }
           } else if (teeFrameworks.length > 0) {
             throw Error(
-              `'${teeFrameworks[0]}' tag must be used with 'tee' tag`,
+              `'${teeFrameworks[0]}' tag must be used with 'tee' tag`
             );
           }
         } catch (e) {
           return createError({ message: e.message });
         }
         return true;
-      },
+      }
     );
 
 export const apporderSchema = (opt) =>
@@ -474,19 +474,19 @@ export const apporderSchema = (opt) =>
       workerpoolrestrict: addressSchema(opt).required(),
       requesterrestrict: addressSchema(opt).required(),
     },
-    '${originalValue} is not a valid apporder',
+    '${originalValue} is not a valid apporder'
   );
 
 export const saltedApporderSchema = (opt) =>
   apporderSchema(opt).shape(
     salted(),
-    '${originalValue} is not a valid salted apporder',
+    '${originalValue} is not a valid salted apporder'
   );
 
 export const signedApporderSchema = (opt) =>
   saltedApporderSchema(opt).shape(
     signed(),
-    '${originalValue} is not a valid signed apporder',
+    '${originalValue} is not a valid signed apporder'
   );
 
 export const datasetorderSchema = (opt) =>
@@ -500,19 +500,19 @@ export const datasetorderSchema = (opt) =>
       workerpoolrestrict: addressSchema(opt).required(),
       requesterrestrict: addressSchema(opt).required(),
     },
-    '${originalValue} is not a valid datasetorder',
+    '${originalValue} is not a valid datasetorder'
   );
 
 export const saltedDatasetorderSchema = (opt) =>
   datasetorderSchema(opt).shape(
     salted(),
-    '${originalValue} is not a valid salted datasetorder',
+    '${originalValue} is not a valid salted datasetorder'
   );
 
 export const signedDatasetorderSchema = (opt) =>
   saltedDatasetorderSchema(opt).shape(
     signed(),
-    '${originalValue} is not a valid signed datasetorder',
+    '${originalValue} is not a valid signed datasetorder'
   );
 
 export const workerpoolorderSchema = (opt) =>
@@ -528,19 +528,19 @@ export const workerpoolorderSchema = (opt) =>
       datasetrestrict: addressSchema(opt).required(),
       requesterrestrict: addressSchema(opt).required(),
     },
-    '${originalValue} is not a valid workerpoolorder',
+    '${originalValue} is not a valid workerpoolorder'
   );
 
 export const saltedWorkerpoolorderSchema = (opt) =>
   workerpoolorderSchema(opt).shape(
     salted(),
-    '${originalValue} is not a valid salted workerpoolorder',
+    '${originalValue} is not a valid salted workerpoolorder'
   );
 
 export const signedWorkerpoolorderSchema = (opt) =>
   saltedWorkerpoolorderSchema(opt).shape(
     signed(),
-    '${originalValue} is not a valid signed workerpoolorder',
+    '${originalValue} is not a valid signed workerpoolorder'
   );
 
 export const requestorderSchema = (opt) =>
@@ -561,19 +561,19 @@ export const requestorderSchema = (opt) =>
       callback: addressSchema(opt).required(),
       params: paramsSchema(),
     },
-    '${originalValue} is not a valid requestorder',
+    '${originalValue} is not a valid requestorder'
   );
 
 export const saltedRequestorderSchema = (opt) =>
   requestorderSchema(opt).shape(
     salted(),
-    '${originalValue} is not a valid salted requestorder',
+    '${originalValue} is not a valid salted requestorder'
   );
 
 export const signedRequestorderSchema = (opt) =>
   saltedRequestorderSchema(opt).shape(
     signed(),
-    '${originalValue} is not a valid signed requestorder',
+    '${originalValue} is not a valid signed requestorder'
   );
 
 export const multiaddressSchema = () =>
@@ -595,18 +595,12 @@ export const objMrenclaveSchema = () =>
     entrypoint: mixed().when('framework', ([framework], entrypointSchema) =>
       framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
         ? string().required()
-        : entrypointSchema.is(
-            [undefined],
-            'Unknown key "${path}" in mrenclave',
-          ),
+        : entrypointSchema.is([undefined], 'Unknown key "${path}" in mrenclave')
     ),
     heapSize: mixed().when('framework', ([framework], entrypointSchema) =>
       framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
         ? positiveIntSchema().required()
-        : entrypointSchema.is(
-            [undefined],
-            'Unknown key "${path}" in mrenclave',
-          ),
+        : entrypointSchema.is([undefined], 'Unknown key "${path}" in mrenclave')
     ),
   })
     .json()
@@ -661,7 +655,7 @@ export const mrenclaveSchema = () =>
           }
           return false;
         }
-      },
+      }
     )
     .default(() => utf8ToBuffer(''));
 
@@ -708,7 +702,7 @@ export const fileBufferSchema = () =>
       return Buffer.from(value);
     } catch (e) {
       throw new ValidationError(
-        'Invalid file buffer, must be ArrayBuffer or Buffer',
+        'Invalid file buffer, must be ArrayBuffer or Buffer'
       );
     }
   });
@@ -728,7 +722,7 @@ export const base64Encoded256bitsKeySchema = () =>
         debug('is-base64-256bits-key', e);
         return false;
       }
-    },
+    }
   );
 
 export const ensDomainSchema = () =>
@@ -748,7 +742,7 @@ export const ensDomainSchema = () =>
           debug('ensDomainSchema no-empty-label', e);
           return false;
         }
-      },
+      }
     )
     .test(
       'valid-namehash',
@@ -761,7 +755,7 @@ export const ensDomainSchema = () =>
           debug('ensDomainSchema valid-namehash', e);
           return false;
         }
-      },
+      }
     )
     .test(
       'no-uppercase',
@@ -776,7 +770,7 @@ export const ensDomainSchema = () =>
           debug('ensDomainSchema no-uppercase', e);
           return false;
         }
-      },
+      }
     );
 
 export const ensLabelSchema = () =>
@@ -793,7 +787,7 @@ export const ensLabelSchema = () =>
           debug('ensLabelSchema no-dot', e);
           return false;
         }
-      },
+      }
     )
     .test(
       'valid-namehash',
@@ -806,7 +800,7 @@ export const ensLabelSchema = () =>
           debug('ensLabelSchema valid-namehash', e);
           return false;
         }
-      },
+      }
     )
     .test(
       'no-uppercase',
@@ -821,7 +815,7 @@ export const ensLabelSchema = () =>
           debug('ensLabelSchema no-uppercase', e);
           return false;
         }
-      },
+      }
     );
 
 export const textRecordKeySchema = () => string().required().strict(true);
@@ -836,8 +830,8 @@ export const smsUrlOrMapSchema = () =>
       return object(
         teeFrameworksList.reduce(
           (acc, curr) => ({ ...acc, [curr]: basicUrlSchema() }),
-          {},
-        ),
+          {}
+        )
       )
         .noUnknown(true)
         .nonNullable()

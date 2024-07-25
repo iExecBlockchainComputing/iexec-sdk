@@ -13,7 +13,7 @@ const debug = Debug('iexec:ens:resolution');
 
 export const getOwner = async (
   contracts = throwIfMissing(),
-  name = throwIfMissing(),
+  name = throwIfMissing()
 ) => {
   try {
     const vName = await ensDomainSchema().validate(name);
@@ -22,7 +22,7 @@ export const getOwner = async (
     const ensRegistryContract = new Contract(
       ensAddress,
       abi,
-      contracts.provider,
+      contracts.provider
     );
     return await wrapCall(ensRegistryContract.owner(nameHash));
   } catch (e) {
@@ -33,7 +33,7 @@ export const getOwner = async (
 
 export const resolveName = async (
   contracts = throwIfMissing(),
-  name = throwIfMissing(),
+  name = throwIfMissing()
 ) => {
   try {
     const vName = await ensDomainSchema().validate(name);
@@ -47,7 +47,7 @@ export const resolveName = async (
 
 export const lookupAddress = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address = throwIfMissing()
 ) => {
   try {
     const vAddress = await addressSchema({

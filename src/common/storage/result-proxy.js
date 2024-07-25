@@ -9,7 +9,7 @@ const debug = Debug('iexec:storage:result-proxy');
 
 export const login = async (
   contracts = throwIfMissing(),
-  resultProxyURL = throwIfMissing(),
+  resultProxyURL = throwIfMissing()
 ) => {
   try {
     checkSigner(contracts);

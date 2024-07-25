@@ -149,7 +149,7 @@ export default class IExecENSModule extends IExecModule {
    */
   claimName(
     label: string,
-    domain?: ENS,
+    domain?: ENS
   ): Promise<{ name: ENS; registerTxHash?: TxHash }>;
   /**
    * **SIGNER REQUIRED, ONLY ENS NAME OWNER**
@@ -193,7 +193,7 @@ export default class IExecENSModule extends IExecModule {
    */
   obsConfigureResolution(
     name: ENS,
-    address?: Address,
+    address?: Address
   ): Promise<ENSConfigurationObservable>;
   /**
    * **SIGNER REQUIRED, ONLY ENS NAME OWNER**
@@ -223,7 +223,7 @@ export default class IExecENSModule extends IExecModule {
    */
   configureResolution(
     name: ENS,
-    address?: Address,
+    address?: Address
   ): Promise<{
     name: ENS;
     address: Address;

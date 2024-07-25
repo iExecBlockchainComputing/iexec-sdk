@@ -56,12 +56,12 @@ generateKeys
       const nodeMinVersion = 'v10.12.0';
       if (gt(nodeMinVersion, process.version)) {
         throw Error(
-          `Minimum node version to use this command is ${nodeMinVersion}, found ${process.version}`,
+          `Minimum node version to use this command is ${nodeMinVersion}, found ${process.version}`
         );
       }
       const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
-        Object.assign(walletOptions, { isSigner: false }),
+        Object.assign(walletOptions, { isSigner: false })
       );
       const [address] = await keystore.accounts();
 
@@ -93,7 +93,7 @@ generateKeys
                 publicKey: pub,
               });
             }
-          },
+          }
         );
       });
       spinner.stop();
@@ -116,7 +116,7 @@ generateKeys
             privateKeyFile: priKeyFileName,
             publicKeyFile: pubKeyFileName,
           },
-        },
+        }
       );
     } catch (error) {
       handleError(error, cli, opts);
@@ -137,12 +137,12 @@ decryptResults
     try {
       const { beneficiarySecretsFolderPath } = createEncFolderPaths(opts);
       const beneficiarySecretFolderExists = await pathExists(
-        beneficiarySecretsFolderPath,
+        beneficiarySecretsFolderPath
       );
 
       if (!beneficiarySecretFolderExists) {
         throw Error(
-          'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
+          'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?'
         );
       }
 
@@ -155,21 +155,21 @@ decryptResults
 
       const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
-        Object.assign(walletOptions, { isSigner: false }),
+        Object.assign(walletOptions, { isSigner: false })
       );
 
       let beneficiaryKeyPath;
       if (opts.beneficiaryKeyFile) {
         beneficiaryKeyPath = join(
           beneficiarySecretsFolderPath,
-          opts.beneficiaryKeyFile,
+          opts.beneficiaryKeyFile
         );
       } else {
         const [address] = await keystore.accounts();
         spinner.info(`Using beneficiary encryption key for wallet ${address}`);
         beneficiaryKeyPath = join(
           beneficiarySecretsFolderPath,
-          privateKeyName(address),
+          privateKeyName(address)
         );
       }
 
@@ -179,7 +179,7 @@ decryptResults
       } catch (error) {
         debug(error);
         throw Error(
-          `Failed to load beneficiary encryption key from "${beneficiaryKeyPath}"`,
+          `Failed to load beneficiary encryption key from "${beneficiaryKeyPath}"`
         );
       }
 
@@ -190,7 +190,7 @@ decryptResults
       const encResultsZip = await readFile(inputFile);
       const decryptedResultsZip = await decryptResult(
         encResultsZip,
-        beneficiaryKey,
+        beneficiaryKey
       );
       await saveTextToFile(outputFile, decryptedResultsZip, { force: true });
       spinner.succeed(`Results successfully decrypted in ${outputFile}`, {
@@ -236,7 +236,7 @@ pushSecret
         const { beneficiarySecretsFolderPath } = createEncFolderPaths();
         secretFilePath = join(
           beneficiarySecretsFolderPath,
-          publicKeyName(address),
+          publicKeyName(address)
         );
       }
       const publicKey = await readFile(secretFilePath, 'utf8');
@@ -246,7 +246,7 @@ pushSecret
         sms,
         getResultEncryptionKeyName(),
         secretToPush,
-        { forceUpdate: !!opts.forceUpdate },
+        { forceUpdate: !!opts.forceUpdate }
       );
       if (isPushed) {
         spinner.succeed('Encryption key successfully pushed', {
@@ -275,7 +275,7 @@ checkSecret
     try {
       const walletOptions = computeWalletLoadOptions(opts);
       const keystore = Keystore(
-        Object.assign(walletOptions, { isSigner: false }),
+        Object.assign(walletOptions, { isSigner: false })
       );
       const chain = await loadChain(opts.chain, {
         spinner,
@@ -295,7 +295,7 @@ checkSecret
         contracts,
         sms,
         keyAddress,
-        getResultEncryptionKeyName(),
+        getResultEncryptionKeyName()
       );
       if (secretExists) {
         spinner.succeed(`Encryption key found for address ${keyAddress}`, {

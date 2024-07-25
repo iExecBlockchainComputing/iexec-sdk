@@ -9,24 +9,24 @@ export default class IExecSecretModule extends IExecModule {
     this.checkRequesterSecretExists = async (
       address,
       secretName,
-      { teeFramework } = {},
+      { teeFramework } = {}
     ) =>
       checkRequesterSecretExists(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL({ teeFramework }),
         address,
-        secretName,
+        secretName
       );
     this.pushRequesterSecret = async (
       secretName,
       secretValue,
-      { teeFramework } = {},
+      { teeFramework } = {}
     ) =>
       pushRequesterSecret(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL({ teeFramework }),
         secretName,
-        secretValue,
+        secretValue
       );
   }
 }

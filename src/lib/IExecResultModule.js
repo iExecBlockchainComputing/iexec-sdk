@@ -10,17 +10,17 @@ export default class IExecResultModule extends IExecModule {
 
     this.checkResultEncryptionKeyExists = async (
       address,
-      { teeFramework } = {},
+      { teeFramework } = {}
     ) =>
       checkWeb2SecretExists(
         await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL({ teeFramework }),
         address,
-        getResultEncryptionKeyName(),
+        getResultEncryptionKeyName()
       );
     this.pushResultEncryptionKey = async (
       publicKey,
-      { forceUpdate = false, teeFramework } = {},
+      { forceUpdate = false, teeFramework } = {}
     ) => {
       // secretValue can be:
       // - a PEM public key
@@ -32,7 +32,7 @@ export default class IExecResultModule extends IExecModule {
         await this.config.resolveSmsURL({ teeFramework }),
         getResultEncryptionKeyName(),
         formattedPublicKey,
-        { forceUpdate },
+        { forceUpdate }
       );
     };
   }

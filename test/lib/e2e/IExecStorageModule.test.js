@@ -83,8 +83,8 @@ describe('storage', () => {
       expect(pushRes.isUpdated).toBe(false);
       await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
         Error(
-          `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`,
-        ),
+          `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`
+        )
       );
       const pushForTeeFramework = await iexec.storage.pushStorageToken('oops', {
         teeFramework: 'gramine',
@@ -101,11 +101,11 @@ describe('storage', () => {
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
       await expect(
-        iexec.storage.pushStorageToken('oops', { provider: 'default' }),
+        iexec.storage.pushStorageToken('oops', { provider: 'default' })
       ).rejects.toThrow(
         Error(
-          `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`,
-        ),
+          `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`
+        )
       );
     });
 
@@ -117,11 +117,11 @@ describe('storage', () => {
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
       await expect(
-        iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
+        iexec.storage.pushStorageToken('oops', { provider: 'dropbox' })
       ).rejects.toThrow(
         Error(
-          `Secret "iexec-result-dropbox-token" already exists for ${wallet.address}`,
-        ),
+          `Secret "iexec-result-dropbox-token" already exists for ${wallet.address}`
+        )
       );
     });
 
@@ -152,7 +152,7 @@ describe('storage', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-        },
+        }
       );
     });
 
@@ -167,7 +167,7 @@ describe('storage', () => {
         {
           constructor: SmsCallError,
           message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-        },
+        }
       );
     });
 
@@ -184,7 +184,7 @@ describe('storage', () => {
       await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
       const withSecretRes = await iexecReadOnly.storage.checkStorageTokenExists(
         wallet.address,
-        { provider: 'dropbox' },
+        { provider: 'dropbox' }
       );
       expect(withSecretRes).toBe(true);
       const unsetProviderRes =
@@ -193,7 +193,7 @@ describe('storage', () => {
       await expect(
         iexecReadOnly.storage.checkStorageTokenExists(wallet.address, {
           provider: 'test',
-        }),
+        })
       ).rejects.toThrow(Error('"test" not supported'));
       const unsetForTeeFramework =
         await iexecReadOnly.storage.checkStorageTokenExists(wallet.address, {

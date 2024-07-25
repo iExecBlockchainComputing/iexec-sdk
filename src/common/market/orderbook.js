@@ -33,7 +33,7 @@ export const fetchAppOrderbook = async (
     isDatasetStrict = false,
     isWorkerpoolStrict = false,
     isRequesterStrict = false,
-  } = {},
+  } = {}
 ) => {
   try {
     const query = {
@@ -110,7 +110,7 @@ export const fetchDatasetOrderbook = async (
     isAppStrict = false,
     isWorkerpoolStrict = false,
     isRequesterStrict = false,
-  } = {},
+  } = {}
 ) => {
   try {
     const query = {
@@ -190,7 +190,7 @@ export const fetchWorkerpoolOrderbook = async (
     isAppStrict = false,
     isDatasetStrict = false,
     isRequesterStrict = false,
-  } = {},
+  } = {}
 ) => {
   try {
     const query = {
@@ -279,7 +279,7 @@ export const fetchRequestOrderbook = async (
     page = 0,
     pageSize = 20,
     isWorkerpoolStrict = false,
-  } = {},
+  } = {}
 ) => {
   try {
     const query = {

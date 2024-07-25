@@ -55,7 +55,7 @@ export const httpRequest =
       '\nbody',
       body,
       '\nheaders',
-      headers,
+      headers
     );
     const baseURL = new URL(endpoint, api).href;
     const queryString = makeQueryString(query);
@@ -69,7 +69,7 @@ export const httpRequest =
         debug(`httpRequest() fetch:`, error);
         throw new ApiCallErrorClass(
           `Connection to ${api} failed with a network error`,
-          error,
+          error
         );
       })
       .then((response) => {
@@ -77,8 +77,8 @@ export const httpRequest =
           throw new ApiCallErrorClass(
             `Server at ${api} encountered an internal error`,
             Error(
-              `Server internal error: ${response.status} ${response.statusText}`,
-            ),
+              `Server internal error: ${response.status} ${response.statusText}`
+            )
           );
         }
         return response;
@@ -143,7 +143,7 @@ export const downloadZipApi = {
         throw Error(
           `API error: ${response.status} ${
             response.statusText ? response.statusText : ''
-          }`,
+          }`
         );
       }
       return response;
@@ -175,7 +175,7 @@ export const getAuthorization = async ({
       throw Error('Unexpected challenge format');
     }
     const sign = await wrapSignTypedData(
-      signer.signTypedData(domain, types, message),
+      signer.signTypedData(domain, types, message)
     );
     const hash = hashEIP712(typedData);
     const separator = '_';

@@ -63,7 +63,7 @@ const chainsConfSchema = () =>
           Object.entries({ ...chainsOjb }).map(async ([name, chain]) => {
             await string().validate(name, { strict: true });
             await chainConfSchema().validate(chain, { strict: true });
-          }),
+          })
         );
         return true;
       })
@@ -96,7 +96,7 @@ const deployedObjSchema = () =>
       Object.entries({ ...obj }).map(async ([chainId, address]) => {
         await chainIdSchema().validate(chainId, { strict: true });
         await addressSchema().validate(address, { strict: true });
-      }),
+      })
     );
     return true;
   });
@@ -120,7 +120,7 @@ const ORDERS_FILE_NAME = 'orders.json';
 export const saveToFile = async (
   fileName,
   text,
-  { force = false, strict = true, fileDir, format } = {},
+  { force = false, strict = true, fileDir, format } = {}
 ) => {
   try {
     let filePath;
@@ -161,7 +161,7 @@ export const saveToFile = async (
 export const saveTextToFile = async (
   fileName,
   text,
-  { force = false, strict = true, fileDir } = {},
+  { force = false, strict = true, fileDir } = {}
 ) => {
   try {
     return await saveToFile(fileName, text, {
@@ -179,7 +179,7 @@ export const saveTextToFile = async (
 const saveJSONToFile = async (
   fileName,
   obj,
-  { force = false, strict = true, fileDir } = {},
+  { force = false, strict = true, fileDir } = {}
 ) => {
   try {
     const json = JSON.stringify(obj, null, 2);
@@ -240,7 +240,7 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
       throw new Error(
         options.loadErrorMessage
           ? options.loadErrorMessage(fileName)
-          : info.missingConfFile(fileName),
+          : info.missingConfFile(fileName)
       );
     }
     throw new Error(`${error} in ${fileName}`);

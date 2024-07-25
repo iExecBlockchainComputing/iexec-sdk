@@ -80,7 +80,7 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   deployDataset(
-    dataset: DatasetDeploymentArgs,
+    dataset: DatasetDeploymentArgs
   ): Promise<{ address: Address; txHash: TxHash }>;
   /**
    * predict the dataset contract address given the dataset deployment arguments
@@ -117,7 +117,7 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   showDataset(
-    datasetAddress: Addressish,
+    datasetAddress: Addressish
   ): Promise<{ objAddress: Address; dataset: Dataset }>;
   /**
    * count the datasets owned by an address.
@@ -140,7 +140,7 @@ export default class IExecDatasetModule extends IExecModule {
    */
   showUserDataset(
     index: BNish,
-    address: Addressish,
+    address: Addressish
   ): Promise<{ objAddress: Address; dataset: Dataset }>;
   /**
    * generate an encryption key to encrypt a dataset
@@ -178,7 +178,7 @@ export default class IExecDatasetModule extends IExecModule {
    */
   encrypt(
     datasetFile: Buffer | ArrayBuffer | Uint8Array,
-    encyptionKey: string,
+    encyptionKey: string
   ): Promise<Buffer>;
   /**
    * compute the encrypted dataset file's checksum required for dataset deployment
@@ -201,7 +201,7 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   computeEncryptedFileChecksum(
-    encryptedFile: Buffer | ArrayBuffer | Uint8Array,
+    encryptedFile: Buffer | ArrayBuffer | Uint8Array
   ): Promise<string>;
   /**
    * check if a the dataset secret exists in the Secret Management Service
@@ -216,7 +216,7 @@ export default class IExecDatasetModule extends IExecModule {
     datasetAddress: Addressish,
     options?: {
       teeFramework?: TeeFramework;
-    },
+    }
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
@@ -236,7 +236,7 @@ export default class IExecDatasetModule extends IExecModule {
     encryptionKey: string,
     options?: {
       teeFramework?: TeeFramework;
-    },
+    }
   ): Promise<boolean>;
   /**
    * **ONLY DATASET OWNER**
@@ -253,7 +253,7 @@ export default class IExecDatasetModule extends IExecModule {
    */
   transferDataset(
     datasetAddress: Addressish,
-    to: Addressish,
+    to: Addressish
   ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
   /**
    * Create an IExecDatasetModule instance using an IExecConfig instance

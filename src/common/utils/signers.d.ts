@@ -19,7 +19,7 @@ export class EnhancedWallet extends Wallet {
     options?: {
       gasPrice?: string;
       getTransactionCount?: (blockTag?: BlockTag) => Promise<number>;
-    },
+    }
   );
 }
 
@@ -32,6 +32,6 @@ export class BrowserProviderSigner extends AbstractSigner {
   signTypedData(
     domain: TypedDataDomain,
     types: Record<string, TypedDataField[]>,
-    value: Record<string, any>,
+    value: Record<string, any>
   ): Promise<string>;
 }
