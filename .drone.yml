@@ -338,7 +338,6 @@ steps:
       - node -v
       - npm -v
       - npm ci
-      - npm run build
 
   - name: build
     image: node:18
@@ -347,6 +346,20 @@ steps:
       - npm run build
     depends_on:
       - install
+
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+    depends_on:
+      - build
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+    depends_on:
+      - build
 
   - name: test
     image: node:18
@@ -433,6 +446,22 @@ steps:
     image: node:18
     commands:
       - npm run build
+    depends_on:
+      - install
+
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+    depends_on:
+      - build
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+    depends_on:
+      - build
 
   - name: npm publish dry-run
     image: node:18
@@ -471,7 +500,28 @@ steps:
       - npm -v
       - npm ci
 
-  - name: set version nightly
+  - name: build
+    image: node:18
+    commands:
+      - npm run build
+    depends_on:
+      - install
+
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+    depends_on:
+      - build
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+    depends_on:
+      - build
+
+  - name: set-version-nightly
     image: node:18
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
@@ -484,11 +534,6 @@ steps:
       branch:
         - voucher
 
-  - name: build
-    image: node:18
-    commands:
-      - npm run build
-
   - name: npm publish
     image: plugins/npm
     pull: always
@@ -498,6 +543,11 @@ steps:
       token:
         from_secret: npm_token
       tag: ${DRONE_BRANCH}
+    depends_on:
+      - format
+      - lint
+      - build
+      - set-version-nightly
 
   - name: docker publish
     image: plugins/docker
@@ -546,6 +596,22 @@ steps:
     image: node:18
     commands:
       - npm run build
+    depends_on:
+      - install
+
+  - name: format
+    image: node:18.19
+    commands:
+      - npm run check-format
+    depends_on:
+      - build
+
+  - name: lint
+    image: node:18.19
+    commands:
+      - npm run lint
+    depends_on:
+      - build
 
   - name: npm publish
     image: plugins/npm
@@ -556,6 +622,10 @@ steps:
       token:
         from_secret: npm_token
       tag: latest
+    depends_on:
+      - format
+      - lint
+      - build
 
   - name: docker publish
     image: plugins/docker

@@ -147,6 +147,8 @@
     "npm": ">=8"
   },
   "scripts": {
+    "format": "prettier --write .",
+    "check-format": "prettier --check .",
     "lint": "eslint src",
     "build": "npm run build:codegen && npm run build:dist && npm run build:packages && npm run build:doc",
     "test": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest --coverage",

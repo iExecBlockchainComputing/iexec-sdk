@@ -56,7 +56,7 @@ const decrypt = async (encryptedJSON, password) => {
   } catch (error) {
     debug('decrypt()', error);
     if (error.shortMessage) {
-      throw Error(error.shortMessage)
+      throw Error(error.shortMessage);
     }
     throw Error('Failed to decrypt wallet');
   }

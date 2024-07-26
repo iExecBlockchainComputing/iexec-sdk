@@ -1,4 +1,5 @@
 import Debug from 'debug';
+// eslint-disable-next-line import/no-unresolved
 import { gql } from 'graphql-request';
 import { throwIfMissing } from '../../utils/validator.js';
 import { checksummedAddress } from '../../utils/utils.js';
