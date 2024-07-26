@@ -4,6 +4,7 @@ export type * from './IExecConfig.js';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../common/utils/signers.js';
 import { AnyRecord, ProviderOptions, TeeFramework } from '../common/types.js';
+import { AbstractProvider, AbstractSigner, BrowserProvider } from 'ethers';
 
 export interface Eip1193Provider {
   request(request: {
@@ -13,15 +14,26 @@ export interface Eip1193Provider {
 }
 export interface IExecConfigArgs {
   /**
-   * A web3 Eth provider or network name or chain id
+   * A web3 Eth provider, a network name, a chain id or an ethers provider
    *
-   * examples:
-   * - `window.ethereum`
-   * - `"mainnet"` or `1` or `"1"` for ethereum mainnet
+   * read-only provider examples:
+   * - `"mainnet"` or `1` or `"1"` for ethereum mainnet provider
    * - `"bellecour"` or `134` or `"134"` for iExec sidechain
    * - `"http://localhost:8545"` for local chain
+   * - `new ethers.JsonRpcProvider("https://bellecour.iex.ec")` ethers provider connected to bellecour
+   *
+   * signer provider examples:
+   * - `window.ethereum` for browser injected wallet provider
+   * - `utils.getSignerFromPrivateKey('bellecour', PRIVATE_KEY)` signer connected to bellecour
+   * - `new ethers.Wallet(PRIVATE_KEY, new ethers.JsonRpcProvider("https://bellecour.iex.ec"))` ethers wallet connected to bellecour
    */
-  ethProvider: Eip1193Provider | EnhancedWallet | string | number;
+  ethProvider:
+    | Eip1193Provider
+    | AbstractProvider
+    | AbstractSigner
+    | BrowserProvider
+    | string
+    | number;
   /**
    * flavour to use (default standard)
    */
@@ -41,10 +53,6 @@ export interface IExecConfigOptions {
    * override the IExec contract address to target a custom instance
    */
   hubAddress?: string;
-  /**
-   * override the ENS registry contract address to target a custom instance
-   */
-  ensRegistryAddress?: string;
   /**
    * override the ENS public resolver contract address to target a custom instance
    */

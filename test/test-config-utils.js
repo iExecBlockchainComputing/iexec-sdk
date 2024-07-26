@@ -1,5 +1,5 @@
-import { Wallet } from 'ethers';
-import { IExec, utils } from '../src/lib/index.js';
+import { Wallet, JsonRpcProvider } from 'ethers';
+import { IExec } from '../src/lib/index.js';
 
 export const getTestConfigOptions =
   (chain) =>
@@ -35,11 +35,11 @@ export const getTestConfig =
         iexec: new IExec({ ethProvider: chain.rpcURL }, configOptions),
       };
     }
+    const provider = new JsonRpcProvider(chain.rpcURL, undefined, {
+      pollingInterval: 1000,
+    });
     const wallet = privateKey ? new Wallet(privateKey) : Wallet.createRandom();
-    const ethProvider = utils.getSignerFromPrivateKey(
-      chain.rpcURL,
-      wallet.privateKey,
-    );
+    const ethProvider = new Wallet(wallet.privateKey, provider);
     return {
       iexec: new IExec({ ethProvider }, configOptions),
       wallet,

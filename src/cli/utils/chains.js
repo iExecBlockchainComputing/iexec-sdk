@@ -1,5 +1,4 @@
 import Debug from 'debug';
-import { JsonRpcProvider } from 'ethers';
 import {
   getChainDefaults,
   isEnterpriseEnabled,
@@ -38,14 +37,9 @@ const createChainFromConf = (
 ) => {
   try {
     const chain = { ...chainConf };
-    const provider =
-      chainConf.host && chainConf.host.indexOf('http') === 0
-        ? new JsonRpcProvider(chainConf.host, {
-            ensAddress: chainConf.ensRegistry,
-            chainId: parseInt(chainConf.id, 10),
-            name: chainName,
-          })
-        : getReadOnlyProvider(chainConf.host, { providers: providerOptions });
+    const provider = getReadOnlyProvider(chainConf.host, {
+      providers: providerOptions,
+    });
 
     chain.name = chainName;
     const contracts = new IExecContractsClient({
@@ -60,15 +54,9 @@ const createChainFromConf = (
     chain.contracts = contracts;
     if (bridgeConf) {
       chain.bridgedNetwork = { ...bridgeConf };
-      const bridgeProvider =
-        bridgeConf.host && bridgeConf.host.indexOf('http') === 0
-          ? new JsonRpcProvider(bridgeConf.host, {
-              ensAddress: bridgeConf.ensRegistry,
-              chainId: parseInt(bridgeConf.id, 10),
-            })
-          : getReadOnlyProvider(bridgeConf.host, {
-              providers: providerOptions,
-            });
+      const bridgeProvider = getReadOnlyProvider(bridgeConf.host, {
+        providers: providerOptions,
+      });
       chain.bridgedNetwork.contracts = new IExecContractsClient({
         provider: bridgeProvider,
         chainId: bridgeConf.id,

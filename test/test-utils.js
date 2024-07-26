@@ -71,6 +71,8 @@ export const TEST_CHAINS = {
     ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
+      undefined,
+      { pollingInterval: 100 },
     ),
     defaults: {
       isNative: false,
@@ -112,6 +114,8 @@ export const TEST_CHAINS = {
     ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+      undefined,
+      { pollingInterval: 100 },
     ),
     defaults: {
       hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
@@ -146,7 +150,10 @@ export const getRandomAddress = () => getRandomWallet().address;
 export const getRandomBytes32 = () => hexlify(randomBytes(32));
 export class InjectedProvider {
   constructor(rpcUrl, privateKey) {
-    this.signer = new Wallet(privateKey, new JsonRpcProvider(rpcUrl));
+    this.signer = new Wallet(
+      privateKey,
+      new JsonRpcProvider(rpcUrl, undefined, { pollingInterval: 100 }), // fast polling for tests
+    );
   }
 
   async request(args) {
@@ -289,6 +296,28 @@ export const setNRlcBalance = (chain) => async (address, nRlcTargetBalance) => {
   }
   await faucetSendNRlcToReachTargetBalance(chain)(address, nRlcTargetBalance);
 };
+
+export const setStakedNRlcBalance =
+  (chain) => async (address, nRlcTargetBalance) => {
+    const sponsorWallet = Wallet.createRandom(chain.provider);
+    const iexec = new IExec(
+      {
+        ethProvider: sponsorWallet,
+      },
+      { hubAddress: chain.hubAddress },
+    );
+    await setNRlcBalance(chain)(
+      sponsorWallet.address,
+      BigInt(nRlcTargetBalance),
+    );
+    const contractClient = await iexec.config.resolveContractsClient();
+    const iexecContract = contractClient.getIExecContract();
+    const tx = await iexecContract.depositFor(address, {
+      value: BigInt(nRlcTargetBalance) * 10n ** 9n,
+      gasPrice: 0, // TODO: wont work on non gasless chain
+    });
+    await tx.wait();
+  };
 
 export const initializeTask = (chain) => async (dealid, idx) => {
   const iexecContract = new Contract(
@@ -453,25 +482,10 @@ const createAndPublishWorkerpoolOrder = async (
   const workerpoolprice = 1000;
   const volume = 1000;
 
-  await setNRlcBalance(chain)(
-    await iexec.wallet.getAddress(),
+  await setStakedNRlcBalance(chain)(
+    workerpoolOwnerWallet.address,
     volume * workerpoolprice,
   );
-
-  const retryableDeposit = async (tryCount = 1) => {
-    try {
-      await iexec.account.deposit(volume * workerpoolprice);
-    } catch (error) {
-      console.warn(`Error sending deposit (try count ${tryCount}):`, error);
-      if (tryCount < 3) {
-        await sleep(3000 * tryCount);
-        await retryableDeposit(tryCount + 1);
-      } else {
-        throw new Error(`Failed to deposit after ${tryCount} attempts`);
-      }
-    }
-  };
-  await retryableDeposit();
 
   const workerpoolorder = await iexec.order.createWorkerpoolorder({
     workerpool,
@@ -542,25 +556,7 @@ export const createVoucher =
     ];
 
     // deposit voucher value on VoucherHub with a random wallet
-    const voucherSponsorWallet = getRandomWallet();
-    const iexecVoucherSponsor = new IExec(
-      {
-        ethProvider: getSignerFromPrivateKey(
-          chain.rpcURL,
-          voucherSponsorWallet.privateKey,
-        ),
-      },
-      { hubAddress: chain.hubAddress },
-    );
-    await setNRlcBalance(chain)(voucherSponsorWallet.address, value);
-    const contractClient =
-      await iexecVoucherSponsor.config.resolveContractsClient();
-    const iexecContract = contractClient.getIExecContract();
-    const tx = await iexecContract.depositFor(chain.voucherHubAddress, {
-      value: BigInt(value) * 10n ** 9n,
-      gasPrice: 0,
-    });
-    await tx.wait();
+    await setStakedNRlcBalance(chain)(chain.voucherHubAddress, value);
 
     const voucherHubContract = new Contract(
       chain.voucherHubAddress,

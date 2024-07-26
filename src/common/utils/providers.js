@@ -3,7 +3,6 @@ import { getChainDefaults, getId } from './config.js';
 
 export const getReadOnlyProvider = (host, options = {}) => {
   const providerOptions = options.providers || {};
-  const networkOptions = options.network;
   let resolvedHost = host;
 
   const defaults = getChainDefaults({ id: getId(host) });
@@ -18,13 +17,11 @@ export const getReadOnlyProvider = (host, options = {}) => {
     throw Error('Invalid provider host name or url');
   }
 
-  let resolvedNetwork = networkOptions;
-  if (!resolvedNetwork && defaults && defaults.network) {
-    resolvedNetwork = defaults.network;
-  }
   // RPC endpoint
   if (resolvedHost.startsWith('http')) {
-    return new JsonRpcProvider(resolvedHost, resolvedNetwork);
+    return new JsonRpcProvider(resolvedHost, undefined, {
+      pollingInterval: 1000, // override default 4s for faster tx confirms (TODO: default value per network + option)
+    });
   }
   // API provider
   const { quorum, ...providersOptionsRest } = providerOptions;
@@ -36,12 +33,13 @@ export const getReadOnlyProvider = (host, options = {}) => {
     'etherscan',
     'infura',
     'pocket', // currently commented in ethers
+    'chainstack',
     'quicknode',
   ];
   const nonConfiguredProviders = apiProvidersList.filter(
     (apiProvider) => !Object.keys(providersOptionsRest).includes(apiProvider),
   );
-  return getDefaultProvider(resolvedNetwork || resolvedHost, {
+  return getDefaultProvider(resolvedHost, {
     quorum: quorum || 1,
     ...(nonConfiguredProviders.length < apiProvidersList.length &&
       Object.fromEntries(nonConfiguredProviders.map((name) => [name, '-']))),

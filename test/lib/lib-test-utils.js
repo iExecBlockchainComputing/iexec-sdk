@@ -2,7 +2,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { expect } from '@jest/globals';
 import { NULL_ADDRESS, TEE_FRAMEWORKS, getId, sleep } from '../test-utils.js';
-
 export { getTestConfig, getTestConfigOptions } from '../test-config-utils.js';
 
 export const ONE_ETH = 10n ** 18n;
