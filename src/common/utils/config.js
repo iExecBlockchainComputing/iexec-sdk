@@ -15,6 +15,10 @@ const ensMap = {
     registry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
     publicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
   },
+  65535: {
+    registry: '0x9d4454B023096f34B160D6B654540c56A1F81688',
+    publicResolver: '0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00',
+  },
 };
 
 const voucherHubMap = {
@@ -28,6 +32,11 @@ const networkMap = {
     name: 'bellecour',
     chainId: 134,
     ensAddress: ensMap[134].registry,
+  },
+  65535: {
+    name: 'poco-chain',
+    chainId: 65535,
+    ensAddress: ensMap[65535].registry,
   },
 };
 
@@ -128,3 +137,11 @@ const bellecourNetwork = new Network(networkMap[134].name, 134).attachPlugin(
 );
 Network.register(bellecourNetwork.chainId, () => bellecourNetwork);
 Network.register(bellecourNetwork.name, () => bellecourNetwork);
+
+// configure bellecour-bubble network and attaching the ENS plugin
+const bellecourBubbleNetwork = new Network(
+  networkMap[65535].name,
+  65535,
+).attachPlugin(new EnsPlugin(ensMap[65535].registry, 65535));
+Network.register(bellecourBubbleNetwork.chainId, () => bellecourBubbleNetwork);
+Network.register(bellecourBubbleNetwork.name, () => bellecourBubbleNetwork);
