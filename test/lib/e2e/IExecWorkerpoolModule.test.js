@@ -3,11 +3,16 @@
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { deployRandomWorkerpool, getTestConfig } from '../lib-test-utils.js';
-import { TEST_CHAINS, getId, getRandomAddress } from '../../test-utils.js';
+import {
+  SELECTED_CHAIN,
+  TEST_CHAINS,
+  getId,
+  getRandomAddress,
+} from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('workerpool', () => {
   describe('showWorkerpool()', () => {

@@ -3,10 +3,14 @@
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { getTestConfig } from '../lib-test-utils.js';
-import { TEST_CHAINS, adminCreateCategory } from '../../test-utils.js';
+import {
+  SELECTED_CHAIN,
+  TEST_CHAINS,
+  adminCreateCategory,
+} from '../../test-utils.js';
 import '../../jest-setup.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('hub', () => {
   describe('showCategory()', () => {

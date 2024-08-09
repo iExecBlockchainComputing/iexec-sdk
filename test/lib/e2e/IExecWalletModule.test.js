@@ -5,6 +5,7 @@ import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils.js';
 import {
   INFURA_PROJECT_ID,
+  SELECTED_CHAIN,
   TEST_CHAINS,
   getRandomAddress,
   getRandomWallet,
@@ -14,7 +15,7 @@ import {
 import '../../jest-setup.js';
 import { IExec } from '../../../src/lib/index.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 const tokenTestChain = TEST_CHAINS['custom-token-chain'];
 
 describe('wallet', () => {

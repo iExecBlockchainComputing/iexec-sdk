@@ -20,13 +20,14 @@ import {
   getRandomBytes32,
   SERVICE_HTTP_500_URL,
   getRandomAddress,
+  SELECTED_CHAIN,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
 
 const { ObjectNotFoundError, MarketCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 describe('deal', () => {
   describe('fetchRequesterDeals()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {

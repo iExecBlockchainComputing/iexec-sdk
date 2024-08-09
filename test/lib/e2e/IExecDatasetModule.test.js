@@ -17,6 +17,7 @@ import {
   getRandomAddress,
   SERVICE_HTTP_500_URL,
   SERVICE_UNREACHABLE_URL,
+  SELECTED_CHAIN,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
@@ -25,7 +26,7 @@ const { SmsCallError } = errors;
 
 const { readFile, ensureDir, writeFile } = fsExtra;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('dataset', () => {
   describe('showDataset()', () => {
