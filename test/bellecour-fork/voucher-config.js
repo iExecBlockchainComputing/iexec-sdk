@@ -1,1 +1,1 @@
-export const VOUCHER_HUB_ADDRESS = 'TO BE DEPLOYED';
+export const VOUCHER_HUB_ADDRESS = 'TO_BE_DEPLOYED';

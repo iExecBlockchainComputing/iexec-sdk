@@ -2,10 +2,14 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { getTestConfig } from '../lib-test-utils.js';
-import { TEST_CHAINS, TEE_FRAMEWORKS } from '../../test-utils.js';
+import {
+  TEST_CHAINS,
+  TEE_FRAMEWORKS,
+  SELECTED_CHAIN,
+} from '../../test-utils.js';
 import '../../jest-setup.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('result', () => {
   describe('pushResultEncryptionKey()', () => {

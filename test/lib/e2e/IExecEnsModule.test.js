@@ -15,11 +15,12 @@ import {
   getId,
   getRandomAddress,
   INFURA_PROJECT_ID,
+  SELECTED_CHAIN,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { IExec } from '../../../src/lib/index.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('ens', () => {
   describe('ens resolution', () => {

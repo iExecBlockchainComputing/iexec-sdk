@@ -4,6 +4,7 @@ import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { getTestConfig } from '../lib-test-utils.js';
 import {
+  SELECTED_CHAIN,
   TEST_CHAINS,
   adminCreateCategory,
   getId,
@@ -14,7 +15,7 @@ import {
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('[workflow]', () => {
   let noDurationCatId;

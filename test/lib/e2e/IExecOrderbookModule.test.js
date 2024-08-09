@@ -16,13 +16,14 @@ import {
   SERVICE_UNREACHABLE_URL,
   SERVICE_HTTP_500_URL,
   getRandomBytes32,
+  SELECTED_CHAIN,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
 
 const { MarketCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('orderbook', () => {
   describe('fetch...Order()', () => {

@@ -8,6 +8,7 @@ import {
   ALCHEMY_API_KEY,
   ETHERSCAN_API_KEY,
   INFURA_PROJECT_ID,
+  SELECTED_CHAIN,
   TEST_CHAINS,
   getId,
   getRandomWallet,
@@ -317,7 +318,7 @@ describe('utils', () => {
   });
 
   describe('getSignerFromPrivateKey()', () => {
-    const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+    const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
     const tokenTestChain = TEST_CHAINS['custom-token-chain'];
 
     test('gasPrice option allows to specify gasPrice', async () => {

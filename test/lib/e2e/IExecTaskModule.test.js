@@ -13,6 +13,7 @@ import {
   SERVICE_HTTP_500_URL,
   SERVICE_UNREACHABLE_URL,
   TEST_CHAINS,
+  SELECTED_CHAIN,
   adminCreateCategory,
   initializeTask,
   sleep,
@@ -22,7 +23,7 @@ import { errors } from '../../../src/lib/index.js';
 
 const { ObjectNotFoundError, IpfsGatewayCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('task', () => {
   describe('fetchResults()', () => {

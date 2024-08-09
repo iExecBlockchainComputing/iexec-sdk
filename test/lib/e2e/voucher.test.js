@@ -2,6 +2,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import {
+  SELECTED_CHAIN,
   TEST_CHAINS,
   createVoucher,
   createVoucherType,
@@ -10,7 +11,7 @@ import {
 import '../../jest-setup.js';
 import { getTestConfig } from '../lib-test-utils.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 
 describe('voucher test utils', () => {
   test('createVoucherType should create a voucherType and return the id', async () => {

@@ -9,6 +9,7 @@ import {
   getTestConfig,
 } from '../lib-test-utils.js';
 import {
+  SELECTED_CHAIN,
   TEST_CHAINS,
   addVoucherEligibleAsset,
   createVoucher,
@@ -19,7 +20,7 @@ import {
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const iexecTestChain = TEST_CHAINS[SELECTED_CHAIN];
 const unknownTestChain = TEST_CHAINS['custom-token-chain'];
 
 describe('voucher', () => {
