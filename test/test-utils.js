@@ -20,6 +20,7 @@ export {
   NULL_BYTES,
   NULL_BYTES32,
 } from '../src/common/utils/constant.js';
+import 'dotenv/config';
 
 export const sleep = (ms) =>
   new Promise((res) => {
@@ -38,7 +39,7 @@ export const execAsync = (cmd) =>
     });
   });
 
-const { DRONE } = process.env;
+const { DRONE, ENV } = process.env;
 
 export const { INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
   process.env;
@@ -52,6 +53,9 @@ export const SERVICE_HTTP_500_URL = DRONE
   : 'http://localhost:5500';
 
 export const SERVICE_UNREACHABLE_URL = 'http://unreachable:80';
+
+export const SELECTED_CHAIN =
+  ENV === 'bubble' ? 'bellecour-bubble' : 'bellecour-fork';
 
 export const TEST_CHAINS = {
   // autoseal chain with iExec token
@@ -126,6 +130,35 @@ export const TEST_CHAINS = {
       name: 'bellecour',
     },
     isAnvil: true,
+  },
+  'bellecour-bubble': {
+    chainId: '65535',
+    rpcURL: 'http://chain.wp-throughput.az1.internal:8545',
+    hubAddress: '0xc4b11f41746D3Ad8504da5B383E1aB9aa969AbC7',
+    ensRegistryAddress: '0x9d4454B023096f34B160D6B654540c56A1F81688',
+    ensPublicResolverAddress: '0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00',
+    // TODO TO_COMPLETE
+    voucherHubAddress: '',
+    smsMap: {
+      gramine: undefined,
+      scone: 'http://teeservices.wp-throughput.az1.internal:13300',
+    },
+    resultProxyURL: 'http://result.wp-throughput.az1.internal:13200',
+    iexecGatewayURL: 'http://market.wp-throughput.az1.internal:3000',
+    ipfsGatewayURL: 'https://ipfs-gateway.v8-bellecour.iex.ec',
+    ipfsNodeURL: 'https://ipfs-upload.v8-bellecour.iex.ec',
+    pocoSubgraphURL:
+      'http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/poco-v5',
+    voucherSubgraphURL:
+      'http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/iexec-voucher',
+    provider: new JsonRpcProvider(
+      'http://chain.wp-throughput.az1.internal:8545',
+    ),
+    defaults: {
+      isNative: false,
+      useGas: true,
+    },
+    isAnvil: false,
   },
 };
 
