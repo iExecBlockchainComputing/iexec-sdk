@@ -153,12 +153,14 @@ export const TEST_CHAINS = {
       'http://thegraph.wp-throughput.az1.internal:8000/subgraphs/name/bellecour/iexec-voucher',
     provider: new JsonRpcProvider(
       'http://chain.wp-throughput.az1.internal:8545',
+      undefined,
+      { pollingInterval: 100 },
     ),
     defaults: {
       isNative: false,
       useGas: true,
     },
-    isAnvil: false,
+    isAnvil: true,
   },
 };
 
