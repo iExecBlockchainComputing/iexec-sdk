@@ -203,6 +203,42 @@ describe('iexec account', () => {
     });
   });
 
+  describe('approve', () => {
+    beforeAll(async () => {
+      await runIExecCliRaw(`${iexecPath} account deposit 6 RLC`);
+    });
+
+    test('500 (nRLC)', async () => {
+      const amount = '500';
+      const spender = getRandomAddress();
+      const raw = await execAsync(
+        `${iexecPath} account approve ${amount} ${spender} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.txHash).toBeDefined();
+      const tx = await testChain.provider.getTransaction(res.txHash);
+      expect(tx).toBeDefined();
+      expect(tx.gasPrice.toString()).toBe('0');
+      // TODO expect spender allowance to be 500 nRLC
+    });
+
+    test('5 RLC', async () => {
+      const amount = '5';
+      const spender = getRandomAddress();
+      const raw = await execAsync(
+        `${iexecPath} account approve ${amount} ${spender} RLC --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.txHash).toBeDefined();
+      const tx = await testChain.provider.getTransaction(res.txHash);
+      expect(tx).toBeDefined();
+      expect(tx.gasPrice.toString()).toBe('0');
+      // TODO expect spender allowance to be 5 RLC
+    });
+  });
+
   describe('show', () => {
     beforeAll(async () => {
       await runIExecCliRaw(`${iexecPath} account deposit 1`);

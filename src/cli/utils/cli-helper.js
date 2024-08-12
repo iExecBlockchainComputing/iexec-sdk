@@ -77,10 +77,13 @@ export const info = {
   showing: (obj) => `Showing ${obj}...`,
   counting: (obj) => `Counting ${obj}...`,
   depositing: () => 'Making deposit...',
+  approving: () => 'Making approve...',
   checkingSwapRate: () => 'Checking swap rate...',
   claiming: (obj) => `Claiming ${obj}...`,
   deposited: (amount) => `Deposited ${amount} RLC to your iExec account`,
   withdrawing: () => 'Making withdraw...',
+  approved: (amount, spender, unit) =>
+    `Approved ${spender} to spend ${amount} ${unit} from your iExec account`,
   withdrawn: (amount) => `${amount} RLC withdrawn from your iExec account`,
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
@@ -118,6 +121,8 @@ export const desc = {
   claimObj: (objName) => `claim a ${objName} that is not COMPLETED`,
   deposit: () => 'deposit RLC onto your iExec account (default unit nRLC)',
   withdraw: () => 'withdraw RLC from your iExec account (default unit nRLC)',
+  approve: () =>
+    'approve spender to spend up to amount of RLC from your iExec account (default unit nRLC)',
   sendETH: () => 'send ether to an address (default unit ether)',
   sendRLC: () => 'send RLC to an address (default unit RLC)',
   sendNRLC: () =>
