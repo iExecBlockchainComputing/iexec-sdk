@@ -356,4 +356,49 @@ describe('iexec account', () => {
       expect(bnValue.toNumber()).toBe(0);
     });
   });
+
+  describe('revoke', () => {
+    beforeAll(async () => {
+      await runIExecCliRaw(`${iexecPath} account deposit 6 RLC`);
+    });
+
+    test('should revoke allowance and return zero amount', async () => {
+      const amount = '500';
+      const spender = getRandomAddress();
+
+      // approve the spender
+      const approveRaw = await execAsync(
+        `${iexecPath} account approve ${amount} ${spender} --raw`,
+      );
+      const approveRes = JSON.parse(approveRaw);
+      expect(approveRes.ok).toBe(true);
+      expect(approveRes.txHash).toBeDefined();
+
+      // check allowance after approval
+      const allowanceRaw = await execAsync(
+        `${iexecPath} account allowance ${spender} --raw`,
+      );
+      const allowanceRes = JSON.parse(allowanceRaw);
+      const bnValueAfterApproval = new BN(allowanceRes.amount, 16);
+      expect(allowanceRes.ok).toBe(true);
+      expect(bnValueAfterApproval.toString()).toBe(amount);
+
+      // revoke the spender's allowance
+      const revokeRaw = await execAsync(
+        `${iexecPath} account revoke ${spender} --raw`,
+      );
+      const revokeRes = JSON.parse(revokeRaw);
+      expect(revokeRes.ok).toBe(true);
+      expect(revokeRes.txHash).toBeDefined();
+
+      // check allowance after revocation
+      const allowanceRawAfterRevoke = await execAsync(
+        `${iexecPath} account allowance ${spender} --raw`,
+      );
+      const allowanceResAfterRevoke = JSON.parse(allowanceRawAfterRevoke);
+      const bnValueAfterRevoke = new BN(allowanceResAfterRevoke.amount, 16);
+      expect(allowanceResAfterRevoke.ok).toBe(true);
+      expect(bnValueAfterRevoke.toNumber()).toBe(0);
+    });
+  });
 });

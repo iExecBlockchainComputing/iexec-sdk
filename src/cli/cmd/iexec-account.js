@@ -198,4 +198,31 @@ allowance
     }
   });
 
+const revoke = cli.command('revoke <spender>');
+addGlobalOptions(revoke);
+addWalletLoadOptions(revoke);
+revoke
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.txConfirms())
+  .description(desc.revoke())
+  .action(async (spender, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
+      const keystore = Keystore(walletOptions);
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
+      await connectKeystore(chain, keystore, { txOptions });
+      spinner.start(info.revoking(spender));
+      const txHash = await accountApprove(chain.contracts, 0, spender);
+      spinner.succeed(info.revoked(spender), {
+        raw: { txHash },
+      });
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
 finalizeCli(cli);
