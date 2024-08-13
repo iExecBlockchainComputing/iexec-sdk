@@ -261,7 +261,14 @@ describe('iexec account', () => {
       const tx = await testChain.provider.getTransaction(res.txHash);
       expect(tx).toBeDefined();
       expect(tx.gasPrice.toString()).toBe('0');
-      // TODO expect spender allowance to be 500 nRLC
+
+      const raw1 = await execAsync(
+        `${iexecPath} account allowance ${spender} --raw`,
+      );
+      const res1 = JSON.parse(raw1);
+      const bnValue = new BN(res1.amount, 16);
+      expect(res1.ok).toBe(true);
+      expect(bnValue.toString()).toBe(amount);
     });
 
     test('5 RLC', async () => {
@@ -276,7 +283,15 @@ describe('iexec account', () => {
       const tx = await testChain.provider.getTransaction(res.txHash);
       expect(tx).toBeDefined();
       expect(tx.gasPrice.toString()).toBe('0');
-      // TODO expect spender allowance to be 5 RLC
+
+      const raw1 = await execAsync(
+        `${iexecPath} account allowance ${spender} --raw`,
+      );
+      const res1 = JSON.parse(raw1);
+      const bnValue = new BN(res1.amount, 16);
+      expect(res1.ok).toBe(true);
+      const nRLCAmount = BigInt(amount) * 10n ** 9n;
+      expect(bnValue.toString()).toBe(nRLCAmount.toString());
     });
   });
 
