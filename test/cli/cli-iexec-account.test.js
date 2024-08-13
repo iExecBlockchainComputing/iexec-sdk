@@ -6,6 +6,7 @@ import {
   TEST_CHAINS,
   execAsync,
   getRandomAddress,
+  getRandomWallet,
   setBalance,
 } from '../test-utils.js';
 import {
@@ -15,6 +16,7 @@ import {
   runIExecCliRaw,
   setChain,
   setRandomWallet,
+  setWallet,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
@@ -115,6 +117,45 @@ describe('iexec account', () => {
       expect(initialAccountBalance.add(bnAmount).eq(finalAccountBalance)).toBe(
         true,
       );
+    });
+  });
+
+  describe('show', () => {
+    beforeAll(async () => {
+      await runIExecCliRaw(`${iexecPath} account deposit 1`);
+    });
+
+    test('(user wallet)', async () => {
+      const raw = await execAsync(`${iexecPath} account show --raw`);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.balance).toBeDefined();
+      expect(res.balance.stake).not.toBe('0');
+      expect(res.balance.locked).toBe('0');
+    });
+
+    test('[address]', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account show ${getRandomAddress()} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.balance).toBeDefined();
+      expect(res.balance.stake).toBe('0');
+      expect(res.balance.locked).toBe('0');
+    });
+
+    test('--wallet-address <address> (missing wallet file)', async () => {
+      const raw = await execAsync(
+        `${iexecPath} account show --wallet-address ${getRandomAddress()} --raw`,
+      ).catch((e) => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error.message).toBe(
+        'Failed to load wallet address from keystore: Wallet file not found',
+      );
+      expect(res.error.name).toBe('Error');
+      expect(res.balance).toBeUndefined();
     });
   });
 
@@ -239,42 +280,65 @@ describe('iexec account', () => {
     });
   });
 
-  describe('show', () => {
+  describe('allowance', () => {
     beforeAll(async () => {
-      await runIExecCliRaw(`${iexecPath} account deposit 1`);
+      await runIExecCliRaw(`${iexecPath} account deposit 6 RLC`);
     });
 
-    test('(user wallet)', async () => {
-      const raw = await execAsync(`${iexecPath} account show --raw`);
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.balance).toBeDefined();
-      expect(res.balance.stake).not.toBe('0');
-      expect(res.balance.locked).toBe('0');
-    });
-
-    test('[address]', async () => {
+    test('should return the allowed amount', async () => {
+      const amount = '500';
+      const spender = getRandomAddress();
+      await execAsync(
+        `${iexecPath} account approve ${amount} ${spender} --raw`,
+      );
       const raw = await execAsync(
-        `${iexecPath} account show ${getRandomAddress()} --raw`,
+        `${iexecPath} account allowance ${spender} --raw`,
       );
       const res = JSON.parse(raw);
+      const bnValue = new BN(res.amount, 16);
       expect(res.ok).toBe(true);
-      expect(res.balance).toBeDefined();
-      expect(res.balance.stake).toBe('0');
-      expect(res.balance.locked).toBe('0');
+      expect(amount).toBe(bnValue.toString());
     });
 
-    test('--wallet-address <address> (missing wallet file)', async () => {
+    test('should return zero allowance if no approval exists', async () => {
+      const spender = getRandomAddress();
       const raw = await execAsync(
-        `${iexecPath} account show --wallet-address ${getRandomAddress()} --raw`,
-      ).catch((e) => e.message);
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(false);
-      expect(res.error.message).toBe(
-        'Failed to load wallet address from keystore: Wallet file not found',
+        `${iexecPath} account allowance ${spender} --raw`,
       );
-      expect(res.error.name).toBe('Error');
-      expect(res.balance).toBeUndefined();
+      const res = JSON.parse(raw);
+      const bnValue = new BN(res.amount, 16);
+      expect(res.ok).toBe(true);
+      expect(bnValue.toNumber()).toBe(0);
+    });
+
+    test('should return the allowed amount for a specified user', async () => {
+      const amount = '500';
+      const spender = getRandomAddress();
+      const { privateKey, address: owner } = getRandomWallet();
+      await setWallet(privateKey);
+      await execAsync(
+        `${iexecPath} account approve ${amount} ${spender} --raw`,
+      );
+
+      const raw = await execAsync(
+        `${iexecPath} account allowance ${spender} --user ${owner} --raw`,
+      );
+      const res = JSON.parse(raw);
+      const bnValue = new BN(res.amount, 16);
+      expect(res.ok).toBe(true);
+      expect(bnValue.toString()).toBe(amount);
+    });
+
+    test('should return zero allowance if no approval exists for a specified user', async () => {
+      const spender = getRandomAddress();
+      const owner = getRandomAddress();
+      const raw = await execAsync(
+        `${iexecPath} account allowance ${spender} --user ${owner} --raw`,
+      );
+      const res = JSON.parse(raw);
+      const bnValue = new BN(res.amount, 16);
+      expect(res.ok).toBe(true);
+      expect(bnValue.toNumber()).toBe(0);
     });
   });
 });

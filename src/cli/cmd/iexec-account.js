@@ -5,7 +5,10 @@ import {
   deposit as accountDeposit,
   withdraw as accountWithdraw,
 } from '../../common/account/fund.js';
-import { approve as accountApprove } from '../../common/account/allowance.js';
+import {
+  approve as accountApprove,
+  checkAllowance,
+} from '../../common/account/allowance.js';
 import { checkBalance } from '../../common/account/balance.js';
 import { Keystore } from '../utils/keystore.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
@@ -161,6 +164,34 @@ approve
       );
       spinner.succeed(info.approved(amount, spender, unit), {
         raw: { txHash },
+      });
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const allowance = cli.command('allowance <spender>');
+addGlobalOptions(allowance);
+addWalletLoadOptions(allowance);
+allowance
+  .option(...option.chain())
+  .option(...option.user())
+  .description(desc.allowance())
+  .action(async (spender, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = computeWalletLoadOptions(opts);
+      const keystore = Keystore({ ...walletOptions, isSigner: false });
+      const [chain, [address]] = await Promise.all([
+        loadChain(opts.chain, { spinner }),
+        keystore.accounts(),
+      ]);
+      const owner = opts.user || address;
+      spinner.start(info.checkingAllowance(spender, owner));
+      const amount = await checkAllowance(chain.contracts, owner, spender);
+      spinner.succeed(info.allowance(spender, owner, amount), {
+        raw: { amount },
       });
     } catch (error) {
       handleError(error, cli, opts);

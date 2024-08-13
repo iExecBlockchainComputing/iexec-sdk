@@ -84,6 +84,10 @@ export const info = {
   withdrawing: () => 'Making withdraw...',
   approved: (amount, spender, unit) =>
     `Approved ${spender} to spend ${amount} ${unit} from your iExec account`,
+  checkingAllowance: (spender, user) =>
+    `Checking allowance for ${spender} on user’s account ${user}...`,
+  allowance: (spender, user, amount) =>
+    `Allowance amount for spender ${spender} on account ${user}: ${amount} nRLC`,
   withdrawn: (amount) => `${amount} RLC withdrawn from your iExec account`,
   downloading: () => 'Downloading result',
   decrypting: () => 'Decrypting result',
@@ -123,6 +127,8 @@ export const desc = {
   withdraw: () => 'withdraw RLC from your iExec account (default unit nRLC)',
   approve: () =>
     'approve spender to spend up to amount of RLC from your iExec account (default unit nRLC)',
+  allowance: () =>
+    "checks the amount of allowance approved for the specified spender to use your iExec account (specify --user to see another user's allowance)",
   sendETH: () => 'send ether to an address (default unit ether)',
   sendRLC: () => 'send RLC to an address (default unit RLC)',
   sendNRLC: () =>
