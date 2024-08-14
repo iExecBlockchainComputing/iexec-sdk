@@ -8,7 +8,7 @@ import { Address, ENS, TxHash } from '../common/types.js';
 
 declare class ENSConfigurationObservable extends Observable {
   /**
-   * subscribe and start the ENS configuration process until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned cancel method.
+   * subscribe and start the ENS configuration process until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned cancel method.
    *
    * return the `cancel: () => void` method.
    *
