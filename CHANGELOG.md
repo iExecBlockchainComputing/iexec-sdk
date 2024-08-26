@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.10.1] 2024-08-26
+
+### Changed
+
+- Typescript fixes
+- fix an issue occurring when network 134 is already registered on ethers
+- doc fixes
+
 ## [8.10.0] 2024-07-24
 
 ### Added
