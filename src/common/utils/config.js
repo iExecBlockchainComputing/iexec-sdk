@@ -99,8 +99,10 @@ export const getChainDefaults = ({ id, flavour }) => ({
 export const isEnterpriseEnabled = (id) => !!enterpriseEnabledMap[id];
 
 // register ethers unknown networks
-const bellecourNetwork = new Network(networkMap[134].name, 134).attachPlugin(
-  new EnsPlugin(ensMap[134].registry, 134),
-);
-Network.register(bellecourNetwork.chainId, () => bellecourNetwork);
-Network.register(bellecourNetwork.name, () => bellecourNetwork);
+if (Network.from(134).name === 'unknown') {
+  const bellecourNetwork = new Network(networkMap[134].name, 134).attachPlugin(
+    new EnsPlugin(ensMap[134].registry, 134),
+  );
+  Network.register(bellecourNetwork.chainId, () => bellecourNetwork);
+  Network.register(bellecourNetwork.name, () => bellecourNetwork);
+}
