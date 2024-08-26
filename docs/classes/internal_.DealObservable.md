@@ -40,7 +40,7 @@
 
 ▸ **subscribe**(`callbacks`): () => `void`
 
-subscribe to deal updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned unsubscribe method.
+subscribe to deal updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
 
 return the `unsubscribe: () => void` method.
 
@@ -66,7 +66,7 @@ data:
 
 ▸ (): `void`
 
-subscribe to deal updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned unsubscribe method.
+subscribe to deal updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
 
 return the `unsubscribe: () => void` method.
 
