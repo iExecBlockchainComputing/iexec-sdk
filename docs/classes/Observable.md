@@ -40,7 +40,7 @@
 
 ▸ **subscribe**(`callbacks`): () => `void`
 
-subscribe to a data source events via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned unsubscribe method.
+subscribe to a data source events via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
 
 return the `unsubscribe: () => void` method.
 
@@ -59,7 +59,7 @@ return the `unsubscribe: () => void` method.
 
 ▸ (): `void`
 
-subscribe to a data source events via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned unsubscribe method.
+subscribe to a data source events via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
 
 return the `unsubscribe: () => void` method.
 
