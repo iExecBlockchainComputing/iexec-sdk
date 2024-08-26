@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - Typescript fixes
 - fix an issue occurring when network 134 is already registered on ethers
-- nRLC/RLC ratio doc fix
+- doc fixes
 
 ## [8.10.0] 2024-07-24
 
