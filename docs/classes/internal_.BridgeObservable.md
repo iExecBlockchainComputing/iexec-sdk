@@ -40,7 +40,7 @@
 
 ▸ **subscribe**(`callbacks`): () => `void`
 
-subscribe and start the bridge process to transfer tokens from one chain to another until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned cancel method.
+subscribe and start the bridge process to transfer tokens from one chain to another until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned cancel method.
 
 return the `cancel: () => void` method.
 
@@ -61,9 +61,9 @@ data:
 | Name | Type |
 | :------ | :------ |
 | `callbacks` | `Object` |
-| `callbacks.complete` | () => `any` |
-| `callbacks.error` | (`error`: `Error`) => `any` |
-| `callbacks.next` | (`data`: { `bridgeAddress?`: `string` ; `dailyLimit?`: [`BN`](utils.BN.md) ; `maxPerTx?`: [`BN`](utils.BN.md) ; `message`: ``"CHECK_BRIDGE_POLICY"`` \| ``"BRIDGE_POLICY_CHECKED"`` \| ``"CHECK_BRIDGE_LIMIT"`` \| ``"BRIDGE_LIMIT_CHECKED"`` \| ``"SEND_TO_BRIDGE_TX_REQUEST"`` \| ``"SEND_TO_BRIDGE_TX_SUCCESS"`` \| ``"WAIT_RECEIVE_TX"`` \| ``"RECEIVE_TX_SUCCESS"`` ; `minPerTx?`: [`BN`](utils.BN.md) ; `totalSpentPerDay?`: [`BN`](utils.BN.md) ; `txHash?`: `string`  }) => `any` |
+| `callbacks.complete?` | () => `any` |
+| `callbacks.error?` | (`error`: `Error`) => `any` |
+| `callbacks.next?` | (`data`: { `bridgeAddress?`: `string` ; `dailyLimit?`: [`BN`](utils.BN.md) ; `maxPerTx?`: [`BN`](utils.BN.md) ; `message`: ``"CHECK_BRIDGE_POLICY"`` \| ``"BRIDGE_POLICY_CHECKED"`` \| ``"CHECK_BRIDGE_LIMIT"`` \| ``"BRIDGE_LIMIT_CHECKED"`` \| ``"SEND_TO_BRIDGE_TX_REQUEST"`` \| ``"SEND_TO_BRIDGE_TX_SUCCESS"`` \| ``"WAIT_RECEIVE_TX"`` \| ``"RECEIVE_TX_SUCCESS"`` ; `minPerTx?`: [`BN`](utils.BN.md) ; `totalSpentPerDay?`: [`BN`](utils.BN.md) ; `txHash?`: `string`  }) => `any` |
 
 #### Returns
 
@@ -71,7 +71,7 @@ data:
 
 ▸ (): `void`
 
-subscribe and start the bridge process to transfer tokens from one chain to another until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned cancel method.
+subscribe and start the bridge process to transfer tokens from one chain to another until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned cancel method.
 
 return the `cancel: () => void` method.
 

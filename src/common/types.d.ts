@@ -91,7 +91,7 @@ export type OrderHash = Bytes32;
  */
 export type WeiAmount = number | string | BN;
 /**
- * nRLC amount (nRLC stands for nano RLC, the smallest sub-division of the RLC token: 1 RLC = 1,000,000,000 RLC).
+ * nRLC amount (nRLC stands for nano RLC, the smallest sub-division of the RLC token: 1 RLC = 1,000,000,000 nRLC).
  *
  * named units ('nRLC', 'RLC') can be used with the format `${amount} ${unit}`
  *

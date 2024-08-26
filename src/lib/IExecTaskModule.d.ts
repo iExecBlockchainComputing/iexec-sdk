@@ -36,7 +36,7 @@ interface Task {
 
 declare class TaskObservable extends Observable {
   /**
-   * subscribe to task updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the retruned unsubscribe method.
+   * subscribe to task updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
    *
    * return the `unsubscribe: () => void` method.
    *
