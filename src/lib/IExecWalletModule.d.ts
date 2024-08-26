@@ -47,7 +47,7 @@ declare class BridgeObservable extends Observable {
      * | `WAIT_RECEIVE_TX` | sent once if the bridged chain is configured | `bridgeAddress` |
      * | `RECEIVE_TX_SUCCESS` | sent once if the bridged chain is configured | `txHash` |
      */
-    next: (data: {
+    next?: (data: {
       message:
         | 'CHECK_BRIDGE_POLICY'
         | 'BRIDGE_POLICY_CHECKED'
@@ -69,13 +69,13 @@ declare class BridgeObservable extends Observable {
      *
      * no other callback is fired after firing `complete()`
      */
-    complete: () => any;
+    complete?: () => any;
     /**
      * callback fired once when an error occurs
      *
      * no other callback is fired after firing `error(error: Error)`
      */
-    error: (error: Error) => any;
+    error?: (error: Error) => any;
   }): /**
    * `cancel: () => void` method, calling this method cancels the subscription
    *

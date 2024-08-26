@@ -61,9 +61,9 @@ data:
 | Name | Type |
 | :------ | :------ |
 | `callbacks` | `Object` |
-| `callbacks.complete` | () => `any` |
-| `callbacks.error` | (`error`: `Error`) => `any` |
-| `callbacks.next` | (`data`: { `bridgeAddress?`: `string` ; `dailyLimit?`: [`BN`](utils.BN.md) ; `maxPerTx?`: [`BN`](utils.BN.md) ; `message`: ``"CHECK_BRIDGE_POLICY"`` \| ``"BRIDGE_POLICY_CHECKED"`` \| ``"CHECK_BRIDGE_LIMIT"`` \| ``"BRIDGE_LIMIT_CHECKED"`` \| ``"SEND_TO_BRIDGE_TX_REQUEST"`` \| ``"SEND_TO_BRIDGE_TX_SUCCESS"`` \| ``"WAIT_RECEIVE_TX"`` \| ``"RECEIVE_TX_SUCCESS"`` ; `minPerTx?`: [`BN`](utils.BN.md) ; `totalSpentPerDay?`: [`BN`](utils.BN.md) ; `txHash?`: `string`  }) => `any` |
+| `callbacks.complete?` | () => `any` |
+| `callbacks.error?` | (`error`: `Error`) => `any` |
+| `callbacks.next?` | (`data`: { `bridgeAddress?`: `string` ; `dailyLimit?`: [`BN`](utils.BN.md) ; `maxPerTx?`: [`BN`](utils.BN.md) ; `message`: ``"CHECK_BRIDGE_POLICY"`` \| ``"BRIDGE_POLICY_CHECKED"`` \| ``"CHECK_BRIDGE_LIMIT"`` \| ``"BRIDGE_LIMIT_CHECKED"`` \| ``"SEND_TO_BRIDGE_TX_REQUEST"`` \| ``"SEND_TO_BRIDGE_TX_SUCCESS"`` \| ``"WAIT_RECEIVE_TX"`` \| ``"RECEIVE_TX_SUCCESS"`` ; `minPerTx?`: [`BN`](utils.BN.md) ; `totalSpentPerDay?`: [`BN`](utils.BN.md) ; `txHash?`: `string`  }) => `any` |
 
 #### Returns
 
