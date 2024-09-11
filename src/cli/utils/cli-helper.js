@@ -87,7 +87,7 @@ export const info = {
     `Approved ${spender} to spend ${amount} ${unit} from your iExec account`,
   revoked: (spender) => `Revoked ${spender} to use your iExec account`,
   checkingAllowance: (spender, user) =>
-    `Checking allowance for ${spender} on user’s account ${user}...`,
+    `Checking allowance for ${spender} on user's account ${user}...`,
   allowance: (spender, user, amount) =>
     `Allowance amount for spender ${spender} on account ${user}: ${amount} nRLC`,
   withdrawn: (amount) => `${amount} RLC withdrawn from your iExec account`,
