@@ -748,7 +748,7 @@ Options:
 
 #### iexec account allowance
 
-checks the amount of allowance approved for the specified spender to use your iExec account (specify --user to see another user's allowance)
+check the amount of allowance approved for the specified spender to use your iExec account (specify --user to see another user's allowance)
 
 Usage:
 
