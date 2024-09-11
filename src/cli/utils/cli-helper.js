@@ -130,7 +130,7 @@ export const desc = {
   approve: () =>
     'approve spender to spend up to amount of RLC from your iExec account (default unit nRLC)',
   allowance: () =>
-    "checks the amount of allowance approved for the specified spender to use your iExec account (specify --user to see another user's allowance)",
+    "check the amount of allowance approved for the specified spender to use your iExec account (specify --user to see another user's allowance)",
   revoke: () => 'revoke the approval for the spender to use your iExec account',
   sendETH: () => 'send ether to an address (default unit ether)',
   sendRLC: () => 'send RLC to an address (default unit RLC)',
