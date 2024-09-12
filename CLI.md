@@ -648,6 +648,9 @@ Commands:
 - [deposit](#iexec-account-deposit)
 - [withdraw](#iexec-account-withdraw)
 - [show](#iexec-account-show)
+- [approve](#iexec-account-approve)
+- [allowance](#iexec-account-allowance)
+- [revoke](#iexec-account-revoke)
 
 #### iexec account deposit
 
@@ -718,6 +721,77 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
+
+#### iexec account approve
+
+approve spender to spend up to amount of RLC from your iExec account (default unit nRLC)
+
+Usage:
+
+```sh
+iexec account approve <amount> <spender> [unit] [options]
+```
+
+Options:
+
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
+
+#### iexec account allowance
+
+check the amount of allowance approved for the specified spender to use your iExec account (specify --user to see another user's allowance)
+
+Usage:
+
+```sh
+iexec account allowance <spender> [options]
+```
+
+Options:
+
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --user \<address\> | custom user address |
+
+#### iexec account revoke
+
+revoke the approval for the spender to use your iExec account
+
+Usage:
+
+```sh
+iexec account revoke <spender> [options]
+```
+
+Options:
+
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
+| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 ### iexec app
 
