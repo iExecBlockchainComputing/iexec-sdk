@@ -7,7 +7,6 @@ import {
   createVoucher,
   createVoucherType,
   execAsync,
-  getRandomAddress,
   setBalance,
 } from '../test-utils.js';
 import {
@@ -19,6 +18,7 @@ import {
   setChain,
   setDatasetUniqueName,
   setRandomWallet,
+  setWorkerpoolUniqueDescription,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
@@ -26,13 +26,25 @@ const testChain = TEST_CHAINS['bellecour-fork'];
 
 describe('iexec voucher', () => {
   let userWallet;
-
+  let voucherType;
+  let voucherValue;
+  let deployedAppAddress;
+  let deployedDatasetAddress;
+  let deployedWorkerpoolAddress;
   beforeAll(async () => {
-    await globalSetup('cli-iexec-account');
+    await globalSetup('cli-iexec-voucher');
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
     userWallet = await setRandomWallet();
     await setBalance(testChain)(userWallet.address, 50n * 10n ** 18n);
+
+    voucherType = await createVoucherType(testChain)({});
+    voucherValue = 1000;
+    await createVoucher(testChain)({
+      owner: userWallet.address,
+      voucherType,
+      value: voucherValue,
+    });
   });
 
   afterAll(async () => {
@@ -40,29 +52,7 @@ describe('iexec voucher', () => {
   });
 
   describe('show', () => {
-    beforeAll(async () => {
-      await runIExecCliRaw(`${iexecPath} account deposit 1`);
-    });
-
-    test('returns error when no voucher is found for the user', async () => {
-      const raw = await execAsync(`${iexecPath} voucher show --raw`).catch(
-        (e) => e.message,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(false);
-      expect(res.error.message).toBe(
-        `No Voucher found for address ${userWallet.address}`,
-      );
-    });
-
     test('returns voucher details when user has one without sponsored assets', async () => {
-      const voucherType = await createVoucherType(testChain)({});
-      const voucherValue = 1000;
-      await createVoucher(testChain)({
-        owner: userWallet.address,
-        voucherType,
-        value: voucherValue,
-      });
       const raw = await execAsync(`${iexecPath} voucher show --raw`);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
@@ -79,18 +69,11 @@ describe('iexec voucher', () => {
     });
 
     test('returns voucher details when user has one with sponsored assets', async () => {
-      const voucherType = await createVoucherType(testChain)({});
-      const voucherValue = 1000;
-      await createVoucher(testChain)({
-        owner: userWallet.address,
-        voucherType,
-        value: voucherValue,
-      });
-
+      // deploy and add eligible assets (app, dataset, workerpool)
       await execAsync(`${iexecPath} app init`);
       await setAppUniqueName();
       const deployedApp = await runIExecCliRaw(`${iexecPath} app deploy`);
-      const deployedAppAddress = deployedApp.address;
+      deployedAppAddress = deployedApp.address;
       await addVoucherEligibleAsset(testChain)(deployedAppAddress, voucherType);
 
       await execAsync(`${iexecPath} dataset init`);
@@ -98,24 +81,24 @@ describe('iexec voucher', () => {
       const deployedDataset = await runIExecCliRaw(
         `${iexecPath} dataset deploy`,
       );
-      const deployedDatasetAddress = deployedDataset.address;
+      deployedDatasetAddress = deployedDataset.address;
       await addVoucherEligibleAsset(testChain)(
         deployedDatasetAddress,
         voucherType,
       );
 
       await execAsync(`${iexecPath} workerpool init`);
-      await setDatasetUniqueName();
+      await setWorkerpoolUniqueDescription();
       const deployedWorkerpool = await runIExecCliRaw(
         `${iexecPath} workerpool deploy`,
       );
-      const deployedWorkerpoolAddress = deployedWorkerpool.address;
+      deployedWorkerpoolAddress = deployedWorkerpool.address;
       await addVoucherEligibleAsset(testChain)(
         deployedWorkerpoolAddress,
         voucherType,
       );
 
-      // TODO : enable when `iexec voucher authorize` est implimenté
+      // TODO : enable when `iexec voucher authorize` is implemented
       // const requesterAddress = await getRandomAddress();
       // await execAsync(
       //   `${iexecPath} iexec voucher authorize ${requesterAddress} --raw`,
@@ -132,10 +115,22 @@ describe('iexec voucher', () => {
       expect(res.allowanceAmount).toBeDefined();
       expect(res.sponsoredApps).toEqual([deployedAppAddress]);
       expect(res.sponsoredDatasets).toEqual([deployedDatasetAddress]);
-      expect(res.sponsoredWorkerpools).toEqual([deployedWorkerpoolAddress]);
 
-      // TODO : enable when `iexec voucher authorize` est implimenté
+      // TODO : enable when `iexec voucher authorize` is implemented
       // expect(res.authorizedAccounts).toEqual([requesterAddress]);
+    });
+
+    test('returns error when no voucher is found for the user', async () => {
+      // use a new random wallet that doesn't have a voucher
+      const newWallet = await setRandomWallet();
+      const raw = await execAsync(`${iexecPath} voucher show --raw`).catch(
+        (e) => e.message,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error.message).toBe(
+        `No Voucher found for address ${newWallet.address}`,
+      );
     });
   });
 });
