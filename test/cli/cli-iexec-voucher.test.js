@@ -36,7 +36,6 @@ describe('iexec voucher', () => {
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
     userWallet = await setRandomWallet();
-    await setBalance(testChain)(userWallet.address, 50n * 10n ** 18n);
 
     voucherType = await createVoucherType(testChain)({});
     voucherValue = 1000;
