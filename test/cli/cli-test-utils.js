@@ -73,6 +73,8 @@ export const setChain =
             iexecGateway: chain.iexecGatewayURL,
             resultProxy: chain.resultProxyURL,
             ensPublicResolver: chain.ensPublicResolverAddress,
+            voucherSubgraph: chain.voucherSubgraphURL,
+            voucherHub: chain.voucherHubAddress,
             useGas: chain.useGas,
             native: chain.isNative,
             ...chainOptions,
