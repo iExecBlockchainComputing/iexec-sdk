@@ -7,7 +7,6 @@ import {
   createVoucher,
   createVoucherType,
   execAsync,
-  setBalance,
 } from '../test-utils.js';
 import {
   globalSetup,
