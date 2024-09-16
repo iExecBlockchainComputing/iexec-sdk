@@ -97,11 +97,10 @@ describe('iexec voucher', () => {
         voucherType,
       );
 
-      // TODO : enable when `iexec voucher authorize` is implemented
-      // const requesterAddress = await getRandomAddress();
-      // await execAsync(
-      //   `${iexecPath} iexec voucher authorize ${requesterAddress} --raw`,
-      // );
+      const requesterAddress = await getRandomAddress();
+      await execAsync(
+        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
+      );
 
       const raw = await execAsync(`${iexecPath} voucher show --raw`);
       const res = JSON.parse(raw);
@@ -114,9 +113,7 @@ describe('iexec voucher', () => {
       expect(res.allowanceAmount).toBeDefined();
       expect(res.sponsoredApps).toEqual([deployedAppAddress]);
       expect(res.sponsoredDatasets).toEqual([deployedDatasetAddress]);
-
-      // TODO : enable when `iexec voucher authorize` is implemented
-      // expect(res.authorizedAccounts).toEqual([requesterAddress]);
+      expect(res.authorizedAccounts).toEqual([requesterAddress]);
     });
 
     test('returns error when no voucher is found for the user', async () => {
