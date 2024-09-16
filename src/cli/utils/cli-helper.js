@@ -79,13 +79,18 @@ export const info = {
   depositing: () => 'Making deposit...',
   approving: () => 'Making approve...',
   revoking: (spender) => `Revoking allowance for spender address ${spender}...`,
+  revokingVoucherAuthorization: () => `Revoking voucher authorization...`,
   checkingSwapRate: () => 'Checking swap rate...',
   claiming: (obj) => `Claiming ${obj}...`,
   deposited: (amount) => `Deposited ${amount} RLC to your iExec account`,
   withdrawing: () => 'Making withdraw...',
+  authorizing: (requester) => `Authorizing ${requester} to use the voucher...`,
   approved: (amount, spender, unit) =>
     `Approved ${spender} to spend ${amount} ${unit} from your iExec account`,
+  authorized: (requester) => `Requester ${requester} authorized successfully`,
   revoked: (spender) => `Revoked ${spender} to use your iExec account`,
+  revokedVoucherAuthorization: (requester) =>
+    `Revoked ${requester} to use the voucher`,
   checkingAllowance: (spender, user) =>
     `Checking allowance for ${spender} on user's account ${user}...`,
   allowance: (spender, user, amount) =>
@@ -127,6 +132,8 @@ export const desc = {
   claimObj: (objName) => `claim a ${objName} that is not COMPLETED`,
   deposit: () => 'deposit RLC onto your iExec account (default unit nRLC)',
   withdraw: () => 'withdraw RLC from your iExec account (default unit nRLC)',
+  authorize: () => 'authorize requester to use the voucher',
+  revokeVoucherAuthorization: () => 'revoke authorization to use the voucher',
   approve: () =>
     'approve spender to spend up to amount of RLC from your iExec account (default unit nRLC)',
   allowance: () =>

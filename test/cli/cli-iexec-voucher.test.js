@@ -7,6 +7,7 @@ import {
   createVoucher,
   createVoucherType,
   execAsync,
+  getRandomAddress,
 } from '../test-utils.js';
 import {
   globalSetup,
@@ -124,6 +125,115 @@ describe('iexec voucher', () => {
       const raw = await execAsync(`${iexecPath} voucher show --raw`).catch(
         (e) => e.message,
       );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error.message).toBe(
+        `No Voucher found for address ${newWallet.address}`,
+      );
+    });
+  });
+
+  describe('authorize', () => {
+    let requesterAddress;
+
+    beforeAll(async () => {
+      userWallet = await setRandomWallet();
+      voucherType = await createVoucherType(testChain)({});
+      await createVoucher(testChain)({
+        owner: userWallet.address,
+        voucherType,
+        value: 1000,
+      });
+      requesterAddress = await getRandomAddress();
+    });
+
+    beforeEach(async () => {
+      requesterAddress = await getRandomAddress();
+    });
+
+    test('authorize the requester to use the voucher', async () => {
+      const raw = await execAsync(
+        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.txHash).toBeDefined();
+    });
+
+    test('throw when requester is already authorized', async () => {
+      await execAsync(
+        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
+      );
+      const raw = await execAsync(
+        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
+      ).catch((e) => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error.message).toBe(
+        `${requesterAddress} is already authorized`,
+      );
+    });
+
+    test('throw when the user has no voucher', async () => {
+      // use a new random wallet that doesn't have a voucher
+      const newWallet = await setRandomWallet();
+      const raw = await execAsync(
+        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
+      ).catch((e) => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error.message).toBe(
+        `No Voucher found for address ${newWallet.address}`,
+      );
+    });
+  });
+
+  describe('revoke', () => {
+    let requesterAddress;
+
+    beforeAll(async () => {
+      userWallet = await setRandomWallet();
+      voucherType = await createVoucherType(testChain)({});
+      await createVoucher(testChain)({
+        owner: userWallet.address,
+        voucherType,
+        value: 1000,
+      });
+      requesterAddress = await getRandomAddress();
+
+      await execAsync(
+        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
+      );
+    });
+
+    test('revoke the requester authorization to use the voucher', async () => {
+      const raw = await execAsync(
+        `${iexecPath} voucher revoke ${requesterAddress} --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.txHash).toBeDefined();
+    });
+
+    test('throw when requester was not previously authorized', async () => {
+      const newRequesterAddress = await getRandomAddress();
+
+      const raw = await execAsync(
+        `${iexecPath} voucher revoke ${newRequesterAddress} --raw`,
+      ).catch((e) => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error.message).toBe(
+        `${newRequesterAddress} is not authorized`,
+      );
+    });
+
+    test('throw when the user has no voucher', async () => {
+      // use a new random wallet that doesn't have a voucher
+      const newWallet = await setRandomWallet();
+      const raw = await execAsync(
+        `${iexecPath} voucher revoke ${requesterAddress} --raw`,
+      ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
       expect(res.error.message).toBe(
