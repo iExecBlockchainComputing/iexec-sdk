@@ -807,6 +807,8 @@ iexec voucher <command> [options]
 Commands:
 
 - [show](#iexec-voucher-show)
+- [authorize](#iexec-voucher-authorize)
+- [revoke](#iexec-voucher-revoke)
 
 #### iexec voucher show
 
@@ -830,6 +832,50 @@ Options:
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
 | --user \<address\> | custom user address |
+
+#### iexec voucher authorize
+
+authorize requester to use the voucher
+
+Usage:
+
+```sh
+iexec voucher authorize <requester> [options]
+```
+
+Options:
+
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
+
+#### iexec voucher revoke
+
+revoke authorization to use the voucher
+
+Usage:
+
+```sh
+iexec voucher revoke <requester> [options]
+```
+
+Options:
+
+| option | description |
+| --- | --- |
+| --raw | use raw output |
+| --quiet | stop prompting updates |
+| --password \<password\> | password used to encrypt the wallet (unsafe) |
+| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
+| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
+| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
+| --chain \<name\> | chain name from "chain.json" |
 
 ### iexec app
 
