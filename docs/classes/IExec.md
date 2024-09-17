@@ -183,7 +183,7 @@ ___
 
 ### voucher
 
-• **voucher**: [`IExecVoucherModule`](internal_.IExecVoucherModule.md)
+• **voucher**: [`IExecVoucherModule`](IExecVoucherModule.md)
 
 voucher module
 

@@ -1,8 +1,6 @@
-[iexec](../README.md) / [Exports](../modules.md) / [<internal\>](../modules/internal_.md) / IExecVoucherModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecVoucherModule
 
 # Class: IExecVoucherModule
-
-[<internal>](../modules/internal_.md).IExecVoucherModule
 
 module exposing voucher methods
 
@@ -16,25 +14,25 @@ module exposing voucher methods
 
 ### Constructors
 
-- [constructor](internal_.IExecVoucherModule.md#constructor)
+- [constructor](IExecVoucherModule.md#constructor)
 
 ### Properties
 
-- [config](internal_.IExecVoucherModule.md#config)
+- [config](IExecVoucherModule.md#config)
 
 ### Methods
 
-- [authorizeRequester](internal_.IExecVoucherModule.md#authorizerequester)
-- [getVoucherAddress](internal_.IExecVoucherModule.md#getvoucheraddress)
-- [revokeRequesterAuthorization](internal_.IExecVoucherModule.md#revokerequesterauthorization)
-- [showUserVoucher](internal_.IExecVoucherModule.md#showuservoucher)
-- [fromConfig](internal_.IExecVoucherModule.md#fromconfig)
+- [authorizeRequester](IExecVoucherModule.md#authorizerequester)
+- [getVoucherAddress](IExecVoucherModule.md#getvoucheraddress)
+- [revokeRequesterAuthorization](IExecVoucherModule.md#revokerequesterauthorization)
+- [showUserVoucher](IExecVoucherModule.md#showuservoucher)
+- [fromConfig](IExecVoucherModule.md#fromconfig)
 
 ## Constructors
 
 ### constructor
 
-• **new IExecVoucherModule**(`configOrArgs`, `options?`): [`IExecVoucherModule`](internal_.IExecVoucherModule.md)
+• **new IExecVoucherModule**(`configOrArgs`, `options?`): [`IExecVoucherModule`](IExecVoucherModule.md)
 
 Create an IExecModule instance using an IExecConfig like
 
@@ -47,7 +45,7 @@ Create an IExecModule instance using an IExecConfig like
 
 #### Returns
 
-[`IExecVoucherModule`](internal_.IExecVoucherModule.md)
+[`IExecVoucherModule`](IExecVoucherModule.md)
 
 #### Inherited from
 

@@ -111,6 +111,12 @@
       "browser": "./dist/esm/lib/IExecTaskModule.js",
       "default": "./dist/esm/lib/IExecTaskModule.js"
     },
+    "./IExecVoucherModule": {
+      "types": "./dist/esm/lib/IExecVoucherModule.d.ts",
+      "import": "./dist/esm/lib/IExecVoucherModule.js",
+      "browser": "./dist/esm/lib/IExecVoucherModule.js",
+      "default": "./dist/esm/lib/IExecVoucherModule.js"
+    },
     "./IExecWalletModule": {
       "types": "./dist/esm/lib/IExecWalletModule.d.ts",
       "import": "./dist/esm/lib/IExecWalletModule.js",
@@ -134,12 +140,6 @@
       "import": "./dist/esm/lib/utils.js",
       "browser": "./dist/esm/lib/utils.js",
       "default": "./dist/esm/lib/utils.js"
-    },
-    "./IExecVoucherModule": {
-      "types": "./dist/esm/lib/IExecVoucherModule.d.ts",
-      "import": "./dist/esm/lib/IExecVoucherModule.js",
-      "browser": "./dist/esm/lib/IExecVoucherModule.js",
-      "default": "./dist/esm/lib/IExecVoucherModule.js"
     }
   },
   "engine": {
