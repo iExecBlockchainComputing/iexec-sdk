@@ -18,6 +18,7 @@ import {
   setChain,
   setDatasetUniqueName,
   setRandomWallet,
+  setWallet,
   setWorkerpoolUniqueDescription,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
@@ -31,6 +32,7 @@ describe('iexec voucher', () => {
   let deployedAppAddress;
   let deployedDatasetAddress;
   let deployedWorkerpoolAddress;
+  let requesterAddress;
   beforeAll(async () => {
     await globalSetup('cli-iexec-voucher');
     await execAsync(`${iexecPath} init --skip-wallet --force`);
@@ -44,6 +46,7 @@ describe('iexec voucher', () => {
       voucherType,
       value: voucherValue,
     });
+    requesterAddress = await getRandomAddress();
   });
 
   afterAll(async () => {
@@ -97,9 +100,10 @@ describe('iexec voucher', () => {
         voucherType,
       );
 
-      const requesterAddress = await getRandomAddress();
+      const randomRequesterAddress = await getRandomAddress();
+
       await execAsync(
-        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
+        `${iexecPath} voucher authorize ${randomRequesterAddress} --raw`,
       );
 
       const raw = await execAsync(`${iexecPath} voucher show --raw`);
@@ -113,7 +117,7 @@ describe('iexec voucher', () => {
       expect(res.allowanceAmount).toBeDefined();
       expect(res.sponsoredApps).toEqual([deployedAppAddress]);
       expect(res.sponsoredDatasets).toEqual([deployedDatasetAddress]);
-      expect(res.authorizedAccounts).toEqual([requesterAddress]);
+      expect(res.authorizedAccounts).toEqual([randomRequesterAddress]);
     });
 
     test('returns error when no voucher is found for the user', async () => {
@@ -127,27 +131,11 @@ describe('iexec voucher', () => {
       expect(res.error.message).toBe(
         `No Voucher found for address ${newWallet.address}`,
       );
+      setWallet(userWallet.privateKey);
     });
   });
 
   describe('authorize', () => {
-    let requesterAddress;
-
-    beforeAll(async () => {
-      userWallet = await setRandomWallet();
-      voucherType = await createVoucherType(testChain)({});
-      await createVoucher(testChain)({
-        owner: userWallet.address,
-        voucherType,
-        value: 1000,
-      });
-      requesterAddress = await getRandomAddress();
-    });
-
-    beforeEach(async () => {
-      requesterAddress = await getRandomAddress();
-    });
-
     test('authorize the requester to use the voucher', async () => {
       const raw = await execAsync(
         `${iexecPath} voucher authorize ${requesterAddress} --raw`,
@@ -158,9 +146,6 @@ describe('iexec voucher', () => {
     });
 
     test('throw when requester is already authorized', async () => {
-      await execAsync(
-        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
-      );
       const raw = await execAsync(
         `${iexecPath} voucher authorize ${requesterAddress} --raw`,
       ).catch((e) => e.message);
@@ -182,27 +167,11 @@ describe('iexec voucher', () => {
       expect(res.error.message).toBe(
         `No Voucher found for address ${newWallet.address}`,
       );
+      setWallet(userWallet.privateKey);
     });
   });
 
   describe('revoke', () => {
-    let requesterAddress;
-
-    beforeAll(async () => {
-      userWallet = await setRandomWallet();
-      voucherType = await createVoucherType(testChain)({});
-      await createVoucher(testChain)({
-        owner: userWallet.address,
-        voucherType,
-        value: 1000,
-      });
-      requesterAddress = await getRandomAddress();
-
-      await execAsync(
-        `${iexecPath} voucher authorize ${requesterAddress} --raw`,
-      );
-    });
-
     test('revoke the requester authorization to use the voucher', async () => {
       const raw = await execAsync(
         `${iexecPath} voucher revoke ${requesterAddress} --raw`,
@@ -236,6 +205,7 @@ describe('iexec voucher', () => {
       expect(res.error.message).toBe(
         `No Voucher found for address ${newWallet.address}`,
       );
+      setWallet(userWallet.privateKey);
     });
   });
 });
