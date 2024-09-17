@@ -16,6 +16,7 @@ import {
   cancelWorkerpoolorder,
   computeOrderHash,
   matchOrders,
+  estimateMatchOrders,
 } from '../../common/market/order.js';
 import {
   publishApporder,
@@ -416,6 +417,7 @@ fill
   .option(...option.fillRequestOrder())
   .option(...option.fillRequestParams())
   .option(...option.skipPreflightCheck())
+  .option(...option.useVoucher())
   .description(desc.fill(objName))
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -580,6 +582,29 @@ fill
         });
       }
 
+      if (
+        opts.useVoucher &&
+        (appOrder.appprice !== 0 ||
+          datasetOrder?.datasetprice !== 0 ||
+          workerpoolOrder.workerpoolprice !== 0)
+      ) {
+        const matchOrderCost = await estimateMatchOrders(
+          chain.contracts,
+          chain.voucherHub,
+          appOrder,
+          useDataset ? datasetOrder : undefined,
+          workerpoolOrder,
+          requestOrder,
+          opts.useVoucher,
+        );
+
+        spinner.info(
+          `total cost for matching orders: ${matchOrderCost.total} nRLC`,
+        );
+        spinner.info(
+          `sponsored cost covered by voucher: ${matchOrderCost.sponsored} nRLC`,
+        );
+      }
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.filling(objName));
       const { dealid, volume, txHash } = await matchOrders(
@@ -589,6 +614,7 @@ fill
         useDataset ? datasetOrder : undefined,
         workerpoolOrder,
         requestOrder,
+        opts.useVoucher,
       );
       spinner.succeed(
         `${volume} task successfully purchased with dealid ${dealid}`,
