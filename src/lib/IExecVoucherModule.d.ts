@@ -72,5 +72,5 @@ export default class IExecVoucherModule extends IExecModule {
   /**
    * Create an IExecVoucherModule instance using an IExecConfig instance
    */
-  static fromConfig(config: IExecConfig): IExecNetworkModule;
+  static fromConfig(config: IExecConfig): IExecVoucherModule;
 }

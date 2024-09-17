@@ -158,7 +158,7 @@ ___
 
 ### fromConfig
 
-▸ **fromConfig**(`config`): `IExecNetworkModule`
+▸ **fromConfig**(`config`): [`IExecVoucherModule`](IExecVoucherModule.md)
 
 Create an IExecVoucherModule instance using an IExecConfig instance
 
@@ -170,7 +170,7 @@ Create an IExecVoucherModule instance using an IExecConfig instance
 
 #### Returns
 
-`IExecNetworkModule`
+[`IExecVoucherModule`](IExecVoucherModule.md)
 
 #### Overrides
 
