@@ -53,6 +53,12 @@ export default class IExecVoucherModule extends IExecModule {
    * const userVoucher = await showUserVoucher(userAddress);
    * console.log('address:', userVoucher.address);
    * console.log('balance:', userVoucher.balance);
+   * console.log('expiration:', userVoucher.expirationTimestamp);
+   * console.log('sponsored apps:', userVoucher.sponsoredApps);
+   * console.log('sponsored datasets:', userVoucher.sponsoredDatasets);
+   * console.log('sponsored workerpools:', userVoucher.sponsoredWorkerpools);
+   * console.log('allowance on user account:', userVoucher.allowanceAmount);
+   * console.log('authorized accounts:', userVoucher.authorizedAccounts);
    * ```
    */
   showUserVoucher(owner: Addressish): Promise<VoucherInfo>;
