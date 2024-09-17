@@ -401,6 +401,10 @@ export const option = {
     '--requester-strict',
     'fetch orders created strictly for the specified requester',
   ],
+  useVoucher: () => [
+    '--use-voucher',
+    'use the voucher to cover the costs of matching orders',
+  ],
 };
 
 export const optionCreator = {

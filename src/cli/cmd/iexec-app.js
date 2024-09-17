@@ -47,6 +47,7 @@ import {
   signWorkerpoolorder,
   signRequestorder,
   matchOrders,
+  estimateMatchOrders,
 } from '../../common/market/order.js';
 import {
   publishApporder,
@@ -584,6 +585,7 @@ run
   .option(...orderOption.beneficiary())
   .option(...orderOption.params())
   .option(...option.skipPreflightCheck())
+  .option(...option.useVoucher())
   .description(desc.appRun())
   .action(async (appAddress, opts) => {
     await checkUpdate(opts);
@@ -1052,6 +1054,30 @@ run
         );
       }
 
+      if (
+        opts.useVoucher &&
+        (apporder.appprice !== 0 ||
+          datasetorder.datasetprice !== 0 ||
+          workerpoolorder.workerpoolprice !== 0)
+      ) {
+        const matchOrderCost = await estimateMatchOrders(
+          chain.contracts,
+          chain.voucherHub,
+          apporder,
+          datasetorder,
+          workerpoolorder,
+          requestorder,
+          opts.useVoucher,
+        );
+
+        spinner.info(
+          `total cost for matching orders: ${matchOrderCost.total} nRLC`,
+        );
+        spinner.info(
+          `sponsored cost covered by voucher: ${matchOrderCost.sponsored} nRLC`,
+        );
+      }
+
       spinner.stop();
 
       if (!opts.force) {
@@ -1097,6 +1123,7 @@ run
         datasetorder,
         workerpoolorder,
         requestorder,
+        opts.useVoucher,
       );
 
       result.deals.push({ dealid, volume: volume.toString(), txHash });

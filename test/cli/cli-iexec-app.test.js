@@ -6,6 +6,8 @@ import {
   NULL_BYTES32,
   TEST_CHAINS,
   adminCreateCategory,
+  createVoucher,
+  createVoucherType,
   execAsync,
   getRandomAddress,
   getRandomWallet,
@@ -393,6 +395,64 @@ describe('iexec app', () => {
       expect(res.failedTasks[0].status).toBe(0);
       expect(res.failedTasks[0].statusName).toBe('TIMEOUT');
       expect(res.failedTasks[0].taskTimedOut).toBe(true);
+    });
+
+    test('iexec app run --use-voucher - fail without voucher', async () => {
+      const raw = await execAsync(
+        `${iexecPath} app run --workerpool deployed --use-voucher --skip-preflight-check --force --raw`,
+      ).catch((e) => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error.message).toBe(
+        `No voucher available for the requester ${userWallet.address}`,
+      );
+    });
+
+    test('iexec app run --use-voucher', async () => {
+      const voucherType = await createVoucherType(testChain)({});
+      await createVoucher(testChain)({
+        owner: userWallet.address,
+        voucherType,
+        value: 1000,
+      });
+
+      const raw = await execAsync(
+        `${iexecPath} app run --workerpool deployed --use-voucher --skip-preflight-check --force --raw`,
+      ).catch((e) => e.message);
+      const res = JSON.parse(raw);
+
+      expect(res.ok).toBe(true);
+      expect(res.deals).toBeDefined();
+      expect(res.deals.length).toBe(1);
+      expect(res.deals[0].volume).toBe('1');
+      expect(res.deals[0].dealid).toBeDefined();
+      expect(res.deals[0].txHash).toBeDefined();
+
+      const rawDeal = await execAsync(
+        `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
+      );
+      const resDeal = JSON.parse(rawDeal);
+
+      expect(resDeal.ok).toBe(true);
+      expect(resDeal.deal).toBeDefined();
+      expect(resDeal.deal.app.pointer).toBe(userApp);
+      expect(resDeal.deal.app.price).toBe('0');
+      expect(resDeal.deal.dataset.pointer).toBe(NULL_ADDRESS);
+      expect(resDeal.deal.dataset.price).toBe('0');
+      expect(resDeal.deal.workerpool.pointer).toBe(userWokerpool);
+      expect(resDeal.deal.workerpool.price).toBe('0');
+      expect(resDeal.deal.category).toBe('0');
+      expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
+      expect(resDeal.deal.requester).toBe(userWallet.address);
+      expect(resDeal.deal.beneficiary).toBe(userWallet.address);
+      expect(resDeal.deal.params).toBe(
+        `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${testChain.resultProxyURL}"}`,
+      );
+      expect(resDeal.deal.botFirst).toBe('0');
+      expect(resDeal.deal.botSize).toBe('1');
+      expect(resDeal.deal.trust).toBe('1');
+      expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
+      expect(resDeal.deal.tasks['0']).toBeDefined();
     });
   });
 
