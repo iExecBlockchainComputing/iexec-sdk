@@ -197,99 +197,6 @@ describe('iexec order', () => {
     await execAsync(`${iexecPath} order init --workerpool`);
     await editWorkerpoolorder({
       category: 0,
-      volume: '1',
-    });
-    const raw = await execAsync(`${iexecPath} order sign --workerpool --raw`);
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.apporder).toBeUndefined();
-    expect(res.datasetorder).toBeUndefined();
-    expect(res.workerpoolorder).toBeDefined();
-    expect(res.requestorder).toBeUndefined();
-    expect(res.workerpoolorder.workerpool).toBeDefined();
-  });
-
-  test('iexec order sign --request', async () => {
-    await execAsync(`${iexecPath} order init --request`);
-    await editRequestorder({
-      app: userApp,
-      dataset: userDataset,
-      workerpool: userWorkerpool,
-      category: 0,
-      volume: '1',
-    });
-    const raw = await execAsync(
-      `${iexecPath} order sign --request --skip-preflight-check --raw`,
-    );
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.apporder).toBeUndefined();
-    expect(res.datasetorder).toBeUndefined();
-    expect(res.workerpoolorder).toBeUndefined();
-    expect(res.requestorder).toBeDefined();
-    expect(res.requestorder.app).toBeDefined();
-  });
-
-  test('iexec order fill --use-voucher - fail without voucher', async () => {
-    const raw = await execAsync(
-      `${iexecPath} order fill --use-voucher --skip-preflight-check --raw`,
-    ).catch((e) => e.message);
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(false);
-    expect(res.error.message).toBe(
-      `No voucher available for the requester ${userWallet.address}`,
-    );
-  });
-
-  test('iexec order fill --use-voucher', async () => {
-    const voucherType = await createVoucherType(testChain)({});
-    await createVoucher(testChain)({
-      owner: userWallet.address,
-      voucherType,
-      value: 1000,
-    });
-
-    const raw = await execAsync(
-      `${iexecPath} order fill --use-voucher --skip-preflight-check --raw`,
-    );
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.volume).toBe('1');
-    expect(res.dealid).toBeDefined();
-    expect(res.txHash).toBeDefined();
-    await testChain.provider.getTransaction(res.txHash).then((tx) => {
-      expect(tx.gasPrice.toString()).toBe('0');
-    });
-  });
-
-  test('iexec order sign --app', async () => {
-    await execAsync(`${iexecPath} order init --app`);
-    const raw = await execAsync(`${iexecPath} order sign --app --raw`);
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.apporder).toBeDefined();
-    expect(res.datasetorder).toBeUndefined();
-    expect(res.workerpoolorder).toBeUndefined();
-    expect(res.requestorder).toBeUndefined();
-    expect(res.apporder.app).toBeDefined();
-  });
-
-  test('iexec order sign --dataset', async () => {
-    await execAsync(`${iexecPath} order init --dataset`);
-    const raw = await execAsync(`${iexecPath} order sign --dataset --raw`);
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.apporder).toBeUndefined();
-    expect(res.datasetorder).toBeDefined();
-    expect(res.workerpoolorder).toBeUndefined();
-    expect(res.requestorder).toBeUndefined();
-    expect(res.datasetorder.dataset).toBeDefined();
-  });
-
-  test('iexec order sign --workerpool', async () => {
-    await execAsync(`${iexecPath} order init --workerpool`);
-    await editWorkerpoolorder({
-      category: 0,
       volume: '6',
     });
     const raw = await execAsync(`${iexecPath} order sign --workerpool --raw`);
@@ -423,5 +330,66 @@ describe('iexec order', () => {
       .then((tx) => {
         expect(tx.gasPrice.toString()).toBe('0');
       });
+  });
+
+  describe('iexec order fill --use-voucher', () => {
+    beforeAll(async () => {
+      await execAsync(`${iexecPath} order init --app`);
+      await execAsync(`${iexecPath} order sign --app --raw`);
+
+      await execAsync(`${iexecPath} order init --dataset`);
+      await execAsync(`${iexecPath} order sign --dataset --raw`);
+
+      await execAsync(`${iexecPath} order init --workerpool`);
+      await editWorkerpoolorder({
+        category: 0,
+        volume: '1',
+      });
+      await execAsync(`${iexecPath} order sign --workerpool --raw`);
+
+      await execAsync(`${iexecPath} order init --request`);
+      await editRequestorder({
+        app: userApp,
+        dataset: userDataset,
+        workerpool: userWorkerpool,
+        category: 0,
+        volume: '1',
+      });
+      await execAsync(
+        `${iexecPath} order sign --request --skip-preflight-check --raw`,
+      );
+    });
+
+    test('fail without voucher', async () => {
+      const raw = await execAsync(
+        `${iexecPath} order fill --use-voucher --skip-preflight-check --raw`,
+      ).catch((e) => e.message);
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(false);
+      expect(res.error.message).toBe(
+        `No voucher available for the requester ${userWallet.address}`,
+      );
+    });
+
+    test('should match orders with voucher', async () => {
+      const voucherType = await createVoucherType(testChain)({});
+      await createVoucher(testChain)({
+        owner: userWallet.address,
+        voucherType,
+        value: 1000,
+      });
+
+      const raw = await execAsync(
+        `${iexecPath} order fill --use-voucher --skip-preflight-check --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.volume).toBe('1');
+      expect(res.dealid).toBeDefined();
+      expect(res.txHash).toBeDefined();
+      await testChain.provider.getTransaction(res.txHash).then((tx) => {
+        expect(tx.gasPrice.toString()).toBe('0');
+      });
+    });
   });
 });
