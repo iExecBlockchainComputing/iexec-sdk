@@ -16,7 +16,6 @@ import {
   cancelWorkerpoolorder,
   computeOrderHash,
   matchOrders,
-  estimateMatchOrders,
 } from '../../common/market/order.js';
 import {
   publishApporder,
@@ -582,29 +581,6 @@ fill
         });
       }
 
-      if (
-        opts.useVoucher &&
-        (appOrder.appprice !== 0 ||
-          datasetOrder?.datasetprice !== 0 ||
-          workerpoolOrder.workerpoolprice !== 0)
-      ) {
-        const matchOrderCost = await estimateMatchOrders(
-          chain.contracts,
-          chain.voucherHub,
-          appOrder,
-          useDataset ? datasetOrder : undefined,
-          workerpoolOrder,
-          requestOrder,
-          opts.useVoucher,
-        );
-
-        spinner.info(
-          `total cost for matching orders: ${matchOrderCost.total} nRLC`,
-        );
-        spinner.info(
-          `sponsored cost covered by voucher: ${matchOrderCost.sponsored} nRLC`,
-        );
-      }
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.filling(objName));
       const { dealid, volume, txHash } = await matchOrders(
