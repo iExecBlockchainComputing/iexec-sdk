@@ -3,6 +3,7 @@
 import { describe, test, expect } from '@jest/globals';
 import {
   TEST_CHAINS,
+  addVoucherEligibleAsset,
   createVoucher,
   createVoucherType,
   execAsync,
@@ -15,6 +16,7 @@ import {
   globalSetup,
   globalTeardown,
   iexecPath,
+  runIExecCliRaw,
   setChain,
   setRandomWallet,
 } from './cli-test-utils.js';
@@ -333,25 +335,33 @@ describe('iexec order', () => {
   });
 
   describe('iexec order fill --use-voucher', () => {
+    let workerpoolOrderHash;
+    let datasetOrderHash;
+    let apporderHash;
+
     beforeAll(async () => {
-      await execAsync(`${iexecPath} order init --app`);
-      await execAsync(`${iexecPath} order sign --app --raw`);
+      const publishApporder = await runIExecCliRaw(
+        `${iexecPath} app publish ${userApp} --price 0.000000001 RLC --volume 100 --force`,
+      );
+      apporderHash = publishApporder.orderHash;
+      const publishDatasetorder = await runIExecCliRaw(
+        `${iexecPath} dataset publish ${userDataset} --price 0.000000002 RLC --volume 100 --app-restrict ${userApp} --force`,
+      );
+      datasetOrderHash = publishDatasetorder.orderHash;
 
-      await execAsync(`${iexecPath} order init --dataset`);
-      await execAsync(`${iexecPath} order sign --dataset --raw`);
-
-      await execAsync(`${iexecPath} order init --workerpool`);
-      await editWorkerpoolorder({
-        category: 0,
-        volume: '1',
-      });
-      await execAsync(`${iexecPath} order sign --workerpool --raw`);
+      const publishWorkerpoolorder = await runIExecCliRaw(
+        `${iexecPath} workerpool publish ${userWorkerpool} --price 0.000000003 RLC --volume 100 --category 0 --force`,
+      );
+      workerpoolOrderHash = publishWorkerpoolorder.orderHash;
 
       await execAsync(`${iexecPath} order init --request`);
       await editRequestorder({
         app: userApp,
         dataset: userDataset,
         workerpool: userWorkerpool,
+        appmaxprice: '1000',
+        workerpoolmaxprice: '1000',
+        datasetmaxprice: '1000',
         category: 0,
         volume: '1',
       });
@@ -376,11 +386,14 @@ describe('iexec order', () => {
       await createVoucher(testChain)({
         owner: userWallet.address,
         voucherType,
-        value: 1000,
+        value: 6, // nRLC
       });
+      await addVoucherEligibleAsset(testChain)(userWorkerpool, voucherType);
+      await addVoucherEligibleAsset(testChain)(userDataset, voucherType);
+      await addVoucherEligibleAsset(testChain)(userApp, voucherType);
 
       const raw = await execAsync(
-        `${iexecPath} order fill --use-voucher --skip-preflight-check --raw`,
+        `${iexecPath} order fill --use-voucher --app ${apporderHash} --workerpool ${workerpoolOrderHash} --dataset ${datasetOrderHash} --skip-preflight-check --raw`,
       );
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
