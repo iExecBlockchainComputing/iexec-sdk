@@ -5,6 +5,7 @@ import {
   NULL_ADDRESS,
   NULL_BYTES32,
   TEST_CHAINS,
+  addVoucherEligibleAsset,
   adminCreateCategory,
   createVoucher,
   createVoucherType,
@@ -415,9 +416,12 @@ describe('iexec app', () => {
         voucherType,
         value: 1000,
       });
-
+      await addVoucherEligibleAsset(testChain)(
+        testChain.prodWorkerpool,
+        voucherType,
+      );
       const raw = await execAsync(
-        `${iexecPath} app run --workerpool deployed --use-voucher --skip-preflight-check --force --raw`,
+        `${iexecPath} app run --workerpool ${testChain.prodWorkerpool} --use-voucher --skip-preflight-check --force --raw`,
       ).catch((e) => e.message);
       const res = JSON.parse(raw);
 
@@ -431,6 +435,11 @@ describe('iexec app', () => {
       const rawDeal = await execAsync(
         `${iexecPath} deal show ${res.deals[0].dealid} --raw`,
       );
+      const ensRaw = await execAsync(
+        `${iexecPath} ens resolve ${testChain.prodWorkerpool} --raw`,
+      );
+      const workerpool = JSON.parse(ensRaw);
+
       const resDeal = JSON.parse(rawDeal);
 
       expect(resDeal.ok).toBe(true);
@@ -439,8 +448,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.app.price).toBe('0');
       expect(resDeal.deal.dataset.pointer).toBe(NULL_ADDRESS);
       expect(resDeal.deal.dataset.price).toBe('0');
-      expect(resDeal.deal.workerpool.pointer).toBe(userWokerpool);
-      expect(resDeal.deal.workerpool.price).toBe('0');
+      expect(resDeal.deal.workerpool.pointer).toBe(workerpool.address);
       expect(resDeal.deal.category).toBe('0');
       expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
       expect(resDeal.deal.requester).toBe(userWallet.address);
