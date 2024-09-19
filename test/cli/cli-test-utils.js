@@ -129,6 +129,9 @@ export const editRequestorder = async ({
   app,
   dataset,
   workerpool,
+  appmaxprice,
+  workerpoolmaxprice,
+  datasetmaxprice,
   category,
   volume,
   tag,
@@ -137,16 +140,25 @@ export const editRequestorder = async ({
     app,
     dataset,
     workerpool,
+    appmaxprice,
+    workerpoolmaxprice,
+    datasetmaxprice,
     category,
     volume,
     tag,
   });
 
-export const editWorkerpoolorder = async ({ category, volume, tag }) =>
+export const editWorkerpoolorder = async ({
+  category,
+  volume,
+  tag,
+  workerpoolprice,
+}) =>
   editOrder('workerpoolorder')({
     category,
     volume,
     tag,
+    workerpoolprice,
   });
 
 export const editApporder = async ({ tag }) =>
