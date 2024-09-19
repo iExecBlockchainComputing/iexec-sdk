@@ -148,17 +148,11 @@ export const editRequestorder = async ({
     tag,
   });
 
-export const editWorkerpoolorder = async ({
-  category,
-  volume,
-  tag,
-  workerpoolprice,
-}) =>
+export const editWorkerpoolorder = async ({ category, volume, tag }) =>
   editOrder('workerpoolorder')({
     category,
     volume,
     tag,
-    workerpoolprice,
   });
 
 export const editApporder = async ({ tag }) =>

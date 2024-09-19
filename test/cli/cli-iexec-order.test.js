@@ -372,7 +372,7 @@ describe('iexec order', () => {
 
     test('fail without voucher', async () => {
       const raw = await execAsync(
-        `${iexecPath} order fill --use-voucher --skip-preflight-check --raw`,
+        `${iexecPath} order fill --use-voucher --app ${apporderHash} --workerpool ${workerpoolOrderHash} --dataset ${datasetOrderHash} --skip-preflight-check --raw`,
       ).catch((e) => e.message);
       const res = JSON.parse(raw);
       expect(res.ok).toBe(false);
