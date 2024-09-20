@@ -1130,6 +1130,7 @@ Options:
 | --beneficiary \<address\> | specify the beneficiary of the request (default user address) |
 | --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
 | --skip-preflight-check | skip preflight check, this may result in task execution fail |
+| --use-voucher | use the voucher to cover the costs of matching orders |
 
 #### iexec app request-execution
 
@@ -1844,6 +1845,7 @@ Options:
 | --request \<orderHash\> | specify the requestorder from the marketplace to fill |
 | --params \<json\> | specify the params of the request, existing request order will be ignored<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
 | --skip-preflight-check | skip preflight check, this may result in task execution fail |
+| --use-voucher | use the voucher to cover the costs of matching orders |
 
 #### iexec order publish
 
