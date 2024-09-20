@@ -416,6 +416,7 @@ fill
   .option(...option.fillRequestOrder())
   .option(...option.fillRequestParams())
   .option(...option.skipPreflightCheck())
+  .option(...option.useVoucher())
   .description(desc.fill(objName))
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -589,6 +590,7 @@ fill
         useDataset ? datasetOrder : undefined,
         workerpoolOrder,
         requestOrder,
+        opts.useVoucher,
       );
       spinner.succeed(
         `${volume} task successfully purchased with dealid ${dealid}`,

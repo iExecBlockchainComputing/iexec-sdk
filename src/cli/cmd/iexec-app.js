@@ -47,6 +47,7 @@ import {
   signWorkerpoolorder,
   signRequestorder,
   matchOrders,
+  estimateMatchOrders,
 } from '../../common/market/order.js';
 import {
   publishApporder,
@@ -584,6 +585,7 @@ run
   .option(...orderOption.beneficiary())
   .option(...orderOption.params())
   .option(...option.skipPreflightCheck())
+  .option(...option.useVoucher())
   .description(desc.appRun())
   .action(async (appAddress, opts) => {
     await checkUpdate(opts);
@@ -1038,27 +1040,23 @@ run
 
       debug('requestorder', requestorder);
 
-      const totalCost = new BN(requestorder.appmaxprice)
-        .add(new BN(requestorder.datasetmaxprice))
-        .add(new BN(requestorder.workerpoolmaxprice))
-        .mul(new BN(requestorder.volume));
-
-      const { stake } = await checkBalance(chain.contracts, requester);
-      if (totalCost.gt(stake)) {
-        throw Error(
-          `Not enough RLC on your account (${formatRLC(
-            totalCost,
-          )} RLC required). Run "iexec account deposit" to topup your account.`,
-        );
-      }
+      const { total: totalCost, sponsored } = await estimateMatchOrders(
+        chain.contracts,
+        chain.voucherHub,
+        apporder,
+        datasetorder,
+        workerpoolorder,
+        requestorder,
+        opts.useVoucher,
+      );
 
       spinner.stop();
 
       if (!opts.force) {
         await prompt.custom(
-          `Do you want to spend ${formatRLC(
-            totalCost,
-          )} RLC to execute the following request: ${pretty({
+          `Do you want to spend ${formatRLC(totalCost)} nRLC ${
+            sponsored > 0 ? `(${sponsored} nRLC sponsored by the voucher)` : ''
+          } to execute the following request: ${pretty({
             app: `${requestorder.app} (${formatRLC(
               requestorder.appmaxprice,
             )} RLC)`,
@@ -1097,6 +1095,7 @@ run
         datasetorder,
         workerpoolorder,
         requestorder,
+        opts.useVoucher,
       );
 
       result.deals.push({ dealid, volume: volume.toString(), txHash });
