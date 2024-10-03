@@ -3,79 +3,88 @@ const { writeFile, stat, mkdir } = require('fs/promises');
 
 const minifiers = {
   package: ({ name, version, description }) => ({ name, version, description }),
-  contract: ({ abi, networks }) => ({ abi, networks }),
+  abi: ({ abi }) => ({ abi }),
+  abiNetworks: ({ abi, networks }) => ({
+    abi,
+    networks: Object.fromEntries(
+      Object.entries(networks).map(([chainId, { address }]) => [
+        chainId,
+        { address },
+      ]),
+    ),
+  }),
 };
 
 const sources = [
   ['./package.json', { dir: 'sdk', minifier: minifiers.package }],
   [
     'rlc-faucet-contract/build/contracts/RLC.json',
-    { dir: '@iexec/rlc', minifier: minifiers.contract },
+    { dir: '@iexec/rlc', minifier: minifiers.abiNetworks },
   ],
   [
     '@iexec/erlc/build/contracts-min/ERLCTokenSwap.json',
-    { dir: '@iexec/erlc', minifier: minifiers.contract },
+    { dir: '@iexec/erlc', minifier: minifiers.abiNetworks },
   ],
   [
     '@iexec/poco/package.json',
     { dir: '@iexec/poco', minifier: minifiers.package },
   ],
   [
-    '@iexec/poco/build/contracts-min/RegistryEntry.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    '@iexec/poco/artifacts/contracts/registries/RegistryEntry.sol/RegistryEntry.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
+    // warn /build/
     '@iexec/poco/build/contracts-min/ERC1538Proxy.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    { dir: '@iexec/poco', minifier: minifiers.abiNetworks },
   ],
   [
-    '@iexec/poco/build/contracts-min/IexecInterfaceToken.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    '@iexec/poco/artifacts/contracts/IexecInterfaceToken.sol/IexecInterfaceToken.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/poco/build/contracts-min/IexecInterfaceNative.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
-  ],
-
-  [
-    '@iexec/poco/build/contracts-min/AppRegistry.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    '@iexec/poco/artifacts/contracts/IexecInterfaceNative.sol/IexecInterfaceNative.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/poco/build/contracts-min/WorkerpoolRegistry.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    '@iexec/poco/artifacts/contracts/registries/apps/AppRegistry.sol/AppRegistry.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/poco/build/contracts-min/DatasetRegistry.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    '@iexec/poco/artifacts/contracts/registries/workerpools/WorkerpoolRegistry.sol/WorkerpoolRegistry.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/poco/build/contracts-min/App.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    '@iexec/poco/artifacts/contracts/registries/datasets/DatasetRegistry.sol/DatasetRegistry.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/poco/build/contracts-min/Workerpool.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    '@iexec/poco/artifacts/contracts/registries/apps/App.sol/App.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/poco/build/contracts-min/Dataset.json',
-    { dir: '@iexec/poco', minifier: minifiers.contract },
+    '@iexec/poco/artifacts/contracts/registries/workerpools/Workerpool.sol/Workerpool.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
+  ],
+  [
+    '@iexec/poco/artifacts/contracts/registries/datasets/Dataset.sol/Dataset.json',
+    { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
     '@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.contract },
+    { dir: '@ensdomains/registry', minifier: minifiers.abi },
   ],
   [
     '@ensdomains/ens-contracts/artifacts/contracts/registry/FIFSRegistrar.sol/FIFSRegistrar.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.contract },
+    { dir: '@ensdomains/registry', minifier: minifiers.abi },
   ],
   [
     '@ensdomains/ens-contracts/artifacts/contracts/reverseRegistrar/ReverseRegistrar.sol/ReverseRegistrar.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.contract },
+    { dir: '@ensdomains/registry', minifier: minifiers.abi },
   ],
   [
     '@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json',
-    { dir: '@ensdomains/resolvers', minifier: minifiers.contract },
+    { dir: '@ensdomains/resolvers', minifier: minifiers.abi },
   ],
 ];
 
