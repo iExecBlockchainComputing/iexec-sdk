@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Changed
+
+- Upgrade PoCo to v5.5.0
+
 ## [8.10.1] 2024-08-26
 
 ### Changed
