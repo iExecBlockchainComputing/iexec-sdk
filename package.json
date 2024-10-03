@@ -191,7 +191,7 @@
   "dependencies": {
     "@ensdomains/ens-contracts": "^0.0.22",
     "@iexec/erlc": "^1.0.0",
-    "@iexec/poco": "^5.5.0-alpha.0",
+    "@iexec/poco": "^5.5.0",
     "@multiformats/multiaddr": "^12.1.8",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
