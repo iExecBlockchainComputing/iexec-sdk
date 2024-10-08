@@ -7,7 +7,7 @@ import {
   NULL_BYTES32,
   execAsync,
   getRandomAddress,
-} from '../test-utils';
+} from '../test-utils.js';
 import {
   setWorkerpoolUniqueDescription,
   setChain,
@@ -16,8 +16,8 @@ import {
   runIExecCliRaw,
   setRandomWallet,
   iexecPath,
-} from './cli-test-utils';
-import '../jest-setup';
+} from './cli-test-utils.js';
+import '../jest-setup.js';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 

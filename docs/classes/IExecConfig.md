@@ -34,9 +34,12 @@ const wallet = IExecWalletModule.fromConfig(config);
 - [resolveEnterpriseContractsClient](IExecConfig.md#resolveenterprisecontractsclient)
 - [resolveIexecGatewayURL](IExecConfig.md#resolveiexecgatewayurl)
 - [resolveIpfsGatewayURL](IExecConfig.md#resolveipfsgatewayurl)
+- [resolvePocoSubgraphURL](IExecConfig.md#resolvepocosubgraphurl)
 - [resolveResultProxyURL](IExecConfig.md#resolveresultproxyurl)
 - [resolveSmsURL](IExecConfig.md#resolvesmsurl)
 - [resolveStandardContractsClient](IExecConfig.md#resolvestandardcontractsclient)
+- [resolveVoucherHubAddress](IExecConfig.md#resolvevoucherhubaddress)
+- [resolveVoucherSubgraphURL](IExecConfig.md#resolvevouchersubgraphurl)
 
 ## Constructors
 
@@ -182,6 +185,18 @@ resolve the current IPFS gateway URL
 
 ___
 
+### resolvePocoSubgraphURL
+
+▸ **resolvePocoSubgraphURL**(): `Promise`<`string`\>
+
+resolve the current PoCo subgraph URL
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
 ### resolveResultProxyURL
 
 ▸ **resolveResultProxyURL**(): `Promise`<`string`\>
@@ -222,3 +237,29 @@ resolve the current standard IExecContractsClient
 #### Returns
 
 `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
+
+___
+
+### resolveVoucherHubAddress
+
+▸ **resolveVoucherHubAddress**(): `Promise`<``null`` \| `string`\>
+
+resolve the current VoucherHub contract address
+returns `null` if not available
+
+#### Returns
+
+`Promise`<``null`` \| `string`\>
+
+___
+
+### resolveVoucherSubgraphURL
+
+▸ **resolveVoucherSubgraphURL**(): `Promise`<``null`` \| `string`\>
+
+resolve the current voucher subgraph URL
+returns `null` if not available
+
+#### Returns
+
+`Promise`<``null`` \| `string`\>

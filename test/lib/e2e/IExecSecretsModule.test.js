@@ -1,16 +1,18 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
-import { expectAsyncCustomError, getTestConfig } from '../lib-test-utils';
+import { expectAsyncCustomError, getTestConfig } from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
   SERVICE_UNREACHABLE_URL,
   SERVICE_HTTP_500_URL,
   getRandomAddress,
-} from '../../test-utils';
-import '../../jest-setup';
-import { SmsCallError } from '../../../src/lib/errors';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
+
+const { SmsCallError } = errors;
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

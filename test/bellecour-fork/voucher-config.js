@@ -1,0 +1,1 @@
+export const VOUCHER_HUB_ADDRESS = 'TO BE DEPLOYED';

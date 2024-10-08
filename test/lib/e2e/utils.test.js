@@ -12,11 +12,11 @@ import {
   getId,
   getRandomWallet,
   setBalance,
-} from '../../test-utils';
-import '../../jest-setup';
-import { ONE_ETH, getTestConfigOptions } from '../lib-test-utils';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { ONE_ETH, getTestConfigOptions } from '../lib-test-utils.js';
 
-import { IExec, utils } from '../../../src/lib';
+import { IExec, utils } from '../../../src/lib/index.js';
 
 const { BN, NULL_ADDRESS } = utils;
 

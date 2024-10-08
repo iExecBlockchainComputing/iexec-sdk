@@ -308,9 +308,8 @@ const buyComputation = (iexec) => async () => {
     const appAddress = buyAppAddressInput.value;
     const category = buyCategoryInput.value;
     const params = buyParamsInput.value;
-    const { orders: appOrders } = await iexec.orderbook.fetchAppOrderbook(
-      appAddress,
-    );
+    const { orders: appOrders } =
+      await iexec.orderbook.fetchAppOrderbook(appAddress);
     const appOrder = appOrders && appOrders[0] && appOrders[0].order;
     if (!appOrder) throw Error(`no apporder found for app ${appAddress}`);
     const { orders: workerpoolOrders } =
@@ -519,9 +518,8 @@ const encryptDataset = (iexec) => async () => {
 
     datasetsEncryptOutput.innerText = `Encrypting ${file.name}`;
     const encrypted = await iexec.dataset.encrypt(fileBytes, key);
-    const checksum = await iexec.dataset.computeEncryptedFileChecksum(
-      encrypted,
-    );
+    const checksum =
+      await iexec.dataset.computeEncryptedFileChecksum(encrypted);
 
     datasetsEncryptOutput.innerText = 'Uploading encrypted file to IPFS';
     const ipfs = window.KuboRpcClient.create('/dns4/ipfs-upload.iex.ec/https/');

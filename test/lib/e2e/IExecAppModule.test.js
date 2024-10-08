@@ -3,21 +3,22 @@
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import {
-  deployRandomApp,
-  expectAsyncCustomError,
-  getTestConfig,
-} from '../lib-test-utils';
-import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
   getId,
   getRandomAddress,
   SERVICE_UNREACHABLE_URL,
   SERVICE_HTTP_500_URL,
-} from '../../test-utils';
-import '../../jest-setup';
-import { errors } from '../../../src/lib';
-import { SmsCallError } from '../../../src/lib/errors';
+} from '../../test-utils.js';
+import {
+  deployRandomApp,
+  getTestConfig,
+  expectAsyncCustomError,
+} from '../lib-test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
+
+const { SmsCallError } = errors;
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

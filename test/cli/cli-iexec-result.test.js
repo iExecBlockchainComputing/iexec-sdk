@@ -6,7 +6,7 @@ import {
   TEE_FRAMEWORKS,
   execAsync,
   getRandomAddress,
-} from '../test-utils';
+} from '../test-utils.js';
 import {
   globalSetup,
   globalTeardown,
@@ -14,8 +14,8 @@ import {
   runIExecCliRaw,
   setChain,
   setRandomWallet,
-} from './cli-test-utils';
-import '../jest-setup';
+} from './cli-test-utils.js';
+import '../jest-setup.js';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 

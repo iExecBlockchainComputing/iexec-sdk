@@ -80,6 +80,7 @@ Additionally the [IExec](./classes/IExec.md) module exposes all the following li
 - [IExecSecretsModule](./classes/IExecSecretsModule.md) exposes **secrets** methods
 - [IExecStorageModule](./classes/IExecStorageModule.md) exposes **storage** methods
 - [IExecTaskModule](./classes/IExecTaskModule.md) exposes **task** methods
+- [IExecVoucherModule](./classes/IExecVoucherModule.md) exposes **voucher** methods
 - [IExecWalletModule](./classes/IExecWalletModule.md) exposes **wallet** methods
 - [IExecWorkerpoolModule](./classes/IExecWorkerpoolModule.md) exposes **workerpool** methods
 

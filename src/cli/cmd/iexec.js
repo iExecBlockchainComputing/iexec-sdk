@@ -85,6 +85,8 @@ cli.command('wallet', 'manage local ethereum wallet');
 
 cli.command('account', 'manage iExec account');
 
+cli.command('voucher', 'manage iExec voucher');
+
 cli.command('app', 'manage iExec apps');
 
 cli.command('dataset', 'manage iExec datasets');

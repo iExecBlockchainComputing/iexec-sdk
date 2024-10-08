@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { pathExists, remove } from 'fs-extra';
 import { join } from 'path';
 import { Wallet } from 'ethers';
-import { execAsync, getId } from '../test-utils';
+import { execAsync, getId } from '../test-utils.js';
 
 const IEXEC_JSON = 'iexec.json';
 const CHAIN_JSON = 'chain.json';
@@ -73,6 +73,8 @@ export const setChain =
             iexecGateway: chain.iexecGatewayURL,
             resultProxy: chain.resultProxyURL,
             ensPublicResolver: chain.ensPublicResolverAddress,
+            voucherSubgraph: chain.voucherSubgraphURL,
+            voucherHub: chain.voucherHubAddress,
             useGas: chain.useGas,
             native: chain.isNative,
             ...chainOptions,
@@ -127,6 +129,9 @@ export const editRequestorder = async ({
   app,
   dataset,
   workerpool,
+  appmaxprice,
+  workerpoolmaxprice,
+  datasetmaxprice,
   category,
   volume,
   tag,
@@ -135,6 +140,9 @@ export const editRequestorder = async ({
     app,
     dataset,
     workerpool,
+    appmaxprice,
+    workerpoolmaxprice,
+    datasetmaxprice,
     category,
     volume,
     tag,

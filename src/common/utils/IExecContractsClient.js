@@ -134,9 +134,8 @@ const createClient = ({
         return cachedAddresses[registryName];
       }
       const iexecContract = getIExecContract();
-      const registryAddress = await iexecContract[
-        contractsDescMap[registryName].hubPropName
-      ]();
+      const registryAddress =
+        await iexecContract[contractsDescMap[registryName].hubPropName]();
       cachedAddresses[registryName] = registryAddress;
       return registryAddress;
     } catch (error) {

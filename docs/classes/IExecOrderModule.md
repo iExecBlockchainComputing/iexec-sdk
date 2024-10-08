@@ -30,6 +30,7 @@ module exposing order methods
 - [createDatasetorder](IExecOrderModule.md#createdatasetorder)
 - [createRequestorder](IExecOrderModule.md#createrequestorder)
 - [createWorkerpoolorder](IExecOrderModule.md#createworkerpoolorder)
+- [estimateMatchOrders](IExecOrderModule.md#estimatematchorders)
 - [hashApporder](IExecOrderModule.md#hashapporder)
 - [hashDatasetorder](IExecOrderModule.md#hashdatasetorder)
 - [hashRequestorder](IExecOrderModule.md#hashrequestorder)
@@ -331,6 +332,43 @@ const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerp
 
 ___
 
+### estimateMatchOrders
+
+▸ **estimateMatchOrders**(`orders`, `options?`): `Promise`<{ `sponsored`: `NRlcAmount` ; `total`: `NRlcAmount`  }\>
+
+estimates the cost of matching the provided orders
+
+example:
+```js
+const orders = {
+  apporder,
+  datasetorder
+  workerpoolorder,
+  requestorder,
+};
+const result = await estimateMatchOrders(orders, {useVoucher: true});
+console.log(`total cost for matching orders: ${result.total} nRLC`);
+console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `orders` | `Object` |
+| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) |
+| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) |
+| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) |
+| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
+| `options?` | `Object` |
+| `options.useVoucher?` | `boolean` |
+
+#### Returns
+
+`Promise`<{ `sponsored`: `NRlcAmount` ; `total`: `NRlcAmount`  }\>
+
+___
+
 ### hashApporder
 
 ▸ **hashApporder**(`apporder`): `Promise`<`string`\>
@@ -457,6 +495,7 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 | `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
 | `options?` | `Object` |
 | `options.preflightCheck?` | `boolean` |
+| `options.useVoucher?` | `boolean` |
 
 #### Returns
 

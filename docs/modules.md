@@ -37,6 +37,7 @@
 - [IExecSecretsModule](classes/IExecSecretsModule.md)
 - [IExecStorageModule](classes/IExecStorageModule.md)
 - [IExecTaskModule](classes/IExecTaskModule.md)
+- [IExecVoucherModule](classes/IExecVoucherModule.md)
 - [IExecWalletModule](classes/IExecWalletModule.md)
 - [IExecWorkerpoolModule](classes/IExecWorkerpoolModule.md)
 - [Observable](classes/Observable.md)

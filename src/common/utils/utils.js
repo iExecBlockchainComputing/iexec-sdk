@@ -200,6 +200,17 @@ export const getEventFromLogs = (eventName, logs, { strict = true } = {}) => {
   return eventFound;
 };
 
+export const parseTransactionLogs = (logs, abiInterface) =>
+  logs
+    .map((log) => {
+      try {
+        return abiInterface.parseLog(log);
+      } catch (e) {
+        return null;
+      }
+    })
+    .filter((event) => event !== null);
+
 export const getSalt = () => hexlify(randomBytes(32));
 
 export const TAG_MAP = {

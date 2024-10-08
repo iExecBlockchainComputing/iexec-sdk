@@ -192,7 +192,8 @@ show
       if (!isAddress && !userAddress)
         throw Error(`Missing option ${option.user()[0]} or wallet`);
 
-      if (!addressOrIndex) throw Error(info.missingAddressOrDeployed(objName, chain.id));
+      if (!addressOrIndex)
+        throw Error(info.missingAddressOrDeployed(objName, chain.id));
 
       spinner.start(info.showing(objName));
 

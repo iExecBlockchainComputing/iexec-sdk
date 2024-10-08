@@ -58,6 +58,10 @@ export interface IExecConfigOptions {
    */
   ensPublicResolverAddress?: string;
   /**
+   * override the VoucherHub contract address to target a custom instance
+   */
+  voucherHubAddress?: string;
+  /**
    * override the bridge contract address to target a custom instance
    */
   bridgeAddress?: string;
@@ -111,6 +115,14 @@ export interface IExecConfigOptions {
    * override the IExec market URL to target a custom instance
    */
   iexecGatewayURL?: string;
+  /**
+   * override the PoCo subgraph URL to target a custom instance
+   */
+  pocoSubgraphURL?: string;
+  /**
+   * override the voucher subgraph URL to target a custom instance
+   */
+  voucherSubgraphURL?: string;
   /**
    * number of block to wait for transactions confirmation (default 1)
    */
@@ -194,6 +206,15 @@ export default class IExecConfig {
    */
   resolveIpfsGatewayURL(): Promise<string>;
   /**
+   * resolve the current PoCo subgraph URL
+   */
+  resolvePocoSubgraphURL(): Promise<string>;
+  /**
+   * resolve the current voucher subgraph URL
+   * returns `null` if not available
+   */
+  resolveVoucherSubgraphURL(): Promise<string | null>;
+  /**
    * resolve the current bridge contract address
    */
   resolveBridgeAddress(): Promise<string>;
@@ -205,4 +226,9 @@ export default class IExecConfig {
    * resolve the current ENS public resolver contract address
    */
   resolveEnsPublicResolverAddress(): Promise<string>;
+  /**
+   * resolve the current VoucherHub contract address
+   * returns `null` if not available
+   */
+  resolveVoucherHubAddress(): Promise<string | null>;
 }

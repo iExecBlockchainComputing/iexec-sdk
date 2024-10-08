@@ -8,16 +8,16 @@ import {
   deployRandomWorkerpool,
   getTestConfig,
   runObservableSubscribe,
-} from '../lib-test-utils';
+} from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   NULL_ADDRESS,
   getId,
   getRandomAddress,
   INFURA_PROJECT_ID,
-} from '../../test-utils';
-import '../../jest-setup';
-import { IExec } from '../../../src/lib';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { IExec } from '../../../src/lib/index.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
