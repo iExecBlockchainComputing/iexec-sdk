@@ -46,7 +46,6 @@ const createChainFromConf = (
       provider,
       chainId: chain.id,
       hubAddress: chain.hub,
-      voucherSubgraphURL: chain.voucherSubgraph,
       useGas: chain.useGas,
       isNative: chain.native,
       flavour: chain.flavour,

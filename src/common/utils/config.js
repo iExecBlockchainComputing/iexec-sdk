@@ -1,5 +1,6 @@
 import { Network, EnsPlugin } from 'ethers';
 import { TEE_FRAMEWORKS } from './constant.js';
+import { address as voucherHubBellecourAddress } from '../generated/@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.js';
 
 const hostMap = {
   1: 'mainnet',
@@ -19,7 +20,7 @@ const ensMap = {
 
 const voucherHubMap = {
   standard: {
-    134: '0x000000000000000000000000000000000000dead', // TODO change with deployment address
+    134: voucherHubBellecourAddress,
   },
 };
 
@@ -104,7 +105,7 @@ const idMap = {
 
 export const getId = (idOrName) => idMap[idOrName] || idOrName;
 
-export const getChainDefaults = ({ id, flavour }) => ({
+export const getChainDefaults = ({ id, flavour = 'standard' }) => ({
   host: hostMap[id],
   hub: hubMap[flavour] && hubMap[flavour][id],
   sms: smsMap[flavour] && smsMap[flavour][id],
