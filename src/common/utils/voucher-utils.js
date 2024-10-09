@@ -3,8 +3,8 @@ import { Contract } from 'ethers';
 import { GraphQLClient } from 'graphql-request';
 import { throwIfMissing } from './validator.js';
 import { ConfigurationError } from './errors.js';
-import { abi as voucherHubAbi } from '../voucher/abi/VoucherHub.js';
-import { abi as voucherAbi } from '../voucher/abi/Voucher.js';
+import { abi as voucherHubAbi } from '../generated/@iexec/voucher-contracts/VoucherHub.js';
+import { abi as voucherAbi } from '../generated/@iexec/voucher-contracts/Voucher.js';
 
 export const getVoucherContract = (
   contracts = throwIfMissing(),

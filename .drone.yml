@@ -293,9 +293,10 @@ steps:
       RPC_URL: http://bellecour-fork:8545
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
+      VOUCHER_HUB_ADDRESS: "0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda"
     commands:
+      - export VOUCHER_HUB_START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
       - sh /app/entrypoint.sh
-      - echo "export const VOUCHER_HUB_ADDRESS = '$(cat /app/out/VoucherHub.address)';" > ./test/bellecour-fork/voucher-config.js
     depends_on:
       - bellecour-fork-healthy
       - ipfs-healthy
