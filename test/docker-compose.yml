@@ -40,8 +40,8 @@ services:
       RPC_URL: http://bellecour-fork:8545
       GRAPHNODE_URL: http://graphnode:8020
       IPFS_URL: http://ipfs:5001
-    volumes:
-      - ./voucher-deployer/out:/app/out
+      VOUCHER_HUB_ADDRESS: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda'
+      VOUCHER_HUB_START_BLOCK: $BELLECOUR_FORK_BLOCK
     depends_on:
       bellecour-fork:
         condition: service_healthy
@@ -49,17 +49,6 @@ services:
         condition: service_healthy
       ipfs:
         condition: service_healthy
-
-  bellecour-fork-update-voucher-config:
-    image: bash
-    restart: 'no'
-    command: -c "echo \"export const VOUCHER_HUB_ADDRESS = '$$(cat /app/voucher-deployer/out/VoucherHub.address)';\" > /app/bellecour-fork/voucher-config.js"
-    volumes:
-      - ./voucher-deployer/out:/app/voucher-deployer/out
-      - ./bellecour-fork:/app/bellecour-fork
-    depends_on:
-      bellecour-fork-voucher-deployment:
-        condition: service_completed_successfully
 
   graphnode-postgres:
     image: postgres:12
@@ -310,6 +299,4 @@ services:
       result-proxy:
         condition: service_started
       bellecour-fork-voucher-deployment:
-        condition: service_completed_successfully
-      bellecour-fork-update-voucher-config:
         condition: service_completed_successfully

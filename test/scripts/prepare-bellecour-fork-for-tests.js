@@ -6,11 +6,11 @@ import {
   keccak256,
   toBeHex,
 } from 'ethers';
-import { VOUCHER_HUB_ADDRESS } from '../bellecour-fork/voucher-config.js'; // TODO: change with deployment address once voucher is deployed on bellecour
 
 const { DRONE } = process.env;
 
 const IEXEC_HUB_ADDRESS = '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f';
+const VOUCHER_HUB_ADDRESS = '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda';
 const TARGET_POCO_ADMIN_WALLET = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 const TARGET_FAUCET_WALLET = '0xdFa2585C16cAf9c853086F36d2A37e9b8d1eab87';
 const TARGET_VOUCHER_MANAGER_WALLET =
