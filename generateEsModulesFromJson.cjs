@@ -4,7 +4,7 @@ const { writeFile, stat, mkdir } = require('fs/promises');
 const minifiers = {
   package: ({ name, version, description }) => ({ name, version, description }),
   abi: ({ abi }) => ({ abi }),
-  abiNetworks: ({ abi, networks }) => ({
+  truffleDeployment: ({ abi, networks }) => ({
     abi,
     networks: Object.fromEntries(
       Object.entries(networks).map(([chainId, { address }]) => [
@@ -13,17 +13,18 @@ const minifiers = {
       ]),
     ),
   }),
+  hardhatDeployment: ({ address }) => ({ address }),
 };
 
 const sources = [
   ['./package.json', { dir: 'sdk', minifier: minifiers.package }],
   [
     'rlc-faucet-contract/build/contracts/RLC.json',
-    { dir: '@iexec/rlc', minifier: minifiers.abiNetworks },
+    { dir: '@iexec/rlc', minifier: minifiers.truffleDeployment },
   ],
   [
     '@iexec/erlc/build/contracts-min/ERLCTokenSwap.json',
-    { dir: '@iexec/erlc', minifier: minifiers.abiNetworks },
+    { dir: '@iexec/erlc', minifier: minifiers.truffleDeployment },
   ],
   [
     '@iexec/poco/package.json',
@@ -36,7 +37,7 @@ const sources = [
   [
     // warn /build/
     '@iexec/poco/build/contracts-min/ERC1538Proxy.json',
-    { dir: '@iexec/poco', minifier: minifiers.abiNetworks },
+    { dir: '@iexec/poco', minifier: minifiers.truffleDeployment },
   ],
   [
     '@iexec/poco/artifacts/contracts/IexecInterfaceToken.sol/IexecInterfaceToken.json',
@@ -69,6 +70,21 @@ const sources = [
   [
     '@iexec/poco/artifacts/contracts/registries/datasets/Dataset.sol/Dataset.json',
     { dir: '@iexec/poco', minifier: minifiers.abi },
+  ],
+  [
+    '@iexec/voucher-contracts/artifacts/contracts/beacon/Voucher.sol/Voucher.json',
+    { dir: '@iexec/voucher-contracts', minifier: minifiers.abi },
+  ],
+  [
+    '@iexec/voucher-contracts/artifacts/contracts/VoucherHub.sol/VoucherHub.json',
+    { dir: '@iexec/voucher-contracts', minifier: minifiers.abi },
+  ],
+  [
+    '@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.json',
+    {
+      dir: '@iexec/voucher-contracts/deployments/bellecour',
+      minifier: minifiers.hardhatDeployment,
+    },
   ],
   [
     '@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json',

@@ -10,9 +10,9 @@ import {
 } from 'ethers';
 import { IExec } from '../src/lib/index.js';
 import { getSignerFromPrivateKey } from '../src/lib/utils.js';
-import { VOUCHER_HUB_ADDRESS } from './bellecour-fork/voucher-config.js';
 import { getEventFromLogs } from '../src/common/utils/utils.js';
 import { getTestConfig } from './test-config-utils.js';
+import { abi as voucherHubAbi } from '../src/common/generated/@iexec/voucher-contracts/VoucherHub.js';
 
 export {
   TEE_FRAMEWORKS,
@@ -97,7 +97,6 @@ export const TEST_CHAINS = {
     faucetWallet: new Wallet(
       '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
     ),
-    voucherHubAddress: VOUCHER_HUB_ADDRESS, // TODO: change with deployment address once voucher is deployed on bellecour
     voucherManagerWallet: new Wallet(
       '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
     ),
@@ -119,6 +118,7 @@ export const TEST_CHAINS = {
     ),
     defaults: {
       hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
+      voucherHubAddress: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda',
       ensRegistryAddress: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
       ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
       isNative: true,
@@ -388,54 +388,12 @@ export const adminCreateCategory =
 export const createVoucherType =
   (chain) =>
   async ({ description = 'test', duration = 1000 } = {}) => {
-    const VOUCHER_HUB_ABI = [
-      {
-        inputs: [
-          {
-            internalType: 'string',
-            name: 'description',
-            type: 'string',
-          },
-          {
-            internalType: 'uint256',
-            name: 'duration',
-            type: 'uint256',
-          },
-        ],
-        name: 'createVoucherType',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-      {
-        anonymous: false,
-        inputs: [
-          {
-            indexed: true,
-            internalType: 'uint256',
-            name: 'id',
-            type: 'uint256',
-          },
-          {
-            indexed: false,
-            internalType: 'string',
-            name: 'description',
-            type: 'string',
-          },
-          {
-            indexed: false,
-            internalType: 'uint256',
-            name: 'duration',
-            type: 'uint256',
-          },
-        ],
-        name: 'VoucherTypeCreated',
-        type: 'event',
-      },
-    ];
+    const voucherHubAddress =
+      chain.voucherHubAddress || chain.defaults.voucherHubAddress;
+
     const voucherHubContract = new Contract(
-      chain.voucherHubAddress,
-      VOUCHER_HUB_ABI,
+      voucherHubAddress,
+      voucherHubAbi,
       chain.provider,
     );
     const signer = chain.voucherManagerWallet.connect(chain.provider);
@@ -504,63 +462,14 @@ const createAndPublishWorkerpoolOrder = async (
 export const createVoucher =
   (chain) =>
   async ({ owner, voucherType, value }) => {
-    const VOUCHER_HUB_ABI = [
-      {
-        inputs: [
-          {
-            internalType: 'address',
-            name: 'owner',
-            type: 'address',
-          },
-          {
-            internalType: 'uint256',
-            name: 'voucherType',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'value',
-            type: 'uint256',
-          },
-        ],
-        name: 'createVoucher',
-        outputs: [
-          {
-            internalType: 'address',
-            name: 'voucherAddress',
-            type: 'address',
-          },
-        ],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-      {
-        inputs: [
-          {
-            internalType: 'address',
-            name: 'account',
-            type: 'address',
-          },
-        ],
-        name: 'getVoucher',
-        outputs: [
-          {
-            internalType: 'address',
-            name: 'voucherAddress',
-            type: 'address',
-          },
-        ],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ];
-
+    const voucherHubAddress =
+      chain.voucherHubAddress || chain.defaults.voucherHubAddress;
     // deposit voucher value on VoucherHub with a random wallet
-    await setStakedNRlcBalance(chain)(chain.voucherHubAddress, value);
+    await setStakedNRlcBalance(chain)(voucherHubAddress, value);
 
     const voucherHubContract = new Contract(
-      chain.voucherHubAddress,
-      VOUCHER_HUB_ABI,
+      voucherHubAddress,
+      voucherHubAbi,
       chain.provider,
     );
 
@@ -614,26 +523,10 @@ export const createVoucher =
 
 export const addVoucherEligibleAsset =
   (chain) => async (assetAddress, voucherTypeId) => {
-    const voucherHubContract = new Contract(VOUCHER_HUB_ADDRESS, [
-      {
-        inputs: [
-          {
-            internalType: 'uint256',
-            name: 'voucherTypeId',
-            type: 'uint256',
-          },
-          {
-            internalType: 'address',
-            name: 'asset',
-            type: 'address',
-          },
-        ],
-        name: 'addEligibleAsset',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ]);
+    const voucherHubAddress =
+      chain.voucherHubAddress || chain.defaults.voucherHubAddress;
+
+    const voucherHubContract = new Contract(voucherHubAddress, voucherHubAbi);
 
     const signer = chain.voucherManagerWallet.connect(chain.provider);
 
