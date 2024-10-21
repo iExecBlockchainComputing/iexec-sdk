@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+### Added
+
+- added account methods for staked RLC allowance management
+  - allowance
+  - approve
+  - revoke
+- added support for iExec voucher
+  - show
+  - authorize
+  - revoke
+- added support for using a voucher to pay for a deal
+
 ## [8.11.0] 2024-10-03
 
 ### Changed
