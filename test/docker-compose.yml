@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   custom-token-chain:
     restart: unless-stopped
@@ -31,11 +29,11 @@ services:
       retries: 3
       start_period: 30s
 
-  # TODO: remove this once voucher is deployed on bellecour
-  bellecour-fork-voucher-deployment:
+  voucher-subgraph-deployment:
     restart: 'no'
-    # https://github.com/iExecBlockchainComputing/voucher-deployer
-    image: pierreiexec/voucher-deployer
+    # https://github.com/iExecBlockchainComputing/iexec-voucher-subgraph
+    # TODO replace image with iexechub/voucher-subgraph-deployer when available
+    image: docker-regis.iex.ec/voucher-subgraph:8491d157
     environment:
       RPC_URL: http://bellecour-fork:8545
       GRAPHNODE_URL: http://graphnode:8020
@@ -298,5 +296,5 @@ services:
         condition: service_started
       result-proxy:
         condition: service_started
-      bellecour-fork-voucher-deployment:
+      voucher-subgraph-deployment:
         condition: service_completed_successfully
