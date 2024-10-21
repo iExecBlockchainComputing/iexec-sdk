@@ -289,7 +289,7 @@ steps:
       - market-api
       - market-watcher
 
-  - name: voucher-subgraph-deployment
+  - name: voucher-subgraph-deployer
     # https://github.com/iExecBlockchainComputing/iexec-voucher-subgraph
     # TODO replace image with iexechub/voucher-subgraph-deployer when available
     image: docker-regis.iex.ec/voucher-subgraph:8491d157
@@ -301,7 +301,7 @@ steps:
       VOUCHER_HUB_ADDRESS: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda'
     commands:
       - export VOUCHER_HUB_START_BLOCK=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
-      - sh /app/entrypoint.sh
+      - cd /iexec-voucher-subgraph && npm run all
     depends_on:
       - bellecour-fork-healthy
       - ipfs-healthy
@@ -333,7 +333,7 @@ steps:
       - ipfs-healthy
       - graphnode-healthy
       - custom-token-chain-healthy
-      - voucher-subgraph-deployment
+      - voucher-subgraph-deployer
 
   ### START LOCAL STACK END ###
 

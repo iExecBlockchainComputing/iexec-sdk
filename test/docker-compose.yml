@@ -29,7 +29,7 @@ services:
       retries: 3
       start_period: 30s
 
-  voucher-subgraph-deployment:
+  voucher-subgraph-deployer:
     restart: 'no'
     # https://github.com/iExecBlockchainComputing/iexec-voucher-subgraph
     # TODO replace image with iexechub/voucher-subgraph-deployer when available
@@ -296,5 +296,5 @@ services:
         condition: service_started
       result-proxy:
         condition: service_started
-      voucher-subgraph-deployment:
+      voucher-subgraph-deployer:
         condition: service_completed_successfully
