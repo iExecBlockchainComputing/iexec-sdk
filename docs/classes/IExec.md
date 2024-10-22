@@ -46,7 +46,7 @@ module exposing all the iExec SDK modules
 
 • **new IExec**(`configOrArgs`, `options?`): [`IExec`](IExec.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

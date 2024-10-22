@@ -32,7 +32,7 @@ module exposing result methods
 
 • **new IExecResultModule**(`configOrArgs`, `options?`): [`IExecResultModule`](IExecResultModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

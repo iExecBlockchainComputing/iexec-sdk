@@ -39,7 +39,7 @@ module exposing workerpool methods
 
 • **new IExecWorkerpoolModule**(`configOrArgs`, `options?`): [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

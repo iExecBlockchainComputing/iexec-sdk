@@ -64,7 +64,7 @@ module exposing order methods
 
 • **new IExecOrderModule**(`configOrArgs`, `options?`): [`IExecOrderModule`](IExecOrderModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

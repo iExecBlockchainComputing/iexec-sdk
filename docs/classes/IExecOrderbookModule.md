@@ -38,7 +38,7 @@ module exposing orderbook methods
 
 • **new IExecOrderbookModule**(`configOrArgs`, `options?`): [`IExecOrderbookModule`](IExecOrderbookModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

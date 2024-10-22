@@ -11,7 +11,7 @@ import IExecConfig, {
  */
 export default class IExecModule {
   /**
-   * Create an IExecModule instance using an IExecConfig like
+   * Create an IExecModule instance
    */
   constructor(
     configOrArgs: IExecConfig | IExecConfigArgs,
