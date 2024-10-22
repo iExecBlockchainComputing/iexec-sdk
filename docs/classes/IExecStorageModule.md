@@ -33,7 +33,7 @@ module exposing storage methods
 
 • **new IExecStorageModule**(`configOrArgs`, `options?`): [`IExecStorageModule`](IExecStorageModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

@@ -37,7 +37,7 @@ module exposing account methods
 
 • **new IExecAccountModule**(`configOrArgs`, `options?`): [`IExecAccountModule`](IExecAccountModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

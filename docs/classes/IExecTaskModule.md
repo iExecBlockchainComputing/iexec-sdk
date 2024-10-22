@@ -34,7 +34,7 @@ module exposing task methods
 
 • **new IExecTaskModule**(`configOrArgs`, `options?`): [`IExecTaskModule`](IExecTaskModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

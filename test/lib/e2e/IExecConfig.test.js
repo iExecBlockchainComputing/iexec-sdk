@@ -21,11 +21,11 @@ import {
   TEE_FRAMEWORKS,
   getRandomAddress,
   getRandomWallet,
-} from '../../test-utils';
-import '../../jest-setup';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
 
-import { utils, IExecConfig, errors } from '../../../src/lib';
-import IExecContractsClient from '../../../src/common/utils/IExecContractsClient';
+import { utils, IExecConfig, errors } from '../../../src/lib/index.js';
+import IExecContractsClient from '../../../src/common/utils/IExecContractsClient.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const unknownTestChain = TEST_CHAINS['custom-token-chain'];
@@ -1040,7 +1040,7 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveIpfsGatewayURL();
       await expect(promise).resolves.toBe('https://custom-ipfs.iex.ec');
     });
-    test('success when not configured on custom chain', async () => {
+    test('throw when not configured on custom chain', async () => {
       const config = new IExecConfig({
         ethProvider: unknownTestChain.rpcURL,
       });
@@ -1055,6 +1055,111 @@ describe('[IExecConfig]', () => {
         ethProvider: 'http://localhost:8888',
       });
       const promise = config.resolveIpfsGatewayURL();
+      await expect(promise).rejects.toThrow('Failed to detect network:');
+      await expect(promise).rejects.toThrow(Error);
+    });
+  });
+
+  describe('resolvePocoSubgraphURL()', () => {
+    test('success', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'bellecour',
+      });
+      const promise = config.resolvePocoSubgraphURL();
+      const url = await promise;
+      expect(typeof url).toBe('string');
+      expect(url.length > 0).toBe(true);
+    });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: unknownTestChain.rpcURL,
+        },
+        { pocoSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
+      );
+      const promise = config.resolvePocoSubgraphURL();
+      await expect(promise).resolves.toBe(
+        'https://custom-subgraph.iex.ec/subgraph/name',
+      );
+    });
+    test('success pocoSubgraphURL override', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { pocoSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
+      );
+      const promise = config.resolvePocoSubgraphURL();
+      await expect(promise).resolves.toBe(
+        'https://custom-subgraph.iex.ec/subgraph/name',
+      );
+    });
+    test('throw when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: unknownTestChain.rpcURL,
+      });
+      const promise = config.resolvePocoSubgraphURL();
+      await expect(promise).rejects.toThrow(
+        `pocoSubgraphURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
+      );
+      await expect(promise).rejects.toThrow(Error);
+    });
+    test('throw on network error', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'http://localhost:8888',
+      });
+      const promise = config.resolvePocoSubgraphURL();
+      await expect(promise).rejects.toThrow('Failed to detect network:');
+      await expect(promise).rejects.toThrow(Error);
+    });
+  });
+
+  describe('resolveVoucherSubgraphURL()', () => {
+    test('success', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'bellecour',
+      });
+      const promise = config.resolveVoucherSubgraphURL();
+      const url = await promise;
+      expect(typeof url).toBe('string');
+      expect(url.length > 0).toBe(true);
+    });
+    test('success when configured on custom chain', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: unknownTestChain.rpcURL,
+        },
+        { voucherSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
+      );
+      const promise = config.resolveVoucherSubgraphURL();
+      await expect(promise).resolves.toBe(
+        'https://custom-subgraph.iex.ec/subgraph/name',
+      );
+    });
+    test('success voucherSubgraphURL override', async () => {
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        { voucherSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
+      );
+      const promise = config.resolveVoucherSubgraphURL();
+      await expect(promise).resolves.toBe(
+        'https://custom-subgraph.iex.ec/subgraph/name',
+      );
+    });
+    test('returns null when not configured on custom chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: unknownTestChain.rpcURL,
+      });
+      const res = await config.resolveVoucherSubgraphURL();
+      expect(res).toBe(null);
+    });
+    test('throw on network error', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'http://localhost:8888',
+      });
+      const promise = config.resolveVoucherSubgraphURL();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
     });
@@ -1229,6 +1334,59 @@ describe('[IExecConfig]', () => {
         ethProvider: 'http://localhost:8888',
       });
       const promise = config.resolveEnsPublicResolverAddress();
+      await expect(promise).rejects.toThrow('Failed to detect network:');
+      await expect(promise).rejects.toThrow(Error);
+    });
+  });
+
+  describe('resolveVoucherHubAddress()', () => {
+    test('success', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'bellecour',
+      });
+      const promise = config.resolveVoucherHubAddress();
+      const address = await promise;
+      expect(typeof address).toBe('string');
+      expect(address.length).toBe(42);
+    });
+    test('success voucherHubAddress override', async () => {
+      const voucherHubAddressOverride = getRandomAddress();
+      const config = new IExecConfig(
+        {
+          ethProvider: 'bellecour',
+        },
+        {
+          voucherHubAddress: voucherHubAddressOverride,
+        },
+      );
+      const promise = config.resolveVoucherHubAddress();
+      await expect(promise).resolves.toBe(voucherHubAddressOverride);
+    });
+    test('success with voucherHubAddress on custom chain', async () => {
+      const voucherHubAddressOverride = getRandomAddress();
+      const config = new IExecConfig(
+        {
+          ethProvider: unknownTestChain.rpcURL,
+        },
+        {
+          voucherHubAddress: voucherHubAddressOverride,
+        },
+      );
+      const promise = config.resolveVoucherHubAddress();
+      await expect(promise).resolves.toBe(voucherHubAddressOverride);
+    });
+    test('returns null on unknown chain', async () => {
+      const config = new IExecConfig({
+        ethProvider: unknownTestChain.rpcURL,
+      });
+      const res = await config.resolveVoucherHubAddress();
+      expect(res).toBe(null);
+    });
+    test('throw on network error', async () => {
+      const config = new IExecConfig({
+        ethProvider: 'http://localhost:8888',
+      });
+      const promise = config.resolveVoucherHubAddress();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
     });

@@ -42,7 +42,7 @@ module exposing dataset methods
 
 • **new IExecDatasetModule**(`configOrArgs`, `options?`): [`IExecDatasetModule`](IExecDatasetModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

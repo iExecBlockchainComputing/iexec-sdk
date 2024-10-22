@@ -36,6 +36,8 @@ module base
 
   ↳ [`IExecTaskModule`](IExecTaskModule.md)
 
+  ↳ [`IExecVoucherModule`](IExecVoucherModule.md)
+
   ↳ [`IExecWalletModule`](IExecWalletModule.md)
 
   ↳ [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
@@ -60,7 +62,7 @@ module base
 
 • **new IExecModule**(`configOrArgs`, `options?`): [`IExecModule`](IExecModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

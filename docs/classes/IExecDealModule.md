@@ -39,7 +39,7 @@ module exposing deal methods
 
 • **new IExecDealModule**(`configOrArgs`, `options?`): [`IExecDealModule`](IExecDealModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

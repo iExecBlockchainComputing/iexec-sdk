@@ -99,7 +99,7 @@ export const checkRequestRequirements = async (
   // check dropbox storage token
   if (
     paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER] ===
-      STORAGE_PROVIDERS.DROPBOX
+    STORAGE_PROVIDERS.DROPBOX
   ) {
     const isStorageTokenSet = await checkWeb2SecretExists(
       contracts,

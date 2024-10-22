@@ -32,6 +32,7 @@ module exposing all the iExec SDK modules
 - [secrets](IExec.md#secrets)
 - [storage](IExec.md#storage)
 - [task](IExec.md#task)
+- [voucher](IExec.md#voucher)
 - [wallet](IExec.md#wallet)
 - [workerpool](IExec.md#workerpool)
 
@@ -45,7 +46,7 @@ module exposing all the iExec SDK modules
 
 • **new IExec**(`configOrArgs`, `options?`): [`IExec`](IExec.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 
@@ -177,6 +178,14 @@ ___
 • **task**: [`IExecTaskModule`](IExecTaskModule.md)
 
 task module
+
+___
+
+### voucher
+
+• **voucher**: [`IExecVoucherModule`](IExecVoucherModule.md)
+
+voucher module
 
 ___
 

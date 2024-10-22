@@ -6,9 +6,9 @@ import { BN } from 'bn.js';
 import fsExtra from 'fs-extra';
 import {
   deployRandomDataset,
-  expectAsyncCustomError,
   getTestConfig,
-} from '../lib-test-utils';
+  expectAsyncCustomError,
+} from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   TEE_FRAMEWORKS,
@@ -17,10 +17,11 @@ import {
   getRandomAddress,
   SERVICE_HTTP_500_URL,
   SERVICE_UNREACHABLE_URL,
-} from '../../test-utils';
-import '../../jest-setup';
-import { errors } from '../../../src/lib';
-import { SmsCallError } from '../../../src/lib/errors';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
+
+const { SmsCallError } = errors;
 
 const { readFile, ensureDir, writeFile } = fsExtra;
 

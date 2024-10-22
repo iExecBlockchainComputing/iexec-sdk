@@ -31,7 +31,7 @@ module exposing network methods
 
 • **new IExecNetworkModule**(`configOrArgs`, `options?`): [`IExecNetworkModule`](IExecNetworkModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

@@ -1,5 +1,6 @@
 import { Network, EnsPlugin } from 'ethers';
 import { TEE_FRAMEWORKS } from './constant.js';
+import { address as voucherHubBellecourAddress } from '../generated/@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.js';
 
 const hostMap = {
   1: 'mainnet',
@@ -14,6 +15,12 @@ const ensMap = {
   134: {
     registry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
     publicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
+  },
+};
+
+const voucherHubMap = {
+  standard: {
+    134: voucherHubBellecourAddress,
   },
 };
 
@@ -77,6 +84,20 @@ const iexecGatewayMap = {
   enterprise: {},
 };
 
+const pocoSubgraphMap = {
+  standard: {
+    134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5',
+  },
+  enterprise: {},
+};
+
+const voucherSubgraphMap = {
+  standard: {
+    134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/iexec-voucher',
+  },
+  enterprise: {},
+};
+
 const idMap = {
   mainnet: 1,
   bellecour: 134,
@@ -84,14 +105,18 @@ const idMap = {
 
 export const getId = (idOrName) => idMap[idOrName] || idOrName;
 
-export const getChainDefaults = ({ id, flavour }) => ({
+export const getChainDefaults = ({ id, flavour = 'standard' }) => ({
   host: hostMap[id],
   hub: hubMap[flavour] && hubMap[flavour][id],
   sms: smsMap[flavour] && smsMap[flavour][id],
   ensPublicResolver: ensMap[id] && ensMap[id].publicResolver,
+  voucherHub: voucherHubMap[flavour] && voucherHubMap[flavour][id],
   resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
   ipfsGateway: ipfsGatewayMap[flavour] && ipfsGatewayMap[flavour][id],
   iexecGateway: iexecGatewayMap[flavour] && iexecGatewayMap[flavour][id],
+  pocoSubgraph: pocoSubgraphMap[flavour] && iexecGatewayMap[flavour][id],
+  voucherSubgraph:
+    voucherSubgraphMap[flavour] && voucherSubgraphMap[flavour][id],
   bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
   flavour,
 });

@@ -42,7 +42,7 @@ module exposing wallet methods
 
 • **new IExecWalletModule**(`configOrArgs`, `options?`): [`IExecWalletModule`](IExecWalletModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

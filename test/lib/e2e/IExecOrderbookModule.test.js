@@ -8,7 +8,7 @@ import {
   expectAsyncCustomError,
   getMatchableRequestorder,
   getTestConfig,
-} from '../lib-test-utils';
+} from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   NULL_ADDRESS,
@@ -16,9 +16,11 @@ import {
   SERVICE_UNREACHABLE_URL,
   SERVICE_HTTP_500_URL,
   getRandomBytes32,
-} from '../../test-utils';
-import '../../jest-setup';
-import { MarketCallError } from '../../../src/lib/errors';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
+
+const { MarketCallError } = errors;
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

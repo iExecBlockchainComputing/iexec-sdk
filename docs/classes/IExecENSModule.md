@@ -39,7 +39,7 @@ module exposing ENS methods
 
 • **new IExecENSModule**(`configOrArgs`, `options?`): [`IExecENSModule`](IExecENSModule.md)
 
-Create an IExecModule instance using an IExecConfig like
+Create an IExecModule instance
 
 #### Parameters
 

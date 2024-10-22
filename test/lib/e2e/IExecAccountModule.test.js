@@ -2,16 +2,16 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
-import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils';
+import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils.js';
 import {
   INFURA_PROJECT_ID,
   TEST_CHAINS,
   getRandomAddress,
   setBalance,
   setNRlcBalance,
-} from '../../test-utils';
-import '../../jest-setup';
-import { IExec } from '../../../src/lib';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { IExec } from '../../../src/lib/index.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const tokenTestChain = TEST_CHAINS['custom-token-chain'];
