@@ -495,7 +495,6 @@ trigger:
   branch:
     - next
     - new
-    - voucher
 
 steps:
   - name: install
@@ -532,16 +531,6 @@ steps:
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
 
-  - name: set-version-suffix-voucher
-    image: node:18
-    commands:
-      - eval npm pkg set version="$(npm pkg get version)-voucher"
-    when:
-      branch:
-        - voucher
-    depends_on:
-      - set-version-nightly
-
   - name: npm publish
     image: plugins/npm
     pull: always
@@ -556,7 +545,6 @@ steps:
       - lint
       - build
       - set-version-nightly
-      - set-version-suffix-voucher
 
   - name: docker publish
     image: plugins/docker
