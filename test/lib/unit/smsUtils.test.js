@@ -1,6 +1,6 @@
 // @jest/global comes with jest
-import { getCrypto } from '../../../src/common/utils/crypto';
-import { formatEncryptionKey } from '../../../src/common/sms/smsUtils';
+import { getCrypto } from '../../../src/common/utils/crypto.js';
+import { formatEncryptionKey } from '../../../src/common/sms/smsUtils.js';
 
 describe('formatEncryptionKey', () => {
   describe('When secretValue is a base64 string', () => {

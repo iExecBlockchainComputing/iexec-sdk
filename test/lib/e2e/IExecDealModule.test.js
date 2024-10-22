@@ -9,7 +9,7 @@ import {
   getMatchableRequestorder,
   getTestConfig,
   runObservableSubscribe,
-} from '../lib-test-utils';
+} from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   NULL_BYTES32,
@@ -20,13 +20,11 @@ import {
   getRandomBytes32,
   SERVICE_HTTP_500_URL,
   getRandomAddress,
-} from '../../test-utils';
-import '../../jest-setup';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
 
-import { errors } from '../../../src/lib/index';
-import { MarketCallError } from '../../../src/lib/errors';
-
-const { ObjectNotFoundError } = errors;
+const { ObjectNotFoundError, MarketCallError } = errors;
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('deal', () => {

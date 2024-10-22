@@ -3,7 +3,7 @@ import { BN } from 'bn.js';
 import { getDefaultProvider } from 'ethers';
 import fsExtra from 'fs-extra';
 import { join } from 'path';
-import { INFURA_PROJECT_ID, TEE_FRAMEWORKS } from '../../test-utils';
+import { INFURA_PROJECT_ID, TEE_FRAMEWORKS } from '../../test-utils.js';
 import {
   uint256Schema,
   weiAmountSchema,
@@ -26,8 +26,8 @@ import {
   smsUrlOrMapSchema,
   teeFrameworkSchema,
   addressOrAnySchema,
-} from '../../../src/common/utils/validator';
-import { errors } from '../../../src/lib/index';
+} from '../../../src/common/utils/validator.js';
+import { errors } from '../../../src/lib/index.js';
 
 const { ValidationError } = errors;
 

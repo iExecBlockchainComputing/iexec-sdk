@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   custom-token-chain:
     restart: unless-stopped
@@ -29,6 +27,82 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 30s
+
+  voucher-subgraph-deployer:
+    restart: 'no'
+    # https://github.com/iExecBlockchainComputing/iexec-voucher-subgraph
+    # TODO replace image with iexechub/voucher-subgraph-deployer when available
+    image: docker-regis.iex.ec/voucher-subgraph:8491d157
+    environment:
+      RPC_URL: http://bellecour-fork:8545
+      GRAPHNODE_URL: http://graphnode:8020
+      IPFS_URL: http://ipfs:5001
+      VOUCHER_HUB_ADDRESS: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda'
+      VOUCHER_HUB_START_BLOCK: $BELLECOUR_FORK_BLOCK
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
+      graphnode:
+        condition: service_healthy
+      ipfs:
+        condition: service_healthy
+
+  graphnode-postgres:
+    image: postgres:12
+    restart: unless-stopped
+    command:
+      - 'postgres'
+      - '-cshared_preload_libraries=pg_stat_statements'
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: graphnode
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: graphnode-db
+    healthcheck:
+      test: pg_isready -U graphnode -d graphnode-db
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  graphnode:
+    image: graphprotocol/graph-node:v0.27.0
+    restart: unless-stopped
+    expose:
+      - 8000
+      - 8020
+    ports:
+      # GraphQL HTTP
+      - 8000:8000
+      # GraphQL WS
+      # - 8001:8001
+      # admin RPC
+      - 8020:8020
+      # metrics
+      # - 8040:8040
+    environment:
+      postgres_host: graphnode-postgres
+      postgres_port: 5432
+      postgres_user: graphnode
+      postgres_pass: password
+      postgres_db: graphnode-db
+      ipfs: ipfs:5001
+      ethereum: bellecour:http://bellecour-fork:8545
+      GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER: $BELLECOUR_FORK_BLOCK
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
+      graphnode-postgres:
+        condition: service_healthy
+      ipfs:
+        condition: service_healthy
+    healthcheck:
+      test: netcat -w 1 0.0.0.0 8020
+      interval: 10s
+      timeout: 5s
+      retries: 5
       start_period: 30s
 
   service-internal-error:
@@ -200,3 +274,27 @@ services:
         condition: service_healthy
       market-mongo:
         condition: service_started
+
+  stack-ready:
+    image: bash
+    command:
+      - echo "all services ready"
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
+      custom-token-chain:
+        condition: service_healthy
+      graphnode:
+        condition: service_healthy
+      sms:
+        condition: service_started
+      sms-gramine:
+        condition: service_started
+      market-watcher:
+        condition: service_started
+      market-api:
+        condition: service_started
+      result-proxy:
+        condition: service_started
+      voucher-subgraph-deployer:
+        condition: service_completed_successfully

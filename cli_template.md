@@ -398,9 +398,13 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
   - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value), this key accepts a string or a mapping TEE framework - SMS url.
   - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
+  - optional key `iexecGateway` set the url of the iexec marketplace gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
+  - optional key `pocoSubgraph` set the url of the PoCo subgraph used by the SDK cli on each chain (overwrite default value).
+  - optional key `voucherSubgraph` set the url of the voucher subgraph used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
   - optional key `enterprise` set the enterprise swap contract used by the SDK cli when working with enterprise enabled networks. `bridge.enterpriseSwapChainName` set the reference to the enterprise bound network.
+  - optional key `voucherHub` set the address of the voucher hub contract used by the SDK cli on each chain (overwrite default value).
   - optional key `native` specify whether or not the chain native token is RLC (overwrite default value: chain value or `false`).
   - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction (overwrite default value: chain value or `true`).
 - optional key `providers` set the backends for public chains

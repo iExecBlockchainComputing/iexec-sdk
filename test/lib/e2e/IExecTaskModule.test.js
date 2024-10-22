@@ -7,7 +7,7 @@ import {
   expectAsyncCustomError,
   getMatchableRequestorder,
   getTestConfig,
-} from '../lib-test-utils';
+} from '../lib-test-utils.js';
 import {
   NULL_BYTES32,
   SERVICE_HTTP_500_URL,
@@ -16,12 +16,11 @@ import {
   adminCreateCategory,
   initializeTask,
   sleep,
-} from '../../test-utils';
-import '../../jest-setup';
-import { errors } from '../../../src/lib/index';
-import { IpfsGatewayCallError } from '../../../src/lib/errors';
+} from '../../test-utils.js';
+import '../../jest-setup.js';
+import { errors } from '../../../src/lib/index.js';
 
-const { ObjectNotFoundError } = errors;
+const { ObjectNotFoundError, IpfsGatewayCallError } = errors;
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

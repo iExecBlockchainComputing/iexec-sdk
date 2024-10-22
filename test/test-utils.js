@@ -8,15 +8,18 @@ import {
   hexlify,
   randomBytes,
 } from 'ethers';
-import { IExec } from '../src/lib';
-import { getSignerFromPrivateKey } from '../src/lib/utils';
+import { IExec } from '../src/lib/index.js';
+import { getSignerFromPrivateKey } from '../src/lib/utils.js';
+import { getEventFromLogs } from '../src/common/utils/utils.js';
+import { getTestConfig } from './test-config-utils.js';
+import { abi as voucherHubAbi } from '../src/common/generated/@iexec/voucher-contracts/VoucherHub.js';
 
 export {
   TEE_FRAMEWORKS,
   NULL_ADDRESS,
   NULL_BYTES,
   NULL_BYTES32,
-} from '../src/common/utils/constant';
+} from '../src/common/utils/constant.js';
 
 export const sleep = (ms) =>
   new Promise((res) => {
@@ -68,6 +71,8 @@ export const TEST_CHAINS = {
     ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
+      undefined,
+      { pollingInterval: 100 },
     ),
     defaults: {
       isNative: false,
@@ -92,11 +97,28 @@ export const TEST_CHAINS = {
     faucetWallet: new Wallet(
       '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
     ),
+    voucherManagerWallet: new Wallet(
+      '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
+    ),
+    voucherSubgraphURL: DRONE
+      ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
+      : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
+    debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
+    debugWorkerpoolOwnerWallet: new Wallet(
+      '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3',
+    ),
+    prodWorkerpool: 'prod-v8-bellecour.main.pools.iexec.eth',
+    prodWorkerpoolOwnerWallet: new Wallet(
+      '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc',
+    ),
     provider: new JsonRpcProvider(
       DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+      undefined,
+      { pollingInterval: 100 },
     ),
     defaults: {
       hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
+      voucherHubAddress: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda',
       ensRegistryAddress: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
       ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
       isNative: true,
@@ -275,6 +297,28 @@ export const setNRlcBalance = (chain) => async (address, nRlcTargetBalance) => {
   await faucetSendNRlcToReachTargetBalance(chain)(address, nRlcTargetBalance);
 };
 
+export const setStakedNRlcBalance =
+  (chain) => async (address, nRlcTargetBalance) => {
+    const sponsorWallet = Wallet.createRandom(chain.provider);
+    const iexec = new IExec(
+      {
+        ethProvider: sponsorWallet,
+      },
+      { hubAddress: chain.hubAddress },
+    );
+    await setNRlcBalance(chain)(
+      sponsorWallet.address,
+      BigInt(nRlcTargetBalance),
+    );
+    const contractClient = await iexec.config.resolveContractsClient();
+    const iexecContract = contractClient.getIExecContract();
+    const tx = await iexecContract.depositFor(address, {
+      value: BigInt(nRlcTargetBalance) * 10n ** 9n,
+      gasPrice: 0, // TODO: wont work on non gasless chain
+    });
+    await tx.wait();
+  };
+
 export const initializeTask = (chain) => async (dealid, idx) => {
   const iexecContract = new Contract(
     chain.hubAddress || chain.defaults.hubAddress,
@@ -339,4 +383,173 @@ export const adminCreateCategory =
       }
     }
     return res;
+  };
+
+export const createVoucherType =
+  (chain) =>
+  async ({ description = 'test', duration = 1000 } = {}) => {
+    const voucherHubAddress =
+      chain.voucherHubAddress || chain.defaults.voucherHubAddress;
+
+    const voucherHubContract = new Contract(
+      voucherHubAddress,
+      voucherHubAbi,
+      chain.provider,
+    );
+    const signer = chain.voucherManagerWallet.connect(chain.provider);
+
+    const retryableCreateVoucherType = async (tryCount = 1) => {
+      let id;
+      try {
+        const createVoucherTypeTxHash = await voucherHubContract
+          .connect(signer)
+          .createVoucherType(description, duration);
+        const txReceipt = await createVoucherTypeTxHash.wait();
+        id = getEventFromLogs('VoucherTypeCreated', txReceipt.logs, {
+          strict: true,
+        }).args.id;
+      } catch (error) {
+        console.warn(
+          `Error creating voucher type (try count ${tryCount}):`,
+          error,
+        );
+        if (tryCount < 3) {
+          await sleep(3000 * tryCount);
+          id = await retryableCreateVoucherType(tryCount + 1);
+        } else {
+          throw new Error(
+            `Failed to create voucher after ${tryCount} attempts`,
+          );
+        }
+      }
+      return id;
+    };
+    return retryableCreateVoucherType(); // return voucherType id (bigint)
+  };
+
+// TODO: update createWorkerpoolorder() parameters when it is specified
+const createAndPublishWorkerpoolOrder = async (
+  chain,
+  workerpool,
+  workerpoolOwnerWallet,
+  voucherOwnerAddress,
+) => {
+  const { iexec } = getTestConfig(chain)({
+    privateKey: workerpoolOwnerWallet.privateKey,
+  });
+  const workerpoolprice = 1000;
+  const volume = 1000;
+
+  await setStakedNRlcBalance(chain)(
+    workerpoolOwnerWallet.address,
+    volume * workerpoolprice,
+  );
+
+  const workerpoolorder = await iexec.order.createWorkerpoolorder({
+    workerpool,
+    category: 0,
+    requesterrestrict: voucherOwnerAddress,
+    volume,
+    workerpoolprice,
+    tag: ['tee', 'scone'],
+  });
+
+  await iexec.order
+    .signWorkerpoolorder(workerpoolorder)
+    .then((o) => iexec.order.publishWorkerpoolorder(o));
+};
+
+export const createVoucher =
+  (chain) =>
+  async ({ owner, voucherType, value }) => {
+    const voucherHubAddress =
+      chain.voucherHubAddress || chain.defaults.voucherHubAddress;
+    // deposit voucher value on VoucherHub with a random wallet
+    await setStakedNRlcBalance(chain)(voucherHubAddress, value);
+
+    const voucherHubContract = new Contract(
+      voucherHubAddress,
+      voucherHubAbi,
+      chain.provider,
+    );
+
+    const signer = chain.voucherManagerWallet.connect(chain.provider);
+
+    const retryableCreateVoucher = async (tryCount = 1) => {
+      try {
+        const createVoucherTx = await voucherHubContract
+          .connect(signer)
+          .createVoucher(owner, voucherType, value);
+        await createVoucherTx.wait();
+      } catch (error) {
+        console.warn(`Error creating voucher (try count ${tryCount}):`, error);
+        if (tryCount < 3) {
+          await sleep(3000 * tryCount);
+          await retryableCreateVoucher(tryCount + 1);
+        } else {
+          throw new Error(
+            `Failed to create voucher after ${tryCount} attempts`,
+          );
+        }
+      }
+    };
+    await retryableCreateVoucher();
+
+    try {
+      await createAndPublishWorkerpoolOrder(
+        chain,
+        chain.debugWorkerpool,
+        chain.debugWorkerpoolOwnerWallet,
+        owner,
+      );
+      await createAndPublishWorkerpoolOrder(
+        chain,
+        chain.prodWorkerpool,
+        chain.prodWorkerpoolOwnerWallet,
+        owner,
+      );
+    } catch (error) {
+      console.error('Error publishing workerpoolorder:', error);
+      throw error;
+    }
+
+    try {
+      return await voucherHubContract.getVoucher(owner);
+    } catch (error) {
+      console.error('Error getting voucher:', error);
+      throw error;
+    }
+  };
+
+export const addVoucherEligibleAsset =
+  (chain) => async (assetAddress, voucherTypeId) => {
+    const voucherHubAddress =
+      chain.voucherHubAddress || chain.defaults.voucherHubAddress;
+
+    const voucherHubContract = new Contract(voucherHubAddress, voucherHubAbi);
+
+    const signer = chain.voucherManagerWallet.connect(chain.provider);
+
+    const retryableAddEligibleAsset = async (tryCount = 1) => {
+      try {
+        const tx = await voucherHubContract
+          .connect(signer)
+          .addEligibleAsset(voucherTypeId, assetAddress);
+        await tx.wait();
+      } catch (error) {
+        console.warn(
+          `Error adding eligible asset to voucher (try count ${tryCount}):`,
+          error,
+        );
+        if (tryCount < 3) {
+          await sleep(3000 * tryCount);
+          await retryableAddEligibleAsset(tryCount + 1);
+        } else {
+          throw new Error(
+            `Failed to add eligible asset to voucher after ${tryCount} attempts`,
+          );
+        }
+      }
+    };
+    await retryableAddEligibleAsset();
   };

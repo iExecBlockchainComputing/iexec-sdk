@@ -111,6 +111,12 @@
       "browser": "./dist/esm/lib/IExecTaskModule.js",
       "default": "./dist/esm/lib/IExecTaskModule.js"
     },
+    "./IExecVoucherModule": {
+      "types": "./dist/esm/lib/IExecVoucherModule.d.ts",
+      "import": "./dist/esm/lib/IExecVoucherModule.js",
+      "browser": "./dist/esm/lib/IExecVoucherModule.js",
+      "default": "./dist/esm/lib/IExecVoucherModule.js"
+    },
     "./IExecWalletModule": {
       "types": "./dist/esm/lib/IExecWalletModule.d.ts",
       "import": "./dist/esm/lib/IExecWalletModule.js",
@@ -141,11 +147,13 @@
     "npm": ">=8"
   },
   "scripts": {
+    "format": "prettier --write .",
+    "check-format": "prettier --check .",
     "lint": "eslint src",
     "build": "npm run build:codegen && npm run build:dist && npm run build:packages && npm run build:doc",
     "test": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "stop-test-stack": "cd test && docker compose down --remove-orphans",
-    "start-test-stack": "cd test && npm run stop-test-stack && node scripts/prepare-test-env.js && docker compose up -d",
+    "stop-test-stack": "cd test && docker compose down --remove-orphans --volumes",
+    "start-test-stack": "cd test && npm run stop-test-stack && node scripts/prepare-test-env.js && docker compose pull && docker compose up -d",
     "build:codegen": "rimraf src/common/generated && node generateEsModulesFromJson.cjs",
     "build:dist": "rimraf dist && mkdir dist && mkdir dist/esm && cp -r src/. dist/esm/",
     "build:packages": "node generatePackages.cjs",
@@ -173,6 +181,7 @@
     "IExecSecretsModule",
     "IExecStorageModule",
     "IExecTaskModule",
+    "IExecVoucherModule",
     "IExecWalletModule",
     "IExecWorkerpoolModule",
     "errors",
@@ -192,6 +201,7 @@
     "@ensdomains/ens-contracts": "^0.0.22",
     "@iexec/erlc": "^1.0.0",
     "@iexec/poco": "^5.5.0",
+    "@iexec/voucher-contracts": "^1.0.0",
     "@multiformats/multiaddr": "^12.1.8",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
@@ -199,6 +209,7 @@
     "debug": "^4.3.4",
     "ethers": "^6.13.1",
     "fs-extra": "^11.1.1",
+    "graphql-request": "^7.0.1",
     "inquirer": "^9.2.11",
     "is-docker": "^3.0.0",
     "jszip": "^3.10.1",

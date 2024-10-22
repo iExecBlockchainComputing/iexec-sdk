@@ -5,6 +5,10 @@ import {
   deposit as accountDeposit,
   withdraw as accountWithdraw,
 } from '../../common/account/fund.js';
+import {
+  approve as accountApprove,
+  checkAllowance,
+} from '../../common/account/allowance.js';
 import { checkBalance } from '../../common/account/balance.js';
 import { Keystore } from '../utils/keystore.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
@@ -130,6 +134,92 @@ show
           raw: { balance: cleanBalance },
         },
       );
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const approve = cli.command('approve <amount> <spender> [unit]');
+addGlobalOptions(approve);
+addWalletLoadOptions(approve);
+approve
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.txConfirms())
+  .description(desc.approve())
+  .action(async (amount, spender, unit = 'nRLC', opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
+      const keystore = Keystore(walletOptions);
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
+      await connectKeystore(chain, keystore, { txOptions });
+      spinner.start(info.approving());
+      const txHash = await accountApprove(
+        chain.contracts,
+        [amount, unit],
+        spender,
+      );
+      spinner.succeed(info.approved(amount, spender, unit), {
+        raw: { txHash },
+      });
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const allowance = cli.command('allowance <spender>');
+addGlobalOptions(allowance);
+addWalletLoadOptions(allowance);
+allowance
+  .option(...option.chain())
+  .option(...option.user())
+  .description(desc.allowance())
+  .action(async (spender, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = computeWalletLoadOptions(opts);
+      const keystore = Keystore({ ...walletOptions, isSigner: false });
+      const [chain, [address]] = await Promise.all([
+        loadChain(opts.chain, { spinner }),
+        keystore.accounts(),
+      ]);
+      const owner = opts.user || address;
+      spinner.start(info.checkingAllowance(spender, owner));
+      const amount = await checkAllowance(chain.contracts, owner, spender);
+      spinner.succeed(info.allowance(spender, owner, amount), {
+        raw: { amount },
+      });
+    } catch (error) {
+      handleError(error, cli, opts);
+    }
+  });
+
+const revoke = cli.command('revoke <spender>');
+addGlobalOptions(revoke);
+addWalletLoadOptions(revoke);
+revoke
+  .option(...option.chain())
+  .option(...option.txGasPrice())
+  .option(...option.txConfirms())
+  .description(desc.revoke())
+  .action(async (spender, opts) => {
+    await checkUpdate(opts);
+    const spinner = Spinner(opts);
+    try {
+      const walletOptions = computeWalletLoadOptions(opts);
+      const txOptions = await computeTxOptions(opts);
+      const keystore = Keystore(walletOptions);
+      const chain = await loadChain(opts.chain, { txOptions, spinner });
+      await connectKeystore(chain, keystore, { txOptions });
+      spinner.start(info.revoking(spender));
+      const txHash = await accountApprove(chain.contracts, 0, spender);
+      spinner.succeed(info.revoked(spender), {
+        raw: { txHash },
+      });
     } catch (error) {
       handleError(error, cli, opts);
     }
