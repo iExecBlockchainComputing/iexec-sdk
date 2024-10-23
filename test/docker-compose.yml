@@ -32,8 +32,7 @@ services:
   voucher-subgraph-deployer:
     restart: 'no'
     # https://github.com/iExecBlockchainComputing/iexec-voucher-subgraph
-    # TODO replace image with iexechub/voucher-subgraph-deployer when available
-    image: docker-regis.iex.ec/voucher-subgraph:8491d157
+    image: iexechub/voucher-subgraph-deployer:c0640e8d
     environment:
       RPC_URL: http://bellecour-fork:8545
       GRAPHNODE_URL: http://graphnode:8020
