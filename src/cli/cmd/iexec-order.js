@@ -343,7 +343,6 @@ sign
           const orderObj = await createRequestorder(
             {
               contracts: chain.contracts,
-              resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
             },
             loadedOrder,
           );
@@ -485,7 +484,6 @@ fill
         const unsignedOrder = await createRequestorder(
           {
             contracts: chain.contracts,
-            resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
           },
           {
             app: appOrder.app,

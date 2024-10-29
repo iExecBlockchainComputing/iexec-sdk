@@ -198,9 +198,6 @@ describe('order', () => {
         datasetmaxprice: '0',
         params: {
           iexec_result_storage_provider: 'ipfs',
-          iexec_result_storage_proxy:
-            iexecTestChain.resultProxyURL ||
-            iexecTestChain.defaults.resultProxyURL,
         },
         requester: wallet.address,
         tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -229,6 +226,7 @@ describe('order', () => {
         params: {
           iexec_result_storage_provider: 'dropbox',
           iexec_result_encryption: true,
+          iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
         },
         tag: ['tee', 'scone'],
         trust: '100',
@@ -245,6 +243,7 @@ describe('order', () => {
         params: {
           iexec_result_storage_provider: 'dropbox',
           iexec_result_encryption: true,
+          iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
         },
         requester: wallet.address,
         tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
@@ -281,9 +280,6 @@ describe('order', () => {
             1: 'foo',
           },
           iexec_result_storage_provider: 'ipfs',
-          iexec_result_storage_proxy:
-            iexecTestChain.resultProxyURL ||
-            iexecTestChain.defaults.resultProxyURL,
         },
         requester: wallet.address,
         tag: '0x0000000000000000000000000000000000000000000000000000000000000003',

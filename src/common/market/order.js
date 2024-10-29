@@ -1182,7 +1182,7 @@ export const createWorkerpoolorder = async (
 });
 
 export const createRequestorder = async (
-  { contracts = throwIfMissing(), resultProxyURL = throwIfMissing() } = {},
+  { contracts = throwIfMissing() } = {},
   {
     app = throwIfMissing(),
     category = throwIfMissing(),
@@ -1227,7 +1227,6 @@ export const createRequestorder = async (
       callback: await addressSchema({
         ethProvider: contracts.provider,
       }).validate(callback),
-      resultProxyURL,
     }),
     callback: await addressSchema({
       ethProvider: contracts.provider,

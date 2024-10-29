@@ -237,7 +237,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.workerpool.price).toBe('0');
       expect(resDeal.deal.category).toBe('0');
       expect(resDeal.deal.params).toBe(
-        `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${testChain.resultProxyURL}"}`,
+        `{"iexec_result_storage_provider":"ipfs"}`,
       );
       expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
       expect(resDeal.deal.requester).toBe(userWallet.address);
@@ -276,7 +276,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.workerpool.price).toBe('0');
       expect(resDeal.deal.category).toBe('0');
       expect(resDeal.deal.params).toBe(
-        `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${testChain.resultProxyURL}"}`,
+        `{"iexec_result_storage_provider":"ipfs"}`,
       );
       expect(resDeal.deal.callback).toBe(NULL_ADDRESS);
       expect(resDeal.deal.requester).toBe(userWallet.address);
@@ -478,7 +478,7 @@ describe('iexec app', () => {
         expect(resDeal.deal.requester).toBe(userWallet.address);
         expect(resDeal.deal.beneficiary).toBe(userWallet.address);
         expect(resDeal.deal.params).toBe(
-          `{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"${testChain.resultProxyURL}"}`,
+          `{"iexec_result_storage_provider":"ipfs"}`,
         );
         expect(resDeal.deal.botFirst).toBe('0');
         expect(resDeal.deal.botSize).toBe('1');
