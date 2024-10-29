@@ -9,7 +9,6 @@
 ### Properties
 
 - [iexec\_args](internal_.RequestorderParams.md#iexec_args)
-- [iexec\_developer\_logger](internal_.RequestorderParams.md#iexec_developer_logger)
 - [iexec\_input\_files](internal_.RequestorderParams.md#iexec_input_files)
 - [iexec\_result\_encryption](internal_.RequestorderParams.md#iexec_result_encryption)
 - [iexec\_result\_storage\_provider](internal_.RequestorderParams.md#iexec_result_storage_provider)
@@ -23,18 +22,6 @@
 • `Optional` **iexec\_args**: `string`
 
 arguments to pass to the app
-
-___
-
-### iexec\_developer\_logger
-
-• `Optional` **iexec\_developer\_logger**: `boolean`
-
-[deprecated]
-
-enable debug logs
-
-default false
 
 ___
 
