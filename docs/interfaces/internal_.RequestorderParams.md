@@ -63,8 +63,6 @@ ___
 
 result proxy url
 
-default determined by IExecConfig
-
 ___
 
 ### iexec\_secrets
