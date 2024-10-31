@@ -336,19 +336,8 @@ export const objParamsSchema = () =>
             (value) => value === undefined,
           ),
     ),
-    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
-      `${IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER}`,
-      ([provider], providerSchema) =>
-        provider === STORAGE_PROVIDERS.IPFS
-          ? providerSchema
-              .when('$resultProxyURL', ([resultProxyURL], schema) =>
-                schema.default(resultProxyURL),
-              )
-              .required(
-                `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`,
-              )
-          : providerSchema.notRequired(),
-    ),
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]:
+      basicUrlSchema().notRequired(),
     [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
   })
     .json()

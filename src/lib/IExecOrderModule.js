@@ -68,7 +68,6 @@ export default class IExecOrderModule extends IExecModule {
       createRequestorder(
         {
           contracts: await this.config.resolveContractsClient(),
-          resultProxyURL: await this.config.resolveResultProxyURL(),
         },
         overwrite,
       );
