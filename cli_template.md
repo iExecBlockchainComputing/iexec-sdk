@@ -403,7 +403,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `pocoSubgraph` set the url of the PoCo subgraph used by the SDK cli on each chain (overwrite default value).
   - optional key `voucherSubgraph` set the url of the voucher subgraph used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
-  - optional key `enterprise` set the enterprise swap contract used by the SDK cli when working with enterprise enabled networks. `bridge.enterpriseSwapChainName` set the reference to the enterprise bound network.
   - optional key `voucherHub` set the address of the voucher hub contract used by the SDK cli on each chain (overwrite default value).
   - optional key `native` specify whether or not the chain native token is RLC (overwrite default value: chain value or `false`).
   - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction (overwrite default value: chain value or `true`).
@@ -425,14 +424,10 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
-      "flavour": "standard",
       "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
         "bridgedChainName": "dev-sidechain"
-      },
-      "enterprise": {
-        "enterpriseSwapChainName": "dev-enterprise"
       }
     },
     "dev-sidechain": {
@@ -445,25 +440,10 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "ipfsGateway": "http://localhost:18080",
       "native": true,
       "useGas": false,
-      "flavour": "standard",
       "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
         "bridgedChainName": "development"
-      }
-    },
-    "dev-enterprise": {
-      "host": "http://localhost:8545",
-      "id": "65535",
-      "sms": {
-        "scone": "http://localhost:5000"
-      },
-      "resultProxy": "http://localhost:8089",
-      "ipfsGateway": "http://localhost:8080",
-      "flavour": "enterprise",
-      "hub": "0xb80C02d24791fA92fA8983f15390274698A75D23",
-      "enterprise": {
-        "enterpriseSwapChainName": "dev"
       }
     },
     "mainnet": {},

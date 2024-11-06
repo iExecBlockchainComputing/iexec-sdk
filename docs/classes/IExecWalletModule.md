@@ -32,8 +32,6 @@ module exposing wallet methods
 - [sendETH](IExecWalletModule.md#sendeth)
 - [sendRLC](IExecWalletModule.md#sendrlc)
 - [sweep](IExecWalletModule.md#sweep)
-- [unwrapEnterpriseRLC](IExecWalletModule.md#unwrapenterpriserlc)
-- [wrapEnterpriseRLC](IExecWalletModule.md#wrapenterpriserlc)
 - [fromConfig](IExecWalletModule.md#fromconfig)
 
 ## Constructors
@@ -341,58 +339,6 @@ console.log('sweep ether transaction hash:', sendNativeTxHash);
 #### Returns
 
 `Promise`<{ `sendERC20TxHash`: `string` ; `sendNativeTxHash`: `string`  }\>
-
-___
-
-### unwrapEnterpriseRLC
-
-▸ **unwrapEnterpriseRLC**(`nRLCAmount`): `Promise`<`string`\>
-
-**SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
-
-unwrap some neRLC (enterprise nRLC) into nRLC
-
-example:
-```js
-const txHash = await unwrapEnterpriseRLC(amount);
-console.log(`unwrapped ${amount} neRLC into nRLC (tx: ${txHash})`);
-```
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
-
-#### Returns
-
-`Promise`<`string`\>
-
-___
-
-### wrapEnterpriseRLC
-
-▸ **wrapEnterpriseRLC**(`nRLCAmount`): `Promise`<`string`\>
-
-**SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
-
-wrap some nRLC into neRLC (enterprise nRLC)
-
-example:
-```js
-const txHash = await wrapEnterpriseRLC(amount);
-console.log(`wrapped ${amount} nRLC into neRLC (tx: ${txHash})`);
-```
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
-
-#### Returns
-
-`Promise`<`string`\>
 
 ___
 

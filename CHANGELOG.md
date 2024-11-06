@@ -8,6 +8,25 @@ All notable changes to this project will be documented in this file.
 
 - `iexec_result_storage_proxy` default value is no more set in request params
 
+### Removed
+
+- IExec `enterprise` flavour is removed, although `enterprise` flavour support was dropped for a while the "enterprise" specific methods and keys were still present in `iexec` SDK. These are now removed, although the changes impact some parts of the API, these changes should not impact developers using the `iexec` package.
+  - [BREAKING] `IExecModule`
+    - removed optional constructor param `flavour`
+  - [BREAKING] `IExecConfig`
+    - removed `resolveStandardContractsClient` and `resolveEnterpriseContractsClient` methods
+    - removed optional constructor param `flavour` and `enterpriseSwapConf`
+  - [BREAKING] `IExecWalletModule`
+    - removed `wrapEnterpriseRLC` and `unwrapEnterpriseRLC` methods
+  - [BREAKING] `IExecContractsClient`
+    - removed optional constructor param `flavour`
+    - removed `flavour` key
+  - [BREAKING] CLI `chain.json` configuration file
+    - removed `flavour` key
+    - removed `[chainName].enterprise` key
+  - [BREAKING] CLI `iexec wallet` command
+    - removed `swap-RLC-for-eRLC` and `swap-eRLC-for-RLC`
+
 ## [8.12.0] 2024-10-22
 
 ### Added

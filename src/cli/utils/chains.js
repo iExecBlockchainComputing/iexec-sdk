@@ -1,8 +1,5 @@
 import Debug from 'debug';
-import {
-  getChainDefaults,
-  isEnterpriseEnabled,
-} from '../../common/utils/config.js';
+import { getChainDefaults } from '../../common/utils/config.js';
 import IExecContractsClient from '../../common/utils/IExecContractsClient.js';
 import { EnhancedWallet } from '../../common/utils/signers.js';
 import { loadChainConf } from './fs.js';
@@ -17,23 +14,16 @@ const CHAIN_ALIASES_MAP = {
 };
 
 const CHAIN_NAME_MAP = {
-  1: { id: '1', flavour: 'standard' },
-  mainnet: { id: '1', flavour: 'standard' },
-  134: { id: '134', flavour: 'standard' },
-  bellecour: { id: '134', flavour: 'standard' },
-  enterprise: { id: '1', flavour: 'enterprise' },
-};
-
-const ENTERPRISE_SWAP_MAP = {
-  1: 'enterprise',
-  mainnet: 'enterprise',
-  enterprise: 'mainnet',
+  1: { id: '1' },
+  mainnet: { id: '1' },
+  134: { id: '134' },
+  bellecour: { id: '134' },
 };
 
 const createChainFromConf = (
   chainName,
   chainConf,
-  { bridgeConf, enterpriseSwapConf, providerOptions, txOptions = {} } = {},
+  { bridgeConf, providerOptions, txOptions = {} } = {},
 ) => {
   try {
     const chain = { ...chainConf };
@@ -48,7 +38,6 @@ const createChainFromConf = (
       hubAddress: chain.hub,
       useGas: chain.useGas,
       isNative: chain.native,
-      flavour: chain.flavour,
       confirms: txOptions.confirms,
     });
     chain.contracts = contracts;
@@ -63,19 +52,6 @@ const createChainFromConf = (
         hubAddress: bridgeConf.hub,
         useGas: bridgeConf.useGas,
         isNative: bridgeConf.native,
-        flavour: bridgeConf.flavour,
-        confirms: txOptions.confirms,
-      });
-    }
-    if (enterpriseSwapConf) {
-      chain.enterpriseSwapNetwork = { ...enterpriseSwapConf };
-      chain.enterpriseSwapNetwork.contracts = new IExecContractsClient({
-        provider,
-        chainId: enterpriseSwapConf.id,
-        hubAddress: enterpriseSwapConf.hub,
-        useGas: enterpriseSwapConf.useGas,
-        isNative: enterpriseSwapConf.native,
-        flavour: enterpriseSwapConf.flavour,
         confirms: txOptions.confirms,
       });
     }
@@ -119,18 +95,17 @@ export const loadChain = async (
     if (!name)
       throw Error('Missing chain parameter. Check your "chain.json" file');
 
-    const idAndFlavour = {
+    const idConf = {
       ...CHAIN_NAME_MAP[name],
       ...(loadedConf.id && { id: loadedConf.id }),
-      ...(loadedConf.flavour && { flavour: loadedConf.flavour }),
     };
 
-    const defaultConf = getChainDefaults(idAndFlavour);
+    const defaultConf = getChainDefaults(idConf);
 
     debug('loading chain', name);
     debug('loadedConf', loadedConf);
     debug('defaultConf', defaultConf);
-    const conf = { ...idAndFlavour, ...defaultConf, ...loadedConf };
+    const conf = { ...idConf, ...defaultConf, ...loadedConf };
     debug('conf', conf);
     if (!conf.host) {
       throw Error(
@@ -152,16 +127,15 @@ export const loadChain = async (
         if (!bridgeLoadedConf)
           throw Error(`Missing "${name}" chain in "chain.json"`);
       }
-      const bridgedIdAndFlavour = {
+      const bridgeIdConf = {
         ...CHAIN_NAME_MAP[bridgedChainNameOrId],
         ...(bridgeLoadedConf.id && { id: bridgeLoadedConf.id }),
-        ...(bridgeLoadedConf.flavour && { flavour: bridgeLoadedConf.flavour }),
       };
-      const bridgeDefaultConf = getChainDefaults(bridgedIdAndFlavour);
+      const bridgeDefaultConf = getChainDefaults(bridgeIdConf);
       debug('bridgeLoadedConf', bridgeLoadedConf);
       debug('bridgeDefaultConf', defaultConf);
       bridgeConf = {
-        ...bridgedIdAndFlavour,
+        ...bridgeIdConf,
         ...bridgeDefaultConf,
         ...bridgeLoadedConf,
       };
@@ -172,45 +146,8 @@ export const loadChain = async (
       }
     }
     debug('bridged chain', bridgeConf);
-
-    let enterpriseSwapConf;
-    const enterpriseSwapChainName =
-      (conf.enterprise && conf.enterprise.enterpriseSwapChainName) ||
-      ENTERPRISE_SWAP_MAP[name];
-    const enterpriseSwapFlavour =
-      conf.flavour === 'enterprise' ? 'standard' : 'enterprise';
-    if (isEnterpriseEnabled(conf.id) || enterpriseSwapChainName) {
-      let enterpriseSwapLoadedConf;
-      if (chainsConf.chains[enterpriseSwapChainName]) {
-        enterpriseSwapLoadedConf = chainsConf.chains[enterpriseSwapChainName];
-      }
-      const enterpriseSwapIdAndFlavour = {
-        ...CHAIN_NAME_MAP[enterpriseSwapChainName],
-        ...(enterpriseSwapLoadedConf &&
-          enterpriseSwapLoadedConf.id && { id: enterpriseSwapLoadedConf.id }),
-        flavour: enterpriseSwapFlavour,
-      };
-      const enterpriseSwapDefaultConf = getChainDefaults(
-        enterpriseSwapIdAndFlavour,
-      );
-      debug('enterpriseSwapLoadedConf', enterpriseSwapLoadedConf);
-      debug('enterpriseSwapDefaultConf', defaultConf);
-      enterpriseSwapConf = {
-        ...enterpriseSwapIdAndFlavour,
-        ...{ host: conf.host },
-        ...enterpriseSwapDefaultConf,
-        ...enterpriseSwapLoadedConf,
-      };
-      if (!enterpriseSwapConf.host) {
-        throw Error(
-          `Missing RPC host for enterprise bound chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`,
-        );
-      }
-    }
-    debug('enterprise swap chain', enterpriseSwapConf);
     const chain = createChainFromConf(name, conf, {
       bridgeConf,
-      enterpriseSwapConf,
       providerOptions,
       txOptions,
     });

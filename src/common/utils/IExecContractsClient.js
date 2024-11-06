@@ -11,65 +11,43 @@ import appDesc from '../generated/@iexec/poco/App.js';
 import workerpoolDesc from '../generated/@iexec/poco/Workerpool.js';
 import datasetDesc from '../generated/@iexec/poco/Dataset.js';
 import rlcDesc from '../generated/@iexec/rlc/RLC.js';
-import erlcDesc from '../generated/@iexec/erlc/ERLCTokenSwap.js';
 
 const debug = Debug('iexec:IExecContractsClient');
 
-const enterpriseHubMap = {
-  1: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
-  5: '0x0bf375A6238359CE14987C2285B8B099eE8e8709',
-};
-
-const nativeNetworks = {
-  standard: ['134'],
-  enterprise: [],
-};
+const nativeNetworks = ['134'];
 
 const gasPriceByNetwork = {
   134: 0n,
 };
 
-const getHubAddress = (chainId, flavour) => {
-  if (flavour === 'enterprise') {
-    if (enterpriseHubMap[chainId]) {
-      return enterpriseHubMap[chainId];
-    }
-    throw Error(
-      `Missing iExec enterprise contract default address for chain ${chainId}`,
-    );
-  } else {
-    if (
-      iexecProxyNetworks &&
-      iexecProxyNetworks[chainId] &&
-      iexecProxyNetworks[chainId].address
-    ) {
-      return iexecProxyNetworks[chainId].address;
-    }
-    throw Error(`Missing iExec contract default address for chain ${chainId}`);
+const getHubAddress = (chainId) => {
+  if (
+    iexecProxyNetworks &&
+    iexecProxyNetworks[chainId] &&
+    iexecProxyNetworks[chainId].address
+  ) {
+    return iexecProxyNetworks[chainId].address;
   }
+  throw Error(`Missing iExec contract default address for chain ${chainId}`);
 };
 
-const getIsNative = (chainId, flavour) =>
-  nativeNetworks[flavour].includes(chainId);
+const getIsNative = (chainId) => nativeNetworks.includes(chainId);
 
 const getGasPriceOverride = (chainId) => gasPriceByNetwork[chainId];
 
-const getTokenDesc = (isNative, flavour) => {
+const getTokenDesc = (isNative) => {
   if (isNative) {
     return undefined;
-  }
-  if (flavour === 'enterprise') {
-    return erlcDesc;
   }
   return rlcDesc;
 };
 
-const getContractsDescMap = (isNative, flavour) => ({
+const getContractsDescMap = (isNative) => ({
   hub: {
     contractDesc: isNative ? iexecNativeDesc : iexecTokenDesc,
   },
   token: {
-    contractDesc: getTokenDesc(isNative, flavour),
+    contractDesc: getTokenDesc(isNative),
     hubPropName: 'token',
   },
   app: {
@@ -104,13 +82,12 @@ const createClient = ({
   chainId,
   globalHubAddress,
   isNative,
-  flavour,
 }) => {
   const cachedAddresses = {};
 
-  const contractsDescMap = getContractsDescMap(isNative, flavour);
+  const contractsDescMap = getContractsDescMap(isNative);
 
-  const hubAddress = globalHubAddress || getHubAddress(chainId, flavour);
+  const hubAddress = globalHubAddress || getHubAddress(chainId);
 
   const getContract = (objName, address) => {
     try {
@@ -185,7 +162,6 @@ const createClient = ({
   return {
     pocoVersion,
     isNative,
-    flavour,
     hubAddress,
     getContract,
     getIExecContract,
@@ -204,7 +180,6 @@ class IExecContractsClient {
     hubAddress,
     useGas = true,
     isNative,
-    flavour = 'standard',
     confirms = 1,
   } = {}) {
     const stringChainId = `${chainId}`;
@@ -212,8 +187,6 @@ class IExecContractsClient {
     if (!stringChainId) throw Error('missing chainId key');
     if (!Number.isInteger(confirms) || confirms <= 0)
       throw Error('invalid confirms');
-    if (flavour !== 'standard' && flavour !== 'enterprise')
-      throw Error('invalid flavour');
 
     this._args = {
       provider,
@@ -222,11 +195,10 @@ class IExecContractsClient {
       hubAddress,
       useGas,
       isNative,
-      flavour,
     };
 
     const native =
-      isNative !== undefined ? !!isNative : getIsNative(stringChainId, flavour);
+      isNative !== undefined ? !!isNative : getIsNative(stringChainId);
 
     const gasPriceOverride =
       useGas === false ? 0n : getGasPriceOverride(stringChainId);
@@ -237,7 +209,6 @@ class IExecContractsClient {
       chainId: stringChainId,
       globalHubAddress: hubAddress,
       isNative: native,
-      flavour,
     });
 
     this.setSigner = (ethSigner) => {

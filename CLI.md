@@ -359,8 +359,6 @@ Commands:
 - [sweep](#iexec-wallet-sweep)
 - [bridge-to-sidechain](#iexec-wallet-bridge-to-sidechain)
 - [bridge-to-mainchain](#iexec-wallet-bridge-to-mainchain)
-- [swap-RLC-for-eRLC](#iexec-wallet-swap-rlc-for-erlc)
-- [swap-eRLC-for-RLC](#iexec-wallet-swap-erlc-for-rlc)
 - [sendRLC](#iexec-wallet-sendrlc)
 
 #### iexec wallet create
@@ -541,56 +539,6 @@ Usage:
 
 ```sh
 iexec wallet bridge-to-mainchain <amount> [unit] [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force | force perform action without prompting user |
-
-#### iexec wallet swap-RLC-for-eRLC
-
-swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC
-
-Usage:
-
-```sh
-iexec wallet swap-RLC-for-eRLC <amount> [unit] [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force | force perform action without prompting user |
-
-#### iexec wallet swap-eRLC-for-RLC
-
-swap eRLC for the same amount of RLC (default unit neRLC) - the wallet must be authorized to interact with eRLC
-
-Usage:
-
-```sh
-iexec wallet swap-eRLC-for-RLC <amount> [unit] [options]
 ```
 
 Options:
@@ -2752,7 +2700,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `pocoSubgraph` set the url of the PoCo subgraph used by the SDK cli on each chain (overwrite default value).
   - optional key `voucherSubgraph` set the url of the voucher subgraph used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
-  - optional key `enterprise` set the enterprise swap contract used by the SDK cli when working with enterprise enabled networks. `bridge.enterpriseSwapChainName` set the reference to the enterprise bound network.
   - optional key `voucherHub` set the address of the voucher hub contract used by the SDK cli on each chain (overwrite default value).
   - optional key `native` specify whether or not the chain native token is RLC (overwrite default value: chain value or `false`).
   - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction (overwrite default value: chain value or `true`).
@@ -2774,14 +2721,10 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
-      "flavour": "standard",
       "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
         "bridgedChainName": "dev-sidechain"
-      },
-      "enterprise": {
-        "enterpriseSwapChainName": "dev-enterprise"
       }
     },
     "dev-sidechain": {
@@ -2794,25 +2737,10 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "ipfsGateway": "http://localhost:18080",
       "native": true,
       "useGas": false,
-      "flavour": "standard",
       "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
       "bridge": {
         "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
         "bridgedChainName": "development"
-      }
-    },
-    "dev-enterprise": {
-      "host": "http://localhost:8545",
-      "id": "65535",
-      "sms": {
-        "scone": "http://localhost:5000"
-      },
-      "resultProxy": "http://localhost:8089",
-      "ipfsGateway": "http://localhost:8080",
-      "flavour": "enterprise",
-      "hub": "0xb80C02d24791fA92fA8983f15390274698A75D23",
-      "enterprise": {
-        "enterpriseSwapChainName": "dev"
       }
     },
     "mainnet": {},

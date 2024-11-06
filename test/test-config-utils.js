@@ -12,7 +12,6 @@ export const getTestConfigOptions =
     ensPublicResolverAddress:
       options.ensPublicResolverAddress ?? chain.ensPublicResolverAddress,
     ensRegistryAddress: options.ensRegistryAddress ?? chain.ensRegistryAddress,
-    enterpriseSwapConf: options.enterpriseSwapConf ?? chain.enterpriseSwapConf,
     hubAddress: options.hubAddress ?? chain.hubAddress,
     voucherHubAddress: options.voucherHubAddress ?? chain.voucherHubAddress,
     iexecGatewayURL: options.iexecGatewayURL ?? chain.iexecGatewayURL,

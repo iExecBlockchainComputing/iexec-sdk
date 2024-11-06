@@ -1,7 +1,6 @@
 import Debug from 'debug';
 import BN from 'bn.js';
 import { getAddress } from '../wallet/address.js';
-import { isInWhitelist } from '../wallet/enterprise.js';
 import { checkBalance } from '../account/balance.js';
 import {
   checkDeployedApp,
@@ -612,64 +611,6 @@ const getMatchableVolume = async (
       checkWorkerpoolSignAsync(),
       checkRequestSignAsync(),
     ]);
-
-    // enterprise KYC checks
-    if (contracts.flavour === 'enterprise') {
-      debug('check enterprise');
-      const checkRequesterInWhitelistAsync = async () => {
-        const isKYC = await isInWhitelist(contracts, vRequestOrder.requester, {
-          strict: false,
-        });
-        debug('requester in whitelist', isKYC);
-        if (!isKYC) {
-          throw new Error(
-            `requester ${vRequestOrder.requester} is not authorized to interact with eRLC`,
-          );
-        }
-      };
-      const checkAppOwnerInWhitelistAsync = async () => {
-        const owner = await getAppOwner(contracts, vAppOrder.app);
-        const isKYC = await isInWhitelist(contracts, owner, { strict: false });
-        debug('app owner in whitelist', isKYC);
-        if (!isKYC) {
-          throw new Error(
-            `app owner ${owner} is not authorized to interact with eRLC`,
-          );
-        }
-      };
-      const checkDatasetOwnerInWhitelistAsync = async () => {
-        if (vDatasetOrder.dataset === NULL_ADDRESS) {
-          return;
-        }
-        const owner = await getDatasetOwner(contracts, vDatasetOrder.dataset);
-        const isKYC = await isInWhitelist(contracts, owner, { strict: false });
-        debug('dataset owner in whitelist', isKYC);
-        if (!isKYC) {
-          throw new Error(
-            `dataset owner ${owner} is not authorized to interact with eRLC`,
-          );
-        }
-      };
-      const checkWorkerpoolOwnerInWhitelistAsync = async () => {
-        const owner = await getWorkerpoolOwner(
-          contracts,
-          vWorkerpoolOrder.workerpool,
-        );
-        const isKYC = await isInWhitelist(contracts, owner, { strict: false });
-        debug('workerpool owner in whitelist', isKYC);
-        if (!isKYC) {
-          throw new Error(
-            `workerpool owner ${owner} is not authorized to interact with eRLC`,
-          );
-        }
-      };
-      await Promise.all([
-        checkRequesterInWhitelistAsync(),
-        checkAppOwnerInWhitelistAsync(),
-        checkDatasetOwnerInWhitelistAsync(),
-        checkWorkerpoolOwnerInWhitelistAsync(),
-      ]);
-    }
 
     // address checks
     if (vRequestOrder.app !== vAppOrder.app) {

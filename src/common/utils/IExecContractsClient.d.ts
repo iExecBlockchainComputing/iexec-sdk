@@ -30,10 +30,6 @@ export default class IExecContractsClient {
      */
     isNative?: boolean;
     /**
-     * flavour to use (default standard)
-     */
-    flavour?: string;
-    /**
      * number of block to wait for transactions confirmation (default 1)
      */
     confirms?: number;
@@ -54,10 +50,6 @@ export default class IExecContractsClient {
    * true if current instance use native token
    */
   isNative: string;
-  /**
-   * current IExec flavour
-   */
-  flavour: string;
   /**
    * current IExec contract address
    */
