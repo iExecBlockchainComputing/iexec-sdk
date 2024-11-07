@@ -149,53 +149,56 @@ export const getRandomAddress = () => getRandomWallet().address;
 
 export const getRandomBytes32 = () => hexlify(randomBytes(32));
 export class InjectedProvider {
-  constructor(rpcUrl, privateKey) {
-    this.signer = new Wallet(
-      privateKey,
-      new JsonRpcProvider(rpcUrl, undefined, { pollingInterval: 100 }), // fast polling for tests
-    );
+  constructor(rpcUrl, privateKey, { mockUserRejection, mockError } = {}) {
+    this.provider = new JsonRpcProvider(rpcUrl, undefined, {
+      pollingInterval: 100,
+    }); // fast polling for tests
+    this.signer = new Wallet(privateKey, this.provider);
+    this.mockUserRejection = mockUserRejection;
+    this.mockError = mockError;
   }
 
   async request(args) {
     const { method, params } = args;
-    let rpcPromise;
     switch (method) {
       case 'eth_requestAccounts':
       case 'eth_accounts':
-        rpcPromise = Promise.resolve([this.signer.address]);
-        break;
+        return Promise.resolve([this.signer.address]);
       case 'eth_chainId':
-        rpcPromise = this.signer.provider
+        return this.provider
           .getNetwork()
           .then((network) => network.chainId.toString());
-        break;
+      case 'eth_blockNumber':
+        return this.provider.getBlockNumber();
       case 'personal_sign':
-        rpcPromise = this.signer.signMessage(params[0]);
-        break;
+        if (this.mockError) return Promise.reject(Error('error'));
+        if (this.mockUserRejection) return Promise.reject(Error('user denied'));
+        return this.signer.signMessage(params[0]);
       case 'eth_signTypedData_v3':
       case 'eth_signTypedData_v4':
-        rpcPromise = (async () => {
+        if (this.mockError) return Promise.reject(Error('error'));
+        if (this.mockUserRejection) return Promise.reject(Error('user denied'));
+        return (async () => {
           const typedData = JSON.parse(params[1]);
           const { EIP712Domain, ...types } = typedData.types;
           const { message, domain } = typedData;
           return this.signer.signTypedData(domain, types, message);
         })();
-        break;
       case 'eth_call':
-        rpcPromise = this.provider.call(params[0]);
-        break;
+        return this.provider.call(params[0]);
+      case 'eth_estimateGas':
+        return this.provider.estimateGas(params[0]);
       case 'eth_sendTransaction':
-        rpcPromise = (async () => {
+        if (this.mockError) return Promise.reject(Error('error'));
+        if (this.mockUserRejection) return Promise.reject(Error('user denied'));
+        return (async () => {
           const { gas, ...gasStripped } = params[0];
           const transaction = await this.signer.sendTransaction(gasStripped);
           return transaction.hash;
         })();
-        break;
       default:
-        rpcPromise = Promise.reject(Error('not implemented'));
-        break;
+        return Promise.reject(Error('not implemented'));
     }
-    return rpcPromise;
   }
 }
 

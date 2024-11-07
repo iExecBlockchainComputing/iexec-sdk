@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Next
 
+### Added
+
+- added key `isUserRejection` in `Web3ProviderError` set to `true` when the error is detected as a user rejection
+
 ### Changed
 
 - `iexec_result_storage_proxy` default value is no more set in request params
