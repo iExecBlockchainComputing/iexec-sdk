@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - `iexec_result_storage_proxy` default value is no more set in request params
+- removed deprecated request param `iexec_developer_logger`
 
 ## [8.12.0] 2024-10-22
 

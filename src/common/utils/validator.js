@@ -338,7 +338,6 @@ export const objParamsSchema = () =>
     ),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]:
       basicUrlSchema().notRequired(),
-    [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
   })
     .json()
     .noUnknown(true, 'Unknown key "${unknown}" in params');
