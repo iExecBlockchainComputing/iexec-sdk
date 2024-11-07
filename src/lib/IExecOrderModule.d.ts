@@ -257,14 +257,6 @@ export interface RequestorderParams {
    * result proxy url
    */
   iexec_result_storage_proxy?: string;
-  /**
-   * [deprecated]
-   *
-   * enable debug logs
-   *
-   * default false
-   */
-  iexec_developer_logger?: boolean;
 }
 
 /**

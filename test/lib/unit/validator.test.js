@@ -753,17 +753,6 @@ describe('[objParamsSchema]', () => {
     );
   });
 
-  test('with logger (true)', async () => {
-    await expect(
-      objParamsSchema().validate({
-        iexec_developer_logger: true,
-      }),
-    ).resolves.toEqual({
-      iexec_developer_logger: true,
-      iexec_result_storage_provider: 'ipfs',
-    });
-  });
-
   test('with isCallback in context, do not populate storage', async () => {
     await expect(
       objParamsSchema().validate({}, { context: { isCallback: true } }),
@@ -776,6 +765,7 @@ describe('[objParamsSchema]', () => {
         foo: true,
         iexec_tee_post_compute_fingerprint: 'custom-fingerprint', // removed in in v6
         iexec_tee_post_compute_image: 'custom-image', // removed in in v6
+        iexec_developer_logger: true, // removed in v8
       }),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
