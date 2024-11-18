@@ -11,7 +11,6 @@
 - [confirms](IExecConfigOptions.md#confirms)
 - [defaultTeeFramework](IExecConfigOptions.md#defaultteeframework)
 - [ensPublicResolverAddress](IExecConfigOptions.md#enspublicresolveraddress)
-- [enterpriseSwapConf](IExecConfigOptions.md#enterpriseswapconf)
 - [hubAddress](IExecConfigOptions.md#hubaddress)
 - [iexecGatewayURL](IExecConfigOptions.md#iexecgatewayurl)
 - [ipfsGatewayURL](IExecConfigOptions.md#ipfsgatewayurl)
@@ -72,20 +71,6 @@ ___
 • `Optional` **ensPublicResolverAddress**: `string`
 
 override the ENS public resolver contract address to target a custom instance
-
-___
-
-### enterpriseSwapConf
-
-• `Optional` **enterpriseSwapConf**: `Object`
-
-override the enterprise configuration
-
-#### Type declaration
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `hubAddress?` | `string` | IExec enterprise contract address |
 
 ___
 

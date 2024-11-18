@@ -123,8 +123,7 @@ infoCmd
       const chain = await loadChain(opts.chain, { spinner });
 
       const host =
-        chain.host ===
-        getChainDefaults({ id: chain.id, flavour: chain.flavour }).host
+        chain.host === getChainDefaults({ id: chain.id }).host
           ? 'default'
           : chain.host;
       spinner.info(`Ethereum host: ${host}`);
@@ -132,7 +131,6 @@ infoCmd
       spinner.start(info.checking('iExec contracts info'));
 
       const useNative = !!chain.contracts.isNative;
-      const { flavour } = chain.contracts;
       const rlcAddress = useNative
         ? undefined
         : await wrapCall(chain.contracts.fetchTokenAddress());
@@ -148,7 +146,7 @@ infoCmd
       const { pocoVersion } = chain.contracts;
 
       const iexecAddresses = {
-        'iExec PoCo version': `${pocoVersion} ${flavour}`,
+        'iExec PoCo version': pocoVersion,
         ...((useNative && {
           'native RLC': true,
         }) || { 'RLC ERC20 address': rlcAddress }),
@@ -167,7 +165,6 @@ infoCmd
           datasetRegistryAddress,
           workerpoolRegistryAddress,
           useNative,
-          flavour,
         },
       });
     } catch (error) {

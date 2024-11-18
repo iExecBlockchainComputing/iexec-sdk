@@ -2,10 +2,7 @@ import Debug from 'debug';
 import { BrowserProvider, AbstractProvider, AbstractSigner } from 'ethers';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { ConfigurationError } from '../common/utils/errors.js';
-import {
-  getChainDefaults,
-  isEnterpriseEnabled,
-} from '../common/utils/config.js';
+import { getChainDefaults } from '../common/utils/config.js';
 import { TEE_FRAMEWORKS } from '../common/utils/constant.js';
 import { getReadOnlyProvider } from '../common/utils/providers.js';
 import { BrowserProviderSignerAdapter } from '../common/utils/signers.js';
@@ -18,7 +15,7 @@ const debug = Debug('iexec:IExecConfig');
 
 export default class IExecConfig {
   constructor(
-    { ethProvider, flavour = 'standard' } = {},
+    { ethProvider } = {},
     {
       hubAddress,
       ensPublicResolverAddress,
@@ -28,7 +25,6 @@ export default class IExecConfig {
       confirms,
       bridgeAddress,
       bridgedNetworkConf = {},
-      enterpriseSwapConf = {},
       smsURL,
       resultProxyURL,
       ipfsGatewayURL,
@@ -134,7 +130,7 @@ export default class IExecConfig {
 
     const chainConfDefaultsPromise = (async () => {
       const { chainId } = await networkPromise;
-      return getChainDefaults({ id: chainId, flavour });
+      return getChainDefaults({ id: chainId });
     })();
 
     chainConfDefaultsPromise.catch((err) => {
@@ -152,7 +148,6 @@ export default class IExecConfig {
           useGas,
           confirms,
           isNative,
-          flavour,
         });
       } catch (err) {
         throw new ConfigurationError(
@@ -163,45 +158,6 @@ export default class IExecConfig {
 
     contractsPromise.catch((err) => {
       debug('contractsPromise', err);
-    });
-
-    const enterpriseSwapContractsPromise = (async () => {
-      const { chainId } = await networkPromise;
-      const hasEnterpriseConf =
-        enterpriseSwapConf.hubAddress || isEnterpriseEnabled(chainId);
-      if (!hasEnterpriseConf) {
-        throw new ConfigurationError(
-          `enterpriseSwapConf option not set and no default value for your chain ${chainId}`,
-        );
-      }
-      const enterpriseSwapFlavour =
-        flavour === 'enterprise' ? 'standard' : 'enterprise';
-      const enterpriseConf = {
-        ...getChainDefaults({
-          id: chainId,
-          flavour: enterpriseSwapFlavour,
-        }),
-        ...enterpriseSwapConf,
-      };
-      try {
-        return new IExecContractsClient({
-          chainId,
-          provider,
-          signer,
-          hubAddress: enterpriseConf.hubAddress,
-          confirms,
-          isNative: enterpriseConf.isNative,
-          flavour: enterpriseSwapFlavour,
-        });
-      } catch (err) {
-        throw new ConfigurationError(
-          `Failed to create enterprise swap contracts client: ${err.message}`,
-        );
-      }
-    })();
-
-    enterpriseSwapContractsPromise.catch((err) => {
-      debug('enterpriseSwapContractsPromise', err);
     });
 
     const bridgedConfPromise = (async () => {
@@ -226,7 +182,6 @@ export default class IExecConfig {
       }
       const bridgedChainConfDefaults = getChainDefaults({
         id: bridgedChainId,
-        flavour,
       });
       const bridgedRpcUrl =
         bridgedNetworkConf.rpcURL !== undefined
@@ -251,8 +206,7 @@ export default class IExecConfig {
       return {
         chainId: bridgedChainId,
         rpcURL: bridgedRpcUrl,
-        isNative:
-          flavour === 'standard' ? !contracts.isNative : contracts.isNative,
+        isNative: !contracts.isNative,
         hubAddress: bridgedNetworkConf.hubAddress,
         bridgeAddress: bridgedBridgeAddress,
       };
@@ -273,7 +227,6 @@ export default class IExecConfig {
           hubAddress: bridgedConf.hubAddress,
           confirms,
           isNative: bridgedConf.isNative,
-          flavour,
         });
       } catch (err) {
         throw new ConfigurationError(
@@ -290,22 +243,6 @@ export default class IExecConfig {
     this.resolveContractsClient = async () => contractsPromise;
 
     this.resolveBridgedContractsClient = async () => bridgedContractsPromise;
-
-    this.resolveStandardContractsClient = async () => {
-      const contracts = await contractsPromise;
-      if (contracts.flavour === 'standard') {
-        return contracts;
-      }
-      return enterpriseSwapContractsPromise;
-    };
-
-    this.resolveEnterpriseContractsClient = async () => {
-      const contracts = await contractsPromise;
-      if (contracts.flavour === 'enterprise') {
-        return contracts;
-      }
-      return enterpriseSwapContractsPromise;
-    };
 
     this.resolveSmsURL = async ({
       teeFramework = vDefaultTeeFramework || TEE_FRAMEWORKS.SCONE,

@@ -14,7 +14,6 @@
 
 - [chainId](internal_.IExecContractsClient.md#chainid)
 - [confirms](internal_.IExecContractsClient.md#confirms)
-- [flavour](internal_.IExecContractsClient.md#flavour)
 - [hubAddress](internal_.IExecContractsClient.md#hubaddress)
 - [isNative](internal_.IExecContractsClient.md#isnative)
 - [pocoVersion](internal_.IExecContractsClient.md#pocoversion)
@@ -47,7 +46,6 @@ Create a client for IExec contracts
 | `args` | `Object` | - |
 | `args.chainId` | `string` \| `number` | id of the chain to use (used to resolve IExec contract address) |
 | `args.confirms?` | `number` | number of block to wait for transactions confirmation (default 1) |
-| `args.flavour?` | `string` | flavour to use (default standard) |
 | `args.hubAddress?` | `string` | override the IExec contract address to target a custom instance |
 | `args.isNative?` | `boolean` | true if IExec contract use the chain native token |
 | `args.provider` | `Provider` | ethers Provider |
@@ -73,14 +71,6 @@ ___
 • **confirms**: `number`
 
 number of block to wait for transactions confirmation
-
-___
-
-### flavour
-
-• **flavour**: `string`
-
-current IExec flavour
 
 ___
 

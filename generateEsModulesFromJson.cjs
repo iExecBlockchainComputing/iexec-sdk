@@ -23,10 +23,6 @@ const sources = [
     { dir: '@iexec/rlc', minifier: minifiers.truffleDeployment },
   ],
   [
-    '@iexec/erlc/build/contracts-min/ERLCTokenSwap.json',
-    { dir: '@iexec/erlc', minifier: minifiers.truffleDeployment },
-  ],
-  [
     '@iexec/poco/package.json',
     { dir: '@iexec/poco', minifier: minifiers.package },
   ],

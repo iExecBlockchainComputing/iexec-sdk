@@ -59,7 +59,6 @@ export const TEST_CHAINS = {
     rpcURL: DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
     chainId: '65535',
     hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-    enterpriseHubAddress: '0xb80C02d24791fA92fA8983f15390274698A75D23',
     ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
     ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
     pocoAdminWallet: new Wallet(

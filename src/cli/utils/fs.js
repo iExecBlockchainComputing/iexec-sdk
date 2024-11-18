@@ -37,16 +37,10 @@ const chainConfSchema = () =>
     voucherSubgraph: string(),
     native: boolean(),
     useGas: boolean().default(true),
-    flavour: string().oneOf(['standard', 'enterprise']),
     defaultTeeFramework: teeFrameworkSchema(),
     bridge: object({
       bridgedChainName: string().required(),
       contract: addressSchema().required(),
-    })
-      .notRequired()
-      .strict(),
-    enterprise: object({
-      enterpriseSwapChainName: string().required(),
     })
       .notRequired()
       .strict(),

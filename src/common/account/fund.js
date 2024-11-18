@@ -2,7 +2,6 @@ import Debug from 'debug';
 import BN from 'bn.js';
 import { checkBalance } from './balance.js';
 import { getAddress } from '../wallet/address.js';
-import { isInWhitelist } from '../wallet/enterprise.js';
 import { checkBalances } from '../wallet/balance.js';
 import {
   checkEventFromLogs,
@@ -25,11 +24,6 @@ export const deposit = async (
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
       throw Error('Deposit amount must be greater than 0');
-    if (contracts.flavour === 'enterprise') {
-      await isInWhitelist(contracts, await getAddress(contracts), {
-        strict: true,
-      });
-    }
     let txHash;
     const { nRLC } = await checkBalances(
       contracts,
@@ -83,11 +77,6 @@ export const withdraw = async (
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
       throw Error('Withdraw amount must be greater than 0');
-    if (contracts.flavour === 'enterprise') {
-      await isInWhitelist(contracts, await getAddress(contracts), {
-        strict: true,
-      });
-    }
     const iexecContract = contracts.getIExecContract();
     const { stake } = await checkBalance(
       contracts,

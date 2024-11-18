@@ -236,30 +236,6 @@ export default class IExecWalletModule extends IExecModule {
    */
   obsBridgeToMainchain(nRLCAmount: NRLCAmount): Promise<BridgeObservable>;
   /**
-   * **SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
-   *
-   * wrap some nRLC into neRLC (enterprise nRLC)
-   *
-   * example:
-   * ```js
-   * const txHash = await wrapEnterpriseRLC(amount);
-   * console.log(`wrapped ${amount} nRLC into neRLC (tx: ${txHash})`);
-   * ```
-   */
-  wrapEnterpriseRLC(nRLCAmount: NRLCAmount): Promise<TxHash>;
-  /**
-   * **SIGNER REQUIRED, ONLY ERLC WHITELISTED ACCOUNTS**
-   *
-   * unwrap some neRLC (enterprise nRLC) into nRLC
-   *
-   * example:
-   * ```js
-   * const txHash = await unwrapEnterpriseRLC(amount);
-   * console.log(`unwrapped ${amount} neRLC into nRLC (tx: ${txHash})`);
-   * ```
-   */
-  unwrapEnterpriseRLC(nRLCAmount: NRLCAmount): Promise<TxHash>;
-  /**
    * Create an IExecWalletModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecWalletModule;

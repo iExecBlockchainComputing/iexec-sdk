@@ -7,7 +7,6 @@
 ### Properties
 
 - [ethProvider](IExecConfigArgs.md#ethprovider)
-- [flavour](IExecConfigArgs.md#flavour)
 
 ## Properties
 
@@ -27,11 +26,3 @@ signer provider examples:
 - `window.ethereum` for browser injected wallet provider
 - `utils.getSignerFromPrivateKey('bellecour', PRIVATE_KEY)` signer connected to bellecour
 - `new ethers.Wallet(PRIVATE_KEY, new ethers.JsonRpcProvider("https://bellecour.iex.ec"))` ethers wallet connected to bellecour
-
-___
-
-### flavour
-
-• `Optional` **flavour**: `string`
-
-flavour to use (default standard)

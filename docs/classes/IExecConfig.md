@@ -31,13 +31,11 @@ const wallet = IExecWalletModule.fromConfig(config);
 - [resolveChainId](IExecConfig.md#resolvechainid)
 - [resolveContractsClient](IExecConfig.md#resolvecontractsclient)
 - [resolveEnsPublicResolverAddress](IExecConfig.md#resolveenspublicresolveraddress)
-- [resolveEnterpriseContractsClient](IExecConfig.md#resolveenterprisecontractsclient)
 - [resolveIexecGatewayURL](IExecConfig.md#resolveiexecgatewayurl)
 - [resolveIpfsGatewayURL](IExecConfig.md#resolveipfsgatewayurl)
 - [resolvePocoSubgraphURL](IExecConfig.md#resolvepocosubgraphurl)
 - [resolveResultProxyURL](IExecConfig.md#resolveresultproxyurl)
 - [resolveSmsURL](IExecConfig.md#resolvesmsurl)
-- [resolveStandardContractsClient](IExecConfig.md#resolvestandardcontractsclient)
 - [resolveVoucherHubAddress](IExecConfig.md#resolvevoucherhubaddress)
 - [resolveVoucherSubgraphURL](IExecConfig.md#resolvevouchersubgraphurl)
 
@@ -149,18 +147,6 @@ resolve the current ENS public resolver contract address
 
 ___
 
-### resolveEnterpriseContractsClient
-
-▸ **resolveEnterpriseContractsClient**(): `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
-
-resolve the current enterprise IExecContractsClient
-
-#### Returns
-
-`Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
-
-___
-
 ### resolveIexecGatewayURL
 
 ▸ **resolveIexecGatewayURL**(): `Promise`<`string`\>
@@ -225,18 +211,6 @@ resolve the current SMS URL
 #### Returns
 
 `Promise`<`string`\>
-
-___
-
-### resolveStandardContractsClient
-
-▸ **resolveStandardContractsClient**(): `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
-
-resolve the current standard IExecContractsClient
-
-#### Returns
-
-`Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
 ___
 
