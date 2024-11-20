@@ -29,6 +29,10 @@ export class Web3ProviderError extends Error {
    * The original Error object that caused this web3 provider error.
    */
   cause: Error;
+  /**
+   * Wether the error was caused by a user rejection
+   */
+  isUserRejection?: boolean;
 }
 /**
  * Web3ProviderCallError encapsulates an error thrown by the web3 provider during a web3 call.

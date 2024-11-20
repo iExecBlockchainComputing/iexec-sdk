@@ -29,6 +29,10 @@ export class Web3ProviderError extends Error {
     if (originalError && typeof originalError === 'object') {
       Object.assign(this, getPropsToCopy(originalError));
     }
+    // detect user rejection from ethers error code
+    if (originalError?.code === 'ACTION_REJECTED') {
+      this.isUserRejection = true;
+    }
   }
 }
 

@@ -27,6 +27,7 @@ Web3ProviderError encapsulates an error thrown by the web3 provider.
 ### Properties
 
 - [cause](errors.Web3ProviderError.md#cause)
+- [isUserRejection](errors.Web3ProviderError.md#isuserrejection)
 - [originalError](errors.Web3ProviderError.md#originalerror)
 
 ## Constructors
@@ -57,6 +58,14 @@ Error.constructor
 • **cause**: `Error`
 
 The original Error object that caused this web3 provider error.
+
+___
+
+### isUserRejection
+
+• `Optional` **isUserRejection**: `boolean`
+
+Wether the error was caused by a user rejection
 
 ___
 
