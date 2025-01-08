@@ -147,7 +147,6 @@ export default class IExecWorkerpoolModule extends IExecModule {
    */
   getWorkerpoolApiUrl(
     workerpoolAddress: Addressish,
-    url: string,
   ): Promise<string | undefined>;
   /**
    * **ONLY WORKERPOOL OWNER**

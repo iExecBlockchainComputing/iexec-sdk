@@ -166,6 +166,26 @@ export default class IExecTaskModule extends IExecModule {
    */
   fetchResults(taskid: Taskid): Promise<Response>;
   /**
+   * **SIGNER REQUIRED, ONLY REQUESTER**
+   *
+   * get the workers logs for specified task.
+   *
+   * _NB_: the workerpool must declare it's API url to enable this feature, check declared API url with `IExecWorkerpoolModule.getWorkerpoolApiUrl(workerpool)`
+   *
+   * example:
+   * ```js
+   * const logArray = await fetchLogs('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
+   * logsArray.forEach(({ worker, stdout, stderr }) => {
+   *   console.log(`----- worker ${worker} -----`);
+   *   console.log(`stdout:\n${stdout}`);
+   *   console.log(`stderr:\n${stderr}`);
+   * });
+   * ```
+   */
+  fetchLogs(
+    taskid: Taskid,
+  ): Promise<Array<{ worker: Address; stdout: string; stderr: string }>>;
+  /**
    * Create an IExecTaskModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecTaskModule;
