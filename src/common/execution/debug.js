@@ -80,11 +80,23 @@ export const fetchTaskOffchainInfo = async (
   try {
     const vTaskid = await bytes32Schema().validate(taskid);
     const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
-    return await jsonApi.get({
+    const data = await jsonApi.get({
       api: workerpoolApiUrl,
       endpoint: `/tasks/${vTaskid}`,
       ApiCallErrorClass: WorkerpoolCallError,
     });
+    return {
+      task: {
+        status: data.currentStatus,
+        statusHistory: data.dateStatusList,
+      },
+      replicates: (data.replicates || []).map((replicate) => ({
+        worker: replicate.walletAddress,
+        exitCode: replicate.appExitCode,
+        status: replicate.currentStatus,
+        statusHistory: replicate.statusUpdateList,
+      })),
+    };
   } catch (error) {
     debug('fetchTaskOffchainInfo()', error);
     throw error;

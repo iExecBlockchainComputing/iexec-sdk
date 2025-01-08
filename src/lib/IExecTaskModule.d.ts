@@ -186,6 +186,64 @@ export default class IExecTaskModule extends IExecModule {
     taskid: Taskid,
   ): Promise<Array<{ worker: Address; stdout: string; stderr: string }>>;
   /**
+   * get off-chain status information for specified task.
+   *
+   * _NB_: the workerpool must declare it's API url to enable this feature, check declared API url with `IExecWorkerpoolModule.getWorkerpoolApiUrl(workerpool)`
+   *
+   * example:
+   * ```js
+   * const { task, replicates } = await fetchOffchainInfo('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
+   *
+   * console.log(`task status: ${task.status}`);
+   * replicates.forEach(({ worker, status }) =>
+   *   console.log(`worker ${worker} replicate status: ${status}`)
+   * );
+   * ```
+   */
+  fetchOffchainInfo(taskid: Taskid): Promise<{
+    task: {
+      /**
+       * task status
+       *
+       * see https://protocol.docs.iex.ec/for-developers/task-feedback#task-statuses
+       */
+      status: string;
+      statusHistory: Array<{
+        /**
+         * task status
+         *
+         * see https://protocol.docs.iex.ec/for-developers/task-feedback#task-statuses
+         */
+        status: string;
+        date: string;
+        cause?: string;
+      }>;
+    };
+    replicates: Array<{
+      worker: Address;
+      /**
+       * app exit code (omitted when exit code is 0)
+       */
+      exitCode?: number;
+      /**
+       * replicate status
+       *
+       * see https://protocol.docs.iex.ec/for-developers/task-feedback#replicate-statuses
+       */
+      status: string;
+      statusHistory: Array<{
+        /**
+         * replicate status
+         *
+         * see https://protocol.docs.iex.ec/for-developers/task-feedback#replicate-statuses
+         */
+        status: string;
+        date: string;
+        cause?: string;
+      }>;
+    }>;
+  }>;
+  /**
    * Create an IExecTaskModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecTaskModule;

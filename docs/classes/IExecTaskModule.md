@@ -24,6 +24,7 @@ module exposing task methods
 
 - [claim](IExecTaskModule.md#claim)
 - [fetchLogs](IExecTaskModule.md#fetchlogs)
+- [fetchOffchainInfo](IExecTaskModule.md#fetchoffchaininfo)
 - [fetchResults](IExecTaskModule.md#fetchresults)
 - [obsTask](IExecTaskModule.md#obstask)
 - [show](IExecTaskModule.md#show)
@@ -121,6 +122,36 @@ logsArray.forEach(({ worker, stdout, stderr }) => {
 #### Returns
 
 `Promise`<{ `stderr`: `string` ; `stdout`: `string` ; `worker`: `string`  }[]\>
+
+___
+
+### fetchOffchainInfo
+
+▸ **fetchOffchainInfo**(`taskid`): `Promise`<{ `replicates`: { `exitCode?`: `number` ; `status`: `string` ; `statusHistory`: { `cause?`: `string` ; `date`: `string` ; `status`: `string`  }[] ; `worker`: `string`  }[] ; `task`: { `status`: `string` ; `statusHistory`: { `cause?`: `string` ; `date`: `string` ; `status`: `string`  }[]  }  }\>
+
+get off-chain status information for specified task.
+
+_NB_: the workerpool must declare it's API url to enable this feature, check declared API url with `IExecWorkerpoolModule.getWorkerpoolApiUrl(workerpool)`
+
+example:
+```js
+const { task, replicates } = await fetchOffchainInfo('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
+
+console.log(`task status: ${task.status}`);
+replicates.forEach(({ worker, status }) =>
+  console.log(`worker ${worker} replicate status: ${status}`)
+);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `taskid` | `string` |
+
+#### Returns
+
+`Promise`<{ `replicates`: { `exitCode?`: `number` ; `status`: `string` ; `statusHistory`: { `cause?`: `string` ; `date`: `string` ; `status`: `string`  }[] ; `worker`: `string`  }[] ; `task`: { `status`: `string` ; `statusHistory`: { `cause?`: `string` ; `date`: `string` ; `status`: `string`  }[]  }  }\>
 
 ___
 
