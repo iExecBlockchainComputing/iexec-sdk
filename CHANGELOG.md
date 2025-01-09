@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - added key `isUserRejection` in `Web3ProviderError` set to `true` when the error is detected as a user rejection
-- `task.fetchOffchainInfo(taskid)` to get off chain status information about the task from the workerpool
+- `task.fetchOffchainInfo(taskid)` to get off-chain status information about the task from the workerpool
 - `task.getLogs(taskid)` to get app logs from the workers
 
 ### Changed
@@ -316,7 +316,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - workerpool API url configuration
-- `iexec task debug <taskid> [--logs]` to show offchain information
+- `iexec task debug <taskid> [--logs]` to show off-chain information
 - `ens.getDefaultDomain(address)` to get the default free to use ENS domain given an address
 - support for requester secrets
 - check dataset secret exists on requestorder check
