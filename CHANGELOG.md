@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - added key `isUserRejection` in `Web3ProviderError` set to `true` when the error is detected as a user rejection
 - `task.fetchOffchainInfo(taskid)` to get off-chain status information about the task from the workerpool
-- `task.getLogs(taskid)` to get app logs from the workers
+- `task.fetchLogs(taskid)` to fetch app logs from the workers
 
 ### Changed
 
