@@ -220,7 +220,7 @@ const faucetSendWeiToReachTargetBalance =
     } catch (e) {
       console.warn(`Faucet send Eth: error (try count ${tryCount}) - ${e}`);
       // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 3) {
+      if (tryCount < 5) {
         await sleep(3000 * tryCount);
         await faucetSendWeiToReachTargetBalance(chain)(
           address,
@@ -277,7 +277,7 @@ const faucetSendNRlcToReachTargetBalance =
     } catch (e) {
       console.warn(`Faucet send RLC: error (try count ${tryCount}) - ${e}`);
       // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 3) {
+      if (tryCount < 5) {
         await sleep(3000 * tryCount);
         await faucetSendNRlcToReachTargetBalance(chain)(
           address,
@@ -375,7 +375,7 @@ export const adminCreateCategory =
         `Admin create category: error (try count ${tryCount}) - ${e}`,
       );
       // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 3) {
+      if (tryCount < 5) {
         await sleep(3000 * tryCount);
         res = await adminCreateCategory(chain)(category, tryCount + 1);
       } else {
@@ -415,7 +415,7 @@ export const createVoucherType =
           `Error creating voucher type (try count ${tryCount}):`,
           error,
         );
-        if (tryCount < 3) {
+        if (tryCount < 5) {
           await sleep(3000 * tryCount);
           id = await retryableCreateVoucherType(tryCount + 1);
         } else {
@@ -485,7 +485,7 @@ export const createVoucher =
         await createVoucherTx.wait();
       } catch (error) {
         console.warn(`Error creating voucher (try count ${tryCount}):`, error);
-        if (tryCount < 3) {
+        if (tryCount < 5) {
           await sleep(3000 * tryCount);
           await retryableCreateVoucher(tryCount + 1);
         } else {
@@ -543,7 +543,7 @@ export const addVoucherEligibleAsset =
           `Error adding eligible asset to voucher (try count ${tryCount}):`,
           error,
         );
-        if (tryCount < 3) {
+        if (tryCount < 5) {
           await sleep(3000 * tryCount);
           await retryableAddEligibleAsset(tryCount + 1);
         } else {
