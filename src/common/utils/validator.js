@@ -70,7 +70,7 @@ export const uint256Schema = () =>
 export const booleanSchema = () => boolean();
 
 export const basicUrlSchema = () =>
-  string().matches(/^http[s]?:\/\//, '${path} "${value}" is not a valid URL');
+  string().matches(/^https?:\/\//, '${path} "${value}" is not a valid URL');
 
 const amountErrorMessage = ({ originalValue }) =>
   `${
@@ -816,7 +816,10 @@ export const textRecordKeySchema = () => string().required().strict(true);
 
 export const textRecordValueSchema = () => string().default('').strict(true);
 
-export const workerpoolApiUrlSchema = () => string().url().default('');
+export const workerpoolApiUrlSchema = () =>
+  string()
+    .matches(/^(https?:\/\/.*)?$/, '${path} "${value}" is not a valid URL') // accept empty string to reset workerpool URL
+    .default('');
 
 export const smsUrlOrMapSchema = () =>
   lazy((stringOrMap) => {

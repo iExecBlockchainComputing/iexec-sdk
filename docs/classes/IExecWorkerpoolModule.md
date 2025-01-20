@@ -149,7 +149,7 @@ ___
 
 ### getWorkerpoolApiUrl
 
-▸ **getWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`<`undefined` \| `string`\>
+▸ **getWorkerpoolApiUrl**(`workerpoolAddress`): `Promise`<`undefined` \| `string`\>
 
 read the workerpool API url on the blockchain
 
@@ -157,7 +157,7 @@ _NB_: resolve to `undefined` if the workerpool API url was not declared.
 
 example:
 ```js
-const url = await getWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+const url = await getWorkerpoolApiUrl('my-workerpool.eth');
 console.log('workerpool API url:', url);
 ```
 
@@ -166,7 +166,6 @@ console.log('workerpool API url:', url);
 | Name | Type |
 | :------ | :------ |
 | `workerpoolAddress` | `string` |
-| `url` | `string` |
 
 #### Returns
 

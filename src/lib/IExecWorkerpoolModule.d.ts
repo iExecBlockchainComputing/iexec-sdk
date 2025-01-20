@@ -141,13 +141,12 @@ export default class IExecWorkerpoolModule extends IExecModule {
    *
    * example:
    * ```js
-   * const url = await getWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
+   * const url = await getWorkerpoolApiUrl('my-workerpool.eth');
    * console.log('workerpool API url:', url);
    * ```
    */
   getWorkerpoolApiUrl(
     workerpoolAddress: Addressish,
-    url: string,
   ): Promise<string | undefined>;
   /**
    * **ONLY WORKERPOOL OWNER**

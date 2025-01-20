@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, beforeAll } from '@jest/globals';
 import {
   deployAndGetApporder,
   deployAndGetWorkerpoolorder,
@@ -19,6 +19,7 @@ import {
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
+import { WorkerpoolCallError } from '../../../src/lib/errors.js';
 
 const { ObjectNotFoundError, IpfsGatewayCallError } = errors;
 
@@ -412,6 +413,173 @@ describe('task', () => {
       expect(obsTaskUnsubBeforeCompleteValues[0].task.status).toBe(0);
       expect(obsTaskUnsubBeforeCompleteValues[0].task.statusName).toBe('UNSET');
       expect(obsTaskUnsubBeforeCompleteValues[0].task.taskTimedOut).toBe(false);
+    });
+  });
+
+  describe('fetchOffchainInfo()', () => {
+    test('throw when workerpool API is not configured', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      await expect(
+        iexec.task.fetchOffchainInfo(
+          '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
+        ),
+      ).rejects.toThrow(
+        Error(
+          'Impossible to resolve API url for workerpool 0x13EE8c43Abd7dFAcfa4C42554Dff72d9fbcF3330',
+        ),
+      );
+    });
+
+    describe('when workerpool API is configured', () => {
+      const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecWorkerpoolOwner } = getTestConfig(iexecTestChain)();
+      let taskid;
+      let workerpool;
+
+      beforeAll(async () => {
+        const workerpoolorder =
+          await deployAndGetWorkerpoolorder(iexecWorkerpoolOwner);
+        const apporder = await deployAndGetApporder(iexecWorkerpoolOwner);
+
+        workerpool = workerpoolorder.workerpool;
+        const { name: workerpoolEns } =
+          await iexecWorkerpoolOwner.ens.claimName(
+            workerpool.toLowerCase(),
+            await iexecWorkerpoolOwner.ens.getDefaultDomain(workerpool),
+          );
+        await iexecWorkerpoolOwner.ens.configureResolution(
+          workerpoolEns,
+          workerpool,
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          workerpoolorder,
+          apporder,
+        });
+        const { dealid } = await iexecRequester.order.matchOrders({
+          apporder,
+          workerpoolorder,
+          requestorder,
+        });
+        await initializeTask(iexecTestChain)(dealid, 0);
+        taskid = await iexecRequester.deal.computeTaskId(dealid, 0);
+      });
+
+      test('throw WorkerpoolCallError when the workerpool API is unreachable', async () => {
+        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
+          workerpool,
+          SERVICE_UNREACHABLE_URL,
+        );
+        await expect(
+          iexecRequester.task.fetchOffchainInfo(taskid),
+        ).rejects.toThrow(
+          new WorkerpoolCallError(
+            `Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+          ),
+        );
+      });
+
+      test('throw WorkerpoolCallError when the workerpool API answers with error', async () => {
+        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
+          workerpool,
+          SERVICE_HTTP_500_URL,
+        );
+        await expect(
+          iexecRequester.task.fetchOffchainInfo(taskid),
+        ).rejects.toThrow(
+          new WorkerpoolCallError(
+            `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+            Error('Server internal error: 500 Internal Server Error'),
+          ),
+        );
+      });
+    });
+  });
+
+  describe('fetchLogs()', () => {
+    test('throw when workerpool API is not configured', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      await expect(
+        iexec.task.fetchLogs(
+          '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
+        ),
+      ).rejects.toThrow(
+        Error(
+          'Impossible to resolve API url for workerpool 0x13EE8c43Abd7dFAcfa4C42554Dff72d9fbcF3330',
+        ),
+      );
+    });
+
+    describe('when workerpool API is configured', () => {
+      const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecWorkerpoolOwner } = getTestConfig(iexecTestChain)();
+      let taskid;
+      let workerpool;
+
+      beforeAll(async () => {
+        const workerpoolorder =
+          await deployAndGetWorkerpoolorder(iexecWorkerpoolOwner);
+        const apporder = await deployAndGetApporder(iexecWorkerpoolOwner);
+
+        workerpool = workerpoolorder.workerpool;
+        const { name: workerpoolEns } =
+          await iexecWorkerpoolOwner.ens.claimName(
+            workerpool.toLowerCase(),
+            await iexecWorkerpoolOwner.ens.getDefaultDomain(workerpool),
+          );
+        await iexecWorkerpoolOwner.ens.configureResolution(
+          workerpoolEns,
+          workerpool,
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          workerpoolorder,
+          apporder,
+        });
+        const { dealid } = await iexecRequester.order.matchOrders({
+          apporder,
+          workerpoolorder,
+          requestorder,
+        });
+        await initializeTask(iexecTestChain)(dealid, 0);
+        taskid = await iexecRequester.deal.computeTaskId(dealid, 0);
+      });
+
+      test('throw when user is not the requester', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
+          workerpool,
+          SERVICE_UNREACHABLE_URL,
+        );
+        await expect(iexec.task.fetchLogs(taskid)).rejects.toThrow(
+          Error(
+            `Only task requester ${await iexecRequester.wallet.getAddress()} can access replicates logs`,
+          ),
+        );
+      });
+
+      test('throw WorkerpoolCallError when the workerpool API is unreachable', async () => {
+        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
+          workerpool,
+          SERVICE_UNREACHABLE_URL,
+        );
+        await expect(iexecRequester.task.fetchLogs(taskid)).rejects.toThrow(
+          new WorkerpoolCallError(
+            `Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+          ),
+        );
+      });
+
+      test('throw WorkerpoolCallError when the workerpool API answers with error', async () => {
+        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
+          workerpool,
+          SERVICE_HTTP_500_URL,
+        );
+        await expect(iexecRequester.task.fetchLogs(taskid)).rejects.toThrow(
+          new WorkerpoolCallError(
+            `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+            Error('Server internal error: 500 Internal Server Error'),
+          ),
+        );
+      });
     });
   });
 });
