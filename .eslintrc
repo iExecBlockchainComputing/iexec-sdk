@@ -33,7 +33,6 @@
           "_chainId",
           "_contracts",
           "_bridgedContracts",
-          "_enterpriseSwapContracts",
           "_chainConfDefaults",
           "_bridgedConf"
         ]

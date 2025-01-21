@@ -529,22 +529,8 @@ describe('[paramsInputFilesArraySchema]', () => {
 
 describe('[objParamsSchema]', () => {
   test('empty object', async () => {
-    await expect(objParamsSchema().validate({})).rejects.toThrow(
-      new ValidationError(
-        'iexec_result_storage_proxy is required field with "ipfs" storage',
-      ),
-    );
-  });
-
-  test('empty object with resultProxyURL in context', async () => {
-    await expect(
-      objParamsSchema().validate(
-        {},
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
-    ).resolves.toEqual({
+    await expect(objParamsSchema().validate({})).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
   });
 
@@ -586,7 +572,6 @@ describe('[objParamsSchema]', () => {
     await expect(
       objParamsSchema().validate({
         iexec_secrets: {},
-        iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
       }),
     ).rejects.toThrow(
       new ValidationError('iexec_secrets is not supported for non TEE tasks'),
@@ -598,14 +583,12 @@ describe('[objParamsSchema]', () => {
       objParamsSchema().validate(
         {
           iexec_secrets: { 1: 'foo' },
-          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
     ).resolves.toEqual({
       iexec_secrets: { 1: 'foo' },
       iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
   });
 
@@ -614,7 +597,6 @@ describe('[objParamsSchema]', () => {
       objParamsSchema().validate(
         {
           iexec_secrets: null,
-          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
@@ -626,7 +608,6 @@ describe('[objParamsSchema]', () => {
       objParamsSchema().validate(
         {
           iexec_secrets: { '-1': 'foo' },
-          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
@@ -639,7 +620,6 @@ describe('[objParamsSchema]', () => {
       objParamsSchema().validate(
         {
           iexec_secrets: { 0: 'foo' },
-          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
@@ -652,7 +632,6 @@ describe('[objParamsSchema]', () => {
       objParamsSchema().validate(
         {
           iexec_secrets: { foo: 'foo' },
-          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
@@ -668,7 +647,6 @@ describe('[objParamsSchema]', () => {
       objParamsSchema().validate(
         {
           iexec_secrets: { 1: { foo: 'bar' } },
-          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
@@ -679,7 +657,6 @@ describe('[objParamsSchema]', () => {
       objParamsSchema().validate(
         {
           iexec_secrets: { 1: 1 },
-          iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
         },
         { context: { isTee: true } },
       ),
@@ -690,51 +667,40 @@ describe('[objParamsSchema]', () => {
 
   test('with iexec_args', async () => {
     await expect(
-      objParamsSchema().validate(
-        {
-          iexec_args: 'test',
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
+      objParamsSchema().validate({
+        iexec_args: 'test',
+      }),
     ).resolves.toEqual({
       iexec_args: 'test',
       iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
   });
 
   test('with iexec_input_files', async () => {
     await expect(
-      objParamsSchema().validate(
-        {
-          iexec_input_files: [
-            'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
-            'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
-          ],
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
+      objParamsSchema().validate({
+        iexec_input_files: [
+          'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+          'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+        ],
+      }),
     ).resolves.toEqual({
       iexec_input_files: [
         'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
         'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
       ],
       iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
   });
 
   test('with iexec_input_files (bad url)', async () => {
     await expect(
-      objParamsSchema().validate(
-        {
-          iexec_input_files: [
-            'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
-            'iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
-          ],
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
+      objParamsSchema().validate({
+        iexec_input_files: [
+          'https://iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+          'iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf',
+        ],
+      }),
     ).rejects.toThrow(
       new ValidationError(
         'iexec_input_files[1] "iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf" is not a valid URL',
@@ -755,62 +721,36 @@ describe('[objParamsSchema]', () => {
 
   test('with encryption (true)', async () => {
     await expect(
-      objParamsSchema().validate(
-        {
-          iexec_result_encryption: true,
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
+      objParamsSchema().validate({
+        iexec_result_encryption: true,
+      }),
     ).resolves.toEqual({
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
   });
 
   test("with encryption ('true')", async () => {
     await expect(
-      objParamsSchema().validate(
-        {
-          iexec_result_encryption: 'true',
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
+      objParamsSchema().validate({
+        iexec_result_encryption: 'true',
+      }),
     ).resolves.toEqual({
       iexec_result_encryption: true,
       iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
   });
 
   test("with encryption ('foo')", async () => {
     await expect(
-      objParamsSchema().validate(
-        {
-          iexec_result_encryption: 'foo',
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
+      objParamsSchema().validate({
+        iexec_result_encryption: 'foo',
+      }),
     ).rejects.toThrow(
       new ValidationError(
         'iexec_result_encryption must be a `boolean` type, but the final value was: `"foo"`.',
       ),
     );
-  });
-
-  test('with logger (true)', async () => {
-    await expect(
-      objParamsSchema().validate(
-        {
-          iexec_developer_logger: true,
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
-    ).resolves.toEqual({
-      iexec_developer_logger: true,
-      iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
-    });
   });
 
   test('with isCallback in context, do not populate storage', async () => {
@@ -821,17 +761,14 @@ describe('[objParamsSchema]', () => {
 
   test('strip unexpected key', async () => {
     await expect(
-      objParamsSchema().validate(
-        {
-          foo: true,
-          iexec_tee_post_compute_fingerprint: 'custom-fingerprint', // removed in in v6
-          iexec_tee_post_compute_image: 'custom-image', // removed in in v6
-        },
-        { context: { resultProxyURL: 'https://result-proxy.iex.ec' } },
-      ),
+      objParamsSchema().validate({
+        foo: true,
+        iexec_tee_post_compute_fingerprint: 'custom-fingerprint', // removed in in v6
+        iexec_tee_post_compute_image: 'custom-image', // removed in in v6
+        iexec_developer_logger: true, // removed in v8
+      }),
     ).resolves.toEqual({
       iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://result-proxy.iex.ec',
     });
   });
 });

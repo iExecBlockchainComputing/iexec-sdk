@@ -16,7 +16,6 @@ import {
 import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
 import { getAddress } from './address.js';
 import { getEthBalance, getRlcBalance, checkBalances } from './balance.js';
-import { isInWhitelist } from './enterprise.js';
 
 const debug = Debug('iexec:wallet:send');
 
@@ -106,12 +105,6 @@ export const sendRLC = async (
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(to);
-    if (contracts.flavour === 'enterprise') {
-      await isInWhitelist(contracts, await getAddress(contracts), {
-        strict: true,
-      });
-      await isInWhitelist(contracts, to, { strict: true });
-    }
     const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
     const balance = await getRlcBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
@@ -143,12 +136,6 @@ export const sweep = async (
     const code = await contracts.provider.getCode(vAddressTo);
     if (code !== '0x') {
       throw new Error('Cannot sweep to a contract');
-    }
-    if (contracts.flavour === 'enterprise') {
-      await isInWhitelist(contracts, await getAddress(contracts), {
-        strict: true,
-      });
-      await isInWhitelist(contracts, to, { strict: true });
     }
     let balances = await checkBalances(contracts, userAddress);
     const res = {};

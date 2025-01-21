@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.13.0] 2025-01-21
+
+### Added
+
+- added key `isUserRejection` in `Web3ProviderError` set to `true` when the error is detected as a user rejection
+- `task.fetchOffchainInfo(taskid)` to get off-chain status information about the task from the workerpool
+- `task.fetchLogs(taskid)` to fetch app logs from the workers
+
+### Changed
+
+- `iexec_result_storage_proxy` default value is no more set in request params
+- removed deprecated request param `iexec_developer_logger`
+- change information exposed by `iexec task debug` for better readability
+
+### Removed
+
+- IExec `enterprise` flavour is removed, although `enterprise` flavour support was dropped for a while the "enterprise" specific methods and keys were still present in `iexec` SDK. These are now removed, although the changes impact some parts of the API, these changes should not impact developers using the `iexec` package.
+  - [BREAKING] `IExecModule`
+    - removed optional constructor param `flavour`
+  - [BREAKING] `IExecConfig`
+    - removed `resolveStandardContractsClient` and `resolveEnterpriseContractsClient` methods
+    - removed optional constructor param `flavour` and `enterpriseSwapConf`
+  - [BREAKING] `IExecWalletModule`
+    - removed `wrapEnterpriseRLC` and `unwrapEnterpriseRLC` methods
+  - [BREAKING] `IExecContractsClient`
+    - removed optional constructor param `flavour`
+    - removed `flavour` key
+  - [BREAKING] CLI `chain.json` configuration file
+    - removed `flavour` key
+    - removed `[chainName].enterprise` key
+  - [BREAKING] CLI `iexec wallet` command
+    - removed `swap-RLC-for-eRLC` and `swap-eRLC-for-RLC`
+
 ## [8.12.0] 2024-10-22
 
 ### Added
@@ -283,7 +316,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - workerpool API url configuration
-- `iexec task debug <taskid> [--logs]` to show offchain information
+- `iexec task debug <taskid> [--logs]` to show off-chain information
 - `ens.getDefaultDomain(address)` to get the default free to use ENS domain given an address
 - support for requester secrets
 - check dataset secret exists on requestorder check

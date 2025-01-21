@@ -19,9 +19,7 @@ const ensMap = {
 };
 
 const voucherHubMap = {
-  standard: {
-    134: voucherHubBellecourAddress,
-  },
+  134: voucherHubBellecourAddress,
 };
 
 const networkMap = {
@@ -32,70 +30,44 @@ const networkMap = {
   },
 };
 
-const hubMap = {
-  standard: {},
-  enterprise: {},
-};
+const hubMap = {};
 
 const smsMap = {
-  standard: {
-    134: {
-      [TEE_FRAMEWORKS.SCONE]: 'https://sms.scone-prod.v8-bellecour.iex.ec',
-      [TEE_FRAMEWORKS.GRAMINE]: 'https://sms.gramine.v8-bellecour.iex.ec',
-    },
+  134: {
+    [TEE_FRAMEWORKS.SCONE]: 'https://sms.scone-prod.v8-bellecour.iex.ec',
+    [TEE_FRAMEWORKS.GRAMINE]: 'https://sms.gramine.v8-bellecour.iex.ec',
   },
-  enterprise: {},
 };
 
 const resultProxyMap = {
-  standard: {
-    134: 'https://result.v8-bellecour.iex.ec',
-  },
-  enterprise: {},
+  134: 'https://result.v8-bellecour.iex.ec',
 };
 
 const bridgeMap = {
-  standard: {
-    1: {
-      contract: '0x4e55c9B8953AB1957ad0A59D413631A66798c6a2',
-      bridgedChainId: '134',
-    },
-    134: {
-      contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',
-      bridgedChainId: '1',
-    },
+  1: {
+    contract: '0x4e55c9B8953AB1957ad0A59D413631A66798c6a2',
+    bridgedChainId: '134',
   },
-  enterprise: {},
+  134: {
+    contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',
+    bridgedChainId: '1',
+  },
 };
 
-const enterpriseEnabledMap = {};
-
 const ipfsGatewayMap = {
-  standard: {
-    134: 'https://ipfs-gateway.v8-bellecour.iex.ec',
-  },
-  enterprise: {},
+  134: 'https://ipfs-gateway.v8-bellecour.iex.ec',
 };
 
 const iexecGatewayMap = {
-  standard: {
-    134: 'https://api.market.v8-bellecour.iex.ec',
-  },
-  enterprise: {},
+  134: 'https://api.market.v8-bellecour.iex.ec',
 };
 
 const pocoSubgraphMap = {
-  standard: {
-    134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5',
-  },
-  enterprise: {},
+  134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5',
 };
 
 const voucherSubgraphMap = {
-  standard: {
-    134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/iexec-voucher',
-  },
-  enterprise: {},
+  134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/iexec-voucher',
 };
 
 const idMap = {
@@ -105,23 +77,19 @@ const idMap = {
 
 export const getId = (idOrName) => idMap[idOrName] || idOrName;
 
-export const getChainDefaults = ({ id, flavour = 'standard' }) => ({
+export const getChainDefaults = ({ id }) => ({
   host: hostMap[id],
-  hub: hubMap[flavour] && hubMap[flavour][id],
-  sms: smsMap[flavour] && smsMap[flavour][id],
+  hub: hubMap[id],
+  sms: smsMap[id],
   ensPublicResolver: ensMap[id] && ensMap[id].publicResolver,
-  voucherHub: voucherHubMap[flavour] && voucherHubMap[flavour][id],
-  resultProxy: resultProxyMap[flavour] && resultProxyMap[flavour][id],
-  ipfsGateway: ipfsGatewayMap[flavour] && ipfsGatewayMap[flavour][id],
-  iexecGateway: iexecGatewayMap[flavour] && iexecGatewayMap[flavour][id],
-  pocoSubgraph: pocoSubgraphMap[flavour] && iexecGatewayMap[flavour][id],
-  voucherSubgraph:
-    voucherSubgraphMap[flavour] && voucherSubgraphMap[flavour][id],
-  bridge: bridgeMap[flavour] && bridgeMap[flavour][id],
-  flavour,
+  voucherHub: voucherHubMap[id],
+  resultProxy: resultProxyMap[id],
+  ipfsGateway: ipfsGatewayMap[id],
+  iexecGateway: iexecGatewayMap[id],
+  pocoSubgraph: pocoSubgraphMap[id],
+  voucherSubgraph: voucherSubgraphMap[id],
+  bridge: bridgeMap[id],
 });
-
-export const isEnterpriseEnabled = (id) => !!enterpriseEnabledMap[id];
 
 // register ethers unknown networks
 if (Network.from(134).name === 'unknown') {

@@ -34,10 +34,6 @@ export interface IExecConfigArgs {
     | BrowserProvider
     | string
     | number;
-  /**
-   * flavour to use (default standard)
-   */
-  flavour?: string;
 }
 
 export interface IExecConfigOptions {
@@ -85,15 +81,6 @@ export interface IExecConfigOptions {
      * bridge contract address on bridged network
      */
     bridgeAddress?: string;
-  };
-  /**
-   * override the enterprise configuration
-   */
-  enterpriseSwapConf?: {
-    /**
-     * IExec enterprise contract address
-     */
-    hubAddress?: string;
   };
   /**
    * override the result proxy URL to target a custom instance
@@ -181,14 +168,6 @@ export default class IExecConfig {
    * resolve the current bridged IExecContractsClient
    */
   resolveBridgedContractsClient(): Promise<IExecContractsClient>;
-  /**
-   * resolve the current standard IExecContractsClient
-   */
-  resolveStandardContractsClient(): Promise<IExecContractsClient>;
-  /**
-   * resolve the current enterprise IExecContractsClient
-   */
-  resolveEnterpriseContractsClient(): Promise<IExecContractsClient>;
   /**
    * resolve the current SMS URL
    */

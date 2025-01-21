@@ -949,7 +949,6 @@ run
       const requestorderToSign = await createRequestorder(
         {
           contracts: chain.contracts,
-          resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
         },
         {
           app: apporder.app,
@@ -1302,7 +1301,6 @@ requestRun
       const requestorderToSign = await createRequestorder(
         {
           contracts: chain.contracts,
-          resultProxyURL: getPropertyFormChain(chain, 'resultProxy'),
         },
         {
           app,

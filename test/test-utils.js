@@ -59,7 +59,6 @@ export const TEST_CHAINS = {
     rpcURL: DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
     chainId: '65535',
     hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-    enterpriseHubAddress: '0xb80C02d24791fA92fA8983f15390274698A75D23',
     ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
     ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
     pocoAdminWallet: new Wallet(
@@ -149,53 +148,56 @@ export const getRandomAddress = () => getRandomWallet().address;
 
 export const getRandomBytes32 = () => hexlify(randomBytes(32));
 export class InjectedProvider {
-  constructor(rpcUrl, privateKey) {
-    this.signer = new Wallet(
-      privateKey,
-      new JsonRpcProvider(rpcUrl, undefined, { pollingInterval: 100 }), // fast polling for tests
-    );
+  constructor(rpcUrl, privateKey, { mockUserRejection, mockError } = {}) {
+    this.provider = new JsonRpcProvider(rpcUrl, undefined, {
+      pollingInterval: 100,
+    }); // fast polling for tests
+    this.signer = new Wallet(privateKey, this.provider);
+    this.mockUserRejection = mockUserRejection;
+    this.mockError = mockError;
   }
 
   async request(args) {
     const { method, params } = args;
-    let rpcPromise;
     switch (method) {
       case 'eth_requestAccounts':
       case 'eth_accounts':
-        rpcPromise = Promise.resolve([this.signer.address]);
-        break;
+        return Promise.resolve([this.signer.address]);
       case 'eth_chainId':
-        rpcPromise = this.signer.provider
+        return this.provider
           .getNetwork()
           .then((network) => network.chainId.toString());
-        break;
+      case 'eth_blockNumber':
+        return this.provider.getBlockNumber();
       case 'personal_sign':
-        rpcPromise = this.signer.signMessage(params[0]);
-        break;
+        if (this.mockError) return Promise.reject(Error('error'));
+        if (this.mockUserRejection) return Promise.reject(Error('user denied'));
+        return this.signer.signMessage(params[0]);
       case 'eth_signTypedData_v3':
       case 'eth_signTypedData_v4':
-        rpcPromise = (async () => {
+        if (this.mockError) return Promise.reject(Error('error'));
+        if (this.mockUserRejection) return Promise.reject(Error('user denied'));
+        return (async () => {
           const typedData = JSON.parse(params[1]);
           const { EIP712Domain, ...types } = typedData.types;
           const { message, domain } = typedData;
           return this.signer.signTypedData(domain, types, message);
         })();
-        break;
       case 'eth_call':
-        rpcPromise = this.provider.call(params[0]);
-        break;
+        return this.provider.call(params[0]);
+      case 'eth_estimateGas':
+        return this.provider.estimateGas(params[0]);
       case 'eth_sendTransaction':
-        rpcPromise = (async () => {
+        if (this.mockError) return Promise.reject(Error('error'));
+        if (this.mockUserRejection) return Promise.reject(Error('user denied'));
+        return (async () => {
           const { gas, ...gasStripped } = params[0];
           const transaction = await this.signer.sendTransaction(gasStripped);
           return transaction.hash;
         })();
-        break;
       default:
-        rpcPromise = Promise.reject(Error('not implemented'));
-        break;
+        return Promise.reject(Error('not implemented'));
     }
-    return rpcPromise;
   }
 }
 
@@ -218,7 +220,7 @@ const faucetSendWeiToReachTargetBalance =
     } catch (e) {
       console.warn(`Faucet send Eth: error (try count ${tryCount}) - ${e}`);
       // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 3) {
+      if (tryCount < 5) {
         await sleep(3000 * tryCount);
         await faucetSendWeiToReachTargetBalance(chain)(
           address,
@@ -275,7 +277,7 @@ const faucetSendNRlcToReachTargetBalance =
     } catch (e) {
       console.warn(`Faucet send RLC: error (try count ${tryCount}) - ${e}`);
       // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 3) {
+      if (tryCount < 5) {
         await sleep(3000 * tryCount);
         await faucetSendNRlcToReachTargetBalance(chain)(
           address,
@@ -373,7 +375,7 @@ export const adminCreateCategory =
         `Admin create category: error (try count ${tryCount}) - ${e}`,
       );
       // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 3) {
+      if (tryCount < 5) {
         await sleep(3000 * tryCount);
         res = await adminCreateCategory(chain)(category, tryCount + 1);
       } else {
@@ -413,7 +415,7 @@ export const createVoucherType =
           `Error creating voucher type (try count ${tryCount}):`,
           error,
         );
-        if (tryCount < 3) {
+        if (tryCount < 5) {
           await sleep(3000 * tryCount);
           id = await retryableCreateVoucherType(tryCount + 1);
         } else {
@@ -483,7 +485,7 @@ export const createVoucher =
         await createVoucherTx.wait();
       } catch (error) {
         console.warn(`Error creating voucher (try count ${tryCount}):`, error);
-        if (tryCount < 3) {
+        if (tryCount < 5) {
           await sleep(3000 * tryCount);
           await retryableCreateVoucher(tryCount + 1);
         } else {
@@ -541,7 +543,7 @@ export const addVoucherEligibleAsset =
           `Error adding eligible asset to voucher (try count ${tryCount}):`,
           error,
         );
-        if (tryCount < 3) {
+        if (tryCount < 5) {
           await sleep(3000 * tryCount);
           await retryableAddEligibleAsset(tryCount + 1);
         } else {

@@ -169,10 +169,6 @@ export const desc = {
     'send RLC from the mainchain to the sidechain (default unit nRLC)',
   bridgeToMainchain: () =>
     'send RLC from the sidechain to the mainchain (default unit nRLC)',
-  wrapEnterpriseRLC: () =>
-    'swap RLC for the same amount of eRLC (default unit nRLC) - the wallet must be authorized to interact with eRLC',
-  unwrapEnterpriseRLC: () =>
-    'swap eRLC for the same amount of RLC (default unit neRLC) - the wallet must be authorized to interact with eRLC',
   appRun: () =>
     'run an iExec application at market price (default run last deployed app)',
   requestRun: () => 'request an iExec application execution at limit price',
@@ -602,14 +598,6 @@ export const prompt = {
   transferObj: (objName, objAddress, to, chainId) =>
     question(
       `Do you want to transfer the ownership of the ${objName} ${objAddress} to ${to} [chainId: ${chainId}]`,
-    ),
-  wrap: (amount, chainId) =>
-    question(
-      `Do you want to swap ${amount} RLC for eRLC (1 RLC = 1 eRLC) [chainId: ${chainId}]`,
-    ),
-  unwrap: (amount, chainId) =>
-    question(
-      `Do you want to swap ${amount} eRLC for RLC (1 eRLC = 1 RLC) [chainId: ${chainId}]`,
     ),
   cancelOrder: (orderName, order) =>
     question(`Do you want to cancel the following ${orderName}? ${order}`),

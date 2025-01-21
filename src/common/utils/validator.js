@@ -70,7 +70,7 @@ export const uint256Schema = () =>
 export const booleanSchema = () => boolean();
 
 export const basicUrlSchema = () =>
-  string().matches(/^http[s]?:\/\//, '${path} "${value}" is not a valid URL');
+  string().matches(/^https?:\/\//, '${path} "${value}" is not a valid URL');
 
 const amountErrorMessage = ({ originalValue }) =>
   `${
@@ -336,20 +336,8 @@ export const objParamsSchema = () =>
             (value) => value === undefined,
           ),
     ),
-    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]: string().when(
-      `${IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER}`,
-      ([provider], providerSchema) =>
-        provider === STORAGE_PROVIDERS.IPFS
-          ? providerSchema
-              .when('$resultProxyURL', ([resultProxyURL], schema) =>
-                schema.default(resultProxyURL),
-              )
-              .required(
-                `\${path} is required field with "${STORAGE_PROVIDERS.IPFS}" storage`,
-              )
-          : providerSchema.notRequired(),
-    ),
-    [IEXEC_REQUEST_PARAMS.IEXEC_DEVELOPER_LOGGER]: boolean().notRequired(), // deprecated
+    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]:
+      basicUrlSchema().notRequired(),
   })
     .json()
     .noUnknown(true, 'Unknown key "${unknown}" in params');
@@ -828,7 +816,10 @@ export const textRecordKeySchema = () => string().required().strict(true);
 
 export const textRecordValueSchema = () => string().default('').strict(true);
 
-export const workerpoolApiUrlSchema = () => string().url().default('');
+export const workerpoolApiUrlSchema = () =>
+  string()
+    .matches(/^(https?:\/\/.*)?$/, '${path} "${value}" is not a valid URL') // accept empty string to reset workerpool URL
+    .default('');
 
 export const smsUrlOrMapSchema = () =>
   lazy((stringOrMap) => {

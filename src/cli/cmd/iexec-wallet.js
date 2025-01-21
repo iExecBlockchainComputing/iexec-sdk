@@ -12,10 +12,6 @@ import {
   bridgeToMainchain as walletBridgeToMainchain,
 } from '../../common/wallet/bridge.js';
 import {
-  wrapEnterpriseRLC as walletWrapEnterpriseRLC,
-  unwrapEnterpriseRLC as walletUnwrapEnterpriseRLC,
-} from '../../common/wallet/enterprise.js';
-import {
   Keystore,
   createAndSave,
   importPrivateKeyAndSave,
@@ -530,126 +526,6 @@ bridgeToMainchain
           },
         },
       );
-    } catch (error) {
-      handleError(error, cli, opts);
-    }
-  });
-
-const wrapEnterpriseRLC = cli.command('swap-RLC-for-eRLC <amount> [unit]');
-addGlobalOptions(wrapEnterpriseRLC);
-addWalletLoadOptions(wrapEnterpriseRLC);
-wrapEnterpriseRLC
-  .option(...option.chain())
-  .option(...option.txGasPrice())
-  .option(...option.txConfirms())
-  .option(...option.force())
-  .description(desc.wrapEnterpriseRLC())
-  .action(async (amount, unit, opts) => {
-    await checkUpdate(opts);
-    const spinner = Spinner(opts);
-    try {
-      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = computeWalletLoadOptions(opts);
-      const txOptions = await computeTxOptions(opts);
-      const keystore = Keystore(walletOptions);
-      const [chain] = await Promise.all([
-        loadChain(opts.chain, { txOptions, spinner }),
-      ]);
-      const hasEnterpriseFlavour =
-        chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
-      if (!hasEnterpriseFlavour) {
-        throw Error(
-          `No enterprise smart contracts found on current chain ${chain.id}`,
-        );
-      }
-
-      const standardContracts =
-        chain.contracts.flavour === 'standard'
-          ? chain.contracts
-          : chain.enterpriseSwapNetwork.contracts;
-
-      const enterpriseContracts =
-        chain.contracts.flavour === 'standard'
-          ? chain.enterpriseSwapNetwork.contracts
-          : chain.contracts;
-
-      await connectKeystore({ contracts: standardContracts }, keystore, {
-        txOptions,
-      });
-      if (!opts.force) {
-        await prompt.wrap(formatRLC(nRlcAmount), chain.id);
-      }
-      const message = `${formatRLC(nRlcAmount)} RLC into eRLC`;
-      spinner.start(`Wrapping ${message}...`);
-
-      const txHash = await walletWrapEnterpriseRLC(
-        standardContracts,
-        enterpriseContracts,
-        nRlcAmount,
-      );
-      spinner.succeed(`Wrapped ${message}\n`, {
-        raw: {
-          amount: nRlcAmount,
-          txHash,
-        },
-      });
-    } catch (error) {
-      handleError(error, cli, opts);
-    }
-  });
-
-const unwrapEnterpriseRLC = cli.command('swap-eRLC-for-RLC <amount> [unit]');
-addGlobalOptions(unwrapEnterpriseRLC);
-addWalletLoadOptions(unwrapEnterpriseRLC);
-unwrapEnterpriseRLC
-  .option(...option.chain())
-  .option(...option.txGasPrice())
-  .option(...option.txConfirms())
-  .option(...option.force())
-  .description(desc.unwrapEnterpriseRLC())
-  .action(async (amount, unit, opts) => {
-    await checkUpdate(opts);
-    const spinner = Spinner(opts);
-    try {
-      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = computeWalletLoadOptions(opts);
-      const txOptions = await computeTxOptions(opts);
-      const keystore = Keystore(walletOptions);
-      const [chain] = await Promise.all([
-        loadChain(opts.chain, { txOptions, spinner }),
-      ]);
-      const hasEnterpriseFlavour =
-        chain.enterpriseSwapNetwork && !!chain.enterpriseSwapNetwork.contracts;
-      if (!hasEnterpriseFlavour) {
-        throw Error(
-          `No enterprise smart contracts found on current chain ${chain.id}`,
-        );
-      }
-
-      const enterpriseContracts =
-        chain.contracts.flavour === 'standard'
-          ? chain.enterpriseSwapNetwork.contracts
-          : chain.contracts;
-
-      await connectKeystore({ contracts: enterpriseContracts }, keystore, {
-        txOptions,
-      });
-      if (!opts.force) {
-        await prompt.unwrap(formatRLC(nRlcAmount), chain.id);
-      }
-      const message = `${formatRLC(nRlcAmount)} eRLC into RLC`;
-      spinner.start(`Unwrapping ${message}...`);
-
-      const txHash = await walletUnwrapEnterpriseRLC(
-        enterpriseContracts,
-        nRlcAmount,
-      );
-      spinner.succeed(`Unwrapped ${message}\n`, {
-        raw: {
-          amount: nRlcAmount,
-          txHash,
-        },
-      });
     } catch (error) {
       handleError(error, cli, opts);
     }

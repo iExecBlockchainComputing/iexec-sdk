@@ -21,6 +21,7 @@ Web3ProviderCallError encapsulates an error thrown by the web3 provider during a
 ### Properties
 
 - [cause](errors.Web3ProviderCallError.md#cause)
+- [isUserRejection](errors.Web3ProviderCallError.md#isuserrejection)
 - [originalError](errors.Web3ProviderCallError.md#originalerror)
 
 ## Constructors
@@ -55,6 +56,18 @@ The original Error object that caused this web3 provider error.
 #### Inherited from
 
 [Web3ProviderError](errors.Web3ProviderError.md).[cause](errors.Web3ProviderError.md#cause)
+
+___
+
+### isUserRejection
+
+• `Optional` **isUserRejection**: `boolean`
+
+Wether the error was caused by a user rejection
+
+#### Inherited from
+
+[Web3ProviderError](errors.Web3ProviderError.md).[isUserRejection](errors.Web3ProviderError.md#isuserrejection)
 
 ___
 

@@ -8,10 +8,6 @@ import {
   obsBridgeToMainchain,
   obsBridgeToSidechain,
 } from '../common/wallet/bridge.js';
-import {
-  wrapEnterpriseRLC,
-  unwrapEnterpriseRLC,
-} from '../common/wallet/enterprise.js';
 
 export default class IExecWalletModule extends IExecModule {
   constructor(...args) {
@@ -68,17 +64,6 @@ export default class IExecWalletModule extends IExecModule {
           bridgedContracts: await this.config.resolveBridgedContractsClient(),
           mainchainBridgeAddress: await this.config.resolveBridgeBackAddress(),
         },
-      );
-    this.wrapEnterpriseRLC = async (nRlcAmount) =>
-      wrapEnterpriseRLC(
-        await this.config.resolveStandardContractsClient(),
-        await this.config.resolveEnterpriseContractsClient(),
-        nRlcAmount,
-      );
-    this.unwrapEnterpriseRLC = async (nRlcAmount) =>
-      unwrapEnterpriseRLC(
-        await this.config.resolveEnterpriseContractsClient(),
-        nRlcAmount,
       );
   }
 }

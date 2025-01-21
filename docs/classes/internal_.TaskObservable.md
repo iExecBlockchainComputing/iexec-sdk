@@ -40,7 +40,7 @@
 
 ▸ **subscribe**(`callbacks`): () => `void`
 
-subscribe to task updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
+subscribe to task updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscription is canceled by calling the returned unsubscribe method.
 
 return the `unsubscribe: () => void` method.
 
@@ -67,7 +67,7 @@ data:
 
 ▸ (): `void`
 
-subscribe to task updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
+subscribe to task updates via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscription is canceled by calling the returned unsubscribe method.
 
 return the `unsubscribe: () => void` method.
 

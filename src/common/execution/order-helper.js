@@ -41,7 +41,6 @@ export const createObjParams = async ({
   tag = NULL_BYTES32,
   callback = NULL_ADDRESS,
   noCast = false,
-  resultProxyURL,
 } = {}) => {
   let inputParams;
   if (typeof params === 'string') {
@@ -59,7 +58,7 @@ export const createObjParams = async ({
   const isCallback = callback !== NULL_ADDRESS;
   return objParamsSchema().validate(inputParams, {
     strict: noCast,
-    context: { isTee, isCallback, resultProxyURL },
+    context: { isTee, isCallback },
   });
 };
 

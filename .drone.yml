@@ -2,10 +2,6 @@ kind: pipeline
 type: docker
 name: default
 
-# required until voucher-subgraph-deployer is publicly available
-image_pull_secrets:
-  - dockerconfigregis
-
 trigger:
   event:
     exclude:
@@ -291,8 +287,7 @@ steps:
 
   - name: voucher-subgraph-deployer
     # https://github.com/iExecBlockchainComputing/iexec-voucher-subgraph
-    # TODO replace image with iexechub/voucher-subgraph-deployer when available
-    image: docker-regis.iex.ec/voucher-subgraph:8491d157
+    image: iexechub/voucher-subgraph-deployer:1.0.0
     pull: always
     environment:
       RPC_URL: http://bellecour-fork:8545
