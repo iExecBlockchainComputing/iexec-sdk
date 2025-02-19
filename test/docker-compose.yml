@@ -119,17 +119,12 @@ services:
     restart: unless-stopped
     environment:
       JAVA_TOOL_OPTIONS: '-Xmx256M'
-      # chain
       IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
       IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      # tee framework
       IEXEC_SMS_TEE_RUNTIME_FRAMEWORK: scone
-      # las image
       IEXEC_SMS_IMAGE_LAS_IMAGE: 'las-image'
-      # pre-compute
       IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: 'pre-compute-image'
       IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 'pre-compute-fingerprint'
-      # post-compute
       IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: 'post-compute-image'
       IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: 'post-compute-fingerprint'
     ports:
@@ -145,17 +140,12 @@ services:
     restart: unless-stopped
     environment:
       JAVA_TOOL_OPTIONS: '-Xmx256M'
-      # chain
       IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
       IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      # tee framework
       IEXEC_SMS_TEE_RUNTIME_FRAMEWORK: scone
-      # las image
       IEXEC_SMS_IMAGE_LAS_IMAGE: 'las-image'
-      # pre-compute
       IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: 'pre-compute-image'
       IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 'pre-compute-fingerprint'
-      # post-compute
       IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: 'post-compute-image'
       IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: 'post-compute-fingerprint'
     ports:
