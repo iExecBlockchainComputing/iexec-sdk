@@ -23,7 +23,8 @@ services:
     ports:
       - 8545:8545
     healthcheck:
-      test: nc -z 0.0.0.0 8545
+      # check port 8545 is open without nc
+      test: (echo >/dev/tcp/$(hostname)/8545) &>/dev/null
       interval: 10s
       timeout: 5s
       retries: 3
