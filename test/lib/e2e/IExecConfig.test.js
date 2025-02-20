@@ -785,32 +785,24 @@ describe('[IExecConfig]', () => {
       const sconeSmsUrl = await new IExecConfig({
         ethProvider: 'bellecour',
       }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
-      const gramineSmsUrl = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
       expect(defaultSms).toBe(sconeSmsUrl);
-      expect(defaultSms).not.toBe(gramineSmsUrl);
     });
     test('success override defaultTeeFramework', async () => {
-      const defaultSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL();
+      // TODO replace with another framework when available
       const defaultSmsTeeFrameworkOverride = await new IExecConfig(
         {
           ethProvider: 'bellecour',
         },
-        { defaultTeeFramework: TEE_FRAMEWORKS.GRAMINE },
+        { defaultTeeFramework: TEE_FRAMEWORKS.SCONE },
       ).resolveSmsURL();
-      const gramineSms = await new IExecConfig({
+      const sconeSms = await new IExecConfig({
         ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
-      expect(defaultSmsTeeFrameworkOverride).toBe(gramineSms);
-      expect(defaultSmsTeeFrameworkOverride).not.toBe(defaultSms);
+      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
+      expect(defaultSmsTeeFrameworkOverride).toBe(sconeSms);
     });
     test('success smsURL object override per teeFramework', async () => {
       const smsMap = {
         scone: 'http://foo.io',
-        gramine: 'http://bar.io',
       };
       const config = new IExecConfig(
         {
@@ -821,29 +813,6 @@ describe('[IExecConfig]', () => {
       await expect(
         config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
       ).resolves.toBe(smsMap.scone);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsMap.gramine);
-    });
-    test('success smsURL object override only one teeFramework', async () => {
-      const sconeDefaultSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
-      const smsMap = {
-        gramine: 'http://bar.io',
-      };
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { smsURL: smsMap },
-      );
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(sconeDefaultSms);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsMap.gramine);
     });
     test('success smsURL string override all teeFramework', async () => {
       const smsOverride = 'http://sms-override.iex.ec';
@@ -856,9 +825,6 @@ describe('[IExecConfig]', () => {
       await expect(config.resolveSmsURL()).resolves.toBe(smsOverride);
       await expect(
         config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(smsOverride);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
       ).resolves.toBe(smsOverride);
     });
     test('success with smsURL string on custom chain', async () => {

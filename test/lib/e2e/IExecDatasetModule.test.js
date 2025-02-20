@@ -390,21 +390,6 @@ describe('dataset', () => {
       const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomDataset(iexec);
-      await iexec.dataset.pushDatasetSecret(address, 'foo', {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
-      ).resolves.toBe(false);
       // validate teeFramework
       await expect(
         readOnlyIExec.dataset.checkDatasetSecretExists(getRandomAddress(), {
@@ -474,9 +459,7 @@ describe('dataset', () => {
 
     test('use the default TEE framework SMS', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
-      const { address: datasetAddress } = await deployRandomDataset(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
+      const { address: datasetAddress } = await deployRandomDataset(iexec);
       await expect(
         iexec.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).resolves.toBe(true);
@@ -515,22 +498,6 @@ describe('dataset', () => {
       await expect(
         iexec.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).resolves.toBe(true);
-      await expect(
-        iexec.dataset.checkDatasetSecretExists(datasetAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(false);
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-      await expect(
-        iexec.dataset.checkDatasetSecretExists(datasetAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-
       // validate teeFramework
       await expect(
         iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {

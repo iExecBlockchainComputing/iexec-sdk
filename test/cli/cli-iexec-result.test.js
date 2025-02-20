@@ -86,14 +86,6 @@ describe('iexec result', () => {
         rawAlreadyExistsForTeeFramework,
       );
       expect(resAlreadyExistsForTeeFramework.ok).toBe(false);
-      const resNotExistsForTeeFramework = JSON.parse(
-        await execAsync(
-          `${iexecPath} result push-encryption-key --tee-framework gramine --raw`,
-        ),
-      );
-      expect(resNotExistsForTeeFramework.ok).toBe(true);
-      expect(resNotExistsForTeeFramework.isPushed).toBe(true);
-      expect(resNotExistsForTeeFramework.isUpdated).toBe(false);
     });
 
     test('iexec result push-encryption-key --force-update', async () => {
@@ -151,13 +143,6 @@ describe('iexec result', () => {
       const resExistsOnTeeFramework = JSON.parse(rawExistsOnTeeFramework);
       expect(resExistsOnTeeFramework.ok).toBe(true);
       expect(resExistsOnTeeFramework.isEncryptionKeySet).toBe(true);
-
-      const rawNotExistsOnTeeFramework = await execAsync(
-        `${iexecPath} result check-encryption-key --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
-      );
-      const resNotExistsOnTeeFramework = JSON.parse(rawNotExistsOnTeeFramework);
-      expect(resNotExistsOnTeeFramework.ok).toBe(true);
-      expect(resNotExistsOnTeeFramework.isEncryptionKeySet).toBe(false);
     });
 
     test('check-secret (v4 legacy name)', async () => {

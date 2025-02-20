@@ -25,7 +25,6 @@
 - [Dataset](../interfaces/internal_.Dataset.md)
 - [DatasetDeploymentArgs](../interfaces/internal_.DatasetDeploymentArgs.md)
 - [DatasetorderTemplate](../interfaces/internal_.DatasetorderTemplate.md)
-- [GramineMREnclave](../interfaces/internal_.GramineMREnclave.md)
 - [HashableApporder](../interfaces/internal_.HashableApporder.md)
 - [HashableDatasetorder](../interfaces/internal_.HashableDatasetorder.md)
 - [HashableRequestorder](../interfaces/internal_.HashableRequestorder.md)

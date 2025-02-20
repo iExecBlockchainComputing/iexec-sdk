@@ -91,7 +91,7 @@ console.log('secret exists:', isSecretSet);
 | :------ | :------ |
 | `datasetAddress` | `string` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 
@@ -150,7 +150,7 @@ const checksum = await computeEncryptedFileChecksum(
 
 | Name | Type |
 | :------ | :------ |
-| `encryptedFile` | `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
+| `encryptedFile` | `Buffer` \| `Uint8Array` \| `ArrayBuffer` |
 
 #### Returns
 
@@ -242,7 +242,7 @@ const binary = new Blob([encryptedDataset]);
 
 | Name | Type |
 | :------ | :------ |
-| `datasetFile` | `Buffer` \| `ArrayBuffer` \| `Uint8Array` |
+| `datasetFile` | `Buffer` \| `Uint8Array` \| `ArrayBuffer` |
 | `encyptionKey` | `string` |
 
 #### Returns
@@ -323,7 +323,7 @@ console.log('secret pushed:', pushed);
 | `datasetAddress` | `string` |
 | `encryptionKey` | `string` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 

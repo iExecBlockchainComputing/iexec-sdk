@@ -82,7 +82,7 @@ console.log('secret "my-password" set:', isSecretSet);
 | `requesterAddress` | `string` |
 | `secretName` | `String` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 
@@ -115,7 +115,7 @@ console.log('pushed secret "my-password":', isPushed);
 | `secretName` | `String` |
 | `secretValue` | `String` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 

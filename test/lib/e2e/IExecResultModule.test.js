@@ -30,12 +30,6 @@ describe('result', () => {
           `Secret "iexec-result-encryption-public-key" already exists for ${wallet.address}`,
         ),
       );
-      const pushForTeeFrameworkRes = await iexec.result.pushResultEncryptionKey(
-        'oops',
-        { teeFramework: TEE_FRAMEWORKS.GRAMINE },
-      );
-      expect(pushForTeeFrameworkRes.isPushed).toBe(true);
-      expect(pushForTeeFrameworkRes.isUpdated).toBe(false);
     });
 
     test('forceUpdate allows updating the key', async () => {
@@ -76,14 +70,6 @@ describe('result', () => {
           },
         );
       expect(withSecretForTeeFrameworkRes).toBe(true);
-      const withoutSecretForTeeFrameworkRes =
-        await iexecReadOnly.result.checkResultEncryptionKeyExists(
-          wallet.address,
-          {
-            teeFramework: TEE_FRAMEWORKS.GRAMINE,
-          },
-        );
-      expect(withoutSecretForTeeFrameworkRes).toBe(false);
     });
   });
 });

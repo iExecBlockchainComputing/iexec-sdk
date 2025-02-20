@@ -37,21 +37,6 @@ export interface SconeMREnclave {
   fingerprint: string;
 }
 
-export interface GramineMREnclave {
-  /**
-   * TEE framework name 'GRAMINE'
-   */
-  framework: string;
-  /**
-   * framework's protocol version
-   */
-  version: string;
-  /**
-   * app tee fingerprint
-   */
-  fingerprint: string;
-}
-
 export interface AppDeploymentArgs {
   /**
    * the app owner
@@ -76,7 +61,7 @@ export interface AppDeploymentArgs {
   /**
    * optional for TEE apps only, specify the TEE protocol to use
    */
-  mrenclave?: SconeMREnclave | GramineMREnclave;
+  mrenclave?: SconeMREnclave;
 }
 /**
  * IExec app

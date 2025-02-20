@@ -57,12 +57,6 @@ describe('secrets', () => {
       ).rejects.toThrow(
         Error(`Secret "foo" already exists for ${wallet.address}`),
       );
-      const pushForTeeFrameworkRes = await iexec.secrets.pushRequesterSecret(
-        'foo',
-        'oops',
-        { teeFramework: TEE_FRAMEWORKS.GRAMINE },
-      );
-      expect(pushForTeeFrameworkRes.isPushed).toBe(true);
     });
   });
 
@@ -120,10 +114,10 @@ describe('secrets', () => {
           wallet.address,
           'foo',
           {
-            teeFramework: TEE_FRAMEWORKS.GRAMINE,
+            teeFramework: TEE_FRAMEWORKS.SCONE,
           },
         ),
-      ).resolves.toBe(false);
+      ).resolves.toBe(true);
     });
   });
 });

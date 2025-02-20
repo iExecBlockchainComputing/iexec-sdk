@@ -825,7 +825,7 @@ describe('[tagSchema]', () => {
   test('invalid tee tag', async () => {
     await expect(tagSchema().validate('tee')).rejects.toThrow(
       new ValidationError(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+        "'tee' tag must be used with a tee framework ('scone')",
       ),
     );
     await expect(
@@ -834,7 +834,7 @@ describe('[tagSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+        "'tee' tag must be used with a tee framework ('scone')",
       ),
     );
     await expect(tagSchema().validate('scone')).rejects.toThrow(
@@ -846,30 +846,6 @@ describe('[tagSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError("'scone' tag must be used with 'tee' tag"),
-    );
-    await expect(tagSchema().validate('gramine')).rejects.toThrow(
-      new ValidationError("'gramine' tag must be used with 'tee' tag"),
-    );
-    await expect(
-      tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000004',
-      ),
-    ).rejects.toThrow(
-      new ValidationError("'gramine' tag must be used with 'tee' tag"),
-    );
-    await expect(tagSchema().validate('tee,gramine,scone')).rejects.toThrow(
-      new ValidationError(
-        "tee framework tags are exclusive ('scone'|'gramine')",
-      ),
-    );
-    await expect(
-      tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000007',
-      ),
-    ).rejects.toThrow(
-      new ValidationError(
-        "tee framework tags are exclusive ('scone'|'gramine')",
-      ),
     );
   });
 });
@@ -1056,17 +1032,6 @@ describe('[fileBufferSchema]', () => {
 });
 
 describe('[mrenclaveSchema]', () => {
-  test('valid obj', async () => {
-    const obj = {
-      framework: 'GRAMINE',
-      version: 'v5',
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-    };
-    await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
-      Buffer.from(JSON.stringify(obj), 'utf8'),
-    );
-  });
   test('valid SCONE obj', async () => {
     const obj = {
       framework: 'SCONE',
@@ -1123,30 +1088,6 @@ describe('[mrenclaveSchema]', () => {
   test('allow empty bytes', async () => {
     await expect(mrenclaveSchema().validate(Buffer.from([]))).resolves.toEqual(
       Buffer.from([]),
-    );
-  });
-  test('throw when "entrypoint" is set for non SCONE framework', async () => {
-    const obj = {
-      framework: 'GRAMINE',
-      version: 'v5',
-      entrypoint: '/app/helloworld',
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-    };
-    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('Unknown key "entrypoint" in mrenclave'),
-    );
-  });
-  test('throw when "heapSize" is set for non SCONE framework', async () => {
-    const obj = {
-      framework: 'GRAMINE',
-      version: 'v5',
-      heapSize: 1073741824,
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-    };
-    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('Unknown key "heapSize" in mrenclave'),
     );
   });
   test('throw with null', async () => {
@@ -1407,15 +1348,15 @@ describe('[smsUrlOrMapSchema]', () => {
   });
   test('allow Record<TeeFramework,Url>', async () => {
     const smsMap = {
+      // TODO add new tee framework
       scone: 'http://scone-sms',
-      gramine: 'http://gramine-sms',
     };
     const res = await smsUrlOrMapSchema().validate(smsMap);
     expect(res).toEqual(smsMap);
   });
   test('allow partial Record<TeeFramework,Url>', async () => {
     const smsMap = {
-      gramine: 'http://gramine-sms',
+      scone: 'http://scone-sms',
     };
     const res = await smsUrlOrMapSchema().validate(smsMap);
     expect(res).toEqual(smsMap);

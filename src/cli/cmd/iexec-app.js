@@ -20,7 +20,7 @@ import {
   apporderSchema,
   requestorderSchema,
 } from '../../common/utils/validator.js';
-import { sconeTeeApp, gramineTeeApp } from '../utils/templates.js';
+import { sconeTeeApp } from '../utils/templates.js';
 import {
   deployApp,
   showApp,
@@ -159,9 +159,6 @@ init
       let teeTemplate = {};
       if (teeFramework === TEE_FRAMEWORKS.SCONE) {
         teeTemplate = sconeTeeApp;
-      }
-      if (teeFramework === TEE_FRAMEWORKS.GRAMINE) {
-        teeTemplate = gramineTeeApp;
       }
       const { saved, fileName } = await initObj(objName, {
         overwrite: { ...teeTemplate, owner: address },

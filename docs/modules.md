@@ -229,7 +229,6 @@ example:
 ```js
 const gpuTag = ['gpu'];
 const sconeTeeTag = ['tee', 'scone'];
-const gramineTeeTag = ['tee', 'gramine'];
 ```
 
 ___
@@ -252,7 +251,7 @@ ___
 
 ### TeeFramework
 
-Ƭ **TeeFramework**: ``"scone"`` \| ``"gramine"``
+Ƭ **TeeFramework**: ``"scone"``
 
 Trusted Execution Environment name
 

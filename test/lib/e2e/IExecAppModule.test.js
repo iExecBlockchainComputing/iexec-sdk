@@ -308,7 +308,7 @@ describe('app', () => {
       });
       const { iexec } = getTestConfig(iexecTestChain)();
       const { address } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
+        teeFramework: TEE_FRAMEWORKS.SCONE,
       });
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address),
@@ -321,31 +321,9 @@ describe('app', () => {
       // check inferred teeFramework with teeFramework option
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-    });
-
-    test('allows teeFramework override', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
-        readOnly: true,
-      });
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
-      await iexec.app.pushAppSecret(address, 'foo');
-      await expect(
-        readOnlyIExec.app.checkAppSecretExists(address, {
           teeFramework: TEE_FRAMEWORKS.SCONE,
         }),
-      ).resolves.toBe(false);
-      // validate teeFramework
-      await expect(
-        readOnlyIExec.app.checkAppSecretExists(getRandomAddress(), {
-          teeFramework: 'foo',
-        }),
-      ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
+      ).resolves.toBe(true);
     });
   });
 
@@ -395,9 +373,7 @@ describe('app', () => {
       const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
       const { iexec: iexecRandom, wallet: randomWallet } =
         getTestConfig(iexecTestChain)();
-      const { address: appAddress } = await deployRandomApp(iexecAppOwner, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
+      const { address: appAddress } = await deployRandomApp(iexecAppOwner);
       // only owner can push secret
       await expect(
         iexecRandom.app.pushAppSecret(appAddress, 'foo'),
@@ -411,7 +387,7 @@ describe('app', () => {
     test('infers the SMS from app TEE framework', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const { address: appAddress } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
+        teeFramework: TEE_FRAMEWORKS.SCONE,
       });
       // infer teeFramework to use
       await expect(iexec.app.pushAppSecret(appAddress, 'foo')).resolves.toBe(
@@ -420,7 +396,7 @@ describe('app', () => {
       // check inferred teeFramework with teeFramework option
       await expect(
         iexec.app.pushAppSecret(appAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
+          teeFramework: TEE_FRAMEWORKS.SCONE,
         }),
       ).rejects.toThrow(
         Error(`Secret already exists for ${appAddress} and can't be updated`),
@@ -429,9 +405,7 @@ describe('app', () => {
 
     test('cannot update existing secret', async () => {
       const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
-      const { address: appAddress } = await deployRandomApp(iexecAppOwner, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
+      const { address: appAddress } = await deployRandomApp(iexecAppOwner);
 
       await expect(
         iexecAppOwner.app.pushAppSecret(appAddress, 'foo'),
@@ -453,17 +427,7 @@ describe('app', () => {
       );
       await expect(
         iexec.app.checkAppSecretExists(appAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(false);
-      await expect(
-        iexec.app.pushAppSecret(appAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-      await expect(
-        iexec.app.checkAppSecretExists(appAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
+          teeFramework: TEE_FRAMEWORKS.SCONE,
         }),
       ).resolves.toBe(true);
 

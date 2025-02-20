@@ -168,12 +168,6 @@ describe('utils', () => {
       );
     });
 
-    test("encodeTag(['gramine'])", () => {
-      expect(utils.encodeTag(['gramine'])).toBe(
-        '0x0000000000000000000000000000000000000000000000000000000000000004',
-      );
-    });
-
     test("encodeTag(['gpu'])", () => {
       expect(utils.encodeTag(['gpu'])).toBe(
         '0x0000000000000000000000000000000000000000000000000000000000000100',

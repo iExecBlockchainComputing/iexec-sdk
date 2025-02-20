@@ -311,7 +311,7 @@ describe('order', () => {
     test('preflightCheck TEE framework', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const { address } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
+        teeFramework: TEE_FRAMEWORKS.SCONE,
       });
       const order = await iexec.order.createApporder({
         app: address,
@@ -321,11 +321,6 @@ describe('order', () => {
       );
       await expect(
         iexec.order.signApporder({ ...order, tag: ['tee', 'scone'] }),
-      ).rejects.toThrow(
-        Error('Tag mismatch the TEE framework specified by app'),
-      );
-      await expect(
-        iexec.order.signApporder({ ...order, tag: ['tee', 'gramine'] }),
       ).resolves.toBeDefined();
     });
 
@@ -337,24 +332,11 @@ describe('order', () => {
       await expect(
         iexec.order.signApporder({ ...order, tag: ['tee'] }),
       ).rejects.toThrow(
-        Error(
-          "'tee' tag must be used with a tee framework ('scone'|'gramine')",
-        ),
+        Error("'tee' tag must be used with a tee framework ('scone')"),
       );
       await expect(
         iexec.order.signApporder({ ...order, tag: ['scone'] }),
       ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
-      await expect(
-        iexec.order.signApporder({ ...order, tag: ['gramine'] }),
-      ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
-      await expect(
-        iexec.order.signApporder({
-          ...order,
-          tag: ['tee', 'scone', 'gramine'],
-        }),
-      ).rejects.toThrow(
-        Error("tee framework tags are exclusive ('scone'|'gramine')"),
-      );
     });
   });
 });
@@ -398,13 +380,6 @@ describe('signDatasetorder()', () => {
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
     ).resolves.toBeDefined();
-    await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'gramine'] }),
-    ).rejects.toThrow(
-      Error(
-        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
-      ),
-    );
   });
 
   test('preflightCheck fails with invalid tag', async () => {
@@ -415,22 +390,11 @@ describe('signDatasetorder()', () => {
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
     ).rejects.toThrow(
-      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')"),
+      Error("'tee' tag must be used with a tee framework ('scone')"),
     );
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['scone'] }),
     ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['gramine'] }),
-    ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signDatasetorder({
-        ...order,
-        tag: ['tee', 'scone', 'gramine'],
-      }),
-    ).rejects.toThrow(
-      Error("tee framework tags are exclusive ('scone'|'gramine')"),
-    );
   });
 });
 
@@ -482,22 +446,11 @@ describe('signRequestorder()', () => {
     await expect(
       iexec.order.signRequestorder({ ...order, tag: ['tee'] }),
     ).rejects.toThrow(
-      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')"),
+      Error("'tee' tag must be used with a tee framework ('scone')"),
     );
     await expect(
       iexec.order.signRequestorder({ ...order, tag: ['scone'] }),
     ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signRequestorder({ ...order, tag: ['gramine'] }),
-    ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signRequestorder({
-        ...order,
-        tag: ['tee', 'scone', 'gramine'],
-      }),
-    ).rejects.toThrow(
-      Error("tee framework tags are exclusive ('scone'|'gramine')"),
-    );
   });
 
   test('preflightCheck dropbox storage token exists', async () => {
@@ -673,16 +626,15 @@ describe('hashApporder()', () => {
       app: '0x76fE91568d50C5fF9411223df5A0c50Ec5fa326A',
       appprice: 0,
       volume: 1000000,
-      tag: '0x0000000000000000000000000000000000000000000000000000000000000005',
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000004',
       datasetrestrict: '0x0000000000000000000000000000000000000000',
       workerpoolrestrict: '0x0000000000000000000000000000000000000000',
       requesterrestrict: '0x0000000000000000000000000000000000000000',
       salt: '0xcadb4f169d98b940ae506dfc8ee7832e1ff36854aab92f89b7408257693207b3',
-      sign: '0x5b84b81dd0450897568fa1afdb7969f92259c2f9003a1bed0da96e00c9891957233ad6a0e16101b4ab7b2bf4d4aa117b58bae5fa2bad46522ec62e16ff3c36fe1b',
     };
     const res = await iexec.order.hashApporder(order);
     expect(res).toBe(
-      '0x210576e452027bc2430a32f6fae97bec8bd1f7bb7a96f59202d6947ec7d6de8f',
+      '0xfbf81c735d0321223b5714aca9d1516667ac283edae38200529f80c618050890',
     );
   });
 });
@@ -699,7 +651,6 @@ describe('hashDatasetorder()', () => {
       workerpoolrestrict: '0x0000000000000000000000000000000000000000',
       requesterrestrict: '0x0000000000000000000000000000000000000000',
       salt: '0x48380ababf82c79128c1e3ebcba70ce94c6a3ff0ba4125358d1e0c0f871e29e7',
-      sign: '0x4ce323a70464eb3b35aa90fcd1582e4733a57b16b0d6fb13ffa3189c2e970ffb399779d0c9d4a2d4b0a65adfc2037a7916a9a004148edcdf3dd1a9e12b3c1b0c1b',
     };
     const res = await iexec.order.hashDatasetorder(order);
     expect(res).toBe(
@@ -722,7 +673,6 @@ describe('hashWorkerpoolorder()', () => {
       datasetrestrict: '0x0000000000000000000000000000000000000000',
       requesterrestrict: '0x0000000000000000000000000000000000000000',
       salt: '0x0c8d51b480466c65b459e828ed8549cf4b15ba1abda0ef5d454964c23f3edf62',
-      sign: '0xd8941d9974d6b6468a6dac46e88eb80a1575aedd5921d78e002483bf4faa72e319e4c128f9a7f927857c6039988ba456de8ec337078eb538b13488d2374c379e1c',
     };
     const res = await iexec.order.hashWorkerpoolorder(order);
     expect(res).toBe(
@@ -751,7 +701,6 @@ describe('hashRequestorder()', () => {
       beneficiary: '0x4CF114732732c072D49a783e80C6Fe9fe8BA420a',
       callback: '0x0000000000000000000000000000000000000000',
       salt: '0xef743ff11d68960e724362944b6cd22b59b88402a17f8a1ffabf8fb9be2f4008',
-      sign: '0xdcd90a96f4c5cd05a0f907220e173a038e01e2a647bd9c8e04714be5dd4f986b0478cb69cf46b3cb3eb05ee74d2b91868bee4d96a89bc79ac8d8cccc96810bf21c',
     };
     const res = await iexec.order.hashRequestorder(order);
     expect(res).toBeTxHash();

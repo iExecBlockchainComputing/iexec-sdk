@@ -30,9 +30,6 @@ export const resolveTeeFrameworkFromTag = async (tag) => {
   if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.SCONE])) {
     return TEE_FRAMEWORKS.SCONE;
   }
-  if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.GRAMINE])) {
-    return TEE_FRAMEWORKS.GRAMINE;
-  }
   return undefined;
 };
 

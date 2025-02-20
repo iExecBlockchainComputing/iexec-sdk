@@ -81,7 +81,7 @@ console.log('encryption key available:', isEncryptionKeyAvailable);
 | :------ | :------ |
 | `beneficiaryAddress` | `string` |
 | `options` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 
@@ -144,7 +144,7 @@ console.log('encryption key pushed:', isPushed);
 | `rsaPublicKey` | `string` \| `CryptoKey` |
 | `options?` | `Object` |
 | `options.forceUpdate?` | `boolean` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 

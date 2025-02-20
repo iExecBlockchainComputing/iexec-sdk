@@ -60,7 +60,7 @@ ___
 
 ### defaultTeeFramework
 
-• `Optional` **defaultTeeFramework**: [`TeeFramework`](../modules.md#teeframework)
+• `Optional` **defaultTeeFramework**: ``"scone"``
 
 override the TEE framework to use when as default
 
@@ -132,7 +132,7 @@ ___
 
 ### smsURL
 
-• `Optional` **smsURL**: `string` \| `Record`<[`TeeFramework`](../modules.md#teeframework), `string`\>
+• `Optional` **smsURL**: `string` \| `Record`<``"scone"``, `string`\>
 
 override the SMS URL to target a custom instance
 

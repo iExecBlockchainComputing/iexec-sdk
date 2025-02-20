@@ -43,13 +43,6 @@ describe('iexec storage', () => {
     expect(resAlreadyExists.error.message).toBe(
       'default storage is already initialized, use --force-update option to update your storage token',
     );
-    const rawInitWithTeeFramework = await execAsync(
-      `${iexecPath} storage init --tee-framework gramine --raw`,
-    );
-    const resInitWithTeeFramework = JSON.parse(rawInitWithTeeFramework);
-    expect(resInitWithTeeFramework.ok).toBe(true);
-    expect(resInitWithTeeFramework.isInitialized).toBe(true);
-    expect(resInitWithTeeFramework.isUpdated).toBe(false);
   });
 
   test('iexec storage init --force-update', async () => {
@@ -108,12 +101,6 @@ describe('iexec storage', () => {
     const resAlreadyExists = JSON.parse(rawAlreadyExists);
     expect(resAlreadyExists.ok).toBe(true);
     expect(resAlreadyExists.isInitialized).toBe(true);
-    const rawWithTeeFramework = await execAsync(
-      `${iexecPath} storage check --tee-framework gramine --raw`,
-    );
-    const resWithTeeFramework = JSON.parse(rawWithTeeFramework);
-    expect(resWithTeeFramework.ok).toBe(true);
-    expect(resWithTeeFramework.isInitialized).toBe(false);
   });
 
   test('iexec storage check --user', async () => {

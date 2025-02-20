@@ -27,7 +27,7 @@ ___
 
 ### mrenclave
 
-• `Optional` **mrenclave**: [`SconeMREnclave`](internal_.SconeMREnclave.md) \| [`GramineMREnclave`](internal_.GramineMREnclave.md)
+• `Optional` **mrenclave**: [`SconeMREnclave`](internal_.SconeMREnclave.md)
 
 optional for TEE apps only, specify the TEE protocol to use
 

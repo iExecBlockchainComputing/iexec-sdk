@@ -206,7 +206,7 @@ resolve the current SMS URL
 | Name | Type |
 | :------ | :------ |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 

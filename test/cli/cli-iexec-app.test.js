@@ -68,17 +68,6 @@ describe('iexec app', () => {
       expect(res.app.mrenclave.framework).toBe('SCONE');
     });
 
-    test('--tee-framework gramine', async () => {
-      const raw = await execAsync(
-        `${iexecPath} app init --tee-framework gramine --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.app).toBeDefined();
-      expect(res.app.mrenclave).toBeDefined();
-      expect(res.app.mrenclave.framework).toBe('GRAMINE');
-    });
-
     test('--tee-framework scone', async () => {
       const raw = await execAsync(
         `${iexecPath} app init --tee-framework scone --raw`,
@@ -518,20 +507,6 @@ describe('iexec app', () => {
       );
       expect(resPushed.ok).toBe(true);
       expect(resPushed.isSecretSet).toBe(true);
-
-      const resGramineNotPushed = await runIExecCliRaw(
-        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`,
-      );
-      expect(resGramineNotPushed.ok).toBe(true);
-      expect(resGramineNotPushed.isSecretSet).toBe(false);
-      await runIExecCliRaw(
-        `${iexecPath} app push-secret ${appAddress} --secret-value foo --tee-framework gramine`,
-      );
-      const resGraminePushed = await runIExecCliRaw(
-        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`,
-      );
-      expect(resGraminePushed.ok).toBe(true);
-      expect(resGraminePushed.isSecretSet).toBe(true);
     });
   });
 

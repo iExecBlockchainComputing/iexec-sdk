@@ -92,32 +92,6 @@ describe('iexec requester', () => {
           `${iexecPath} requester check-secret foo ${userWallet.address} --tee-framework tee --raw`,
         ),
       ).rejects.toThrow();
-
-      // check secret TEE framework override
-      const checkOtherFramework = JSON.parse(
-        await execAsync(
-          `${iexecPath} requester check-secret foo ${userWallet.address} --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
-        ),
-      );
-      expect(checkOtherFramework.ok).toBe(true);
-      expect(checkOtherFramework.name).toBe('foo');
-      expect(checkOtherFramework.isSet).toBe(false);
-
-      // push secret TEE framework override
-      const pushOtherFramework = JSON.parse(
-        await execAsync(
-          `${iexecPath} requester push-secret foo --secret-value foo --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
-        ),
-      );
-      expect(pushOtherFramework.ok).toBe(true);
-      const checkOtherFrameworkPushed = JSON.parse(
-        await execAsync(
-          `${iexecPath} requester check-secret foo ${userWallet.address} --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
-        ),
-      );
-      expect(checkOtherFrameworkPushed.ok).toBe(true);
-      expect(checkOtherFrameworkPushed.name).toBe('foo');
-      expect(checkOtherFrameworkPushed.isSet).toBe(true);
     });
   });
 });

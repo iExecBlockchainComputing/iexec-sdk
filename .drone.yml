@@ -183,36 +183,6 @@ steps:
     depends_on:
       - sms
 
-  - name: sms-gramine
-    image: iexechub/iexec-sms:7.1.0
-    detach: true
-    environment:
-      TZ: Europe/Paris
-      IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-pre-compute:7.1.0-sconify-5.3.15-debug
-      IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 9f0f782d6edc611baa23ca0978f555ee58ea70e092640c961e75c25e9e4b0f22
-      IEXEC_TEE_WORKER_PRE_COMPUTE_HEAP_SIZE_GB: 4
-      IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: docker.io/iexechub/tee-worker-post-compute:7.1.1-sconify-5.3.15-debug
-      IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: face1376b97131e2dc75a556381d47a2e03bed9e1bc11e462471f99d1eefae50
-      IEXEC_TEE_WORKER_POST_COMPUTE_HEAP_SIZE_GB: 4
-      IEXEC_IGNORED_SGX_ADVISORIES: INTEL-SA-00161,INTEL-SA-00289,INTEL-SA-00334,INTEL-SA-00381,INTEL-SA-00389,INTEL-SA-00220,INTEL-SA-00270,INTEL-SA-00293,INTEL-SA-00320,INTEL-SA-00329,INTEL-SA-00477
-      IEXEC_SCONE_TOLERATED_INSECURE_OPTIONS: debug-mode,hyperthreading,outdated-tcb
-      IEXEC_SMS_DISPLAY_DEBUG_SESSION: 'true'
-      IEXEC_SCONE_CAS_HOST: foo
-      IEXEC_SMS_IMAGE_LAS_IMAGE: foo
-    expose:
-      - 13300
-    depends_on:
-      - bellecour-fork-healthy
-
-  - name: sms-gramine-healthy
-    image: bash
-    commands:
-      - while ! nc -z sms-gramine 13300 ; do sleep 1 ; done && echo "sms ready"
-    depends_on:
-      - sms
-
   - name: result-proxy
     image: iexechub/iexec-result-proxy:7.1.0
     detach: true
@@ -322,7 +292,6 @@ steps:
     depends_on:
       - bellecour-fork-healthy
       - sms-healthy
-      - sms-gramine-healthy
       - result-proxy-healthy
       - market-api-healthy
       - ipfs-healthy

@@ -83,9 +83,6 @@ export const TEST_CHAINS = {
     rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
     chainId: '134',
     sconeSmsURL: DRONE ? 'http://sms:13300' : 'http://localhost:13300',
-    gramineSmsURL: DRONE
-      ? 'http://sms-gramine:13300'
-      : 'http://localhost:13309',
     iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://localhost:3000',
     resultProxyURL: DRONE
       ? 'http://result-proxy:13200'
@@ -131,7 +128,6 @@ export const TEST_CHAINS = {
 Object.keys(TEST_CHAINS).forEach((chain) => {
   if (!TEST_CHAINS[chain].smsMap) {
     TEST_CHAINS[chain].smsMap = {
-      gramine: TEST_CHAINS[chain].gramineSmsURL,
       scone: TEST_CHAINS[chain].sconeSmsURL,
     };
   }

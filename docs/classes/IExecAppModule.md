@@ -90,7 +90,7 @@ _NB_:
 | :------ | :------ |
 | `appAddress` | `string` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 
@@ -234,7 +234,7 @@ console.log('pushed App secret:', isPushed);
 | `appAddress` | `string` |
 | `secretValue` | `String` |
 | `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+| `options.teeFramework?` | ``"scone"`` |
 
 #### Returns
 
