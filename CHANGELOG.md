@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## NEXT
+## [8.13.1] 2025-02-24
 
 ### Changed
 
