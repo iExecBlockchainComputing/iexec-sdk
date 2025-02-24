@@ -7,7 +7,6 @@ import {
   addressSchema,
   stringSchema,
   throwIfMissing,
-  positiveIntSchema,
 } from '../utils/validator.js';
 import { wrapPersonalSign } from '../utils/errorWrappers.js';
 import { checkSigner } from '../utils/utils.js';
@@ -225,7 +224,6 @@ export const pushAppSecret = async (
   smsURL = throwIfMissing(),
   appAddress = throwIfMissing(),
   secretValue = throwIfMissing(),
-  secretIndex = 1,
 ) => {
   try {
     checkSigner(contracts);
@@ -233,11 +231,10 @@ export const pushAppSecret = async (
     const vAppAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(appAddress);
-    const vSecretIndex = await positiveIntSchema().validate(secretIndex);
     await stringSchema().validate(secretValue, { strict: true });
     const challenge = getChallengeForSetWeb2Secret(
       vAppAddress,
-      vSecretIndex.toString(),
+      '1', // used to be secret index (hardcoded to "1")
       secretValue,
     );
     const binaryChallenge = getBytes(challenge);
@@ -246,7 +243,7 @@ export const pushAppSecret = async (
     );
     const res = await httpRequest('POST')({
       api: smsURL,
-      endpoint: `/apps/${vAppAddress}/secrets/${vSecretIndex}`,
+      endpoint: `/apps/${vAppAddress}/secrets`,
       body: secretValue,
       headers: {
         Authorization: auth,
