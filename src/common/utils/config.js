@@ -34,7 +34,7 @@ const hubMap = {};
 
 const smsMap = {
   134: {
-    [TEE_FRAMEWORKS.SCONE]: 'https://sms.scone-prod.v8-bellecour.iex.ec',
+    [TEE_FRAMEWORKS.SCONE]: 'https://sms.iex.ec',
     [TEE_FRAMEWORKS.GRAMINE]: 'https://sms.gramine.v8-bellecour.iex.ec',
   },
 };
