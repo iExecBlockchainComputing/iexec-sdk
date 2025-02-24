@@ -1,10 +1,6 @@
 import Debug from 'debug';
 import { httpRequest } from '../utils/api-utils.js';
-import {
-  addressSchema,
-  throwIfMissing,
-  positiveIntSchema,
-} from '../utils/validator.js';
+import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { SmsCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:sms:check');
@@ -147,22 +143,20 @@ export const checkAppSecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   appAddress = throwIfMissing(),
-  secretIndex = 1,
 ) => {
   try {
     const vAppAddress = await addressSchema({
       ethProvider: contracts.provider,
     }).validate(appAddress);
-    const vSecretIndex = await positiveIntSchema().validate(secretIndex);
     const kindOfSecret = 'app';
-    const secretId = `${vAppAddress}|${vSecretIndex}`;
+    const secretId = vAppAddress;
     const cached = checkCache({ smsURL, kindOfSecret, secretId });
     if (cached !== undefined) {
       return cached;
     }
     const res = await httpRequest('HEAD')({
       api: smsURL,
-      endpoint: `/apps/${vAppAddress}/secrets/${vSecretIndex}`,
+      endpoint: `/apps/${vAppAddress}/secrets`,
       ApiCallErrorClass: SmsCallError,
     });
     if (res.ok) {

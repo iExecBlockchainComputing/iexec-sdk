@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+### Changed
+
+- migrated from SMS deprecated apps secrets endpoint
+
 ## [8.13.0] 2025-01-21
 
 ### Added
