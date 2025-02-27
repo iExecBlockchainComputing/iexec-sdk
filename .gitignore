@@ -37,3 +37,7 @@ errors/**
 
 # env
 .env
+
+# IDE
+.vscode
+.idea
