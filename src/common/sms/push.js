@@ -65,14 +65,16 @@ const handleNonUpdatablePushSecret = ({
 export const pushWeb3Secret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
-  resourceAddress = throwIfMissing(),
-  secretValue = throwIfMissing(),
+  resourceAddress,
+  secretValue,
 ) => {
   try {
     checkSigner(contracts);
     const vResourceAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(resourceAddress);
+    })
+      .required()
+      .validate(resourceAddress);
     const vSignerAddress = await getAddress(contracts);
     await stringSchema().validate(secretValue, { strict: true });
     const challenge = getChallengeForSetWeb3Secret(
@@ -222,15 +224,17 @@ export const pushRequesterSecret = async (
 export const pushAppSecret = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
-  appAddress = throwIfMissing(),
-  secretValue = throwIfMissing(),
+  appAddress,
+  secretValue,
 ) => {
   try {
     checkSigner(contracts);
     const vSignerAddress = await getAddress(contracts);
     const vAppAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(appAddress);
+    })
+      .required()
+      .validate(appAddress);
     await stringSchema().validate(secretValue, { strict: true });
     const challenge = getChallengeForSetWeb2Secret(
       vAppAddress,

@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import { addressSchema, throwIfMissing } from '../utils/validator.js';
-import { fetchVoucherAddress } from './voucherHub.js';
+import { fetchVoucherAddress, isVoucherAddress } from './voucherHub.js';
 import { checkAllowance } from '../account/allowance.js';
 import { bigIntToBn, checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
@@ -16,18 +16,57 @@ const debug = Debug('iexec:voucher:voucher');
 export const fetchVoucherContract = async (
   contracts = throwIfMissing(),
   voucherHubAddress = throwIfMissing(),
-  owner,
+  userAddress,
+  { voucherAddress } = {},
 ) => {
   try {
-    const voucherAddress = await fetchVoucherAddress(
-      contracts,
-      voucherHubAddress,
-      owner,
-    );
-    if (voucherAddress) {
-      return getVoucherContract(contracts, voucherAddress);
+    const [vUserAddress, vVoucherAddress] = await Promise.all([
+      addressSchema({
+        ethProvider: contracts.provider,
+      })
+        .required()
+        .label('userAddress')
+        .validate(userAddress),
+      addressSchema({
+        ethProvider: contracts.provider,
+      })
+        .label('voucherAddress')
+        .validate(voucherAddress),
+    ]);
+
+    let voucherContract;
+    if (vVoucherAddress) {
+      const isVoucher = await isVoucherAddress(
+        contracts,
+        voucherHubAddress,
+        vVoucherAddress,
+      );
+      if (!isVoucher) {
+        throw new Error('Invalid voucher contract address');
+      }
+      voucherContract = getVoucherContract(contracts, vVoucherAddress);
+      const [userAuthorized, userIsOwner] = await Promise.all([
+        wrapCall(voucherContract.isAccountAuthorized(vUserAddress)),
+        wrapCall(voucherContract.owner()).then(
+          (owner) => owner.toLowerCase() === vUserAddress.toLowerCase(),
+        ),
+      ]);
+      if (!userAuthorized && !userIsOwner) {
+        throw new Error(
+          'User is neither the owner of the voucher nor authorized to use the voucher',
+        );
+      }
+    } else {
+      const ownedVoucherAddress = await fetchVoucherAddress(
+        contracts,
+        voucherHubAddress,
+        userAddress,
+      );
+      if (ownedVoucherAddress) {
+        voucherContract = getVoucherContract(contracts, ownedVoucherAddress);
+      }
     }
-    return undefined;
+    return voucherContract;
   } catch (error) {
     debug('fetchVoucherContract()', error);
     throw error;

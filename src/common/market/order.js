@@ -53,6 +53,7 @@ import {
   uint256Schema,
   nRlcAmountSchema,
   throwIfMissing,
+  booleanSchema,
 } from '../utils/validator.js';
 import {
   wrapCall,
@@ -1034,7 +1035,7 @@ export const matchOrders = async ({
 export const createApporder = async (
   contracts = throwIfMissing(),
   {
-    app = throwIfMissing(),
+    app,
     appprice = '0',
     volume = '1',
     tag = NULL_BYTES32,
@@ -1043,7 +1044,10 @@ export const createApporder = async (
     requesterrestrict = NULL_ADDRESS,
   } = {},
 ) => ({
-  app: await addressSchema({ ethProvider: contracts.provider }).validate(app),
+  app: await addressSchema({ ethProvider: contracts.provider })
+    .required()
+    .label('app')
+    .validate(app),
   appprice: await nRlcAmountSchema().validate(appprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
@@ -1061,7 +1065,7 @@ export const createApporder = async (
 export const createDatasetorder = async (
   contracts = throwIfMissing(),
   {
-    dataset = throwIfMissing(),
+    dataset,
     datasetprice = '0',
     volume = '1',
     tag = NULL_BYTES32,
@@ -1072,7 +1076,10 @@ export const createDatasetorder = async (
 ) => ({
   dataset: await addressSchema({
     ethProvider: contracts.provider,
-  }).validate(dataset),
+  })
+    .label('dataset')
+    .required()
+    .validate(dataset),
   datasetprice: await nRlcAmountSchema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
@@ -1123,8 +1130,8 @@ export const createWorkerpoolorder = async (
 export const createRequestorder = async (
   { contracts = throwIfMissing() } = {},
   {
-    app = throwIfMissing(),
-    category = throwIfMissing(),
+    app,
+    category,
     dataset = NULL_ADDRESS,
     workerpool = NULL_ADDRESS,
     appmaxprice = '0',
@@ -1143,7 +1150,10 @@ export const createRequestorder = async (
   return {
     app: await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(app),
+    })
+      .required()
+      .label('app')
+      .validate(app),
     appmaxprice: await nRlcAmountSchema().validate(appmaxprice),
     dataset: await addressSchema({
       ethProvider: contracts.provider,
@@ -1170,7 +1180,10 @@ export const createRequestorder = async (
     callback: await addressSchema({
       ethProvider: contracts.provider,
     }).validate(callback),
-    category: await uint256Schema().validate(category),
+    category: await uint256Schema()
+      .required()
+      .label('category')
+      .validate(category),
     trust: await uint256Schema().validate(trust),
     tag: await tagSchema().validate(tag),
   };

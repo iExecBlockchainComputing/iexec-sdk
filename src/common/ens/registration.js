@@ -31,12 +31,14 @@ const FIFS_DOMAINS = {
 
 export const getDefaultDomain = async (
   contracts = throwIfMissing(),
-  address = throwIfMissing(),
+  address,
 ) => {
   try {
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(address);
+    })
+      .required()
+      .validate(address);
     const [isApp, isDataset, isWorkerpool] = await Promise.all([
       checkDeployedObj(APP)(contracts, vAddress),
       checkDeployedObj(DATASET)(contracts, vAddress),

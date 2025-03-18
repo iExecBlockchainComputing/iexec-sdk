@@ -64,8 +64,8 @@ const findBlockNumberBeforeTimestamp = async (
 
 export const obsBridgeToSidechain = (
   contracts = throwIfMissing(),
-  bridgeAddress = throwIfMissing(),
-  nRlcAmount = throwIfMissing(),
+  bridgeAddress,
+  nRlcAmount,
   { sidechainBridgeAddress, bridgedContracts } = {},
 ) =>
   new Observable((observer) => {
@@ -78,13 +78,17 @@ export const obsBridgeToSidechain = (
         // input validation
         const vBridgeAddress = await addressSchema({
           ethProvider: contracts.provider,
-        }).validate(bridgeAddress);
+        })
+          .required()
+          .validate(bridgeAddress);
         const vSidechainBridgeAddress = sidechainBridgeAddress
           ? await addressSchema({
               ethProvider: contracts.provider,
             }).validate(sidechainBridgeAddress)
           : undefined;
-        const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
+        const vAmount = await nRlcAmountSchema()
+          .required()
+          .validate(nRlcAmount);
         if (contracts.isNative) throw Error('Current chain is a sidechain');
         const balance = await getRlcBalance(
           contracts,
@@ -317,8 +321,8 @@ export const bridgeToSidechain = async (
 
 export const obsBridgeToMainchain = (
   contracts = throwIfMissing(),
-  bridgeAddress = throwIfMissing(),
-  nRlcAmount = throwIfMissing(),
+  bridgeAddress,
+  nRlcAmount,
   { mainchainBridgeAddress, bridgedContracts } = {},
 ) =>
   new Observable((observer) => {
@@ -335,9 +339,13 @@ export const obsBridgeToMainchain = (
         const vMainchainBridgeAddress = mainchainBridgeAddress
           ? await addressSchema({
               ethProvider: contracts.provider,
-            }).validate(mainchainBridgeAddress)
+            })
+              .required()
+              .validate(mainchainBridgeAddress)
           : undefined;
-        const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
+        const vAmount = await nRlcAmountSchema()
+          .required()
+          .validate(nRlcAmount);
         if (!contracts.isNative) throw Error('Current chain is a mainchain');
         const balance = await getRlcBalance(
           contracts,

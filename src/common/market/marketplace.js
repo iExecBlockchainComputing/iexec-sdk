@@ -243,7 +243,7 @@ export const unpublishRequestorder = async (
 export const unpublishAllApporders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  appAddress = throwIfMissing(),
+  appAddress,
 ) =>
   unpublishOrder(
     contracts,
@@ -254,14 +254,16 @@ export const unpublishAllApporders = async (
       target: UNPUBLISH_TARGET_ALL_ORDERS,
       address: await addressSchema({
         ethProvider: contracts.provider,
-      }).validate(appAddress),
+      })
+        .required()
+        .validate(appAddress),
     },
   );
 
 export const unpublishAllDatasetorders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  datasetAddress = throwIfMissing(),
+  datasetAddress,
 ) =>
   unpublishOrder(
     contracts,
@@ -272,14 +274,16 @@ export const unpublishAllDatasetorders = async (
       target: UNPUBLISH_TARGET_ALL_ORDERS,
       address: await addressSchema({
         ethProvider: contracts.provider,
-      }).validate(datasetAddress),
+      })
+        .required()
+        .validate(datasetAddress),
     },
   );
 
 export const unpublishAllWorkerpoolorders = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  workerpoolAddress = throwIfMissing(),
+  workerpoolAddress,
 ) =>
   unpublishOrder(
     contracts,
@@ -290,7 +294,9 @@ export const unpublishAllWorkerpoolorders = async (
       target: UNPUBLISH_TARGET_ALL_ORDERS,
       address: await addressSchema({
         ethProvider: contracts.provider,
-      }).validate(workerpoolAddress),
+      })
+        .required()
+        .validate(workerpoolAddress),
     },
   );
 
@@ -312,7 +318,7 @@ export const unpublishAllRequestorders = async (
 export const unpublishLastApporder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  appAddress = throwIfMissing(),
+  appAddress,
 ) => {
   const unpublished = await unpublishOrder(
     contracts,
@@ -323,7 +329,9 @@ export const unpublishLastApporder = async (
       target: UNPUBLISH_TARGET_LAST_ORDER,
       address: await addressSchema({
         ethProvider: contracts.provider,
-      }).validate(appAddress),
+      })
+        .required()
+        .validate(appAddress),
     },
   );
   return unpublished[0];
@@ -332,7 +340,7 @@ export const unpublishLastApporder = async (
 export const unpublishLastDatasetorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  datasetAddress = throwIfMissing(),
+  datasetAddress,
 ) => {
   const unpublished = await unpublishOrder(
     contracts,
@@ -343,7 +351,9 @@ export const unpublishLastDatasetorder = async (
       target: UNPUBLISH_TARGET_LAST_ORDER,
       address: await addressSchema({
         ethProvider: contracts.provider,
-      }).validate(datasetAddress),
+      })
+        .required()
+        .validate(datasetAddress),
     },
   );
   return unpublished[0];
@@ -352,7 +362,7 @@ export const unpublishLastDatasetorder = async (
 export const unpublishLastWorkerpoolorder = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  workerpoolAddress = throwIfMissing(),
+  workerpoolAddress,
 ) => {
   const unpublished = await unpublishOrder(
     contracts,
@@ -363,7 +373,9 @@ export const unpublishLastWorkerpoolorder = async (
       target: UNPUBLISH_TARGET_LAST_ORDER,
       address: await addressSchema({
         ethProvider: contracts.provider,
-      }).validate(workerpoolAddress),
+      })
+        .required()
+        .validate(workerpoolAddress),
     },
   );
   return unpublished[0];

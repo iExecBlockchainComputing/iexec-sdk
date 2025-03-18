@@ -18,7 +18,9 @@ export const setWorkerpoolApiUrl = async (
   try {
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(workerpoolAddress);
+    })
+      .required()
+      .validate(workerpoolAddress);
     const vUrl = await workerpoolApiUrlSchema()
       .label('workerpool API url')
       .validate(url);

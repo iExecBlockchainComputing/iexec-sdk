@@ -30,7 +30,7 @@ const debug = Debug('iexec:execution:deal');
 export const fetchRequesterDeals = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  requesterAddress = throwIfMissing(),
+  requesterAddress,
   {
     appAddress,
     datasetAddress,
@@ -42,26 +42,19 @@ export const fetchRequesterDeals = async (
   try {
     const vRequesterAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(requesterAddress);
+    })
+      .required()
+      .validate(requesterAddress);
     const vChainId = await chainIdSchema().validate(contracts.chainId);
-    let vAppAddress;
-    let vDatasetAddress;
-    let vWorkerpoolAddress;
-    if (appAddress) {
-      vAppAddress = await addressSchema({
-        ethProvider: contracts.provider,
-      }).validate(appAddress);
-    }
-    if (datasetAddress) {
-      vDatasetAddress = await addressSchema({
-        ethProvider: contracts.provider,
-      }).validate(datasetAddress);
-    }
-    if (workerpoolAddress) {
-      vWorkerpoolAddress = await addressSchema({
-        ethProvider: contracts.provider,
-      }).validate(workerpoolAddress);
-    }
+    const vAppAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(appAddress);
+    const vDatasetAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(datasetAddress);
+    const vWorkerpoolAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    }).validate(workerpoolAddress);
     const query = {
       chainId: vChainId,
       requester: vRequesterAddress,
