@@ -783,21 +783,21 @@ const getMatchableVolume = async (
   }
 };
 
-export const estimateMatchOrders = async (
+export const estimateMatchOrders = async ({
   contracts,
   voucherHubAddress,
-  appOrder,
-  datasetOrder = NULL_DATASETORDER,
-  workerpoolOrder,
-  requestOrder,
+  apporder,
+  datasetorder = NULL_DATASETORDER,
+  workerpoolorder,
+  requestorder,
   useVoucher,
-) => {
+} = {}) => {
   const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
     await Promise.all([
-      signedApporderSchema().validate(appOrder),
-      signedDatasetorderSchema().validate(datasetOrder),
-      signedWorkerpoolorderSchema().validate(workerpoolOrder),
-      signedRequestorderSchema().validate(requestOrder),
+      signedApporderSchema().validate(apporder),
+      signedDatasetorderSchema().validate(datasetorder),
+      signedWorkerpoolorderSchema().validate(workerpoolorder),
+      signedRequestorderSchema().validate(requestorder),
     ]);
   const matchableVolume = await getMatchableVolume(
     contracts,
@@ -817,7 +817,7 @@ export const estimateMatchOrders = async (
     const voucherAddress = await fetchVoucherAddress(
       contracts,
       voucherHubAddress,
-      requestOrder.requester,
+      requestorder.requester,
     );
     if (!voucherAddress) {
       return { total: totalCost, sponsored: sponsoredCost };
@@ -844,17 +844,15 @@ export const estimateMatchOrders = async (
     ] = await Promise.all([
       voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
         voucherTypeId,
-        appOrder.app,
+        apporder.app,
       ),
-
       voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
         voucherTypeId,
-        datasetOrder.dataset,
+        datasetorder.dataset,
       ),
-
       voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
         voucherTypeId,
-        workerpoolOrder.workerpool,
+        workerpoolorder.workerpool,
       ),
     ]);
 
@@ -873,23 +871,23 @@ export const estimateMatchOrders = async (
   return { total: totalCost, sponsored: sponsoredCost };
 };
 
-export const matchOrders = async (
+export const matchOrders = async ({
   contracts = throwIfMissing(),
   voucherHubAddress,
-  appOrder = throwIfMissing(),
-  datasetOrder = NULL_DATASETORDER,
-  workerpoolOrder = throwIfMissing(),
-  requestOrder = throwIfMissing(),
+  apporder = throwIfMissing(),
+  datasetorder = NULL_DATASETORDER,
+  workerpoolorder = throwIfMissing(),
+  requestorder = throwIfMissing(),
   useVoucher = false,
-) => {
+}) => {
   try {
     checkSigner(contracts);
     const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
       await Promise.all([
-        signedApporderSchema().validate(appOrder),
-        signedDatasetorderSchema().validate(datasetOrder),
-        signedWorkerpoolorderSchema().validate(workerpoolOrder),
-        signedRequestorderSchema().validate(requestOrder),
+        signedApporderSchema().validate(apporder),
+        signedDatasetorderSchema().validate(datasetorder),
+        signedWorkerpoolorderSchema().validate(workerpoolorder),
+        signedRequestorderSchema().validate(requestorder),
       ]);
 
     // check resulting tag
@@ -937,15 +935,15 @@ export const matchOrders = async (
       const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
       if (useVoucher) {
-        const { total, sponsored } = await estimateMatchOrders(
+        const { total, sponsored } = await estimateMatchOrders({
           contracts,
           voucherHubAddress,
-          vAppOrder,
-          vDatasetOrder,
-          vWorkerpoolOrder,
-          vRequestOrder,
+          apporder: vAppOrder,
+          datasetorder: vDatasetOrder,
+          workerpoolorder: vWorkerpoolOrder,
+          requestorder: vRequestOrder,
           useVoucher,
-        );
+        });
         if (total.gt(sponsored)) {
           const allowance = await checkAllowance(
             contracts,

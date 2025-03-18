@@ -1039,15 +1039,16 @@ run
 
       debug('requestorder', requestorder);
 
-      const { total: totalCost, sponsored } = await estimateMatchOrders(
-        chain.contracts,
-        chain.voucherHub,
+      const { total: totalCost, sponsored } = await estimateMatchOrders({
+        contracts: chain.contracts,
+        voucherHubAddress: chain.voucherHub,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-        opts.useVoucher,
-      );
+        useVoucher: opts.useVoucher,
+        voucherAddress: opts.voucherAddress,
+      });
 
       spinner.stop();
 
@@ -1087,15 +1088,15 @@ run
       }
 
       spinner.start('Submitting deal');
-      const { dealid, volume, txHash } = await matchOrders(
-        chain.contracts,
-        chain.voucherHub,
+      const { dealid, volume, txHash } = await matchOrders({
+        contracts: chain.contracts,
+        voucherHubAddress: chain.voucherHub,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-        opts.useVoucher,
-      );
+        useVoucher: opts.useVoucher,
+      });
 
       result.deals.push({ dealid, volume: volume.toString(), txHash });
 

@@ -329,17 +329,17 @@ export default class IExecOrderModule extends IExecModule {
               .validate(datasetorder)
           ).tag,
         ]);
-        return matchOrders(
+        return matchOrders({
           contracts,
           voucherHubAddress,
-          await checkAppRequirements(
+          apporder: await checkAppRequirements(
             {
               contracts,
             },
             apporder,
             { tagOverride: resolvedTag },
           ).then(() => apporder),
-          await checkDatasetRequirements(
+          datasetorder: await checkDatasetRequirements(
             {
               contracts,
               smsURL: await this.config.resolveSmsURL({
@@ -350,7 +350,7 @@ export default class IExecOrderModule extends IExecModule {
             { tagOverride: resolvedTag },
           ).then(() => datasetorder),
           workerpoolorder,
-          await checkRequestRequirements(
+          requestorder: await checkRequestRequirements(
             {
               contracts,
               smsURL: await this.config.resolveSmsURL({
@@ -360,9 +360,9 @@ export default class IExecOrderModule extends IExecModule {
             requestorder,
           ).then(() => requestorder),
           useVoucher,
-        );
+        });
       }
-      return matchOrders(
+      return matchOrders({
         contracts,
         voucherHubAddress,
         apporder,
@@ -370,7 +370,7 @@ export default class IExecOrderModule extends IExecModule {
         workerpoolorder,
         requestorder,
         useVoucher,
-      );
+      });
     };
 
     this.estimateMatchOrders = async (
@@ -379,7 +379,7 @@ export default class IExecOrderModule extends IExecModule {
     ) => {
       const contracts = await this.config.resolveContractsClient();
       const voucherHubAddress = await this.config.resolveVoucherHubAddress();
-      return estimateMatchOrders(
+      return estimateMatchOrders({
         contracts,
         voucherHubAddress,
         apporder,
@@ -387,7 +387,7 @@ export default class IExecOrderModule extends IExecModule {
         workerpoolorder,
         requestorder,
         useVoucher,
-      );
+      });
     };
   }
 }
