@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Next
+
+- added `voucherAddress` option for using a non-owned voucher contract in `matchOrders`
+
 ## [8.13.1] 2025-02-24
 
 ### Changed
