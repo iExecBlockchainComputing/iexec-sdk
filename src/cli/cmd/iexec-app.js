@@ -586,6 +586,7 @@ run
   .option(...orderOption.params())
   .option(...option.skipPreflightCheck())
   .option(...option.useVoucher())
+  .option(...option.voucherAddress())
   .description(desc.appRun())
   .action(async (appAddress, opts) => {
     await checkUpdate(opts);
@@ -732,14 +733,11 @@ run
       debug('trust', trust);
       const callback = await addressSchema({
         ethProvider: chain.contracts.provider,
-      }).validate(opts.callback || NULL_ADDRESS);
+      }).validate(opts.callback);
       debug('callback', callback);
-      const beneficiary =
-        opts.beneficiary === undefined
-          ? undefined
-          : await addressSchema({
-              ethProvider: chain.contracts.provider,
-            }).validate(opts.beneficiary);
+      const beneficiary = await addressSchema({
+        ethProvider: chain.contracts.provider,
+      }).validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
       const watch = !!opts.watch || !!opts.download;
@@ -1096,6 +1094,7 @@ run
         workerpoolorder,
         requestorder,
         useVoucher: opts.useVoucher,
+        voucherAddress: opts.voucherAddress,
       });
 
       result.deals.push({ dealid, volume: volume.toString(), txHash });
@@ -1287,14 +1286,11 @@ requestRun
       debug('trust', trust);
       const callback = await addressSchema({
         ethProvider: chain.contracts.provider,
-      }).validate(opts.callback || NULL_ADDRESS);
+      }).validate(opts.callback);
       debug('callback', callback);
-      const beneficiary =
-        opts.beneficiary === undefined
-          ? undefined
-          : await addressSchema({
-              ethProvider: chain.contracts.provider,
-            }).validate(opts.beneficiary);
+      const beneficiary = await addressSchema({
+        ethProvider: chain.contracts.provider,
+      }).validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
       spinner.info('Creating requestorder');

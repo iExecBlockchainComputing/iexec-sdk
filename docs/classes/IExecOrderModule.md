@@ -353,15 +353,16 @@ console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `orders` | `Object` |
-| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) |
-| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) |
-| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) |
-| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
-| `options?` | `Object` |
-| `options.useVoucher?` | `boolean` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `orders` | `Object` | - |
+| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) | - |
+| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) | - |
+| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) | - |
+| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) | - |
+| `options?` | `Object` | - |
+| `options.useVoucher?` | `boolean` | use a voucher contract to sponsor the deal |
+| `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized to use the voucher by the voucher's owner |
 
 #### Returns
 
@@ -486,16 +487,17 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `orders` | `Object` |
-| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) |
-| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) |
-| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) |
-| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
-| `options?` | `Object` |
-| `options.preflightCheck?` | `boolean` |
-| `options.useVoucher?` | `boolean` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `orders` | `Object` | - |
+| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) | - |
+| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) | - |
+| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) | - |
+| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) | - |
+| `options?` | `Object` | - |
+| `options.preflightCheck?` | `boolean` | - |
+| `options.useVoucher?` | `boolean` | use a voucher contract to sponsor the deal |
+| `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized to use the voucher by the voucher's owner |
 
 #### Returns
 

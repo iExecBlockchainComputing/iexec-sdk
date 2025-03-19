@@ -1024,7 +1024,16 @@ export default class IExecOrderModule extends IExecModule {
     },
     options?: {
       preflightCheck?: boolean;
+      /**
+       * use a voucher contract to sponsor the deal
+       */
       useVoucher?: boolean;
+      /**
+       * override the voucher contract to use, must be combined with `useVoucher: true`
+       *
+       * the user must be authorized to use the voucher by the voucher's owner
+       */
+      voucherAddress?: Addressish;
     },
   ): Promise<{ dealid: Dealid; volume: BN; txHash: TxHash }>;
   /**
@@ -1051,7 +1060,16 @@ export default class IExecOrderModule extends IExecModule {
       requestorder: ConsumableRequestorder;
     },
     options?: {
+      /**
+       * use a voucher contract to sponsor the deal
+       */
       useVoucher?: boolean;
+      /**
+       * override the voucher contract to use, must be combined with `useVoucher: true`
+       *
+       * the user must be authorized to use the voucher by the voucher's owner
+       */
+      voucherAddress?: Addressish;
     },
   ): Promise<{ total: NRlcAmount; sponsored: NRlcAmount }>;
   /**

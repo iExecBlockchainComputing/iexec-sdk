@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, beforeAll } from '@jest/globals';
 import { BN } from 'bn.js';
 import {
   ONE_ETH,
@@ -1715,6 +1715,98 @@ describe('estimateMatchOrders()', () => {
       expect(res.total).toBeInstanceOf(BN);
       expect(res.total).toEqual(expectedTotal);
     });
+
+    describe('with custom voucherAddress option', () => {
+      let voucherAddress;
+      let authorizedRequesterWallet;
+      beforeAll(async () => {
+        const { iexec: iexecVoucherOwner, wallet: voucherOwnerWallet } =
+          getTestConfig(iexecTestChain)();
+        ({ wallet: authorizedRequesterWallet } =
+          getTestConfig(iexecTestChain)());
+
+        voucherAddress = await createVoucher(iexecTestChain)({
+          owner: await voucherOwnerWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 1000,
+        });
+        await iexecVoucherOwner.voucher.authorizeRequester(
+          authorizedRequesterWallet.address,
+        );
+      });
+
+      test('should use specified voucherAddress', async () => {
+        const { iexec: iexecRequester } = getTestConfig(iexecTestChain)({
+          privateKey: authorizedRequesterWallet.privateKey,
+        });
+
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+        });
+
+        const res = await iexecRequester.order.estimateMatchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder,
+          },
+          { useVoucher: true, voucherAddress },
+        );
+        expect(res.sponsored).toBeInstanceOf(BN);
+        expect(res.sponsored).toEqual(expectedTotal);
+        expect(res.total).toBeInstanceOf(BN);
+        expect(res.total).toEqual(expectedTotal);
+      });
+
+      test('should throw if specified voucherAddress is not a voucher', async () => {
+        const { iexec: iexecRequester } = getTestConfig(iexecTestChain)({
+          privateKey: authorizedRequesterWallet.privateKey,
+        });
+
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+        });
+
+        await expect(
+          iexecRequester.order.estimateMatchOrders(
+            {
+              apporder: apporderTemplate,
+              datasetorder: datasetorderTemplate,
+              workerpoolorder: workerpoolorderTemplate,
+              requestorder,
+            },
+            { useVoucher: true, voucherAddress: getRandomAddress() },
+          ),
+        ).rejects.toThrow('Invalid voucher contract address');
+      });
+
+      test('should throw if user is not allowed to use specified voucherAddress', async () => {
+        const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+        });
+
+        await expect(
+          iexecRequester.order.estimateMatchOrders(
+            {
+              apporder: apporderTemplate,
+              datasetorder: datasetorderTemplate,
+              workerpoolorder: workerpoolorderTemplate,
+              requestorder,
+            },
+            { useVoucher: true, voucherAddress },
+          ),
+        ).rejects.toThrow('User is not authorized to use the voucher');
+      });
+    });
   });
 });
 
@@ -2399,25 +2491,56 @@ describe('matchOrders()', () => {
   });
 
   describe('useVoucher option', () => {
-    test('should throw error if no voucher available for the requester', async () => {
-      const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
-      const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
+    let iexecProvider;
+    let apporderTemplate;
+    let datasetorderTemplate;
+    let workerpoolorderTemplate;
+    let voucherTypeId;
 
-      const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+    beforeAll(async () => {
+      const providerConfig = getTestConfig(iexecTestChain)();
+      iexecProvider = providerConfig.iexec;
+      apporderTemplate = await deployAndGetApporder(iexecProvider, {
         volume: 10,
         appprice: 5,
       });
-      const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
-        {
-          volume: 7,
-          datasetprice: 1,
-        },
-      );
-      const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
+      datasetorderTemplate = await deployAndGetDatasetorder(iexecProvider, {
+        volume: 7,
+        datasetprice: 1,
+      });
+      workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
+        iexecProvider,
         { volume: 5, workerpoolprice: 1 },
+      );
+
+      voucherTypeId = await createVoucherType(iexecTestChain)({
+        description: 'test voucher type',
+        duration: 60 * 60,
+      });
+
+      await addVoucherEligibleAsset(iexecTestChain)(
+        apporderTemplate.app,
+        voucherTypeId,
+      );
+      await addVoucherEligibleAsset(iexecTestChain)(
+        datasetorderTemplate.dataset,
+        voucherTypeId,
+      );
+      await addVoucherEligibleAsset(iexecTestChain)(
+        workerpoolorderTemplate.workerpool,
+        voucherTypeId,
+      );
+    });
+
+    test('should throw error if no voucher available for the requester', async () => {
+      const { iexec: iexecRequester, wallet: requesterWallet } =
+        getTestConfig(iexecTestChain)();
+
+      const apporder = await iexecProvider.order.signApporder(apporderTemplate);
+      const datasetorder =
+        await iexecProvider.order.signDatasetorder(datasetorderTemplate);
+      const workerpoolorder = await iexecProvider.order.signWorkerpoolorder(
+        workerpoolorderTemplate,
       );
       const requestorder = await getMatchableRequestorder(iexecRequester, {
         apporder,
@@ -2453,27 +2576,30 @@ describe('matchOrders()', () => {
       )({
         options,
       });
-      const { iexec: iexecResourcesProvider, wallet: providerWallet } =
+      const { iexec: iexecResourceProvider, wallet: resourceProviderWallet } =
         getTestConfig(noVoucherTestChain)({
           options,
         });
 
       await setBalance(noVoucherTestChain)(requesterWallet.address, ONE_ETH);
-      await setBalance(noVoucherTestChain)(providerWallet.address, ONE_ETH);
+      await setBalance(noVoucherTestChain)(
+        resourceProviderWallet.address,
+        ONE_ETH,
+      );
 
-      const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+      const apporder = await deployAndGetApporder(iexecResourceProvider, {
         volume: 10,
         appprice: 5,
       });
       const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
+        iexecResourceProvider,
         {
           volume: 7,
           datasetprice: 1,
         },
       );
       const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
+        iexecResourceProvider,
         { volume: 5, workerpoolprice: 1 },
       );
       const requestorder = await getMatchableRequestorder(iexecRequester, {
@@ -2518,44 +2644,21 @@ describe('matchOrders()', () => {
     test('should throw error for insufficient voucher allowance', async () => {
       const { iexec: iexecRequester, wallet: requesterWallet } =
         getTestConfig(iexecTestChain)();
-      const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
-
-      const apporder = await deployAndGetApporder(iexecResourcesProvider, {
-        volume: 10,
-        appprice: 5,
-      });
-      const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
-        {
-          volume: 7,
-          datasetprice: 1,
-        },
-      );
-      const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
-        { volume: 5, workerpoolprice: 1 },
+      const apporder = await iexecProvider.order.signApporder(apporderTemplate);
+      const datasetorder =
+        await iexecProvider.order.signDatasetorder(datasetorderTemplate);
+      const workerpoolorder = await iexecProvider.order.signWorkerpoolorder(
+        workerpoolorderTemplate,
       );
       const requestorder = await getMatchableRequestorder(iexecRequester, {
         apporder,
         datasetorder,
         workerpoolorder,
       });
-      const voucherTypeId = await createVoucherType(iexecTestChain)({
-        description: 'test voucher type',
-        duration: 42,
-      });
-      await addVoucherEligibleAsset(iexecTestChain)(
-        datasetorder.dataset,
-        voucherTypeId,
-      );
-      await addVoucherEligibleAsset(iexecTestChain)(
-        workerpoolorder.workerpool,
-        voucherTypeId,
-      );
       const voucherAddress = await createVoucher(iexecTestChain)({
         owner: await requesterWallet.getAddress(),
         voucherType: voucherTypeId,
-        value: 1000,
+        value: 10,
       });
       const allowance = await iexecRequester.account.checkAllowance(
         requestorder.requester,
@@ -2564,7 +2667,7 @@ describe('matchOrders()', () => {
       const { total, sponsored } =
         await iexecRequester.order.estimateMatchOrders(
           { apporder, datasetorder, workerpoolorder, requestorder },
-          { preflightCheck: true, useVoucher: true },
+          { useVoucher: true },
         );
 
       const requiredAmount = total.sub(sponsored);
@@ -2590,45 +2693,23 @@ describe('matchOrders()', () => {
     test('should match orders with voucher when user deposits to cover the missing amount', async () => {
       const { iexec: iexecRequester, wallet: requesterWallet } =
         getTestConfig(iexecTestChain)();
-      const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
 
-      const apporder = await deployAndGetApporder(iexecResourcesProvider, {
-        volume: 10,
-        appprice: 5,
-      });
-      const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
-        {
-          volume: 7,
-          datasetprice: 1,
-        },
-      );
-      const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
-        { volume: 5, workerpoolprice: 1 },
+      const apporder = await iexecProvider.order.signApporder(apporderTemplate);
+      const datasetorder =
+        await iexecProvider.order.signDatasetorder(datasetorderTemplate);
+      const workerpoolorder = await iexecProvider.order.signWorkerpoolorder(
+        workerpoolorderTemplate,
       );
       const requestorder = await getMatchableRequestorder(iexecRequester, {
         apporder,
         datasetorder,
         workerpoolorder,
       });
-      const voucherTypeId = await createVoucherType(iexecTestChain)({
-        description: 'test voucher type',
-        duration: 42,
-      });
-      await addVoucherEligibleAsset(iexecTestChain)(
-        datasetorder.dataset,
-        voucherTypeId,
-      );
-      await addVoucherEligibleAsset(iexecTestChain)(
-        workerpoolorder.workerpool,
-        voucherTypeId,
-      );
 
       const voucherAddress = await createVoucher(iexecTestChain)({
         owner: await requesterWallet.getAddress(),
         voucherType: voucherTypeId,
-        value: 1000,
+        value: 10,
       });
       await setNRlcBalance(iexecTestChain)(requesterWallet.address, 30);
       await iexecRequester.account.deposit(30);
@@ -2646,6 +2727,124 @@ describe('matchOrders()', () => {
       expect(res.volume).toBeInstanceOf(BN);
       expect(res.volume.eq(new BN(5))).toBe(true);
       expect(res.dealid).toBeTxHash();
+      const tx = await iexecTestChain.provider.getTransaction(res.txHash);
+      expect(tx.to).toBe(voucherAddress);
+    });
+
+    describe('with custom voucherAddress option', () => {
+      test('should use specified voucherAddress', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+
+        const { iexec: iexecVoucherOwner, wallet: voucherOwnerWallet } =
+          getTestConfig(iexecTestChain)();
+
+        const apporder =
+          await iexecProvider.order.signApporder(apporderTemplate);
+        const datasetorder =
+          await iexecProvider.order.signDatasetorder(datasetorderTemplate);
+        const workerpoolorder = await iexecProvider.order.signWorkerpoolorder(
+          workerpoolorderTemplate,
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        const voucherAddress = await createVoucher(iexecTestChain)({
+          owner: await voucherOwnerWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 1000000000,
+        });
+        await iexecVoucherOwner.voucher.authorizeRequester(
+          requesterWallet.address,
+        );
+
+        const res = await iexecRequester.order.matchOrders(
+          {
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          },
+          { useVoucher: true, voucherAddress },
+        );
+        expect(res.txHash).toBeTxHash();
+        expect(res.volume).toBeInstanceOf(BN);
+        expect(res.volume.eq(new BN(5))).toBe(true);
+        expect(res.dealid).toBeTxHash();
+        const tx = await iexecTestChain.provider.getTransaction(res.txHash);
+        expect(tx.to).toBe(voucherAddress);
+      });
+
+      test('should throw if specified voucherAddress is not a voucher', async () => {
+        const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+
+        const apporder =
+          await iexecProvider.order.signApporder(apporderTemplate);
+        const datasetorder =
+          await iexecProvider.order.signDatasetorder(datasetorderTemplate);
+        const workerpoolorder = await iexecProvider.order.signWorkerpoolorder(
+          workerpoolorderTemplate,
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        await expect(
+          iexecRequester.order.matchOrders(
+            {
+              apporder,
+              datasetorder,
+              workerpoolorder,
+              requestorder,
+            },
+            { useVoucher: true, voucherAddress: getRandomAddress() },
+          ),
+        ).rejects.toThrow(new Error('Invalid voucher contract address'));
+      });
+
+      test('should throw if user is not allowed to use specified voucherAddress', async () => {
+        const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+
+        const { wallet: voucherOwnerWallet } = getTestConfig(iexecTestChain)();
+
+        const apporder =
+          await iexecProvider.order.signApporder(apporderTemplate);
+        const datasetorder =
+          await iexecProvider.order.signDatasetorder(datasetorderTemplate);
+        const workerpoolorder = await iexecProvider.order.signWorkerpoolorder(
+          workerpoolorderTemplate,
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        const voucherAddress = await createVoucher(iexecTestChain)({
+          owner: await voucherOwnerWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 100000000,
+        });
+
+        await expect(
+          iexecRequester.order.matchOrders(
+            {
+              apporder,
+              datasetorder,
+              workerpoolorder,
+              requestorder,
+            },
+            { useVoucher: true, voucherAddress },
+          ),
+        ).rejects.toThrow(
+          new Error('User is not authorized to use the voucher'),
+        );
+      });
     });
   });
 });

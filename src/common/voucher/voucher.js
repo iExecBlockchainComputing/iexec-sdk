@@ -52,9 +52,7 @@ export const fetchVoucherContract = async (
         ),
       ]);
       if (!userAuthorized && !userIsOwner) {
-        throw new Error(
-          'User is neither the owner of the voucher nor authorized to use the voucher',
-        );
+        throw new Error('User is not authorized to use the voucher');
       }
     } else {
       const ownedVoucherAddress = await fetchVoucherAddress(

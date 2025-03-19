@@ -416,6 +416,7 @@ fill
   .option(...option.fillRequestParams())
   .option(...option.skipPreflightCheck())
   .option(...option.useVoucher())
+  .option(...option.voucherAddress())
   .description(desc.fill(objName))
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -589,6 +590,7 @@ fill
         workerpoolorder,
         requestorder,
         useVoucher: opts.useVoucher,
+        voucherAddress: opts.voucherAddress,
       });
       spinner.succeed(
         `${volume} task successfully purchased with dealid ${dealid}`,
