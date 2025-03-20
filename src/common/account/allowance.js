@@ -12,17 +12,19 @@ const debug = Debug('iexec:account:allowance');
 
 export const approve = async (
   contracts = throwIfMissing(),
-  amount = throwIfMissing(),
-  spenderAddress = throwIfMissing(),
+  amount,
+  spenderAddress,
 ) => {
   try {
     checkSigner(contracts);
-    const vAmount = await nRlcAmountSchema().validate(amount);
+    const vAmount = await nRlcAmountSchema().required().validate(amount);
     if (new BN(vAmount).lten(new BN(0)))
       throw Error('Approve amount must be less than or equals 0');
     const vSpenderAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(spenderAddress);
+    })
+      .required()
+      .validate(spenderAddress);
     const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
       iexecContract.approve(vSpenderAddress, vAmount, contracts.txOptions),
@@ -41,16 +43,20 @@ export const approve = async (
 
 export const checkAllowance = async (
   contracts = throwIfMissing(),
-  ownerAddress = throwIfMissing(),
-  spenderAddress = throwIfMissing(),
+  ownerAddress,
+  spenderAddress,
 ) => {
   try {
     const vOwnerAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(ownerAddress);
+    })
+      .required()
+      .validate(ownerAddress);
     const vSpenderAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(spenderAddress);
+    })
+      .required()
+      .validate(spenderAddress);
 
     const iexecContract = contracts.getIExecContract();
     const amount = await wrapCall(

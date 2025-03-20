@@ -111,7 +111,7 @@ export type WeiAmount = number | string | BN;
  */
 export type NRLCAmount = number | string | BN;
 /**
- * human redable task tag
+ * human readable task tag
  *
  * example:
  * ```js

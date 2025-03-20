@@ -401,6 +401,10 @@ export const option = {
     '--use-voucher',
     'use the voucher to cover the costs of matching orders',
   ],
+  voucherAddress: () => [
+    '--voucher-address <voucherAddress>',
+    'specify the voucher contract to use other than the owned voucher',
+  ],
 };
 
 export const optionCreator = {

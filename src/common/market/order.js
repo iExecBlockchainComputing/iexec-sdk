@@ -23,7 +23,6 @@ import {
   TAG_MAP,
   parseTransactionLogs,
 } from '../utils/utils.js';
-import { fetchVoucherAddress } from '../voucher/voucherHub.js';
 import { hashEIP712 } from '../utils/sig-utils.js';
 import {
   NULL_BYTES,
@@ -53,6 +52,7 @@ import {
   uint256Schema,
   nRlcAmountSchema,
   throwIfMissing,
+  booleanSchema,
 } from '../utils/validator.js';
 import {
   wrapCall,
@@ -60,11 +60,9 @@ import {
   wrapWait,
   wrapSignTypedData,
 } from '../utils/errorWrappers.js';
-import {
-  getVoucherContract,
-  getVoucherHubContract,
-} from '../utils/voucher-utils.js';
+import { getVoucherHubContract } from '../utils/voucher-utils.js';
 import { checkAllowance } from '../account/allowance.js';
+import { fetchVoucherContract } from '../voucher/voucher.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -783,22 +781,42 @@ const getMatchableVolume = async (
   }
 };
 
-export const estimateMatchOrders = async (
-  contracts,
-  voucherHubAddress,
-  appOrder,
-  datasetOrder = NULL_DATASETORDER,
-  workerpoolOrder,
-  requestOrder,
-  useVoucher,
-) => {
-  const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
-    await Promise.all([
-      signedApporderSchema().validate(appOrder),
-      signedDatasetorderSchema().validate(datasetOrder),
-      signedWorkerpoolorderSchema().validate(workerpoolOrder),
-      signedRequestorderSchema().validate(requestOrder),
-    ]);
+export const estimateMatchOrders = async ({
+  contracts = throwIfMissing(),
+  voucherHubAddress = throwIfMissing(),
+  apporder,
+  datasetorder = NULL_DATASETORDER,
+  workerpoolorder,
+  requestorder,
+  useVoucher = false,
+  voucherAddress,
+}) => {
+  const [
+    vAppOrder,
+    vDatasetOrder,
+    vWorkerpoolOrder,
+    vRequestOrder,
+    vUseVoucher,
+    vVoucherAddress,
+  ] = await Promise.all([
+    signedApporderSchema().required().label('apporder').validate(apporder),
+    signedDatasetorderSchema()
+      .required()
+      .label('datasetorder')
+      .validate(datasetorder),
+    signedWorkerpoolorderSchema()
+      .required()
+      .label('workerpoolorder')
+      .validate(workerpoolorder),
+    signedRequestorderSchema()
+      .required()
+      .label('requestorder')
+      .validate(requestorder),
+    booleanSchema().required().label('useVoucher').validate(useVoucher),
+    addressSchema({ ethProvider: contracts.provider })
+      .label('voucherAddress')
+      .validate(voucherAddress),
+  ]);
   const matchableVolume = await getMatchableVolume(
     contracts,
     vAppOrder,
@@ -813,24 +831,24 @@ export const estimateMatchOrders = async (
     vWorkerpoolOrder.workerpoolprice,
   );
   let sponsoredCost = new BN(0);
-  if (useVoucher) {
-    const voucherAddress = await fetchVoucherAddress(
+  if (vUseVoucher) {
+    const voucherContract = await fetchVoucherContract(
       contracts,
       voucherHubAddress,
-      requestOrder.requester,
+      await getAddress(contracts),
+      { voucherAddress: vVoucherAddress },
     );
-    if (!voucherAddress) {
+    if (!voucherContract) {
       return { total: totalCost, sponsored: sponsoredCost };
     }
-    const voucherContract = await getVoucherContract(contracts, voucherAddress);
-    const voucherExpiration = voucherContract.getExpiration();
+    const voucherExpiration = await wrapCall(voucherContract.getExpiration());
     const now = Math.floor(Date.now() / 1000);
     if (voucherExpiration <= now) {
       return { total: totalCost, sponsored: sponsoredCost };
     }
     const [balance, voucherTypeId] = await Promise.all([
-      voucherContract.getBalance(),
-      voucherContract.getType(),
+      wrapCall(voucherContract.getBalance()),
+      wrapCall(voucherContract.getType()),
     ]);
     const voucherHubContract = getVoucherHubContract(
       contracts,
@@ -842,19 +860,23 @@ export const estimateMatchOrders = async (
       isDatasetEligibleToMatchOrdersSponsoring,
       isWorkerpoolEligibleToMatchOrdersSponsoring,
     ] = await Promise.all([
-      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
-        voucherTypeId,
-        appOrder.app,
+      wrapCall(
+        voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+          voucherTypeId,
+          apporder.app,
+        ),
       ),
-
-      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
-        voucherTypeId,
-        datasetOrder.dataset,
+      wrapCall(
+        voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+          voucherTypeId,
+          datasetorder.dataset,
+        ),
       ),
-
-      voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
-        voucherTypeId,
-        workerpoolOrder.workerpool,
+      wrapCall(
+        voucherHubContract.isAssetEligibleToMatchOrdersSponsoring(
+          voucherTypeId,
+          workerpoolorder.workerpool,
+        ),
       ),
     ]);
 
@@ -873,24 +895,44 @@ export const estimateMatchOrders = async (
   return { total: totalCost, sponsored: sponsoredCost };
 };
 
-export const matchOrders = async (
+export const matchOrders = async ({
   contracts = throwIfMissing(),
   voucherHubAddress,
-  appOrder = throwIfMissing(),
-  datasetOrder = NULL_DATASETORDER,
-  workerpoolOrder = throwIfMissing(),
-  requestOrder = throwIfMissing(),
+  apporder,
+  datasetorder = NULL_DATASETORDER,
+  workerpoolorder,
+  requestorder,
   useVoucher = false,
-) => {
+  voucherAddress,
+}) => {
   try {
     checkSigner(contracts);
-    const [vAppOrder, vDatasetOrder, vWorkerpoolOrder, vRequestOrder] =
-      await Promise.all([
-        signedApporderSchema().validate(appOrder),
-        signedDatasetorderSchema().validate(datasetOrder),
-        signedWorkerpoolorderSchema().validate(workerpoolOrder),
-        signedRequestorderSchema().validate(requestOrder),
-      ]);
+    const [
+      vAppOrder,
+      vDatasetOrder,
+      vWorkerpoolOrder,
+      vRequestOrder,
+      vUseVoucher,
+      vVoucherAddress,
+    ] = await Promise.all([
+      signedApporderSchema().required().label('apporder').validate(apporder),
+      signedDatasetorderSchema()
+        .required()
+        .label('datasetorder')
+        .validate(datasetorder),
+      signedWorkerpoolorderSchema()
+        .required()
+        .label('workerpoolorder')
+        .validate(workerpoolorder),
+      signedRequestorderSchema()
+        .required()
+        .label('requestorder')
+        .validate(requestorder),
+      booleanSchema().required().label('useVoucher').validate(useVoucher),
+      addressSchema({ ethProvider: contracts.provider })
+        .label('voucherAddress')
+        .validate(voucherAddress),
+    ]);
 
     // check resulting tag
     await tagSchema()
@@ -914,17 +956,16 @@ export const matchOrders = async (
     const appPrice = new BN(vAppOrder.appprice);
     const datasetPrice = new BN(vDatasetOrder.datasetprice);
 
-    // resolve voucher address if used
-    let voucherAddress;
-    if (useVoucher) {
-      const voucherHubContract = getVoucherHubContract(
+    // resolve voucher contract address if used
+    let voucherContract;
+    if (vUseVoucher) {
+      voucherContract = await fetchVoucherContract(
         contracts,
         voucherHubAddress,
+        await getAddress(contracts),
+        { voucherAddress: vVoucherAddress },
       );
-      voucherAddress = await voucherHubContract.getVoucher(
-        vRequestOrder.requester,
-      );
-      if (voucherAddress === NULL_ADDRESS) {
+      if (!voucherContract) {
         throw new Error(
           `No voucher available for the requester ${vRequestOrder.requester}`,
         );
@@ -936,21 +977,22 @@ export const matchOrders = async (
       const costPerTask = appPrice.add(datasetPrice).add(workerpoolPrice);
       const totalCost = costPerTask.mul(matchableVolume);
       const { stake } = await checkBalance(contracts, vRequestOrder.requester);
-      if (useVoucher) {
-        const { total, sponsored } = await estimateMatchOrders(
+      if (vUseVoucher) {
+        const { total, sponsored } = await estimateMatchOrders({
           contracts,
           voucherHubAddress,
-          vAppOrder,
-          vDatasetOrder,
-          vWorkerpoolOrder,
-          vRequestOrder,
-          useVoucher,
-        );
+          apporder: vAppOrder,
+          datasetorder: vDatasetOrder,
+          workerpoolorder: vWorkerpoolOrder,
+          requestorder: vRequestOrder,
+          useVoucher: vUseVoucher,
+          voucherAddress: vVoucherAddress,
+        });
         if (total.gt(sponsored)) {
           const allowance = await checkAllowance(
             contracts,
             vRequestOrder.requester,
-            voucherAddress,
+            await voucherContract.getAddress(),
           );
           const requiredAllowance = total.sub(sponsored);
           if (allowance.lt(requiredAllowance)) {
@@ -992,8 +1034,7 @@ export const matchOrders = async (
 
     let tx;
     const iexecContract = contracts.getIExecContract();
-    if (useVoucher) {
-      const voucherContract = getVoucherContract(contracts, voucherAddress);
+    if (vUseVoucher) {
       tx = await wrapSend(
         voucherContract
           .connect(contracts.signer)
@@ -1036,7 +1077,7 @@ export const matchOrders = async (
 export const createApporder = async (
   contracts = throwIfMissing(),
   {
-    app = throwIfMissing(),
+    app,
     appprice = '0',
     volume = '1',
     tag = NULL_BYTES32,
@@ -1045,7 +1086,10 @@ export const createApporder = async (
     requesterrestrict = NULL_ADDRESS,
   } = {},
 ) => ({
-  app: await addressSchema({ ethProvider: contracts.provider }).validate(app),
+  app: await addressSchema({ ethProvider: contracts.provider })
+    .required()
+    .label('app')
+    .validate(app),
   appprice: await nRlcAmountSchema().validate(appprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
@@ -1063,7 +1107,7 @@ export const createApporder = async (
 export const createDatasetorder = async (
   contracts = throwIfMissing(),
   {
-    dataset = throwIfMissing(),
+    dataset,
     datasetprice = '0',
     volume = '1',
     tag = NULL_BYTES32,
@@ -1074,7 +1118,10 @@ export const createDatasetorder = async (
 ) => ({
   dataset: await addressSchema({
     ethProvider: contracts.provider,
-  }).validate(dataset),
+  })
+    .label('dataset')
+    .required()
+    .validate(dataset),
   datasetprice: await nRlcAmountSchema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
@@ -1125,8 +1172,8 @@ export const createWorkerpoolorder = async (
 export const createRequestorder = async (
   { contracts = throwIfMissing() } = {},
   {
-    app = throwIfMissing(),
-    category = throwIfMissing(),
+    app,
+    category,
     dataset = NULL_ADDRESS,
     workerpool = NULL_ADDRESS,
     appmaxprice = '0',
@@ -1145,7 +1192,10 @@ export const createRequestorder = async (
   return {
     app: await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(app),
+    })
+      .required()
+      .label('app')
+      .validate(app),
     appmaxprice: await nRlcAmountSchema().validate(appmaxprice),
     dataset: await addressSchema({
       ethProvider: contracts.provider,
@@ -1172,7 +1222,10 @@ export const createRequestorder = async (
     callback: await addressSchema({
       ethProvider: contracts.provider,
     }).validate(callback),
-    category: await uint256Schema().validate(category),
+    category: await uint256Schema()
+      .required()
+      .label('category')
+      .validate(category),
     trust: await uint256Schema().validate(trust),
     tag: await tagSchema().validate(tag),
   };

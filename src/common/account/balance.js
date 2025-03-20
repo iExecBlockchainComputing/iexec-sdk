@@ -5,14 +5,13 @@ import { wrapCall } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:account:balance');
 
-export const checkBalance = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
+export const checkBalance = async (contracts = throwIfMissing(), address) => {
   try {
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(address);
+    })
+      .required()
+      .validate(address);
     const iexecContract = contracts.getIExecContract();
     const { stake, locked } = await wrapCall(
       iexecContract.viewAccount(vAddress),

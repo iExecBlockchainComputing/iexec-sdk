@@ -191,6 +191,9 @@ const testResolveEnsPromise = async (value) => {
 };
 
 const testAddressOrAddressPromise = async (value) => {
+  if (value === undefined) {
+    return true;
+  }
   const resolvedValue = typeof value === 'string' ? value : await value;
   return isAddress(resolvedValue);
 };

@@ -586,6 +586,7 @@ run
   .option(...orderOption.params())
   .option(...option.skipPreflightCheck())
   .option(...option.useVoucher())
+  .option(...option.voucherAddress())
   .description(desc.appRun())
   .action(async (appAddress, opts) => {
     await checkUpdate(opts);
@@ -732,14 +733,11 @@ run
       debug('trust', trust);
       const callback = await addressSchema({
         ethProvider: chain.contracts.provider,
-      }).validate(opts.callback || NULL_ADDRESS);
+      }).validate(opts.callback);
       debug('callback', callback);
-      const beneficiary =
-        opts.beneficiary === undefined
-          ? undefined
-          : await addressSchema({
-              ethProvider: chain.contracts.provider,
-            }).validate(opts.beneficiary);
+      const beneficiary = await addressSchema({
+        ethProvider: chain.contracts.provider,
+      }).validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
       const watch = !!opts.watch || !!opts.download;
@@ -1039,15 +1037,16 @@ run
 
       debug('requestorder', requestorder);
 
-      const { total: totalCost, sponsored } = await estimateMatchOrders(
-        chain.contracts,
-        chain.voucherHub,
+      const { total: totalCost, sponsored } = await estimateMatchOrders({
+        contracts: chain.contracts,
+        voucherHubAddress: chain.voucherHub,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-        opts.useVoucher,
-      );
+        useVoucher: opts.useVoucher,
+        voucherAddress: opts.voucherAddress,
+      });
 
       spinner.stop();
 
@@ -1087,15 +1086,16 @@ run
       }
 
       spinner.start('Submitting deal');
-      const { dealid, volume, txHash } = await matchOrders(
-        chain.contracts,
-        chain.voucherHub,
+      const { dealid, volume, txHash } = await matchOrders({
+        contracts: chain.contracts,
+        voucherHubAddress: chain.voucherHub,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-        opts.useVoucher,
-      );
+        useVoucher: opts.useVoucher,
+        voucherAddress: opts.voucherAddress,
+      });
 
       result.deals.push({ dealid, volume: volume.toString(), txHash });
 
@@ -1286,14 +1286,11 @@ requestRun
       debug('trust', trust);
       const callback = await addressSchema({
         ethProvider: chain.contracts.provider,
-      }).validate(opts.callback || NULL_ADDRESS);
+      }).validate(opts.callback);
       debug('callback', callback);
-      const beneficiary =
-        opts.beneficiary === undefined
-          ? undefined
-          : await addressSchema({
-              ethProvider: chain.contracts.provider,
-            }).validate(opts.beneficiary);
+      const beneficiary = await addressSchema({
+        ethProvider: chain.contracts.provider,
+      }).validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
       spinner.info('Creating requestorder');
