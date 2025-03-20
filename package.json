@@ -204,7 +204,7 @@
     "@multiformats/multiaddr": "^12.4.0",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
-    "commander": "^11.1.0",
+    "commander": "^13.1.0",
     "debug": "^4.4.0",
     "ethers": "^6.13.5",
     "fs-extra": "^11.3.0",
