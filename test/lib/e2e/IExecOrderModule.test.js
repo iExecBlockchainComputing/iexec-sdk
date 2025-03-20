@@ -2778,6 +2778,61 @@ describe('matchOrders()', () => {
         expect(tx.to).toBe(voucherAddress);
       });
 
+      test('requester can pay for non-sponsored assets', async () => {
+        const { iexec: iexecRequester, wallet: requesterWallet } =
+          getTestConfig(iexecTestChain)();
+        await setNRlcBalance(iexecTestChain)(requesterWallet.address, 1000);
+        await iexecRequester.account.deposit(1000);
+
+        const { iexec: iexecVoucherOwner, wallet: voucherOwnerWallet } =
+          getTestConfig(iexecTestChain)();
+
+        const { iexec: iexecDatasetProvider } = getTestConfig(iexecTestChain)();
+
+        const apporder =
+          await iexecProvider.order.signApporder(apporderTemplate);
+        const workerpoolorder = await iexecProvider.order.signWorkerpoolorder(
+          workerpoolorderTemplate,
+        );
+        // non-sponsored asset
+        const datasetorder = await deployAndGetDatasetorder(
+          iexecDatasetProvider,
+          { datasetprice: 200 },
+        );
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        const voucherAddress = await createVoucher(iexecTestChain)({
+          owner: await voucherOwnerWallet.getAddress(),
+          voucherType: voucherTypeId,
+          value: 1000000000,
+        });
+        await iexecVoucherOwner.voucher.authorizeRequester(
+          requesterWallet.address,
+        );
+        await iexecRequester.account.approve(500, voucherAddress);
+        const res = await iexecRequester.order.matchOrders(
+          {
+            apporder,
+            datasetorder,
+            workerpoolorder,
+            requestorder,
+          },
+          { useVoucher: true, voucherAddress },
+        );
+        expect(res.txHash).toBeTxHash();
+        expect(res.dealid).toBeTxHash();
+        const tx = await iexecTestChain.provider.getTransaction(res.txHash);
+        expect(tx.to).toBe(voucherAddress);
+        const finalAccountBalance = await iexecRequester.account.checkBalance(
+          requesterWallet.address,
+        );
+        expect(finalAccountBalance.stake.eq(new BN(800))).toBe(true);
+      });
+
       test('should throw if specified voucherAddress is not a voucher', async () => {
         const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
 
