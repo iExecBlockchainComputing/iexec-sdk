@@ -1031,7 +1031,7 @@ export default class IExecOrderModule extends IExecModule {
       /**
        * override the voucher contract to use, must be combined with `useVoucher: true`
        *
-       * the user must be authorized to use the voucher by the voucher's owner
+       * the user must be authorized by the voucher's owner to use it
        */
       voucherAddress?: Addressish;
     },
@@ -1067,11 +1067,11 @@ export default class IExecOrderModule extends IExecModule {
       /**
        * override the voucher contract to use, must be combined with `useVoucher: true`
        *
-       * the user must be authorized to use the voucher by the voucher's owner
+       * the user must be authorized by the voucher's owner to use it
        */
       voucherAddress?: Addressish;
     },
-  ): Promise<{ total: NRlcAmount; sponsored: NRlcAmount }>;
+  ): Promise<{ total: BN; sponsored: BN }>;
   /**
    * Create an IExecOrderModule instance using an IExecConfig instance
    */

@@ -334,7 +334,7 @@ ___
 
 ### estimateMatchOrders
 
-▸ **estimateMatchOrders**(`orders`, `options?`): `Promise`<{ `sponsored`: `NRlcAmount` ; `total`: `NRlcAmount`  }\>
+▸ **estimateMatchOrders**(`orders`, `options?`): `Promise`<{ `sponsored`: [`BN`](utils.BN.md) ; `total`: [`BN`](utils.BN.md)  }\>
 
 estimates the cost of matching the provided orders
 
@@ -362,11 +362,11 @@ console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 | `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) | - |
 | `options?` | `Object` | - |
 | `options.useVoucher?` | `boolean` | use a voucher contract to sponsor the deal |
-| `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized to use the voucher by the voucher's owner |
+| `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized by the voucher's owner to use it |
 
 #### Returns
 
-`Promise`<{ `sponsored`: `NRlcAmount` ; `total`: `NRlcAmount`  }\>
+`Promise`<{ `sponsored`: [`BN`](utils.BN.md) ; `total`: [`BN`](utils.BN.md)  }\>
 
 ___
 
@@ -497,7 +497,7 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 | `options?` | `Object` | - |
 | `options.preflightCheck?` | `boolean` | - |
 | `options.useVoucher?` | `boolean` | use a voucher contract to sponsor the deal |
-| `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized to use the voucher by the voucher's owner |
+| `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized by the voucher's owner to use it |
 
 #### Returns
 
