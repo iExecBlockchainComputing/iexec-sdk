@@ -505,7 +505,7 @@ describe('[paramsInputFilesArraySchema]', () => {
   });
   test('empty string', async () => {
     await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
-      new ValidationError('["0"] "" is not a valid URL'),
+      new ValidationError('[0] "" is not a valid URL'),
     );
   });
   test('string invalid URL', async () => {
