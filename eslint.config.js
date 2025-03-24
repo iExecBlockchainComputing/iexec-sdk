@@ -16,7 +16,7 @@ export default [
       globals: {
         ...globals['shared-node-browser'],
       },
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       sourceType: 'module',
     },
     rules: {
@@ -53,8 +53,8 @@ export default [
       'import/extensions': ['error', 'ignorePackages'],
       'sonarjs/cognitive-complexity': ['warn', 15],
       'sonarjs/no-duplicate-string': 'off',
-      'sonarjs/no-nested-functions': 'warn', // todo refactor to enforce this rule
-      'sonarjs/todo-tag': 'warn', // todo
+      'sonarjs/no-nested-functions': 'warn', // todo refactor to enforce error on this rule
+      'sonarjs/todo-tag': 'warn',
     },
     settings: {
       'import/ignore': ['ethers', 'graphql-request'],
@@ -86,6 +86,16 @@ export default [
     rules: {
       'no-console': 'off',
       'no-await-in-loop': 'off',
+    },
+  },
+  {
+    files: ['*.cjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+      ecmaVersion: 2022,
+      sourceType: 'script',
     },
   },
 ];

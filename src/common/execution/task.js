@@ -30,7 +30,7 @@ const decodeTaskResult = (results) => {
     if (results !== NULL_BYTES) {
       return JSON.parse(Buffer.from(results.substr(2), 'hex').toString('utf8'));
     }
-  } catch (e) {
+  } catch {
     // nothing to do
   }
   return { storage: 'none' };

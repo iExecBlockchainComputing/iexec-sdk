@@ -102,11 +102,11 @@ export const nRlcAmountSchema = ({ defaultUnit = 'nRLC' } = {}) =>
     .transform((value, originalValue) => {
       try {
         return parseRLC(value, defaultUnit).toString();
-      } catch (e) {
+      } catch {
         throw new ValidationError(amountErrorMessage({ originalValue }));
       }
     })
-    .matches(/^[0-9]*$/, amountErrorMessage);
+    .matches(/^\d*$/, amountErrorMessage);
 
 export const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
   string()
@@ -133,11 +133,11 @@ export const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
     .transform((value, originalValue) => {
       try {
         return parseEth(value, defaultUnit).toString();
-      } catch (e) {
+      } catch {
         throw new ValidationError(amountErrorMessage({ originalValue }));
       }
     })
-    .matches(/^[0-9]*$/, amountErrorMessage);
+    .matches(/^\d*$/, amountErrorMessage);
 
 export const chainIdSchema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
@@ -363,7 +363,7 @@ export const paramsSchema = () =>
         try {
           JSON.parse(value);
           return true;
-        } catch (e) {
+        } catch {
           return false;
         }
       },
@@ -406,7 +406,7 @@ export const tagSchema = () =>
         try {
           await bytes32Schema().validate(value);
           return true;
-        } catch (e) {
+        } catch {
           return false;
         }
       },
@@ -626,7 +626,7 @@ export const mrenclaveSchema = () =>
         if (originalValue instanceof Uint8Array) {
           try {
             stringValue = Buffer.from(originalValue).toString();
-          } catch (e) {
+          } catch {
             return false;
           }
         } else if (typeof originalValue === 'string') {
@@ -697,7 +697,7 @@ export const fileBufferSchema = () =>
         throw Error('unsupported string');
       }
       return Buffer.from(value);
-    } catch (e) {
+    } catch {
       throw new ValidationError(
         'Invalid file buffer, must be ArrayBuffer or Buffer',
       );

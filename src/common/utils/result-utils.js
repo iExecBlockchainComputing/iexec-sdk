@@ -36,6 +36,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
    * Best effort size check is performed before buffer allocation, resulting buffer size is checked to ensure big file will not be written on disc.
    * When best effort size check fails to detect large file, buffer allocation could flood the memory.
    */
+  // eslint-disable-next-line sonarjs/no-unsafe-unzip
   const zip = await new JSZip().loadAsync(encryptedZipBuffer).catch((error) => {
     debug(error);
     throw Error(`Failed to load encrypted results zip file`);
