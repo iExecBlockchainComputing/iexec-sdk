@@ -10,6 +10,7 @@ const MAIN_HEADER_LEVEL = 1;
 
 const execPromise = (command) =>
   new Promise((res, rej) => {
+    // eslint-disable-next-line sonarjs/os-command
     exec(command, (error, stdout, stderr) => {
       if (error) {
         rej(Error(stdout + stderr));

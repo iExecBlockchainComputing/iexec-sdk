@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer';
+
 export async function getCrypto() {
   if (globalThis.crypto) {
     // Browser and Node >= 20

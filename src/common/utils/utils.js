@@ -132,7 +132,7 @@ export const multiaddrHexToHuman = (hexString) => {
   const buffer = hexToBuffer(hexString);
   try {
     res = multiaddr(new Uint8Array(buffer)).toString();
-  } catch (error) {
+  } catch {
     res = buffer.toString();
   }
   return res;
@@ -205,7 +205,7 @@ export const parseTransactionLogs = (logs, abiInterface) =>
     .map((log) => {
       try {
         return abiInterface.parseLog(log);
-      } catch (e) {
+      } catch {
         return null;
       }
     })

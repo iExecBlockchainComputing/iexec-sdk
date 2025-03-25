@@ -1046,28 +1046,31 @@ export const renderTasksStatus = (
   );
   const completedTasksArray = tasksArray.filter((task) => task.status === 3);
   const timedoutTasksArray = tasksArray.filter((task) => task.taskTimedOut);
+  const completedDetails = detailed
+    ? `:${pretty(
+        completedTasksArray.map(
+          ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+        ),
+      )}`
+    : '\n';
   const completedMsg =
     completedTasksArray.length > 0
       ? `${completedTasksArray.length}/${tasksArray.length} tasks completed${
-          detailed
-            ? `:${pretty(
-                completedTasksArray.map(
-                  ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
-                ),
-              )}`
-            : '\n'
+          completedDetails
         }`
       : '';
+
+  const failedDetails = detailed
+    ? `:${pretty(
+        timedoutTasksArray.map(
+          ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
+        ),
+      )}`
+    : '\n';
   const failedMsg =
     timedoutTasksArray.length > 0
       ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed${
-          detailed
-            ? `:${pretty(
-                timedoutTasksArray.map(
-                  ({ idx, taskid }) => `Task idx ${idx} (${taskid})`,
-                ),
-              )}`
-            : '\n'
+          failedDetails
         }`
       : '';
   const statusMsg =

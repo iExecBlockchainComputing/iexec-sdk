@@ -101,8 +101,7 @@ const sources = [
 ];
 
 const createEsModule = (jsonObj) => {
-  let module =
-    '// this file is auto generated do not edit it\n/* eslint-disable */\n';
+  let module = '// this file is auto generated do not edit it\n';
   Object.entries(jsonObj).forEach(([key, value]) => {
     module += `export const ${key} = ${JSON.stringify(value)};\n`;
   });
