@@ -5,13 +5,12 @@ import { wrapCall } from '../utils/errorWrappers.js';
 
 const debug = Debug('iexec:wallet:balance');
 
-export const getRlcBalance = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
+export const getRlcBalance = async (contracts = throwIfMissing(), address) => {
   const vAddress = await addressSchema({
     ethProvider: contracts.provider,
-  }).validate(address);
+  })
+    .required()
+    .validate(address);
   const { isNative } = contracts;
   if (isNative) {
     const weiBalance = await contracts.provider.getBalance(vAddress);
@@ -22,25 +21,23 @@ export const getRlcBalance = async (
   return bigIntToBn(nRlcBalance);
 };
 
-export const getEthBalance = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
+export const getEthBalance = async (contracts = throwIfMissing(), address) => {
   const vAddress = await addressSchema({
     ethProvider: contracts.provider,
-  }).validate(address);
+  })
+    .required()
+    .validate(address);
   const weiBalance = await contracts.provider.getBalance(vAddress);
   return bigIntToBn(weiBalance);
 };
 
-export const checkBalances = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
+export const checkBalances = async (contracts = throwIfMissing(), address) => {
   try {
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(address);
+    })
+      .required()
+      .validate(address);
     const [weiBalance, rlcBalance] = await Promise.all([
       getEthBalance(contracts, vAddress),
       getRlcBalance(contracts, vAddress),

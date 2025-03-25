@@ -416,6 +416,7 @@ fill
   .option(...option.fillRequestParams())
   .option(...option.skipPreflightCheck())
   .option(...option.useVoucher())
+  .option(...option.voucherAddress())
   .description(desc.fill(objName))
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -452,13 +453,13 @@ fill
         }
         throw Error(`Invalid ${orderName} hash`);
       };
-      const appOrder = opts.app
+      const apporder = opts.app
         ? await getOrderByHash(APP_ORDER, opts.app)
         : signedOrders[chain.id].apporder;
-      const datasetOrder = opts.dataset
+      const datasetorder = opts.dataset
         ? await getOrderByHash(DATASET_ORDER, opts.dataset)
         : signedOrders[chain.id].datasetorder;
-      const workerpoolOrder = opts.workerpool
+      const workerpoolorder = opts.workerpool
         ? await getOrderByHash(WORKERPOOL_ORDER, opts.workerpool)
         : signedOrders[chain.id].workerpoolorder;
       let requestOrderInput;
@@ -472,12 +473,12 @@ fill
 
       const useDataset = requestOrderInput
         ? requestOrderInput.dataset !== NULL_ADDRESS
-        : !!datasetOrder;
+        : !!datasetorder;
       debug('useDataset', useDataset);
 
-      if (!appOrder) throw new Error('Missing apporder');
-      if (!datasetOrder && useDataset) throw new Error('Missing datasetorder');
-      if (!workerpoolOrder) throw new Error('Missing workerpoolorder');
+      if (!apporder) throw new Error('Missing apporder');
+      if (!datasetorder && useDataset) throw new Error('Missing datasetorder');
+      if (!workerpoolorder) throw new Error('Missing workerpoolorder');
 
       const computeRequestOrder = async () => {
         await connectKeystore(chain, keystore, { txOptions });
@@ -486,13 +487,13 @@ fill
             contracts: chain.contracts,
           },
           {
-            app: appOrder.app,
-            appmaxprice: appOrder.appprice || undefined,
-            dataset: useDataset ? datasetOrder.dataset : undefined,
-            datasetmaxprice: useDataset ? datasetOrder.datasetprice : undefined,
-            workerpool: workerpoolOrder.workerpool || undefined,
-            workerpoolmaxprice: workerpoolOrder.workerpoolprice || undefined,
-            category: workerpoolOrder.category,
+            app: apporder.app,
+            appmaxprice: apporder.appprice || undefined,
+            dataset: useDataset ? datasetorder.dataset : undefined,
+            datasetmaxprice: useDataset ? datasetorder.datasetprice : undefined,
+            workerpool: workerpoolorder.workerpool || undefined,
+            workerpoolmaxprice: workerpoolorder.workerpoolprice || undefined,
+            category: workerpoolorder.category,
             params: inputParams || undefined,
           },
         );
@@ -502,8 +503,8 @@ fill
         return signRequestorder(chain.contracts, unsignedOrder);
       };
 
-      const requestOrder = requestOrderInput || (await computeRequestOrder());
-      if (!requestOrder) {
+      const requestorder = requestOrderInput || (await computeRequestOrder());
+      if (!requestorder) {
         throw new Error('Missing requestorder');
       }
 
@@ -512,15 +513,15 @@ fill
           (
             await requestorderSchema()
               .label('requestorder')
-              .validate(requestOrder)
+              .validate(requestorder)
           ).tag,
-          (await apporderSchema().label('apporder').validate(appOrder)).tag,
+          (await apporderSchema().label('apporder').validate(apporder)).tag,
           ...(useDataset
             ? [
                 (
                   await datasetorderSchema()
                     .label('datasetorder')
-                    .validate(datasetOrder)
+                    .validate(datasetorder)
                 ).tag,
               ]
             : []),
@@ -529,7 +530,7 @@ fill
           {
             contracts: chain.contracts,
           },
-          appOrder,
+          apporder,
           { tagOverride: resolvedTag },
         ).catch((e) => {
           throw Error(
@@ -548,7 +549,7 @@ fill
                 teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
               }),
             },
-            datasetOrder,
+            datasetorder,
             { tagOverride: resolvedTag },
           ).catch((e) => {
             throw Error(
@@ -567,7 +568,7 @@ fill
               teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
             }),
           },
-          requestOrder,
+          requestorder,
         ).catch((e) => {
           throw Error(
             `Request requirements check failed: ${
@@ -581,15 +582,16 @@ fill
 
       await connectKeystore(chain, keystore, { txOptions });
       spinner.start(info.filling(objName));
-      const { dealid, volume, txHash } = await matchOrders(
-        chain.contracts,
-        chain.voucherHub,
-        appOrder,
-        useDataset ? datasetOrder : undefined,
-        workerpoolOrder,
-        requestOrder,
-        opts.useVoucher,
-      );
+      const { dealid, volume, txHash } = await matchOrders({
+        contracts: chain.contracts,
+        voucherHubAddress: chain.voucherHub,
+        apporder,
+        datasetorder: useDataset ? datasetorder : undefined,
+        workerpoolorder,
+        requestorder,
+        useVoucher: opts.useVoucher,
+        voucherAddress: opts.voucherAddress,
+      });
       spinner.succeed(
         `${volume} task successfully purchased with dealid ${dealid}`,
         { raw: { dealid, volume: volume.toString(), txHash } },

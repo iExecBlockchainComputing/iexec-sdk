@@ -45,14 +45,13 @@ export const resolveName = async (
   }
 };
 
-export const lookupAddress = async (
-  contracts = throwIfMissing(),
-  address = throwIfMissing(),
-) => {
+export const lookupAddress = async (contracts = throwIfMissing(), address) => {
   try {
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(address);
+    })
+      .required()
+      .validate(address);
     await checkEns(contracts);
     return await wrapCall(contracts.provider.lookupAddress(vAddress));
   } catch (e) {

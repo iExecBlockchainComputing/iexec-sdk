@@ -1079,6 +1079,7 @@ Options:
 | --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
 | --skip-preflight-check | skip preflight check, this may result in task execution fail |
 | --use-voucher | use the voucher to cover the costs of matching orders |
+| --voucher-address \<voucherAddress\> | specify the voucher contract to use other than the owned voucher |
 
 #### iexec app request-execution
 
@@ -1794,6 +1795,7 @@ Options:
 | --params \<json\> | specify the params of the request, existing request order will be ignored<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
 | --skip-preflight-check | skip preflight check, this may result in task execution fail |
 | --use-voucher | use the voucher to cover the costs of matching orders |
+| --voucher-address \<voucherAddress\> | specify the voucher contract to use other than the owned voucher |
 
 #### iexec order publish
 

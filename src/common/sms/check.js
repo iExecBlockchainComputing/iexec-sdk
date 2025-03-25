@@ -24,12 +24,14 @@ const cacheSecretExists = ({ smsURL, kindOfSecret, secretId }) => {
 export const checkWeb3SecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
-  resourceAddress = throwIfMissing(),
+  resourceAddress,
 ) => {
   try {
     const vResourceAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(resourceAddress);
+    })
+      .required()
+      .validate(resourceAddress);
     const kindOfSecret = 'web3';
     const secretId = vResourceAddress;
     const cached = checkCache({ smsURL, kindOfSecret, secretId });
@@ -64,13 +66,15 @@ export const checkWeb3SecretExists = async (
 export const checkWeb2SecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
-  ownerAddress = throwIfMissing(),
-  secretName = throwIfMissing(),
+  ownerAddress,
+  secretName,
 ) => {
   try {
     const vOwnerAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(ownerAddress);
+    })
+      .required()
+      .validate(ownerAddress);
     const kindOfSecret = 'web2';
     const secretId = `${vOwnerAddress}|${secretName}`;
     const cached = checkCache({ smsURL, kindOfSecret, secretId });
@@ -142,12 +146,14 @@ export const checkRequesterSecretExists = async (
 export const checkAppSecretExists = async (
   contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
-  appAddress = throwIfMissing(),
+  appAddress,
 ) => {
   try {
     const vAppAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(appAddress);
+    })
+      .required()
+      .validate(appAddress);
     const kindOfSecret = 'app';
     const secretId = vAppAddress;
     const cached = checkCache({ smsURL, kindOfSecret, secretId });

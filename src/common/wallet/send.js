@@ -21,16 +21,18 @@ const debug = Debug('iexec:wallet:send');
 
 const sendNativeToken = async (
   contracts = throwIfMissing(),
-  value = throwIfMissing(),
-  to = throwIfMissing(),
+  value,
+  to,
   { gasFees = {} } = {},
 ) => {
   try {
     checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(to);
-    const vValue = await uint256Schema().validate(value);
+    })
+      .required()
+      .validate(to);
+    const vValue = await uint256Schema().required().validate(value);
     const tx = await wrapSend(
       contracts.signer.sendTransaction({
         data: '0x',
@@ -48,16 +50,14 @@ const sendNativeToken = async (
   }
 };
 
-const sendERC20 = async (
-  contracts = throwIfMissing(),
-  nRlcAmount = throwIfMissing(),
-  to = throwIfMissing(),
-) => {
+const sendERC20 = async (contracts = throwIfMissing(), nRlcAmount, to) => {
   checkSigner(contracts);
   const vAddress = await addressSchema({
     ethProvider: contracts.provider,
-  }).validate(to);
-  const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
+  })
+    .required()
+    .validate(to);
+  const vAmount = await nRlcAmountSchema().required().validate(nRlcAmount);
   try {
     const rlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(
@@ -71,17 +71,15 @@ const sendERC20 = async (
   }
 };
 
-export const sendETH = async (
-  contracts = throwIfMissing(),
-  amount = throwIfMissing(),
-  to = throwIfMissing(),
-) => {
+export const sendETH = async (contracts = throwIfMissing(), amount, to) => {
   try {
     checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(to);
-    const vAmount = await weiAmountSchema().validate(amount);
+    })
+      .required()
+      .validate(to);
+    const vAmount = await weiAmountSchema().required().validate(amount);
     if (contracts.isNative)
       throw Error('sendETH() is disabled on sidechain, use sendRLC()');
     const balance = await getEthBalance(contracts, await getAddress(contracts));
@@ -95,17 +93,15 @@ export const sendETH = async (
   }
 };
 
-export const sendRLC = async (
-  contracts = throwIfMissing(),
-  nRlcAmount = throwIfMissing(),
-  to = throwIfMissing(),
-) => {
+export const sendRLC = async (contracts = throwIfMissing(), nRlcAmount, to) => {
   try {
     checkSigner(contracts);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(to);
-    const vAmount = await nRlcAmountSchema().validate(nRlcAmount);
+    })
+      .required()
+      .validate(to);
+    const vAmount = await nRlcAmountSchema().required().validate(nRlcAmount);
     const balance = await getRlcBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
       throw Error('Amount to send exceed wallet balance');
@@ -123,15 +119,14 @@ export const sendRLC = async (
   }
 };
 
-export const sweep = async (
-  contracts = throwIfMissing(),
-  to = throwIfMissing(),
-) => {
+export const sweep = async (contracts = throwIfMissing(), to) => {
   try {
     checkSigner(contracts);
     const vAddressTo = await addressSchema({
       ethProvider: contracts.provider,
-    }).validate(to);
+    })
+      .required()
+      .validate(to);
     const userAddress = await getAddress(contracts);
     const code = await contracts.provider.getCode(vAddressTo);
     if (code !== '0x') {

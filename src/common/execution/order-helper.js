@@ -46,7 +46,7 @@ export const createObjParams = async ({
   if (typeof params === 'string') {
     try {
       inputParams = JSON.parse(params);
-    } catch (e) {
+    } catch {
       inputParams = {
         iexec_args: params,
       };

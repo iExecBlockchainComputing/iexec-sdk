@@ -1,6 +1,6 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, beforeEach } from '@jest/globals';
 import {
   TEST_CHAINS,
   addVoucherEligibleAsset,
@@ -21,6 +21,7 @@ import {
   setRandomWallet,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
+import { getTestConfig } from '../test-config-utils.js';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 
@@ -338,6 +339,7 @@ describe('iexec order', () => {
     let workerpoolOrderHash;
     let datasetOrderHash;
     let apporderHash;
+    let voucherType;
 
     beforeAll(async () => {
       const publishApporder = await runIExecCliRaw(
@@ -365,6 +367,14 @@ describe('iexec order', () => {
         category: 0,
         volume: '1',
       });
+
+      voucherType = await createVoucherType(testChain)({});
+      await addVoucherEligibleAsset(testChain)(userWorkerpool, voucherType);
+      await addVoucherEligibleAsset(testChain)(userDataset, voucherType);
+      await addVoucherEligibleAsset(testChain)(userApp, voucherType);
+    });
+
+    beforeEach(async () => {
       await execAsync(
         `${iexecPath} order sign --request --skip-preflight-check --raw`,
       );
@@ -382,16 +392,11 @@ describe('iexec order', () => {
     });
 
     test('should match orders with voucher', async () => {
-      const voucherType = await createVoucherType(testChain)({});
-      await createVoucher(testChain)({
+      const voucherAddress = await createVoucher(testChain)({
         owner: userWallet.address,
         voucherType,
         value: 6, // nRLC
       });
-      await addVoucherEligibleAsset(testChain)(userWorkerpool, voucherType);
-      await addVoucherEligibleAsset(testChain)(userDataset, voucherType);
-      await addVoucherEligibleAsset(testChain)(userApp, voucherType);
-
       const raw = await execAsync(
         `${iexecPath} order fill --use-voucher --app ${apporderHash} --workerpool ${workerpoolOrderHash} --dataset ${datasetOrderHash} --skip-preflight-check --raw`,
       );
@@ -402,6 +407,35 @@ describe('iexec order', () => {
       expect(res.txHash).toBeDefined();
       await testChain.provider.getTransaction(res.txHash).then((tx) => {
         expect(tx.gasPrice.toString()).toBe('0');
+      });
+      const tx = await testChain.provider.getTransaction(res.txHash);
+      expect(tx.to).toBe(voucherAddress);
+    });
+
+    describe('--voucher-address', () => {
+      test('should match orders with specified voucher', async () => {
+        const { iexec: iexecVoucherOwner, wallet: voucherOwnerWallet } =
+          getTestConfig(testChain)();
+        const voucherAddress = await createVoucher(testChain)({
+          owner: voucherOwnerWallet.address,
+          voucherType,
+          value: 6, // nRLC
+        });
+        await iexecVoucherOwner.voucher.authorizeRequester(userWallet.address);
+
+        const raw = await execAsync(
+          `${iexecPath} order fill --use-voucher --voucher-address ${voucherAddress} --app ${apporderHash} --workerpool ${workerpoolOrderHash} --dataset ${datasetOrderHash} --skip-preflight-check --raw`,
+        );
+        const res = JSON.parse(raw);
+        expect(res.ok).toBe(true);
+        expect(res.volume).toBe('1');
+        expect(res.dealid).toBeDefined();
+        expect(res.txHash).toBeDefined();
+        await testChain.provider.getTransaction(res.txHash).then((tx) => {
+          expect(tx.gasPrice.toString()).toBe('0');
+        });
+        const tx = await testChain.provider.getTransaction(res.txHash);
+        expect(tx.to).toBe(voucherAddress);
       });
     });
   });

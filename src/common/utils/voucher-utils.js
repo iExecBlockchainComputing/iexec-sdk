@@ -1,5 +1,4 @@
 import { Contract } from 'ethers';
-// eslint-disable-next-line import/no-unresolved
 import { GraphQLClient } from 'graphql-request';
 import { throwIfMissing } from './validator.js';
 import { ConfigurationError } from './errors.js';

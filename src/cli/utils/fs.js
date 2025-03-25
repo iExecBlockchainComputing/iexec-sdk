@@ -88,8 +88,8 @@ const deployedObjSchema = () =>
   object().test(async (obj) => {
     await Promise.all(
       Object.entries({ ...obj }).map(async ([chainId, address]) => {
-        await chainIdSchema().validate(chainId, { strict: true });
-        await addressSchema().validate(address, { strict: true });
+        await chainIdSchema().required().validate(chainId, { strict: true });
+        await addressSchema().required().validate(address, { strict: true });
       }),
     );
     return true;

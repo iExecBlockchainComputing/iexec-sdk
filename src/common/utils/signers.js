@@ -8,7 +8,7 @@ export class EnhancedWallet extends Wallet {
     if (options.gasPrice) {
       try {
         BigInt(options.gasPrice);
-      } catch (e) {
+      } catch {
         throw Error('Invalid gasPrice option');
       }
     }

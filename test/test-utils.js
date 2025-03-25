@@ -430,36 +430,37 @@ export const createVoucherType =
   };
 
 // TODO: update createWorkerpoolorder() parameters when it is specified
-const createAndPublishWorkerpoolOrder = async (
-  chain,
-  workerpool,
-  workerpoolOwnerWallet,
-  voucherOwnerAddress,
-) => {
-  const { iexec } = getTestConfig(chain)({
-    privateKey: workerpoolOwnerWallet.privateKey,
-  });
-  const workerpoolprice = 1000;
-  const volume = 1000;
-
-  await setStakedNRlcBalance(chain)(
-    workerpoolOwnerWallet.address,
-    volume * workerpoolprice,
-  );
-
-  const workerpoolorder = await iexec.order.createWorkerpoolorder({
+export const createAndPublishWorkerpoolOrder =
+  (chain) =>
+  async ({
     workerpool,
-    category: 0,
-    requesterrestrict: voucherOwnerAddress,
-    volume,
-    workerpoolprice,
-    tag: ['tee', 'scone'],
-  });
+    workerpoolOwnerWallet,
+    requesterrestrict,
+    volume = 1000,
+    price = 1000,
+  }) => {
+    const { iexec } = getTestConfig(chain)({
+      privateKey: workerpoolOwnerWallet.privateKey,
+    });
 
-  await iexec.order
-    .signWorkerpoolorder(workerpoolorder)
-    .then((o) => iexec.order.publishWorkerpoolorder(o));
-};
+    await setStakedNRlcBalance(chain)(
+      workerpoolOwnerWallet.address,
+      volume * price,
+    );
+
+    const workerpoolorder = await iexec.order.createWorkerpoolorder({
+      workerpool,
+      category: 0,
+      requesterrestrict,
+      volume,
+      workerpoolprice: price,
+      tag: ['tee', 'scone'],
+    });
+
+    await iexec.order
+      .signWorkerpoolorder(workerpoolorder)
+      .then((o) => iexec.order.publishWorkerpoolorder(o));
+  };
 
 export const createVoucher =
   (chain) =>
@@ -498,18 +499,16 @@ export const createVoucher =
     await retryableCreateVoucher();
 
     try {
-      await createAndPublishWorkerpoolOrder(
-        chain,
-        chain.debugWorkerpool,
-        chain.debugWorkerpoolOwnerWallet,
-        owner,
-      );
-      await createAndPublishWorkerpoolOrder(
-        chain,
-        chain.prodWorkerpool,
-        chain.prodWorkerpoolOwnerWallet,
-        owner,
-      );
+      await createAndPublishWorkerpoolOrder(chain)({
+        workerpool: chain.debugWorkerpool,
+        workerpoolOwnerWallet: chain.debugWorkerpoolOwnerWallet,
+        requesterrestrict: owner,
+      });
+      await createAndPublishWorkerpoolOrder(chain)({
+        workerpool: chain.prodWorkerpool,
+        workerpoolOwnerWallet: chain.prodWorkerpoolOwnerWallet,
+        requesterrestrict: owner,
+      });
     } catch (error) {
       console.error('Error publishing workerpoolorder:', error);
       throw error;

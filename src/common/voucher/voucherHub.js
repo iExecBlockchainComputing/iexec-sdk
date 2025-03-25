@@ -14,6 +14,7 @@ export const fetchVoucherAddress = async (
 ) => {
   try {
     const vOwner = await addressSchema({ ethProvider: contracts.provider })
+      .required()
       .label('owner')
       .validate(owner);
     const voucherHubContract = getVoucherHubContract(
@@ -24,6 +25,29 @@ export const fetchVoucherAddress = async (
     return address !== NULL_ADDRESS ? address : null;
   } catch (error) {
     debug('fetchVoucherAddress()', error);
+    throw error;
+  }
+};
+
+export const isVoucherAddress = async (
+  contracts = throwIfMissing(),
+  voucherHubAddress = throwIfMissing(),
+  voucherAddress,
+) => {
+  try {
+    const vVoucherAddress = await addressSchema({
+      ethProvider: contracts.provider,
+    })
+      .required()
+      .label('voucherAddress')
+      .validate(voucherAddress);
+    const voucherHubContract = getVoucherHubContract(
+      contracts,
+      voucherHubAddress,
+    );
+    return wrapCall(voucherHubContract.isVoucher(vVoucherAddress));
+  } catch (error) {
+    debug('checkVoucherAddress()', error);
     throw error;
   }
 };

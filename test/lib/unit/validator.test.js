@@ -505,7 +505,7 @@ describe('[paramsInputFilesArraySchema]', () => {
   });
   test('empty string', async () => {
     await expect(paramsInputFilesArraySchema().validate('')).rejects.toThrow(
-      new ValidationError('["0"] "" is not a valid URL'),
+      new ValidationError('[0] "" is not a valid URL'),
     );
   });
   test('string invalid URL', async () => {
@@ -875,6 +875,13 @@ describe('[tagSchema]', () => {
 });
 
 describe('[addressSchema]', () => {
+  test('undefined', async () => {
+    await expect(
+      addressSchema({
+        ethProvider: getDefaultProvider(mainnetHost),
+      }).validate(undefined),
+    ).resolves.toBe(undefined);
+  });
   test('address', async () => {
     await expect(
       addressSchema().validate('0x607F4C5BB672230e8672085532f7e901544a7375'),
@@ -901,15 +908,6 @@ describe('[addressSchema]', () => {
       ),
     );
   });
-  test('address undefined (throw)', async () => {
-    await expect(
-      addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
-        undefined,
-      ),
-    ).rejects.toThrow(
-      new ValidationError('undefined is not a valid ethereum address'),
-    );
-  });
   test('ens (resolve ENS with ethProvider)', async () => {
     await expect(
       addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
@@ -934,6 +932,13 @@ describe('[addressSchema]', () => {
 });
 
 describe('[addressOrAnySchema]', () => {
+  test('undefined', async () => {
+    await expect(
+      addressOrAnySchema({
+        ethProvider: getDefaultProvider(mainnetHost),
+      }).validate(undefined),
+    ).resolves.toBe(undefined);
+  });
   test('any', async () => {
     await expect(addressOrAnySchema().validate('any')).resolves.toBe('any');
   });
@@ -965,15 +970,6 @@ describe('[addressOrAnySchema]', () => {
       new ValidationError(
         '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address',
       ),
-    );
-  });
-  test('address undefined (throw)', async () => {
-    await expect(
-      addressOrAnySchema({
-        ethProvider: getDefaultProvider(mainnetHost),
-      }).validate(undefined),
-    ).rejects.toThrow(
-      new ValidationError('undefined is not a valid ethereum address'),
     );
   });
   test('ens (resolve ENS with ethProvider)', async () => {

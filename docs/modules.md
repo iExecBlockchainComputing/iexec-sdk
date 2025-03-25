@@ -164,7 +164,7 @@ ___
 
 Ƭ **HumanSingleTag**: `string`
 
-human redable task tag
+human readable task tag
 
 example:
 ```js

@@ -57,9 +57,8 @@ describe('account', () => {
       describe('token chain', () => {
         test('expose bridged balances (bellecour) on mainnet', async () => {
           const iexec = new IExec({ ethProvider: 'mainnet' });
-          const res = await iexec.account.checkBridgedBalance(
-            getRandomAddress(),
-          );
+          const res =
+            await iexec.account.checkBridgedBalance(getRandomAddress());
           expect(res.stake).toBeInstanceOf(BN);
           expect(res.locked).toBeInstanceOf(BN);
         });
