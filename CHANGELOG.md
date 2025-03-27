@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.14.1] 2025-03-27
+
+### Changed
+
+- migrated subgraphs default base URL (<https://thegraph.iex.ec>)
+
 ## [8.14.0] 2025-03-25
 
 ### Added
