@@ -63,11 +63,11 @@ const iexecGatewayMap = {
 };
 
 const pocoSubgraphMap = {
-  134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5',
+  134: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
 };
 
 const voucherSubgraphMap = {
-  134: 'https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/iexec-voucher',
+  134: 'https://thegraph.iex.ec/subgraphs/name/bellecour/iexec-voucher',
 };
 
 const idMap = {
