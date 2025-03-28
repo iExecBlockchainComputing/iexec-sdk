@@ -78,7 +78,7 @@ const jsonDocToMd = (jsonDoc) => {
   const getCommandsList = (commandsArray) =>
     `${commandsArray
       .map(
-        ({ name, fullName }) => `- ${getMdInternalLink(name, fullName)}${EOL}`,
+        ({ fullName }) => `- ${getMdInternalLink(fullName, fullName)}${EOL}`,
       )
       .join('')}${EOL}`;
 
