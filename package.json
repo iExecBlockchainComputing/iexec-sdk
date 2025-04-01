@@ -202,6 +202,7 @@
     "@iexec/poco": "^5.5.0",
     "@iexec/voucher-contracts": "^1.0.0",
     "@multiformats/multiaddr": "^12.4.0",
+    "@types/bn.js": "^5.1.6",
     "bn.js": "^5.2.1",
     "buffer": "^6.0.3",
     "commander": "^13.1.0",
@@ -223,7 +224,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
-    "@types/bn.js": "^5.1.6",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-import": "^2.31.0",
