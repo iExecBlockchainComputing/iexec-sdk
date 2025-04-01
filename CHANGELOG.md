@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+### Changed
+
+- fixed `BN` type export issue
+
 ## [8.14.1] 2025-03-27
 
 ### Changed
