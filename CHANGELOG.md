@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## NEXT
 
+### Added
+
+- added support for aes-256-cbc encrypted result decryption
+
 ### Changed
 
 - fixed `BN` type export issue
