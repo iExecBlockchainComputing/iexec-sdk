@@ -10,11 +10,17 @@ const debug = Debug('iexec:result-utils');
 export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   const { CryptoKey } = await getCrypto();
 
-  let pemPrivateKey;
+  let pemRsaPrivateKey;
   if (beneficiaryKey instanceof CryptoKey) {
-    pemPrivateKey = await privateAsPem(beneficiaryKey);
+    pemRsaPrivateKey = await privateAsPem(beneficiaryKey);
   } else {
-    pemPrivateKey = Buffer.from(beneficiaryKey).toString();
+    pemRsaPrivateKey = Buffer.from(beneficiaryKey).toString();
+  }
+  let rsaPrivateKey;
+  try {
+    rsaPrivateKey = forgePki.pki.privateKeyFromPem(pemRsaPrivateKey);
+  } catch (error) {
+    throw Error('Invalid beneficiary key', { cause: error });
   }
 
   const ENC_KEY_FILE_NAME = 'aes-key.rsa';
@@ -85,23 +91,34 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
       );
     });
 
-  const base64encodedEncryptedAesKey = Buffer.from(
-    encryptedResultsKeyArrayBuffer,
-  ).toString();
-
-  const encryptedAesKeyBuffer = Buffer.from(
-    base64encodedEncryptedAesKey,
-    'base64',
-  );
-
+  const encryptedAesKeyBuffer = Buffer.from(encryptedResultsKeyArrayBuffer);
   debug('Decrypting results key');
   let aesKeyBuffer;
+  const aesKeyDecryptionErrors = [];
   try {
-    const key = forgePki.pki.privateKeyFromPem(pemPrivateKey);
-    const base64EncodedResultsKey = key.decrypt(encryptedAesKeyBuffer);
-    aesKeyBuffer = Buffer.from(base64EncodedResultsKey, 'base64');
+    try {
+      const resultsKey = rsaPrivateKey.decrypt(encryptedAesKeyBuffer);
+      aesKeyBuffer = Buffer.from(resultsKey, 'binary');
+    } catch (error) {
+      aesKeyDecryptionErrors.push(error);
+      debug(
+        'standard result key decryption failed, trying base64 encoded encrypted key (legacy)',
+      );
+      const base64encodedEncryptedAesKey = Buffer.from(
+        encryptedResultsKeyArrayBuffer,
+      ).toString();
+      const encryptedAesKeyBuffer = Buffer.from(
+        base64encodedEncryptedAesKey,
+        'base64',
+      );
+      const base64EncodedResultsKey = rsaPrivateKey.decrypt(
+        encryptedAesKeyBuffer,
+      );
+      aesKeyBuffer = Buffer.from(base64EncodedResultsKey, 'base64');
+    }
   } catch (error) {
-    debug(error);
+    aesKeyDecryptionErrors.push(error);
+    debug(`decryption errors: ${aesKeyDecryptionErrors}`);
     throw Error('Failed to decrypt results key with beneficiary key');
   }
 
@@ -120,36 +137,55 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
       );
     });
 
-  // decrypt AES ECB (with one time AES key)
-  debug('Decrypting results');
+  // decrypt AES (with one time AES key)
+  debug(`Decrypting results`);
   try {
-    const base64EncodedEncryptedZip = Buffer.from(
-      encResultsArrayBuffer,
-    ).toString();
-    let encryptedOutZipBuffer = Buffer.from(
-      base64EncodedEncryptedZip,
-      'base64',
-    );
-    const aesEcbDecipher = forgeAes.cipher.createDecipher(
-      'AES-ECB',
-      forgeAes.util.createBuffer(aesKeyBuffer),
-    );
-    aesEcbDecipher.start();
+    let aesDecipher;
+    let encryptedOutZipBuffer;
+    switch (aesKeyBuffer.byteLength * 8) {
+      case 256:
+        // current result encryption was based on aes-256-cbc IV is stored in the 16 first bytes of the payload
+        debug(`aes-256-cbc mode detected`);
+        aesDecipher = forgeAes.cipher.createDecipher(
+          'AES-CBC',
+          forgeAes.util.createBuffer(aesKeyBuffer),
+        );
+        aesDecipher.start({
+          iv: forgeAes.util.createBuffer(encResultsArrayBuffer.slice(0, 16)),
+        });
+        encryptedOutZipBuffer = Buffer.from(encResultsArrayBuffer.slice(16));
+        break;
+      case 128:
+        // legacy result encryption was based on aes-128-ecb with aes encrypted payload encoded in base64
+        debug(`Legacy mode aes-128-ecb mode detected`);
+        aesDecipher = forgeAes.cipher.createDecipher(
+          'AES-ECB',
+          forgeAes.util.createBuffer(aesKeyBuffer),
+        );
+        aesDecipher.start();
+        encryptedOutZipBuffer = Buffer.from(
+          Buffer.from(encResultsArrayBuffer).toString(),
+          'base64',
+        );
+        break;
+      default:
+        throw Error('Failed to determine result encryption mode');
+    }
 
     const CHUNK_SIZE = 10 * 1000 * 1000;
     let decryptionBuffer = Buffer.from([]);
     while (encryptedOutZipBuffer.byteLength > 0) {
       // flush cipher buffer
-      const tmpBuffer = Buffer.from(aesEcbDecipher.output.getBytes(), 'binary');
+      const tmpBuffer = Buffer.from(aesDecipher.output.getBytes(), 'binary');
       decryptionBuffer = Buffer.concat([decryptionBuffer, tmpBuffer]);
       // process chunk
-      const chunk = encryptedOutZipBuffer.slice(0, CHUNK_SIZE);
-      encryptedOutZipBuffer = encryptedOutZipBuffer.slice(CHUNK_SIZE);
-      aesEcbDecipher.update(forgeAes.util.createBuffer(chunk));
+      const chunk = encryptedOutZipBuffer.subarray(0, CHUNK_SIZE);
+      encryptedOutZipBuffer = encryptedOutZipBuffer.subarray(CHUNK_SIZE);
+      aesDecipher.update(forgeAes.util.createBuffer(chunk));
     }
-    aesEcbDecipher.finish();
+    aesDecipher.finish();
     const finalizationBuffer = Buffer.from(
-      aesEcbDecipher.output.getBytes(),
+      aesDecipher.output.getBytes(),
       'binary',
     );
     return Buffer.concat([decryptionBuffer, finalizationBuffer]);

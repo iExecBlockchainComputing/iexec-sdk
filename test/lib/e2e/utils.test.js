@@ -263,6 +263,29 @@ describe('utils', () => {
       );
       const res = await utils.decryptResult(encZip, beneficiaryKey);
       const resContent = [];
+      // eslint-disable-next-line sonarjs/no-unsafe-unzip
+      const resZip = await new JSZip().loadAsync(res);
+      resZip.forEach((relativePath, zipEntry) => {
+        resContent.push(zipEntry);
+      });
+      expect(resContent.length).toBe(2);
+      expect(resContent[0].name).toBe('computed.json');
+      expect(resContent[1].name).toBe('result.txt');
+    });
+
+    test('decrypts legacy encrypted AES-128-ECB result with a binary key', async () => {
+      const encZip = await readFile(
+        join(
+          process.cwd(),
+          'test/inputs/encryptedResults/legacyEncryptedResults.zip',
+        ),
+      );
+      const beneficiaryKey = await readFile(
+        join(process.cwd(), 'test/inputs/beneficiaryKeys/legacy_expected_key'),
+      );
+      const res = await utils.decryptResult(encZip, beneficiaryKey);
+      const resContent = [];
+      // eslint-disable-next-line sonarjs/no-unsafe-unzip
       const resZip = await new JSZip().loadAsync(res);
       resZip.forEach((relativePath, zipEntry) => {
         resContent.push(zipEntry);
@@ -287,14 +310,25 @@ describe('utils', () => {
       ).toString();
       const res = await utils.decryptResult(encZip, beneficiaryKey);
       const resContent = [];
+      // eslint-disable-next-line sonarjs/no-unsafe-unzip
       const resZip = await new JSZip().loadAsync(res);
       resZip.forEach((relativePath, zipEntry) => {
         resContent.push(zipEntry);
       });
-      expect(resContent.length).toBe(3);
+      expect(resContent.length).toBe(2);
       expect(resContent[0].name).toBe('computed.json');
-      expect(resContent[1].name).toBe('volume.fspf');
-      expect(resContent[2].name).toBe('result.txt');
+      expect(resContent[1].name).toBe('result.txt');
+    });
+
+    test('detects invalid key', async () => {
+      const encZip = await readFile(
+        join(
+          process.cwd(),
+          'test/inputs/encryptedResults/encryptedResults.zip',
+        ),
+      );
+      const err = await utils.decryptResult(encZip, 'foo').catch((e) => e);
+      expect(err).toEqual(new Error('Invalid beneficiary key'));
     });
 
     test('fails to decrypt the result with the wrong key', async () => {
