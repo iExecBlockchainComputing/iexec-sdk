@@ -1,0 +1,86 @@
+name: Test SDK
+
+on: [pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+		services:
+		  postgres:
+		    image: postgres
+		    env:
+		      POSTGRES_USER: graphnode
+		      POSTGRES_PASSWORD: password
+		      POSTGRES_DB: graphnode-db
+		    options: >-
+		      --health-cmd pg_isready
+		      --health-interval 10s
+		      --health-timeout 5s
+		      --health-retries 5
+		    command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
+    steps:
+			- uses: actions/checkout@v4
+
+      - uses: actions/nodejs@v4
+        with:
+					node-version: '18'
+
+			- name: Prepare
+				run: node test/scripts/prepare-test-env.js
+
+			- name: Test
+				run: npm test
+
+	    - name: Install Foundry
+	      uses: foundry-rs/foundry-toolchain@v1
+	      with:
+					version: stable
+	        cache: true
+
+      - name: Start Anvil
+        run: |
+          anvil --host 0.0.0.0 --port 8545 --block-time 1 --hardfork berlin --fork-url $(cat local-stack-env/BELLECOUR_FORK_URL) --fork-block-number $(cat local-stack-env/BELLECOUR_FORK_BLOCK) --chain-id 134 --gas-limit 6700000 --gas-price 0 &
+
+      - name: Wait for Anvil to start
+        run: |
+          timeout=30
+          interval=1
+          echo "Waiting for Anvil to start..."
+          for ((i=0; i<timeout; i++)); do
+            if nc -z localhost 8545; then
+               echo "Anvil is operational."
+               exit 0
+            fi
+            echo "Attempt $((i+1)) of $timeout: Anvil is not ready, waiting ${interval}s..."
+            sleep $interval
+          done
+          echo "Error: Anvil did not start within the timeout period."
+          exit 1
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.12.0
+        with:
+          mongodb-version: '6.0'
+
+	    - name: Start Redis
+	      uses: supercharge/redis-github-action@1.7.0
+	      with:
+	        redis-version: '7'
+
+      - name: Start Graph Node # Find cleaner way to start graph node
+        run: |
+          docker run -d \
+            --name graphnode \
+            -p 8000:8000 \
+            -p 8020:8020 \
+            -e postgres_host=localhost \
+            -e postgres_port=5432 \
+            -e postgres_user=graphnode \
+            -e postgres_pass=password \
+            -e postgres_db=graphnode-db \
+            -e ipfs=localhost:5001 \
+            -e ethereum=bellecour:http://localhost:8545 \
+            graphprotocol/graph-node:v0.27.0
+
+          export GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER=$(cat local-stack-env/BELLECOUR_FORK_BLOCK)
+          echo $GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER
