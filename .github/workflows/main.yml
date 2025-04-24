@@ -57,13 +57,12 @@ jobs:
         image: ghcr.io/foundry-rs/foundry:v1.0.0
         ports:
           - 8545:8545
-        options: >-
-          --entrypoint anvil
-          --mount type=bind,source=${{ github.workspace }}/local-stack-env,target=/local-stack-env
         env:
           FORK_URL: ${{ steps.prepare.outputs.bellecour_url }}
           FORK_BLOCK: ${{ steps.prepare.outputs.bellecour_block }}
-        command: >
+        options: >-
+          --entrypoint anvil
+          --mount type=bind,source=${{ github.workspace }}/local-stack-env,target=/local-stack-env
           --host 0.0.0.0
           --port 8545
           --block-time 1
@@ -175,7 +174,7 @@ jobs:
         options: >-
           --entrypoint bash
           --mount type=bind,source=${{ github.workspace }}/local-stack-env,target=/local-stack-env
-        command: -c "export START_BLOCK=$(cat /local-stack-env/BELLECOUR_FORK_BLOCK) && cd /app && npm start"
+          -c "export START_BLOCK=$(cat /local-stack-env/BELLECOUR_FORK_BLOCK) && cd /app && npm start"
 
       market-api:
         image: iexechub/iexec-market-api:6.4
@@ -209,7 +208,7 @@ jobs:
         options: >-
           --entrypoint bash
           --mount type=bind,source=${{ github.workspace }}/local-stack-env,target=/local-stack-env
-        command: -c "export VOUCHER_HUB_START_BLOCK=$(cat /local-stack-env/BELLECOUR_FORK_BLOCK) && cd /iexec-voucher-subgraph && npm run all"
+          -c "export VOUCHER_HUB_START_BLOCK=$(cat /local-stack-env/BELLECOUR_FORK_BLOCK) && cd /iexec-voucher-subgraph && npm run all"
 
       custom-token-chain:
         image: iexechub/poco-chaintest:5.3.2-token-openethereum
