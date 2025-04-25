@@ -9,216 +9,6 @@ jobs:
       ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
       INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
       ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
-    services:
-      postgres:
-        image: postgres:12
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: graphnode
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: graphnode-db
-        options: >-
-          --health-cmd "pg_isready -U graphnode"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      ipfs:
-        image: ipfs/go-ipfs:v0.9.1
-        ports:
-          - 5001:5001
-          - 8080:8080
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 5001 && nc -z localhost 8080'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      graphnode:
-        image: graphprotocol/graph-node:v0.27.0
-        ports:
-          - 8000:8000
-          - 8020:8020
-        env:
-          IPFS: ipfs:5001
-          POSTGRES_HOST: postgres
-          POSTGRES_USER: graphnode
-          POSTGRES_DB: graphnode-db
-          POSTGRES_PASSWORD: password
-          ETHEREUM: bellecour-fork:http://localhost:8545
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 8020 && nc -z localhost 8000'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      bellecour-fork:
-        image: ghcr.io/foundry-rs/foundry:v1.0.0
-        ports:
-          - 8545:8545
-        env:
-          FORK_URL: ${{ steps.prepare.outputs.bellecour_url }}
-          FORK_BLOCK: ${{ steps.prepare.outputs.bellecour_block }}
-        options: >-
-          --entrypoint anvil
-          --mount type=bind,source=${{ github.workspace }}/local-stack-env,target=/local-stack-env
-          --host 0.0.0.0
-          --port 8545
-          --block-time 1
-          --hardfork berlin
-          --fork-url $(cat /local-stack-env/BELLECOUR_FORK_URL)
-          --fork-block-number $(cat /local-stack-env/BELLECOUR_FORK_BLOCK)
-          --chain-id 134
-          --gas-limit 6700000
-          --gas-price 0
-
-      market-mongo:
-        image: mongo:6.0.3
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 27017'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      market-redis:
-        image: redis:7.0.7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 6379'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      result-proxy-mongo:
-        image: mongo:4.2
-        ports:
-          - 13202:13202
-        options: >-
-          --command "mongod --bind_ip_all --port 13202"
-          --health-cmd "bash -c 'nc -z localhost 13202'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      sms:
-        image: iexechub/iexec-sms:8.7.0
-        ports:
-          - 13300:13300
-        env:
-          JAVA_TOOL_OPTIONS: '-Xmx256M'
-          IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
-          IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-          IEXEC_SMS_TEE_RUNTIME_FRAMEWORK: scone
-          IEXEC_SMS_IMAGE_LAS_IMAGE: 'las-image'
-          IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: 'pre-compute-image'
-          IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 'pre-compute-fingerprint'
-          IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: 'post-compute-image'
-          IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: 'post-compute-fingerprint'
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 13300'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      sms-gramine:
-        image: iexechub/iexec-sms:8.7.0
-        ports:
-          - 13301:13300
-        env:
-          JAVA_TOOL_OPTIONS: '-Xmx256M'
-          IEXEC_SMS_BLOCKCHAIN_NODE_ADDRESS: http://bellecour-fork:8545
-          IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-          IEXEC_SMS_TEE_RUNTIME_FRAMEWORK: scone
-          IEXEC_SMS_IMAGE_LAS_IMAGE: 'las-image'
-          IEXEC_TEE_WORKER_PRE_COMPUTE_IMAGE: 'pre-compute-image'
-          IEXEC_TEE_WORKER_PRE_COMPUTE_FINGERPRINT: 'pre-compute-fingerprint'
-          IEXEC_TEE_WORKER_POST_COMPUTE_IMAGE: 'post-compute-image'
-          IEXEC_TEE_WORKER_POST_COMPUTE_FINGERPRINT: 'post-compute-fingerprint'
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 13300'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      result-proxy:
-        image: iexechub/iexec-result-proxy:7.1.0
-        ports:
-          - 13200:13200
-        env:
-          IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
-          IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
-          IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-          MONGO_HOST: result-proxy-mongo
-          MONGO_PORT: 13202
-          IEXEC_IPFS_HOST: ipfs:5001
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 13200'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      market-watcher:
-        image: iexechub/iexec-market-watcher:6.4
-        ports:
-          - 4000:4000
-        env:
-          CHAIN: BELLECOUR
-          ETH_WS_HOST: ws://bellecour-fork:8545
-          ETH_RPC_HOST: http://bellecour-fork:8545
-          MONGO_HOST: market-mongo
-          REDIS_HOST: market-redis
-        options: >-
-          --entrypoint bash
-          --mount type=bind,source=${{ github.workspace }}/local-stack-env,target=/local-stack-env
-          -c "export START_BLOCK=$(cat /local-stack-env/BELLECOUR_FORK_BLOCK) && cd /app && npm start"
-
-      market-api:
-        image: iexechub/iexec-market-api:6.4
-        ports:
-          - 3000:3000
-        env:
-          CHAINS: BELLECOUR_FORK
-          BELLECOUR_FORK_ETH_RPC_HOST: http://bellecour-fork:8545
-          BELLECOUR_FORK_CHAIN_ID: 134
-          BELLECOUR_FORK_IS_NATIVE: 'true'
-          BELLECOUR_FORK_IEXEC_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-          MONGO_HOST: market-mongo
-          REDIS_HOST: market-redis
-          RATE_LIMIT_MAX: 10000
-          RATE_LIMIT_PERIOD: 60000
-          MAX_OPEN_ORDERS_PER_WALLET: 1000
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 3000'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      voucher-subgraph-deployer:
-        image: iexechub/voucher-subgraph-deployer:1.0.0
-        ports: []
-        env:
-          RPC_URL: http://bellecour-fork:8545
-          GRAPHNODE_URL: http://graphnode:8020
-          IPFS_URL: http://ipfs:5001
-          VOUCHER_HUB_ADDRESS: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda'
-        options: >-
-          --entrypoint bash
-          --mount type=bind,source=${{ github.workspace }}/local-stack-env,target=/local-stack-env
-          -c "export VOUCHER_HUB_START_BLOCK=$(cat /local-stack-env/BELLECOUR_FORK_BLOCK) && cd /iexec-voucher-subgraph && npm run all"
-
-      custom-token-chain:
-        image: iexechub/poco-chaintest:5.3.2-token-openethereum
-        ports:
-          - 8546:8545
-        options: >-
-          --health-cmd "bash -c 'nc -z localhost 8545'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -227,13 +17,21 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Prepare local stack env
         id: prepare
         run: |
           node test/scripts/prepare-test-env.js
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Start local stack
+        uses: hoverkraft-tech/compose-action@2.2.0
+        with:
+          compose-file: "./test/docker-compose.yml"
+        env:
+          FORK_URL: ${{ steps.prepare.outputs.bellecour_url }}
+          FORK_BLOCK: ${{ steps.prepare.outputs.bellecour_block }}
 
       - name: Build
         run: npm run build
@@ -256,5 +54,3 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-
-        # Check for node 20 tests
