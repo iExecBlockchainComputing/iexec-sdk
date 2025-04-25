@@ -1,0 +1,47 @@
+name: Test SDK
+
+on: [pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+      INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+      ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare local stack env
+        id: prepare
+        run: npm run start-test-stack
+
+      - name: Build
+        run: npm run build
+
+      - name: Check format
+        run: npm run check-format
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Install global & Test
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xxd
+          npm install -g .
+          npm test
+
+      - name: SonarScanner
+        uses: SonarSource/sonarqube-scan-action@v5.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
