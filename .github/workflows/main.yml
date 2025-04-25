@@ -22,16 +22,7 @@ jobs:
 
       - name: Prepare local stack env
         id: prepare
-        run: |
-          node test/scripts/prepare-test-env.js
-
-      - name: Start local stack
-        uses: hoverkraft-tech/compose-action@2.2.0
-        with:
-          compose-file: "./test/docker-compose.yml"
-        env:
-          FORK_URL: ${{ steps.prepare.outputs.bellecour_url }}
-          FORK_BLOCK: ${{ steps.prepare.outputs.bellecour_block }}
+        run: npm run start-test-stack
 
       - name: Build
         run: npm run build
