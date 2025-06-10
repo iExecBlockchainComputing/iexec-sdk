@@ -3,7 +3,12 @@ import { BN } from 'bn.js';
 import { getDefaultProvider } from 'ethers';
 import fsExtra from 'fs-extra';
 import { join } from 'path';
-import { INFURA_PROJECT_ID, TEE_FRAMEWORKS } from '../../test-utils.js';
+import {
+  ALCHEMY_API_KEY,
+  ETHERSCAN_API_KEY,
+  INFURA_PROJECT_ID,
+  TEE_FRAMEWORKS,
+} from '../../test-utils.js';
 import {
   uint256Schema,
   weiAmountSchema,
@@ -33,9 +38,12 @@ const { ValidationError } = errors;
 
 const { readFile } = fsExtra;
 
-const mainnetHost = INFURA_PROJECT_ID
-  ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
-  : 'mainnet';
+const mainnetDefaultProvider = getDefaultProvider('mainnet', {
+  cloudflare: true,
+  alchemy: ALCHEMY_API_KEY || '-',
+  etherscan: ETHERSCAN_API_KEY || '-',
+  infura: INFURA_PROJECT_ID || '-',
+});
 
 describe('[positiveIntSchema]', () => {
   test('int', async () => {
@@ -878,7 +886,7 @@ describe('[addressSchema]', () => {
   test('undefined', async () => {
     await expect(
       addressSchema({
-        ethProvider: getDefaultProvider(mainnetHost),
+        ethProvider: mainnetDefaultProvider,
       }).validate(undefined),
     ).resolves.toBe(undefined);
   });
@@ -894,7 +902,7 @@ describe('[addressSchema]', () => {
   });
   test('address (with ethProvider)', async () => {
     await expect(
-      addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
+      addressSchema({ ethProvider: mainnetDefaultProvider }).validate(
         '0x607F4C5BB672230e8672085532f7e901544a7375',
       ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
@@ -910,14 +918,14 @@ describe('[addressSchema]', () => {
   });
   test('ens (resolve ENS with ethProvider)', async () => {
     await expect(
-      addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
+      addressSchema({ ethProvider: mainnetDefaultProvider }).validate(
         'rlc.iexec.eth',
       ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   }, 10000);
   test('invalid ens (throw when ens is missing)', async () => {
     await expect(
-      addressSchema({ ethProvider: getDefaultProvider(mainnetHost) }).validate(
+      addressSchema({ ethProvider: mainnetDefaultProvider }).validate(
         'pierre.iexec.eth',
       ),
     ).rejects.toThrow(
@@ -935,7 +943,7 @@ describe('[addressOrAnySchema]', () => {
   test('undefined', async () => {
     await expect(
       addressOrAnySchema({
-        ethProvider: getDefaultProvider(mainnetHost),
+        ethProvider: mainnetDefaultProvider,
       }).validate(undefined),
     ).resolves.toBe(undefined);
   });
@@ -957,7 +965,7 @@ describe('[addressOrAnySchema]', () => {
   test('address (with ethProvider)', async () => {
     await expect(
       addressOrAnySchema({
-        ethProvider: getDefaultProvider(mainnetHost),
+        ethProvider: mainnetDefaultProvider,
       }).validate('0x607F4C5BB672230e8672085532f7e901544a7375'),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
@@ -975,14 +983,14 @@ describe('[addressOrAnySchema]', () => {
   test('ens (resolve ENS with ethProvider)', async () => {
     await expect(
       addressOrAnySchema({
-        ethProvider: getDefaultProvider(mainnetHost),
+        ethProvider: mainnetDefaultProvider,
       }).validate('rlc.iexec.eth'),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   }, 10000);
   test('invalid ens (throw when ens is missing)', async () => {
     await expect(
       addressOrAnySchema({
-        ethProvider: getDefaultProvider(mainnetHost),
+        ethProvider: mainnetDefaultProvider,
       }).validate('pierre.iexec.eth'),
     ).rejects.toThrow(
       new ValidationError('Unable to resolve ENS pierre.iexec.eth'),

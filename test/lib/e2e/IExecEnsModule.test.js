@@ -14,7 +14,7 @@ import {
   NULL_ADDRESS,
   getId,
   getRandomAddress,
-  INFURA_PROJECT_ID,
+  DEFAULT_PROVIDER_OPTIONS,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { IExec } from '../../../src/lib/index.js';
@@ -34,11 +34,7 @@ describe('ens', () => {
       const iexec = new IExec(
         { ethProvider: 'mainnet' },
         {
-          providerOptions: {
-            cloudflare: 1,
-            infura: INFURA_PROJECT_ID,
-            quorum: 1,
-          },
+          providerOptions: DEFAULT_PROVIDER_OPTIONS,
         },
       );
       const balance = await iexec.wallet.checkBalances('core.v5.iexec.eth');
