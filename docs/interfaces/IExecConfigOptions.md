@@ -6,6 +6,7 @@
 
 ### Properties
 
+- [allowExperimentalNetworks](IExecConfigOptions.md#allowexperimentalnetworks)
 - [bridgeAddress](IExecConfigOptions.md#bridgeaddress)
 - [bridgedNetworkConf](IExecConfigOptions.md#bridgednetworkconf)
 - [confirms](IExecConfigOptions.md#confirms)
@@ -24,6 +25,16 @@
 - [voucherSubgraphURL](IExecConfigOptions.md#vouchersubgraphurl)
 
 ## Properties
+
+### allowExperimentalNetworks
+
+• `Optional` **allowExperimentalNetworks**: `boolean`
+
+if true allows using a provider connected to an experimental networks (default false)
+
+⚠️ experimental networks are networks on which the iExec's stack is partially deployed, experimental networks can be subject to instabilities or discontinuity. Access is provided without warranties.
+
+___
 
 ### bridgeAddress
 

@@ -4,7 +4,7 @@ import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils.js';
 import {
-  INFURA_PROJECT_ID,
+  DEFAULT_PROVIDER_OPTIONS,
   TEST_CHAINS,
   getRandomAddress,
   setBalance,
@@ -47,7 +47,9 @@ describe('account', () => {
       test('expose bridged balances (mainnet) on bellecour', async () => {
         const iexec = new IExec(
           { ethProvider: 'bellecour' },
-          { providerOptions: { infura: INFURA_PROJECT_ID } },
+          {
+            providerOptions: DEFAULT_PROVIDER_OPTIONS,
+          },
         );
         const res = await iexec.account.checkBridgedBalance(getRandomAddress());
         expect(res.stake).toBeInstanceOf(BN);
@@ -56,7 +58,12 @@ describe('account', () => {
 
       describe('token chain', () => {
         test('expose bridged balances (bellecour) on mainnet', async () => {
-          const iexec = new IExec({ ethProvider: 'mainnet' });
+          const iexec = new IExec(
+            { ethProvider: 'mainnet' },
+            {
+              providerOptions: DEFAULT_PROVIDER_OPTIONS,
+            },
+          );
           const res =
             await iexec.account.checkBridgedBalance(getRandomAddress());
           expect(res.stake).toBeInstanceOf(BN);
