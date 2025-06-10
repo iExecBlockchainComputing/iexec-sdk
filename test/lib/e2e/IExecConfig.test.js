@@ -21,6 +21,7 @@ import {
   TEE_FRAMEWORKS,
   getRandomAddress,
   getRandomWallet,
+  DEFAULT_PROVIDER_OPTIONS,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 
@@ -90,12 +91,7 @@ describe('[IExecConfig]', () => {
         const config = new IExecConfig(
           { ethProvider: 'mainnet' },
           {
-            providerOptions: {
-              cloudflare: true,
-              alchemy: ALCHEMY_API_KEY,
-              etherscan: ETHERSCAN_API_KEY,
-              infura: INFURA_PROJECT_ID,
-            },
+            providerOptions: DEFAULT_PROVIDER_OPTIONS,
           },
         );
         const { provider, signer, chainId } =
@@ -140,12 +136,7 @@ describe('[IExecConfig]', () => {
         const config = new IExecConfig(
           { ethProvider: '1' },
           {
-            providerOptions: {
-              cloudflare: true,
-              alchemy: ALCHEMY_API_KEY,
-              etherscan: ETHERSCAN_API_KEY,
-              infura: INFURA_PROJECT_ID,
-            },
+            providerOptions: DEFAULT_PROVIDER_OPTIONS,
           },
         );
         const { provider, signer, chainId } =
@@ -180,12 +171,7 @@ describe('[IExecConfig]', () => {
         const config = new IExecConfig(
           { ethProvider: 1 },
           {
-            providerOptions: {
-              cloudflare: true,
-              alchemy: ALCHEMY_API_KEY,
-              etherscan: ETHERSCAN_API_KEY,
-              infura: INFURA_PROJECT_ID,
-            },
+            providerOptions: DEFAULT_PROVIDER_OPTIONS,
           },
         );
         const { provider, signer, chainId } =
@@ -417,12 +403,7 @@ describe('[IExecConfig]', () => {
             'mainnet',
             wallet.privateKey,
             {
-              providers: {
-                cloudflare: true,
-                infura: INFURA_PROJECT_ID,
-                alchemy: ALCHEMY_API_KEY,
-                etherscan: ETHERSCAN_API_KEY,
-              },
+              providers: DEFAULT_PROVIDER_OPTIONS,
             },
           ),
         });
@@ -551,7 +532,12 @@ describe('[IExecConfig]', () => {
 
     describe('bridged chain provider', () => {
       test('IExecConfig({ ethProvider: "bellecour" })', async () => {
-        const config = new IExecConfig({ ethProvider: 'bellecour' });
+        const config = new IExecConfig(
+          { ethProvider: 'bellecour' },
+          {
+            providerOptions: DEFAULT_PROVIDER_OPTIONS,
+          },
+        );
         const { provider, signer, chainId } =
           await config.resolveBridgedContractsClient();
         expect(signer).toBeUndefined();
@@ -599,12 +585,7 @@ describe('[IExecConfig]', () => {
         const config = new IExecConfig(
           { ethProvider: 'mainnet' },
           {
-            providerOptions: {
-              cloudflare: true,
-              alchemy: ALCHEMY_API_KEY,
-              etherscan: ETHERSCAN_API_KEY,
-              infura: INFURA_PROJECT_ID,
-            },
+            providerOptions: DEFAULT_PROVIDER_OPTIONS,
           },
         );
         const { provider, signer, chainId } =

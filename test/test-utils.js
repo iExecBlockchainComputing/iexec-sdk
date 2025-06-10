@@ -47,6 +47,14 @@ console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
 console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
 console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
 
+export const DEFAULT_PROVIDER_OPTIONS = {
+  cloudflare: true,
+  alchemy: ALCHEMY_API_KEY,
+  etherscan: ETHERSCAN_API_KEY,
+  infura: INFURA_PROJECT_ID,
+  quorum: 1,
+};
+
 export const SERVICE_HTTP_500_URL = DRONE
   ? 'http://service-internal-error:80'
   : 'http://localhost:5500';
