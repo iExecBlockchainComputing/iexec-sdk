@@ -58,6 +58,7 @@ export const getId = (idOrName) =>
 
 export const getChainDefaults = ({ id, allowExperimental = false }) => {
   const {
+    name,
     host,
     ensRegistry,
     ensPublicResolver,
@@ -78,6 +79,7 @@ export const getChainDefaults = ({ id, allowExperimental = false }) => {
       .find((networkConfig) => `${id}` === `${networkConfig.id}`) || {};
 
   return {
+    name,
     host,
     ensRegistry,
     ensPublicResolver,

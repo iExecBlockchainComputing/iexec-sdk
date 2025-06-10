@@ -27,6 +27,7 @@ describe('getChainDefaults', () => {
       hub: undefined,
       iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
       ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
+      name: 'bellecour',
       pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
       resultProxy: 'https://result.v8-bellecour.iex.ec',
       sms: {
