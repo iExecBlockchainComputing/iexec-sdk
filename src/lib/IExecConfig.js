@@ -33,6 +33,7 @@ export default class IExecConfig {
       voucherSubgraphURL,
       defaultTeeFramework,
       providerOptions,
+      allowExperimentalNetworks = false,
     } = {},
   ) {
     if (
@@ -130,7 +131,10 @@ export default class IExecConfig {
 
     const chainConfDefaultsPromise = (async () => {
       const { chainId } = await networkPromise;
-      return getChainDefaults({ id: chainId });
+      return getChainDefaults({
+        id: chainId,
+        allowExperimental: allowExperimentalNetworks,
+      });
     })();
 
     chainConfDefaultsPromise.catch((err) => {
@@ -182,6 +186,7 @@ export default class IExecConfig {
       }
       const bridgedChainConfDefaults = getChainDefaults({
         id: bridgedChainId,
+        allowExperimental: allowExperimentalNetworks,
       });
       const bridgedRpcUrl =
         bridgedNetworkConf.rpcURL !== undefined
