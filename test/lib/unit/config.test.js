@@ -16,7 +16,7 @@ describe('getId()', () => {
 
 describe('getChainDefaults', () => {
   test('id 134 returns bellecour config', () => {
-    expect(getChainDefaults({ id: 134 })).toEqual({
+    expect(getChainDefaults(134)).toEqual({
       bridge: {
         bridgedChainId: '1',
         contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',
@@ -40,12 +40,12 @@ describe('getChainDefaults', () => {
     });
   });
   test('unknown id returns empty object', () => {
-    expect(getChainDefaults({ id: 0 })).toEqual({});
+    expect(getChainDefaults(0)).toEqual({});
   });
-  test('experimental networks are accessible with `allowExperimental:true` hidden by default', () => {
-    expect(getChainDefaults({ id: 421614 })).toEqual({});
+  test('experimental networks are accessible with `allowExperimentalNetworks:true` hidden by default', () => {
+    expect(getChainDefaults(421614)).toEqual({});
     expect(
-      getChainDefaults({ id: 421614, allowExperimental: true }).host,
+      getChainDefaults(421614, { allowExperimentalNetworks: true }).host,
     ).toBeDefined();
   });
 });

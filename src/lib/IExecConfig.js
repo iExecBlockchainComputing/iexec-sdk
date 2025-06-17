@@ -77,6 +77,7 @@ export default class IExecConfig {
       if (isRpcUrlProvider) {
         provider = getReadOnlyProvider(ethProvider, {
           providers: providerOptions,
+          allowExperimentalNetworks,
         });
       } else if (isEthersAbstractSignerWithProvider) {
         provider = ethProvider.provider;
@@ -131,9 +132,8 @@ export default class IExecConfig {
 
     const chainConfDefaultsPromise = (async () => {
       const { chainId } = await networkPromise;
-      return getChainDefaults({
-        id: chainId,
-        allowExperimental: allowExperimentalNetworks,
+      return getChainDefaults(chainId, {
+        allowExperimentalNetworks,
       });
     })();
 
@@ -143,12 +143,13 @@ export default class IExecConfig {
 
     const contractsPromise = (async () => {
       const { chainId } = await networkPromise;
+      const chainConfDefaults = await chainConfDefaultsPromise;
       try {
         return new IExecContractsClient({
           chainId,
           provider,
           signer,
-          hubAddress,
+          hubAddress: hubAddress || chainConfDefaults.hub,
           useGas,
           confirms,
           isNative,
@@ -184,9 +185,8 @@ export default class IExecConfig {
           `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
         );
       }
-      const bridgedChainConfDefaults = getChainDefaults({
-        id: bridgedChainId,
-        allowExperimental: allowExperimentalNetworks,
+      const bridgedChainConfDefaults = getChainDefaults(bridgedChainId, {
+        allowExperimentalNetworks,
       });
       const bridgedRpcUrl =
         bridgedNetworkConf.rpcURL !== undefined
@@ -228,6 +228,7 @@ export default class IExecConfig {
           chainId: bridgedConf.chainId,
           provider: getReadOnlyProvider(bridgedConf.rpcURL, {
             providers: providerOptions,
+            allowExperimentalNetworks,
           }),
           hubAddress: bridgedConf.hubAddress,
           confirms,

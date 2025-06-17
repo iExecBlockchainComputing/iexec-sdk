@@ -11,12 +11,18 @@ const debug = Debug('iexec:chains');
 const createChainFromConf = (
   chainName,
   chainConf,
-  { bridgeConf, providerOptions, txOptions = {} } = {},
+  {
+    bridgeConf,
+    providerOptions,
+    txOptions = {},
+    allowExperimentalNetworks = false,
+  } = {},
 ) => {
   try {
     const chain = { ...chainConf };
     const provider = getReadOnlyProvider(chainConf.host, {
       providers: providerOptions,
+      allowExperimentalNetworks,
     });
 
     chain.name = chainName;
@@ -33,6 +39,7 @@ const createChainFromConf = (
       chain.bridgedNetwork = { ...bridgeConf };
       const bridgeProvider = getReadOnlyProvider(bridgeConf.host, {
         providers: providerOptions,
+        allowExperimentalNetworks,
       });
       chain.bridgedNetwork.contracts = new IExecContractsClient({
         provider: bridgeProvider,
@@ -56,6 +63,7 @@ export const loadChain = async (
 ) => {
   try {
     const chainsConf = await loadChainConf();
+    const { allowExperimentalNetworks } = chainsConf;
     const providerOptions = chainsConf.providers;
     let name;
     let loadedConf;
@@ -64,10 +72,14 @@ export const loadChain = async (
         loadedConf = chainsConf.chains[chainNameOrId];
         name = chainNameOrId;
       } else {
-        const { name: alias } = getChainDefaults({
-          id: getId(chainNameOrId),
-          allowExperimental: chainsConf.allowExperimentalNetworks,
-        });
+        const { name: alias } = getChainDefaults(
+          getId(chainNameOrId, {
+            allowExperimentalNetworks,
+          }),
+          {
+            allowExperimentalNetworks,
+          },
+        );
         if (alias && chainsConf.chains[alias]) {
           loadedConf = chainsConf.chains[alias];
           name = alias;
@@ -87,12 +99,15 @@ export const loadChain = async (
       throw Error('Missing chain parameter. Check your "chain.json" file');
 
     const idConf = {
-      id: loadedConf.id || getId(name),
+      id:
+        loadedConf.id ||
+        getId(name, {
+          allowExperimentalNetworks,
+        }),
     };
 
-    const defaultConf = getChainDefaults({
-      id: idConf.id,
-      allowExperimental: chainsConf.allowExperimentalNetworks,
+    const defaultConf = getChainDefaults(idConf.id, {
+      allowExperimentalNetworks,
     });
 
     debug('loading chain', name);
@@ -113,10 +128,14 @@ export const loadChain = async (
       if (chainsConf.chains[bridgedChainNameOrId]) {
         bridgeLoadedConf = chainsConf.chains[bridgedChainNameOrId];
       } else {
-        const { name: alias } = getChainDefaults({
-          id: getId(bridgedChainNameOrId),
-          allowExperimental: chainsConf.allowExperimentalNetworks,
-        });
+        const { name: alias } = getChainDefaults(
+          getId(bridgedChainNameOrId, {
+            allowExperimentalNetworks,
+          }),
+          {
+            allowExperimentalNetworks,
+          },
+        );
         if (alias && chainsConf.chains[alias]) {
           bridgeLoadedConf = chainsConf.chains[alias];
         }
@@ -124,9 +143,15 @@ export const loadChain = async (
           throw Error(`Missing "${name}" chain in "chain.json"`);
       }
       const bridgeIdConf = {
-        id: bridgeLoadedConf.id || getId(bridgedChainNameOrId),
+        id:
+          bridgeLoadedConf.id ||
+          getId(bridgedChainNameOrId, {
+            allowExperimentalNetworks,
+          }),
       };
-      const bridgeDefaultConf = getChainDefaults(bridgeIdConf);
+      const bridgeDefaultConf = getChainDefaults(bridgeIdConf.id, {
+        allowExperimentalNetworks,
+      });
       debug('bridgeLoadedConf', bridgeLoadedConf);
       debug('bridgeDefaultConf', defaultConf);
       bridgeConf = {
@@ -145,6 +170,7 @@ export const loadChain = async (
       bridgeConf,
       providerOptions,
       txOptions,
+      allowExperimentalNetworks,
     });
     spinner.info(`Using chain ${name} [chainId: ${chain.id}]`);
     return chain;

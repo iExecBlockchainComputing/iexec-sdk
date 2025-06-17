@@ -27,6 +27,7 @@ import '../../jest-setup.js';
 
 import { utils, IExecConfig, errors } from '../../../src/lib/index.js';
 import IExecContractsClient from '../../../src/common/utils/IExecContractsClient.js';
+import { getChainDefaults } from '../../../src/common/utils/config.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 const unknownTestChain = TEST_CHAINS['custom-token-chain'];
@@ -129,6 +130,31 @@ describe('[IExecConfig]', () => {
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
+      describe('allowExperimentalNetworks', () => {
+        test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
+          const createConfig = () =>
+            new IExecConfig({ ethProvider: 'arbitrum-sepolia-testnet' });
+          expect(createConfig).toThrow(
+            Error('Invalid ethProvider: Invalid provider host name or url'),
+          );
+          expect(createConfig).toThrow(errors.ConfigurationError);
+        });
+        test('allows experimental chains when allowExperimentalNetworks is enabled', async () => {
+          const config = new IExecConfig(
+            { ethProvider: 'arbitrum-sepolia-testnet' },
+            { allowExperimentalNetworks: true },
+          );
+          const { provider, signer, chainId } =
+            await config.resolveContractsClient();
+          expect(signer).toBeUndefined();
+          expect(provider).toBeDefined();
+          expect(provider).toBeInstanceOf(JsonRpcProvider);
+          expect(chainId).toBe('421614');
+          const network = await provider.getNetwork();
+          expect(network.chainId).toBe(421614n);
+          expect(network.name).toBe('arbitrum-sepolia');
+        });
+      });
     });
 
     describe('read-only ethProvider from network chainId', () => {
@@ -215,6 +241,30 @@ describe('[IExecConfig]', () => {
           Error('Invalid ethProvider: Invalid provider host name or url'),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
+      });
+      describe('allowExperimentalNetworks', () => {
+        test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
+          const createConfig = () => new IExecConfig({ ethProvider: 421614 });
+          expect(createConfig).toThrow(
+            Error('Invalid ethProvider: Invalid provider host name or url'),
+          );
+          expect(createConfig).toThrow(errors.ConfigurationError);
+        });
+        test('allows experimental chains when allowExperimentalNetworks is enabled', async () => {
+          const config = new IExecConfig(
+            { ethProvider: 421614 },
+            { allowExperimentalNetworks: true },
+          );
+          const { provider, signer, chainId } =
+            await config.resolveContractsClient();
+          expect(signer).toBeUndefined();
+          expect(provider).toBeDefined();
+          expect(provider).toBeInstanceOf(JsonRpcProvider);
+          expect(chainId).toBe('421614');
+          const network = await provider.getNetwork();
+          expect(network.chainId).toBe(421614n);
+          expect(network.name).toBe('arbitrum-sepolia');
+        });
       });
     });
 
@@ -371,6 +421,38 @@ describe('[IExecConfig]', () => {
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
+      describe('allowExperimentalNetworks', () => {
+        const experimentalNetworkRpcUrl = getChainDefaults(421614, {
+          allowExperimentalNetworks: true,
+        }).host;
+
+        test('fail resolving config with experimental chains when allowExperimentalNetworks is not enabled', async () => {
+          const config = new IExecConfig({
+            ethProvider: experimentalNetworkRpcUrl,
+          });
+
+          await expect(config.resolveContractsClient()).rejects.toThrow(
+            Error(
+              'Failed to create contracts client: Missing iExec contract default address for chain 421614',
+            ),
+          );
+        });
+        test('allows experimental chains when allowExperimentalNetworks is enabled', async () => {
+          const config = new IExecConfig(
+            { ethProvider: experimentalNetworkRpcUrl },
+            { allowExperimentalNetworks: true },
+          );
+          const { provider, signer, chainId } =
+            await config.resolveContractsClient();
+          expect(signer).toBeUndefined();
+          expect(provider).toBeDefined();
+          expect(provider).toBeInstanceOf(JsonRpcProvider);
+          expect(chainId).toBe('421614');
+          const network = await provider.getNetwork();
+          expect(network.chainId).toBe(421614n);
+          expect(network.name).toBe('arbitrum-sepolia');
+        });
+      });
     });
 
     describe('signer provider from private key', () => {
@@ -443,6 +525,46 @@ describe('[IExecConfig]', () => {
         expect(
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+      });
+      describe('allowExperimentalNetworks', () => {
+        const experimentalNetworkRpcUrl = getChainDefaults(421614, {
+          allowExperimentalNetworks: true,
+        }).host;
+
+        test('fail resolving config with experimental chains when allowExperimentalNetworks is not enabled', async () => {
+          const injectedProvider = new InjectedProvider(
+            experimentalNetworkRpcUrl,
+            getRandomWallet().privateKey,
+          );
+          const config = new IExecConfig({
+            ethProvider: injectedProvider,
+          });
+
+          await expect(config.resolveContractsClient()).rejects.toThrow(
+            Error(
+              'Failed to create contracts client: Missing iExec contract default address for chain 421614',
+            ),
+          );
+        });
+        test('allows experimental chains when allowExperimentalNetworks is enabled', async () => {
+          const injectedProvider = new InjectedProvider(
+            experimentalNetworkRpcUrl,
+            getRandomWallet().privateKey,
+          );
+          const config = new IExecConfig(
+            { ethProvider: injectedProvider },
+            { allowExperimentalNetworks: true },
+          );
+          const { provider, signer, chainId } =
+            await config.resolveContractsClient();
+          expect(signer).toBeDefined();
+          expect(provider).toBeDefined();
+          expect(provider).toBeInstanceOf(BrowserProvider);
+          expect(chainId).toBe('421614');
+          const network = await provider.getNetwork();
+          expect(network.chainId).toBe(421614n);
+          expect(network.name).toBe('arbitrum-sepolia');
+        });
       });
     });
 

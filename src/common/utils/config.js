@@ -72,12 +72,18 @@ const networkConfigs = [
   },
 ];
 
-export const getId = (idOrName) =>
-  networkConfigs.find(
-    ({ id, name }) => idOrName === name || `${idOrName}` === `${id}`,
-  )?.id;
+export const getId = (idOrName, { allowExperimentalNetworks = false } = {}) =>
+  networkConfigs
+    .filter(
+      ({ isExperimental }) =>
+        allowExperimentalNetworks || isExperimental === false,
+    )
+    .find(({ id, name }) => idOrName === name || `${idOrName}` === `${id}`)?.id;
 
-export const getChainDefaults = ({ id, allowExperimental = false }) => {
+export const getChainDefaults = (
+  id,
+  { allowExperimentalNetworks = false } = {},
+) => {
   const {
     name,
     host,
@@ -95,7 +101,8 @@ export const getChainDefaults = ({ id, allowExperimental = false }) => {
   } =
     networkConfigs
       .filter(
-        ({ isExperimental }) => allowExperimental || isExperimental === false,
+        ({ isExperimental }) =>
+          allowExperimentalNetworks || isExperimental === false,
       )
       .find((networkConfig) => `${id}` === `${networkConfig.id}`) || {};
 
