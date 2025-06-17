@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## NEXT
+
+### Changed
+
+- updated `iexec app init --tee` template to Scone v5.9
+
 ## [8.15.0] 2025-04-10
 
 ### Added
