@@ -42,8 +42,11 @@ describe('getChainDefaults', () => {
   test('unknown id returns empty object', () => {
     expect(getChainDefaults({ id: 0 })).toEqual({});
   });
-  test.skip('experimental networks are hidden by default', () => {
-    throw Error('TODO');
+  test('experimental networks are accessible with `allowExperimental:true` hidden by default', () => {
+    expect(getChainDefaults({ id: 421614 })).toEqual({});
+    expect(
+      getChainDefaults({ id: 421614, allowExperimental: true }).host,
+    ).toBeDefined();
   });
 });
 

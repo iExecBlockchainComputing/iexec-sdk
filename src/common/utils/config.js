@@ -49,6 +49,27 @@ const networkConfigs = [
     shouldRegisterNetwork: false,
     isExperimental: false,
   },
+  {
+    id: 421614,
+    name: 'arbitrum-sepolia-testnet',
+    hub: '0x14B465079537655E1662F012e99EBa3863c8B9E0',
+    host: 'https://sepolia-rollup.arbitrum.io/rpc',
+    ensRegistry: undefined, // TODO: not supported
+    ensPublicResolver: undefined, // TODO: not supported
+    sms: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
+    },
+    resultProxy: undefined, // not exposed
+    ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
+    iexecGateway: 'https://api-market.arbitrum-sepolia-testnet.iex.ec',
+    pocoSubgraph:
+      'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/2GCj8gzLCihsiEDq8cYvC5nUgK6VfwZ6hm3Wj8A3kcxz',
+    voucherHub: undefined, // no voucher
+    voucherSubgraph: undefined, // no voucher
+    bridge: {}, // no bridge
+    shouldRegisterNetwork: false,
+    isExperimental: true,
+  },
 ];
 
 export const getId = (idOrName) =>
