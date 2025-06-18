@@ -14,13 +14,13 @@ export default class IExecContractsClient {
      */
     signer?: Signer;
     /**
-     * id of the chain to use (used to resolve IExec contract address)
+     * id of the chain
      */
     chainId: number | string;
     /**
-     * override the IExec contract address to target a custom instance
+     * IExec contract address
      */
-    hubAddress?: string;
+    hubAddress: string;
     /**
      * if false set the gasPrice to 0 (default true)
      */

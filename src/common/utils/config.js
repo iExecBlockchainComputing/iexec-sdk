@@ -1,14 +1,15 @@
 import { Network, EnsPlugin } from 'ethers';
 import { TEE_FRAMEWORKS } from './constant.js';
 import { address as voucherHubBellecourAddress } from '../generated/@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.js';
+import { networks as iexecProxyNetworks } from '../generated/@iexec/poco/ERC1538Proxy.js';
 
 const networkConfigs = [
   {
     id: 134,
     name: 'bellecour',
-    hub: undefined, // use default
+    hub: iexecProxyNetworks[134].address,
     host: 'https://bellecour.iex.ec',
-    ensRegistry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006', // use ethers default '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
+    ensRegistry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
     ensPublicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
     sms: {
       [TEE_FRAMEWORKS.SCONE]: 'https://sms.iex.ec',
@@ -31,7 +32,7 @@ const networkConfigs = [
   {
     id: 1,
     name: 'mainnet',
-    hub: undefined, // use default
+    hub: iexecProxyNetworks[1].address,
     host: 'mainnet',
     ensRegistry: undefined, // use ethers default
     ensPublicResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',

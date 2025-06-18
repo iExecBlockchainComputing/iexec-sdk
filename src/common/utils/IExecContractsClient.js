@@ -1,7 +1,6 @@
 import Debug from 'debug';
 import { Contract } from 'ethers';
 import { version as pocoVersion } from '../generated/@iexec/poco/package.js';
-import { networks as iexecProxyNetworks } from '../generated/@iexec/poco/ERC1538Proxy.js';
 import iexecTokenDesc from '../generated/@iexec/poco/IexecInterfaceToken.js';
 import iexecNativeDesc from '../generated/@iexec/poco/IexecInterfaceNative.js';
 import appRegistryDesc from '../generated/@iexec/poco/AppRegistry.js';
@@ -18,17 +17,6 @@ const nativeNetworks = ['134'];
 
 const gasPriceByNetwork = {
   134: 0n,
-};
-
-const getHubAddress = (chainId) => {
-  if (
-    iexecProxyNetworks &&
-    iexecProxyNetworks[chainId] &&
-    iexecProxyNetworks[chainId].address
-  ) {
-    return iexecProxyNetworks[chainId].address;
-  }
-  throw Error(`Missing iExec contract default address for chain ${chainId}`);
 };
 
 const getIsNative = (chainId) => nativeNetworks.includes(chainId);
@@ -76,18 +64,11 @@ const getContractsDescMap = (isNative) => ({
   },
 });
 
-const createClient = ({
-  ethSigner,
-  ethProvider,
-  chainId,
-  globalHubAddress,
-  isNative,
-}) => {
+const createClient = ({ ethSigner, ethProvider, hubAddress, isNative }) => {
   const cachedAddresses = {};
+  if (!hubAddress) throw Error('Missing iExec contract address');
 
   const contractsDescMap = getContractsDescMap(isNative);
-
-  const hubAddress = globalHubAddress || getHubAddress(chainId);
 
   const getContract = (objName, address) => {
     try {
@@ -184,6 +165,7 @@ class IExecContractsClient {
   } = {}) {
     const stringChainId = `${chainId}`;
     if (!provider) throw Error('missing provider key');
+    if (!hubAddress) throw Error('missing hubAddress key');
     if (!stringChainId) throw Error('missing chainId key');
     if (!Number.isInteger(confirms) || confirms <= 0)
       throw Error('invalid confirms');
@@ -206,8 +188,7 @@ class IExecContractsClient {
     const client = createClient({
       ethSigner: signer,
       ethProvider: provider,
-      chainId: stringChainId,
-      globalHubAddress: hubAddress,
+      hubAddress,
       isNative: native,
     });
 

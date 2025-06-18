@@ -24,7 +24,7 @@ describe('getChainDefaults', () => {
       ensPublicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
       ensRegistry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
       host: 'https://bellecour.iex.ec',
-      hub: undefined,
+      hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
       iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
       ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
       name: 'bellecour',

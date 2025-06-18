@@ -433,7 +433,7 @@ describe('[IExecConfig]', () => {
 
           await expect(config.resolveContractsClient()).rejects.toThrow(
             Error(
-              'Failed to create contracts client: Missing iExec contract default address for chain 421614',
+              'hubAddress option not set and no default value for your chain 421614',
             ),
           );
         });
@@ -542,7 +542,7 @@ describe('[IExecConfig]', () => {
 
           await expect(config.resolveContractsClient()).rejects.toThrow(
             Error(
-              'Failed to create contracts client: Missing iExec contract default address for chain 421614',
+              'hubAddress option not set and no default value for your chain 421614',
             ),
           );
         });
@@ -800,7 +800,7 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveContractsClient();
       await expect(promise).rejects.toThrow(
         Error(
-          `Failed to create contracts client: Missing iExec contract default address for chain ${unknownTestChain.chainId}`,
+          `hubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
       await expect(promise).rejects.toThrow(errors.ConfigurationError);
