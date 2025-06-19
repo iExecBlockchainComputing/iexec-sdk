@@ -183,6 +183,7 @@ const iexec = new IExec({ ethProvider });
 | `host` | `string` | node RPC url |
 | `privateKey` | `string` | wallet private key |
 | `options?` | `Object` | - |
+| `options.allowExperimentalNetworks?` | `boolean` | if true allows using a provider connected to an experimental networks (default false) ⚠️ experimental networks are networks on which the iExec's stack is partially deployed, experimental networks can be subject to instabilities or discontinuity. Access is provided without warranties. |
 | `options.gasPrice?` | `string` \| `number` \| `bigint` | gas price override |
 | `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> | nonce override |
 | `options.providers` | [`ProviderOptions`](../interfaces/ProviderOptions.md) | providers options |

@@ -4,7 +4,10 @@ import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils.js';
 import {
+  ALCHEMY_API_KEY,
+  ETHERSCAN_API_KEY,
   INFURA_PROJECT_ID,
+  DEFAULT_PROVIDER_OPTIONS,
   TEST_CHAINS,
   getRandomAddress,
   getRandomWallet,
@@ -67,7 +70,9 @@ describe('wallet', () => {
       test('expose bridged balances (mainnet) on bellecour', async () => {
         const iexec = new IExec(
           { ethProvider: 'bellecour' },
-          { providerOptions: { infura: INFURA_PROJECT_ID } },
+          {
+            providerOptions: DEFAULT_PROVIDER_OPTIONS,
+          },
         );
         const address = getRandomAddress();
         const balance = await iexec.wallet.checkBridgedBalances(address);
@@ -79,7 +84,12 @@ describe('wallet', () => {
     });
     describe('token chain', () => {
       test('expose bridged balances (bellecour) on mainnet', async () => {
-        const iexec = new IExec({ ethProvider: 'mainnet' });
+        const iexec = new IExec(
+          { ethProvider: 'mainnet' },
+          {
+            providerOptions: DEFAULT_PROVIDER_OPTIONS,
+          },
+        );
         const address = getRandomAddress();
         const balance = await iexec.wallet.checkBridgedBalances(address);
         expect(balance.nRLC).toStrictEqual(new BN(0));
