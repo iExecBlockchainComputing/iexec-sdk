@@ -1,11 +1,18 @@
 import { getDefaultProvider, JsonRpcProvider } from 'ethers';
 import { getChainDefaults, getId } from './config.js';
 
-export const getReadOnlyProvider = (host, options = {}) => {
-  const providerOptions = options.providers || {};
+export const getReadOnlyProvider = (
+  host,
+  { providers = {}, allowExperimentalNetworks = false } = {},
+) => {
   let resolvedHost = host;
 
-  const defaults = getChainDefaults({ id: getId(host) });
+  const defaults = getChainDefaults(
+    getId(host, { allowExperimentalNetworks }),
+    {
+      allowExperimentalNetworks,
+    },
+  );
 
   if (defaults && defaults.host) {
     resolvedHost = defaults.host;
@@ -24,7 +31,7 @@ export const getReadOnlyProvider = (host, options = {}) => {
     });
   }
   // API provider
-  const { quorum, ...providersOptionsRest } = providerOptions;
+  const { quorum, ...providersOptionsRest } = providers;
   // disable non configured providers when at least 1 is configured
   const apiProvidersList = [
     'alchemy',

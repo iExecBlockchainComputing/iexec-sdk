@@ -15,7 +15,7 @@ const debug = Debug('iexec:voucher:voucher');
 
 export const fetchVoucherContract = async (
   contracts = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
+  voucherHubAddress,
   userAddress,
   { voucherAddress } = {},
 ) => {
@@ -135,7 +135,7 @@ export const showUserVoucher = async (
 
 export const authorizeRequester = async (
   contracts = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
+  voucherHubAddress,
   requester,
 ) => {
   try {
@@ -176,7 +176,7 @@ export const authorizeRequester = async (
 
 export const revokeRequesterAuthorization = async (
   contracts = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
+  voucherHubAddress,
   requester,
 ) => {
   try {

@@ -44,9 +44,9 @@ Create a client for IExec contracts
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `args` | `Object` | - |
-| `args.chainId` | `string` \| `number` | id of the chain to use (used to resolve IExec contract address) |
+| `args.chainId` | `string` \| `number` | id of the chain |
 | `args.confirms?` | `number` | number of block to wait for transactions confirmation (default 1) |
-| `args.hubAddress?` | `string` | override the IExec contract address to target a custom instance |
+| `args.hubAddress` | `string` | IExec contract address |
 | `args.isNative?` | `boolean` | true if IExec contract use the chain native token |
 | `args.provider` | `Provider` | ethers Provider |
 | `args.signer?` | `Signer` | ethers Signer, required to sign transactions and messages |
