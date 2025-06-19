@@ -76,8 +76,7 @@ const networkConfigs = [
 export const getId = (idOrName, { allowExperimentalNetworks = false } = {}) =>
   networkConfigs
     .filter(
-      ({ isExperimental }) =>
-        allowExperimentalNetworks || isExperimental === false,
+      ({ isExperimental }) => allowExperimentalNetworks || !isExperimental,
     )
     .find(({ id, name }) => idOrName === name || `${idOrName}` === `${id}`)?.id;
 
@@ -102,8 +101,7 @@ export const getChainDefaults = (
   } =
     networkConfigs
       .filter(
-        ({ isExperimental }) =>
-          allowExperimentalNetworks || isExperimental === false,
+        ({ isExperimental }) => allowExperimentalNetworks || !isExperimental,
       )
       .find((networkConfig) => `${id}` === `${networkConfig.id}`) || {};
 
