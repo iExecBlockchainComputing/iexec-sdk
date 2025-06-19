@@ -51,6 +51,7 @@ const chainConfSchema = () =>
 const chainsConfSchema = () =>
   object({
     default: string(),
+    allowExperimentalNetworks: boolean().default(false),
     chains: object()
       .test(async (chainsOjb) => {
         await Promise.all(

@@ -33,6 +33,7 @@ export default class IExecConfig {
       voucherSubgraphURL,
       defaultTeeFramework,
       providerOptions,
+      allowExperimentalNetworks = false,
     } = {},
   ) {
     if (
@@ -76,6 +77,7 @@ export default class IExecConfig {
       if (isRpcUrlProvider) {
         provider = getReadOnlyProvider(ethProvider, {
           providers: providerOptions,
+          allowExperimentalNetworks,
         });
       } else if (isEthersAbstractSignerWithProvider) {
         provider = ethProvider.provider;
@@ -130,7 +132,9 @@ export default class IExecConfig {
 
     const chainConfDefaultsPromise = (async () => {
       const { chainId } = await networkPromise;
-      return getChainDefaults({ id: chainId });
+      return getChainDefaults(chainId, {
+        allowExperimentalNetworks,
+      });
     })();
 
     chainConfDefaultsPromise.catch((err) => {
@@ -139,12 +143,19 @@ export default class IExecConfig {
 
     const contractsPromise = (async () => {
       const { chainId } = await networkPromise;
+      const chainConfDefaults = await chainConfDefaultsPromise;
+      const resolvedHubAddress = hubAddress || chainConfDefaults.hub;
+      if (!resolvedHubAddress) {
+        throw new ConfigurationError(
+          `hubAddress option not set and no default value for your chain ${chainId}`,
+        );
+      }
       try {
         return new IExecContractsClient({
           chainId,
           provider,
           signer,
-          hubAddress,
+          hubAddress: resolvedHubAddress,
           useGas,
           confirms,
           isNative,
@@ -172,42 +183,38 @@ export default class IExecConfig {
         );
       }
       const bridgedChainId =
-        bridgedNetworkConf.chainId !== undefined
-          ? bridgedNetworkConf.chainId
-          : chainConfDefaults.bridge && chainConfDefaults.bridge.bridgedChainId;
+        bridgedNetworkConf.chainId ?? chainConfDefaults.bridge?.bridgedChainId;
       if (!bridgedChainId) {
         throw new ConfigurationError(
           `Missing chainId in bridgedNetworkConf and no default value for your chain ${chainId}`,
         );
       }
-      const bridgedChainConfDefaults = getChainDefaults({
-        id: bridgedChainId,
+      const bridgedChainConfDefaults = getChainDefaults(bridgedChainId, {
+        allowExperimentalNetworks,
       });
       const bridgedRpcUrl =
-        bridgedNetworkConf.rpcURL !== undefined
-          ? bridgedNetworkConf.rpcURL
-          : bridgedChainConfDefaults.host;
+        bridgedNetworkConf.rpcURL ?? bridgedChainConfDefaults.host;
       if (!bridgedRpcUrl) {
         throw new ConfigurationError(
           `Missing rpcURL in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
         );
       }
       const bridgedBridgeAddress =
-        bridgedNetworkConf.bridgeAddress !== undefined
-          ? bridgedNetworkConf.bridgeAddress
-          : bridgedChainConfDefaults.bridge &&
-            bridgedChainConfDefaults.bridge.contract;
+        bridgedNetworkConf.bridgeAddress ??
+        bridgedChainConfDefaults.bridge?.contract;
       if (!bridgedBridgeAddress) {
         throw new ConfigurationError(
           `Missing bridgeAddress in bridgedNetworkConf and no default value for bridged chain ${bridgedChainId}`,
         );
       }
+      const bridgedHubAddress =
+        bridgedNetworkConf.hubAddress ?? bridgedChainConfDefaults.hub;
       const contracts = await contractsPromise;
       return {
         chainId: bridgedChainId,
         rpcURL: bridgedRpcUrl,
         isNative: !contracts.isNative,
-        hubAddress: bridgedNetworkConf.hubAddress,
+        hubAddress: bridgedHubAddress,
         bridgeAddress: bridgedBridgeAddress,
       };
     })();
@@ -218,15 +225,22 @@ export default class IExecConfig {
 
     const bridgedContractsPromise = (async () => {
       const bridgedConf = await bridgedConfPromise;
+      const { hubAddress, chainId, isNative, rpcURL } = bridgedConf;
+      if (!hubAddress) {
+        throw new ConfigurationError(
+          `Missing hubAddress in bridgedNetworkConf and no default value for bridged chain ${chainId}`,
+        );
+      }
       try {
         return new IExecContractsClient({
-          chainId: bridgedConf.chainId,
-          provider: getReadOnlyProvider(bridgedConf.rpcURL, {
+          chainId,
+          provider: getReadOnlyProvider(rpcURL, {
             providers: providerOptions,
+            allowExperimentalNetworks,
           }),
-          hubAddress: bridgedConf.hubAddress,
+          hubAddress,
           confirms,
-          isNative: bridgedConf.isNative,
+          isNative,
         });
       } catch (err) {
         throw new ConfigurationError(

@@ -123,9 +123,7 @@ infoCmd
       const chain = await loadChain(opts.chain, { spinner });
 
       const host =
-        chain.host === getChainDefaults({ id: chain.id }).host
-          ? 'default'
-          : chain.host;
+        chain.host === getChainDefaults(chain.id).host ? 'default' : chain.host;
       spinner.info(`Ethereum host: ${host}`);
 
       spinner.start(info.checking('iExec contracts info'));

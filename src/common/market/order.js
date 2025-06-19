@@ -783,7 +783,7 @@ const getMatchableVolume = async (
 
 export const estimateMatchOrders = async ({
   contracts = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
+  voucherHubAddress,
   apporder,
   datasetorder = NULL_DATASETORDER,
   workerpoolorder,
