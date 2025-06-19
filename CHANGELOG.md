@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## NEXT
+## [8.16.0] 2025-06-19
+
+### Added
+
+- added experimental networks
 
 ### Changed
 
