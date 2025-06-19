@@ -9,7 +9,7 @@ const debug = Debug('iexec:voucher:voucherHub');
 
 export const fetchVoucherAddress = async (
   contracts = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
+  voucherHubAddress,
   owner,
 ) => {
   try {
@@ -31,7 +31,7 @@ export const fetchVoucherAddress = async (
 
 export const isVoucherAddress = async (
   contracts = throwIfMissing(),
-  voucherHubAddress = throwIfMissing(),
+  voucherHubAddress,
   voucherAddress,
 ) => {
   try {
