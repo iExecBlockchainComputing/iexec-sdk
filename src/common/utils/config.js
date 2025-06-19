@@ -124,7 +124,7 @@ export const getChainDefaults = (
   };
 };
 
-// register ethers unknown networks
+// Register unknown networks and their ENS settings for the ethers library
 networkConfigs.forEach((networkConfig) => {
   if (
     networkConfig.shouldRegisterNetwork &&
