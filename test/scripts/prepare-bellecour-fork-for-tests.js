@@ -7,8 +7,6 @@ import {
   toBeHex,
 } from 'ethers';
 
-const { DRONE } = process.env;
-
 const IEXEC_HUB_ADDRESS = '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f';
 const VOUCHER_HUB_ADDRESS = '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda';
 const TARGET_POCO_ADMIN_WALLET = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
@@ -22,7 +20,7 @@ const PROD_WORKERPOOL_OWNER_WALLET =
 const DEBUG_WORKERPOOL = '0xdb214a4a444d176e22030be1ed89da1b029320f2'; // 'debug-v8-bellecour.main.pools.iexec.eth';
 const PROD_WORKERPOOL = '0x0e7bc972c99187c191a17f3cae4a2711a4188c3f'; // 'prod-v8-bellecour.main.pools.iexec.eth';
 
-const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545';
+const rpcURL = 'http://localhost:8545';
 
 const provider = new JsonRpcProvider(rpcURL, undefined, {
   pollingInterval: 100, // fast polling for tests
