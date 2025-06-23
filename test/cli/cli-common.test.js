@@ -10,8 +10,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const { DRONE } = process.env;
-const iexecPath = DRONE ? 'iexec' : 'node ../../../src/cli/cmd/iexec.js';
+const iexecPath = 'iexec';
 
 beforeAll(async () => {
   await globalSetup('cli-common');

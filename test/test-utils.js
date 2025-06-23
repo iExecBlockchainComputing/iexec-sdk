@@ -38,8 +38,6 @@ export const execAsync = (cmd) =>
     });
   });
 
-const { DRONE } = process.env;
-
 export const { INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
   process.env;
 
@@ -55,16 +53,14 @@ export const DEFAULT_PROVIDER_OPTIONS = {
   quorum: 1,
 };
 
-export const SERVICE_HTTP_500_URL = DRONE
-  ? 'http://service-internal-error:80'
-  : 'http://localhost:5500';
+export const SERVICE_HTTP_500_URL = 'http://localhost:5500';
 
 export const SERVICE_UNREACHABLE_URL = 'http://unreachable:80';
 
 export const TEST_CHAINS = {
   // autoseal chain with iExec token
   'custom-token-chain': {
-    rpcURL: DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
+    rpcURL: 'http://localhost:18545',
     chainId: '65535',
     hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
     ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
@@ -76,11 +72,9 @@ export const TEST_CHAINS = {
     faucetWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
-    provider: new JsonRpcProvider(
-      DRONE ? 'http://custom-token-chain:8545' : 'http://localhost:18545',
-      undefined,
-      { pollingInterval: 100 },
-    ),
+    provider: new JsonRpcProvider('http://localhost:18545', undefined, {
+      pollingInterval: 100,
+    }),
     defaults: {
       isNative: false,
       useGas: true,
@@ -88,16 +82,12 @@ export const TEST_CHAINS = {
     isAnvil: false,
   },
   'bellecour-fork': {
-    rpcURL: DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
+    rpcURL: 'http://localhost:8545',
     chainId: '134',
-    sconeSmsURL: DRONE ? 'http://sms:13300' : 'http://localhost:13300',
-    gramineSmsURL: DRONE
-      ? 'http://sms-gramine:13300'
-      : 'http://localhost:13309',
-    iexecGatewayURL: DRONE ? 'http://market-api:3000' : 'http://localhost:3000',
-    resultProxyURL: DRONE
-      ? 'http://result-proxy:13200'
-      : 'http://localhost:13200',
+    sconeSmsURL: 'http://localhost:13300',
+    gramineSmsURL: 'http://localhost:13309',
+    iexecGatewayURL: 'http://localhost:3000',
+    resultProxyURL: 'http://localhost:13200',
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
@@ -107,9 +97,8 @@ export const TEST_CHAINS = {
     voucherManagerWallet: new Wallet(
       '0x2c906d4022cace2b3ee6c8b596564c26c4dcadddf1e949b769bcb0ad75c40c33',
     ),
-    voucherSubgraphURL: DRONE
-      ? 'http://graphnode:8000/subgraphs/name/bellecour/iexec-voucher'
-      : 'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
+    voucherSubgraphURL:
+      'http://localhost:8000/subgraphs/name/bellecour/iexec-voucher',
     debugWorkerpool: 'debug-v8-bellecour.main.pools.iexec.eth',
     debugWorkerpoolOwnerWallet: new Wallet(
       '0x800e01919eadf36f110f733decb1cc0f82e7941a748e89d7a3f76157f6654bb3',
@@ -118,11 +107,9 @@ export const TEST_CHAINS = {
     prodWorkerpoolOwnerWallet: new Wallet(
       '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc',
     ),
-    provider: new JsonRpcProvider(
-      DRONE ? 'http://bellecour-fork:8545' : 'http://localhost:8545',
-      undefined,
-      { pollingInterval: 100 },
-    ),
+    provider: new JsonRpcProvider('http://localhost:8545', undefined, {
+      pollingInterval: 100,
+    }),
     defaults: {
       hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
       voucherHubAddress: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda',
