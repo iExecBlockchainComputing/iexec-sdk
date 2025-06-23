@@ -7,9 +7,9 @@ import { execAsync, getId } from '../test-utils.js';
 const IEXEC_JSON = 'iexec.json';
 const CHAIN_JSON = 'chain.json';
 
-const { DRONE, INFURA_PROJECT_ID } = process.env;
+const { INFURA_PROJECT_ID } = process.env;
 
-export const iexecPath = DRONE ? 'iexec' : 'node ../../../src/cli/cmd/iexec.js';
+export const iexecPath = 'iexec';
 
 export const globalSetup = async (testid = 'shared') => {
   const testDir = `test/tests-working-dir/${testid}`;
