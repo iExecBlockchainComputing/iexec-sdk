@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.16.0] 2025-06-19
+
+### Added
+
+- added experimental networks
+
+### Changed
+
+- updated `iexec app init --tee` template to Scone v5.9
+
 ## [8.15.0] 2025-04-10
 
 ### Added
