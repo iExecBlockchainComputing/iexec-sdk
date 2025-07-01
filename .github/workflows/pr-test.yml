@@ -79,5 +79,6 @@ jobs:
     with:
       push: false
       image-name: 'iexechub/iexec-sdk'
+      image-tag: ${{ github.sha }}
       dockerfile: 'Dockerfile'
       context: '.'
