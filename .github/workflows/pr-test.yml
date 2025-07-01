@@ -1,4 +1,4 @@
-name: Test SDK
+name: PR test
 
 on: [pull_request]
 
@@ -27,45 +27,32 @@ jobs:
       - name: Lint
         run: npm run lint
 
-  test:
+  test-node-18:
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      node-version: '18'
+      upload-coverage: true
+    secrets:
+      infura-project-id: ${{ secrets.INFURA_PROJECT_ID }}
+      etherscan-api-key: ${{ secrets.ETHERSCAN_API_KEY }}
+      alchemy-api-key: ${{ secrets.ALCHEMY_API_KEY }}
+
+  sonar:
     runs-on: ubuntu-latest
+    needs: test-node-18
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
+      - uses: actions/download-artifact@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Install global
-        run: npm install -g .
-
-      - name: Start e2e test stack
-        run: npm run start-test-stack
-
-      - name: Test
-        run: npm test
-        env:
-          INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
-          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
-          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          artifact-ids: ${{ needs.test.outputs.coverage-artifact-id }}
+          path: coverage
 
       - name: SonarScanner
         uses: SonarSource/sonarqube-scan-action@v5.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-      - name: Stop e2e test stack
-        if: always()
-        run: npm run stop-test-stack
 
   build:
     runs-on: ubuntu-latest
