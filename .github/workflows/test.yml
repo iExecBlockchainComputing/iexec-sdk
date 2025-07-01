@@ -2,6 +2,10 @@ name: Test SDK
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.ref }}-test
+  cancel-in-progress: true
+
 jobs:
   check-code:
     runs-on: ubuntu-latest
