@@ -44,14 +44,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Prepare test environment
+      - name: Install global
+        run: npm install -g .
+
+      - name: Start e2e test stack
         run: |
           sudo apt-get update
           sudo apt-get install -y xxd
           npm run start-test-stack
-
-      - name: Install global
-        run: npm install -g .
 
       - name: Test
         run: npm test
@@ -65,6 +65,10 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Stop e2e test stack
+        if: always()
+        run: npm run stop-test-stack
 
   build:
     runs-on: ubuntu-latest
