@@ -54,7 +54,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-  build:
+  npm-dry-run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -71,5 +71,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: publish dry-run
+      - name: npm publish dry-run
         run: npm publish --dry-run
+
+  docker-dry-run:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
+    with:
+      push: false
+      image-name: 'iexechub/iexec-sdk'
+      dockerfile: 'Dockerfile'
+      context: '.'
