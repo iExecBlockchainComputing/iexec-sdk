@@ -48,10 +48,7 @@ jobs:
         run: npm install -g .
 
       - name: Start e2e test stack
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xxd
-          npm run start-test-stack
+        run: npm run start-test-stack
 
       - name: Test
         run: npm test
