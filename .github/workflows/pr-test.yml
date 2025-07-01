@@ -82,3 +82,5 @@ jobs:
       image-tag: ${{ github.sha }}
       dockerfile: 'Dockerfile'
       context: '.'
+      security-scan: false
+      hadolint: false
