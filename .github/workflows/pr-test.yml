@@ -3,7 +3,7 @@ name: PR test
 on: [pull_request]
 
 concurrency:
-  group: ${{ github.ref }}-test
+  group: ${{ github.ref }}-pr-test
   cancel-in-progress: true
 
 jobs:
