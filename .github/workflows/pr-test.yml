@@ -69,4 +69,4 @@ jobs:
       push: false
       hadolint: true
       security-scan: true
-      security-report: comment
+      security-report: sarif
