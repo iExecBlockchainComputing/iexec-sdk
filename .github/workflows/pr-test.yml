@@ -60,6 +60,7 @@ jobs:
       install-command: npm ci
       build-command: npm run build
       dry-run: true
+      environment: ''
 
   docker-dry-run:
     # TODO use tagged version
