@@ -1,0 +1,19 @@
+name: docker publish staging
+description: Publish a staging version on docker registry
+
+on:
+  workflow_dispatch:
+
+jobs:
+  compute-staging-version:
+    uses: ./.github/workflows/reusable-compute-staging-version.yml
+
+  docker-publish:
+    uses: ./.github/workflows/reusable-docker.yml
+    needs: compute-staging-version
+    with:
+      dry-run: true # TODO set to false
+      tag: ${{ needs.compute-staging-version.outputs.version }}
+    secrets:
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }} # TODO ensure secret is set
+      docker-password: ${{ secrets.DOCKERHUB_TOKEN }} # TODO ensure secret is set
