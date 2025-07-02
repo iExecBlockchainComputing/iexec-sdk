@@ -46,7 +46,6 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           artifact-ids: ${{ needs.test.outputs.coverage-artifact-id }}
-          path: coverage
 
       - name: SonarScanner
         uses: SonarSource/sonarqube-scan-action@v5.1.0
