@@ -55,6 +55,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   npm-dry-run:
+    # TODO use tagged version
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/npm-publish-dry-run
     with:
       install-command: npm ci
@@ -62,12 +63,10 @@ jobs:
       dry-run: true
 
   docker-dry-run:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
+    # TODO use tagged version
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-fixes
     with:
-      push: false
       image-name: 'iexechub/iexec-sdk'
-      image-tag: ${{ github.sha }}
-      dockerfile: 'Dockerfile'
-      context: '.'
+      push: false
       security-scan: false
       hadolint: false
