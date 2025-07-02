@@ -60,11 +60,6 @@ jobs:
       dry-run: true
 
   docker-dry-run:
-    # TODO use tagged version
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-fixes
+    uses: ./.github/workflows/reusable-docker.yml
     with:
-      image-name: 'iexechub/iexec-sdk'
-      push: false
-      hadolint: true
-      security-scan: true
-      security-report: comment
+      dry-run: true

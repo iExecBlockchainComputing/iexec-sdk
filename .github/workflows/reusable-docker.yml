@@ -1,0 +1,38 @@
+name: docker publish
+
+on:
+  workflow_call:
+    inputs:
+      dry-run:
+        description: 'Run in dry-run mode (the docker image will not be published)'
+        default: false
+        type: boolean
+      tag:
+        description: 'Tag of Docker Image'
+        default: 'latest'
+        type: string
+    secrets:
+      docker-username:
+        description: 'Docker registry username (required unless `dry-run: true`)'
+        required: false
+      docker-password:
+        description: 'Docker registry password or PAT (required unless `dry-run: true`)'
+        required: false
+
+jobs:
+  docker-publish:
+    # TODO use tagged version
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-fixes
+    with:
+      image-name: 'iexechub/iexec-sdk'
+      registry: 'docker.io'
+      dockerfile: 'Dockerfile'
+      context: '.'
+      security-scan: true
+      security-report: 'sarif'
+      hadolint: true
+      push: ${{ !inputs.dry-run }}
+      image-tag: ${{ inputs.tag }}
+    secrets:
+      username: ${{ secrets.docker-username }}
+      password: ${{ secrets.docker-password }}
