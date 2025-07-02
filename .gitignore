@@ -29,6 +29,9 @@ test/tests-working-dir
 # sonar output
 .scannerwork
 
+# codegen output
+src/common/generated
+
 # build output
 dist/**
 IExec*/**

@@ -147,6 +147,7 @@
     "npm": ">=8"
   },
   "scripts": {
+    "codegen": "rimraf src/common/generated && node generateEsModulesFromJson.cjs",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "lint": "eslint src",
@@ -154,7 +155,7 @@
     "test": "npm run test:prepare && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "stop-test-stack": "cd test && docker compose down --remove-orphans --volumes",
     "start-test-stack": "cd test && npm run stop-test-stack && node scripts/prepare-test-env.js && docker compose pull && docker compose up -d",
-    "build:codegen": "rimraf src/common/generated && node generateEsModulesFromJson.cjs",
+    "build:codegen": "npm run codegen",
     "build:dist": "rimraf dist && mkdir dist && mkdir dist/esm && cp -r src/. dist/esm/",
     "build:packages": "node generatePackages.cjs",
     "build:doc": "npm run build:doc:lib && npm run build:doc:cli",
