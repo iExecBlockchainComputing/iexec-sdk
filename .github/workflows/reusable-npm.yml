@@ -29,6 +29,7 @@ jobs:
       build-command: npm run build
       dry-run: ${{ inputs.dry-run }}
       tag: ${{ inputs.tag }}
+      version: ${{ inputs.version }}
       environment: ${{ (inputs.dry-run && '') || inputs.tag }}
       provenance: ${{ !inputs.dry-run }}
     secrets:
