@@ -55,8 +55,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   npm-dry-run:
-    # TODO use tagged version
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/npm-publish-dry-run
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.5.0
     with:
       install-command: npm ci
       build-command: npm run build
