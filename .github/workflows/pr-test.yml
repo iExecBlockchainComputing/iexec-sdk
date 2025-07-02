@@ -68,4 +68,3 @@ jobs:
     with:
       image-name: 'iexechub/iexec-sdk'
       push: false
-      security-scan: false
