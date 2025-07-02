@@ -66,6 +66,6 @@ jobs:
         if: ${{ inputs.upload-coverage }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.sha }}-${{github.run_id}}-coverage
+          name: coverage
           path: coverage
           overwrite: true
