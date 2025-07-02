@@ -1,59 +1,6 @@
 ---
 kind: pipeline
 type: docker
-name: publish dry-run
-
-trigger:
-  event:
-    exclude:
-      - promote
-
-steps:
-  - name: install
-    image: node:18
-    pull: always
-    commands:
-      - node -v
-      - npm -v
-      - npm ci
-
-  - name: build
-    image: node:18
-    commands:
-      - npm run build
-    depends_on:
-      - install
-
-  - name: format
-    image: node:18.19
-    commands:
-      - npm run check-format
-    depends_on:
-      - build
-
-  - name: lint
-    image: node:18.19
-    commands:
-      - npm run lint
-    depends_on:
-      - build
-
-  - name: npm publish dry-run
-    image: node:18
-    commands:
-      - npm publish --dry-run
-
-  - name: docker publish dry-run
-    image: plugins/docker
-    pull: always
-    settings:
-      repo: iexechub/iexec-sdk
-      dockerfile: Dockerfile
-      dry_run: true
-
----
-kind: pipeline
-type: docker
 name: publish nightly
 
 trigger:
