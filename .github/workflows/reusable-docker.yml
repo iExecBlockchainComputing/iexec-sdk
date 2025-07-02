@@ -22,8 +22,7 @@ on:
 
 jobs:
   docker-publish:
-    # TODO use tagged version
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-fixes
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.3.0
     with:
       image-name: 'iexechub/iexec-sdk'
       registry: 'docker.io'
