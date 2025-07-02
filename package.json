@@ -3,7 +3,7 @@
   "version": "8.16.0",
   "description": "iExec SDK",
   "bin": {
-    "iexec": "./dist/esm/cli/cmd/iexec.js"
+    "iexec": "dist/esm/cli/cmd/iexec.js"
   },
   "main": "./dist/esm/lib/index.js",
   "types": "./dist/esm/lib/index.d.ts",
