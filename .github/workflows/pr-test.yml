@@ -67,3 +67,6 @@ jobs:
     with:
       image-name: 'iexechub/iexec-sdk'
       push: false
+      hadolint: true
+      security-scan: true
+      security-report: comment
