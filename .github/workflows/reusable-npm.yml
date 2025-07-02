@@ -29,5 +29,6 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
       tag: ${{ inputs.tag }}
       environment: ${{ (inputs.dry-run && '') || inputs.tag }}
+      provenance: ${{ !inputs.dry-run }}
     secrets:
       npm-token: ${{ secrets.npm-token }}

@@ -1,0 +1,35 @@
+name: npm publish staging
+description: Publish a staging version on npm, dist-tag named after the branch name
+
+on:
+  workflow_dispatch:
+
+jobs:
+  compute-staging-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+      - name: Set publish version
+        id: set-publish-version
+        run: |
+          BRANCH=$(echo "${{ github.ref_name }}" | sed 's|/|-|g')
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          STAGING_VERSION="${CURRENT_VERSION}-${BRANCH}-${GITHUB_SHA::7}"
+          echo "VERSION=${STAGING_VERSION}" >> $GITHUB_OUTPUT
+          echo "TAG=${BRANCH}" >> $GITHUB_OUTPUT
+    outputs:
+      version: ${{ steps.set-publish-version.outputs.VERSION }}
+      tag: ${{ steps.set-publish-version.outputs.TAG }}
+
+  npm-dry-run:
+    uses: ./.github/workflows/reusable-npm.yml
+    needs: compute-staging-version
+    with:
+      dry-run: true # TODO set to false
+      version: ${{ needs.compute-staging-version.outputs.version }}
+      tag: ${{ needs.compute-staging-version.outputs.tag }}
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
