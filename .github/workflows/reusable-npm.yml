@@ -1,4 +1,5 @@
 name: npm publish
+description: reusable npm workflow for this project
 
 on:
   workflow_call:

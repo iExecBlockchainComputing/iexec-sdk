@@ -1,4 +1,5 @@
 name: PR test
+description: tests the PR
 
 on: [pull_request]
 

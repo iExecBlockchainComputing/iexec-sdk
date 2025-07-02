@@ -1,4 +1,5 @@
 name: Conventional Commit Check Commits
+description: checks every commit in the PR respects the conventional commit
 
 on: [pull_request]
 

@@ -1,4 +1,5 @@
 name: docker publish
+description: reusable docker workflow for this project
 
 on:
   workflow_call:

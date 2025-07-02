@@ -1,5 +1,5 @@
 name: npm publish staging
-description: Publish a staging version on npm, dist-tag named after the branch name
+description: Publish a staging version on npm
 
 on:
   workflow_dispatch:

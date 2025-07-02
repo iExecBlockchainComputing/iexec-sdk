@@ -1,4 +1,5 @@
 name: Conventional Commit Check PR Title
+description: checks the PR title respects the conventional commit
 
 on:
   pull_request_target:

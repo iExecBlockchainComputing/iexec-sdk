@@ -1,4 +1,5 @@
-name: Test SDK
+name: Compute staging version
+description: compute a staging version from the current version, branch name and commit
 
 on:
   workflow_call:
