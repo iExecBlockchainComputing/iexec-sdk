@@ -55,24 +55,11 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   npm-dry-run:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: npm publish dry-run
-        run: npm publish --dry-run
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/npm-publish-dry-run
+    with:
+      install-command: npm ci
+      build-command: npm run build
+      dry-run: true
 
   docker-dry-run:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
