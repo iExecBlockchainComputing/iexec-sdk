@@ -1,0 +1,36 @@
+name: npm publish
+description: reusable npm workflow for this project
+
+on:
+  workflow_call:
+    inputs:
+      dry-run:
+        description: 'Run in dry-run mode (the package will not be published)'
+        default: false
+        type: boolean
+      version:
+        description: 'Version to publish (leave empty to use package.json version)'
+        default: ''
+        type: string
+      tag:
+        description: 'npm publish tag (e.g., latest, nightly)'
+        default: ''
+        type: string
+    secrets:
+      npm-token:
+        description: 'NPM auth token (required unless `dry-run: true`)'
+        required: false
+
+jobs:
+  npm-publish:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.5.0
+    with:
+      install-command: npm ci
+      build-command: npm run build
+      dry-run: ${{ inputs.dry-run }}
+      tag: ${{ inputs.tag }}
+      version: ${{ inputs.version }}
+      environment: ${{ (inputs.dry-run && '') || inputs.tag }}
+      provenance: ${{ !inputs.dry-run }}
+    secrets:
+      npm-token: ${{ secrets.npm-token }}

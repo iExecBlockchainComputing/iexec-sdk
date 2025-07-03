@@ -1,0 +1,71 @@
+name: test SDK
+description: reusable test workflow for this project
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node version to use as specified in actions/setup-node@v4'
+        default: '20'
+        type: string
+      upload-coverage:
+        description: 'Upload coverage data for later reuse'
+        type: boolean
+        default: false
+    secrets:
+      infura-project-id:
+        required: true
+      etherscan-api-key:
+        required: true
+      alchemy-api-key:
+        required: true
+    outputs:
+      coverage-artifact-id:
+        description: 'Coverage artifact id (if `upload-coverage: true`)'
+        value: ${{ jobs.test.outputs.coverage-artifact-id }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      coverage-artifact-id: ${{ steps.upload-coverage.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci && npm run
+
+      - name: Build
+        run: npm run build
+
+      - name: Install global
+        run: npm install -g .
+
+      - name: Start e2e test stack
+        run: npm run start-test-stack
+
+      - name: Test
+        run: npm test
+        env:
+          INFURA_PROJECT_ID: ${{ secrets.infura-project-id }}
+          ETHERSCAN_API_KEY: ${{ secrets.etherscan-api-key }}
+          ALCHEMY_API_KEY: ${{ secrets.alchemy-api-key }}
+
+      - name: Stop e2e test stack
+        if: always()
+        run: npm run stop-test-stack
+
+      - name: Upload coverage
+        id: upload-coverage
+        if: ${{ inputs.upload-coverage }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+          overwrite: true

@@ -1,0 +1,15 @@
+name: Conventional Commit Check PR Title
+description: checks the PR title respects the conventional commit
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - reopened
+
+jobs:
+  lint-pr-title:
+    permissions:
+      pull-requests: read
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/conventional-commits.yml@conventional-commits-v1.1.0

@@ -45,6 +45,7 @@ Check the [documentation](./CLI.md)
 
 ```sh
 npm ci
+npm run codegen
 ```
 
 ### Build
