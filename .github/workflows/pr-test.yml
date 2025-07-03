@@ -41,7 +41,7 @@ jobs:
   test-node-versions:
     uses: ./.github/workflows/reusable-test.yml
     # for release PR run tests on all supported node versions
-    if: ${{ contains('release-please--',  github.ref_name ) }}
+    if: ${{ startsWith('release-please--',  github.ref_name ) }}
     strategy:
       matrix:
         node-version: ['20', '22', '24']
