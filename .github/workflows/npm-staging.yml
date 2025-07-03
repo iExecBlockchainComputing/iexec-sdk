@@ -12,7 +12,6 @@ jobs:
     uses: ./.github/workflows/reusable-npm.yml
     needs: compute-staging-version
     with:
-      dry-run: true # TODO set to false
       version: ${{ needs.compute-staging-version.outputs.version }}
       tag: ${{ needs.compute-staging-version.outputs.dist-tag }}
     secrets:
