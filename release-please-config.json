@@ -21,8 +21,11 @@
     { "type": "ci", "section": "Misc", "hidden": true },
     { "type": "docs", "section": "Misc", "hidden": true }
   ],
-
-  "release-type": "node",
-  "changelog-path": "CHANGELOG.md",
-  "include-v-in-tag": true
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "changelog-path": "CHANGELOG.md",
+      "include-v-in-tag": true
+    }
+  }
 }
