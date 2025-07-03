@@ -6,7 +6,7 @@ on:
     inputs:
       node-version:
         description: 'Node version to use as specified in actions/setup-node@v4'
-        default: '18'
+        default: '20'
         type: string
       upload-coverage:
         description: 'Upload coverage data for later reuse'
@@ -39,7 +39,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci && npm run
 
       - name: Build
         run: npm run build
