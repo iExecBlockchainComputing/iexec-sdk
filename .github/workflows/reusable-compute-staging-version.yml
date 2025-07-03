@@ -22,8 +22,9 @@ jobs:
         id: set-publish-version
         run: |
           BRANCH=$(echo "${{ github.ref_name }}" | sed 's|/|-|g')
+          COMMIT_SHA="${{ github.sha }}"
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
-          STAGING_VERSION="${CURRENT_VERSION}-${BRANCH}-${GITHUB_SHA::7}"
+          STAGING_VERSION="${CURRENT_VERSION}-${BRANCH}-${COMMIT_SHA::7}"
           echo "VERSION=${STAGING_VERSION}" >> $GITHUB_OUTPUT
           echo "DIST_TAG=${BRANCH}" >> $GITHUB_OUTPUT
           echo "VERSION=${STAGING_VERSION}"
