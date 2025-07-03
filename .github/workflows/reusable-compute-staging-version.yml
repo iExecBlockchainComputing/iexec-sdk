@@ -5,7 +5,6 @@ on:
   workflow_call:
     outputs:
       version:
-        description: 'Coverage artifact id (if `upload-coverage: true`)'
         value: ${{ jobs.compute-staging-version.outputs.version }}
       dist-tag:
         value: ${{ jobs.compute-staging-version.outputs.dist-tag }}
