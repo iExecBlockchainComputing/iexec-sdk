@@ -38,7 +38,7 @@ jobs:
       etherscan-api-key: ${{ secrets.ETHERSCAN_API_KEY }}
       alchemy-api-key: ${{ secrets.ALCHEMY_API_KEY }}
 
-  test-node-versions:
+  test-supported-node-versions:
     uses: ./.github/workflows/reusable-test.yml
     # for release PR run tests on all supported node versions
     if: ${{ startsWith(github.ref_name,'release-please--') }}
@@ -46,7 +46,7 @@ jobs:
       matrix:
         node-version: ['22', '24']
     with:
-      node-version:
+      node-version: ${{ matrix.node-version }}
     secrets:
       infura-project-id: ${{ secrets.INFURA_PROJECT_ID }}
       etherscan-api-key: ${{ secrets.ETHERSCAN_API_KEY }}
