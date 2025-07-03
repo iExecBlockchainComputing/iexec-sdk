@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.16.0] 2025-06-19
+## [8.16.0] (2025-06-19)
 
 ### Added
 
@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 
 - updated `iexec app init --tee` template to Scone v5.9
 
-## [8.15.0] 2025-04-10
+## [8.15.0] (2025-04-10)
 
 ### Added
 
@@ -22,26 +22,26 @@ All notable changes to this project will be documented in this file.
 
 - fixed `BN` type export issue
 
-## [8.14.1] 2025-03-27
+## [8.14.1] (2025-03-27)
 
 ### Changed
 
 - migrated subgraphs default base URL (<https://thegraph.iex.ec>)
 
-## [8.14.0] 2025-03-25
+## [8.14.0] (2025-03-25)
 
 ### Added
 
 - added `voucherAddress` option for using a non-owned voucher contract in `matchOrders`
 
-## [8.13.1] 2025-02-24
+## [8.13.1] (2025-02-24)
 
 ### Changed
 
 - migrated SMS default URL (<https://sms.iex.ec>)
 - migrated from SMS deprecated apps secrets endpoint
 
-## [8.13.0] 2025-01-21
+## [8.13.0] (2025-01-21)
 
 ### Added
 
@@ -74,7 +74,7 @@ All notable changes to this project will be documented in this file.
   - [BREAKING] CLI `iexec wallet` command
     - removed `swap-RLC-for-eRLC` and `swap-eRLC-for-RLC`
 
-## [8.12.0] 2024-10-22
+## [8.12.0] (2024-10-22)
 
 ### Added
 
@@ -88,13 +88,13 @@ All notable changes to this project will be documented in this file.
   - revoke
 - added support for using a voucher to pay for a deal
 
-## [8.11.0] 2024-10-03
+## [8.11.0] (2024-10-03)
 
 ### Changed
 
 - Upgrade PoCo to v5.5.0
 
-## [8.10.1] 2024-08-26
+## [8.10.1] (2024-08-26)
 
 ### Changed
 
@@ -102,7 +102,7 @@ All notable changes to this project will be documented in this file.
 - fix an issue occurring when network 134 is already registered on ethers
 - doc fixes
 
-## [8.10.0] 2024-07-24
+## [8.10.0] (2024-07-24)
 
 ### Added
 
@@ -118,13 +118,13 @@ All notable changes to this project will be documented in this file.
 - removed `ensRegistryAddress` option (use ethers `Network.register()` to configure custom networks supporting ENS)
 - CLI removed `iexec registry` commands
 
-## [8.9.1] 2024-06-19
+## [8.9.1] (2024-06-19)
 
 ### Changed
 
 - fixed exposed version
 
-## [8.9.0] 2024-06-19
+## [8.9.0] (2024-06-19)
 
 ### Added
 
@@ -140,14 +140,14 @@ All notable changes to this project will be documented in this file.
 
 - [DEPRECATED] `originalError` is deprecated in favor of Error `cause`
 
-## [8.8.0] 2024-05-28
+## [8.8.0] (2024-05-28)
 
 ### Changed
 
 - Typescript fixes
 - accept `CryptoKey` in `utils.decryptResult(encrypted, key)`
 
-## [8.7.0] 2024-04-22
+## [8.7.0] (2024-04-22)
 
 ### Added
 
@@ -163,13 +163,13 @@ All notable changes to this project will be documented in this file.
 - move tests to the local fork of bellecour
 - cache secrets' existence when confirmed by the SMS
 
-## [8.6.1] 2024-03-11
+## [8.6.1] (2024-03-11)
 
 ### Changed
 
 - fix bundling issue occurring in webpack due to conditional import of node builtin in node context
 
-## [8.6.0] 2024-03-04
+## [8.6.0] (2024-03-04)
 
 ### Added
 
@@ -180,7 +180,7 @@ All notable changes to this project will be documented in this file.
 - remove ipfs initialization preflight checks on request orders
 - Typescript fixes
 
-## [8.5.2] 2024-01-24
+## [8.5.2] (2024-01-24)
 
 ### Added
 
@@ -191,14 +191,14 @@ All notable changes to this project will be documented in this file.
 
 - fix encryption key formatting issue in `iexec.result.pushResultEncryptionKey(key)`
 
-## [8.5.1] 2023-12-21
+## [8.5.1] (2023-12-21)
 
 ### Changed
 
 - fix regression causing browser providers (metamask) to prompt unlock screen on IExec instantiation
 - fix `iexec task show --download` issue with node 18 and above
 
-## [8.5.0] 2023-11-02
+## [8.5.0] (2023-11-02)
 
 ### Changed
 
@@ -206,7 +206,7 @@ All notable changes to this project will be documented in this file.
 - updated dependencies
 - [BREAKING] drop support for node 16
 
-## [8.4.0] 2023-10-03
+## [8.4.0] (2023-10-03)
 
 ### Added
 
@@ -218,55 +218,55 @@ All notable changes to this project will be documented in this file.
 - fix error message in `iexec app show`
 - fix ambiguous error message when trying to transfer an asset not deployed
 
-## [8.3.0] 2023-09-22
+## [8.3.0] (2023-09-22)
 
 ### Added
 
 - add transfer methods allowing to transfer the ownership of apps, datasets and workerpools
 
-## [8.2.1] 2023-08-01
+## [8.2.1] (2023-08-01)
 
 ### Changed
 
 - fix missing import causing `decryptResult()` to crash in browser
 
-## [8.2.0] 2023-07-28
+## [8.2.0] (2023-07-28)
 
 ### Changed
 
 - use `node-forge` for crypto operations to remove dependencies on nodejs built-in modules
 
-## [8.1.5] 2023-06-22
+## [8.1.5] (2023-06-22)
 
 ### Changed
 
 - fix windows install
 
-## [8.1.4] 2023-06-01
+## [8.1.4] (2023-06-01)
 
 ### Changed
 
 - Typescript fixes
 
-## [8.1.3] 2023-05-26
+## [8.1.3] (2023-05-26)
 
 ### Changed
 
 - Typescript fixes
 
-## [8.1.2] 2023-05-26
+## [8.1.2] (2023-05-26)
 
 ### Changed
 
 - Typescript fixes
 
-## [8.1.1] 2023-05-22
+## [8.1.1] (2023-05-22)
 
 ### Changed
 
 - Typescript fixes
 
-## [8.1.0] 2023-05-17
+## [8.1.0] (2023-05-17)
 
 ### Changed
 
@@ -274,7 +274,7 @@ All notable changes to this project will be documented in this file.
 - app orderbook accept `"any"` for the app address to fetch orderbook without filtering on app
 - dataset orderbook accept `"any"` for the dataset address to fetch orderbook without filtering on dataset
 
-## [8.0.0] 2023-04-07
+## [8.0.0] (2023-04-07)
 
 ### Added
 
@@ -318,39 +318,39 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] goerli is no longer available in the default configuration
 - [BREAKING] removed now useless faucet commands `iexec wallet get-RLC` and `iexec wallet get-ether`
 
-## [7.2.5] 2023-04-03
+## [7.2.5] (2023-04-03)
 
 ### Changed
 
 - changed IPFS default gateway to v7 stack specific gateway
 - fix API providers configuration
 
-## [7.2.4] 2023-01-12
+## [7.2.4] (2023-01-12)
 
 ### Changed
 
 - fix `iexec orderbook` raw pagination
 
-## [7.2.3] 2022-12-14
+## [7.2.3] (2022-12-14)
 
 ### Changed
 
 - TypeScript fixes
 
-## [7.2.2] 2022-09-05
+## [7.2.2] (2022-09-05)
 
 ### Changed
 
 - TypeScript fixes
 - [DEPRECATED] request param `iexec_developer_logger` was removed from iExec worker, using this param no longer have an effect. `iexec_developer_logger` will be removed in a next version.
 
-## [7.2.1] 2022-07-25
+## [7.2.1] (2022-07-25)
 
 ## Changed
 
 - TypeScript fixes
 
-## [7.2.0] 2022-07-05
+## [7.2.0] (2022-07-05)
 
 ### Added
 
@@ -369,7 +369,7 @@ All notable changes to this project will be documented in this file.
 - `iexec ens register <label> --for <address>` default domain is selected given the nature of `--for` address
 - [DEPRECATED] Node 12 support will be dropped
 
-## [7.1.1] 2022-06-06
+## [7.1.1] (2022-06-06)
 
 ### Changed
 
@@ -377,7 +377,7 @@ All notable changes to this project will be documented in this file.
 - fix typo in `iexec storage init --raw` output
 - fix typo in `iexec storage check --raw` output
 
-## [7.1.0] 2022-04-11
+## [7.1.0] (2022-04-11)
 
 ### Added
 
@@ -393,7 +393,7 @@ All notable changes to this project will be documented in this file.
 - documentation refactoring
 - fix ENS configure resolution removed useless transaction for EOA
 
-## [7.0.2] 2022-02-16
+## [7.0.2] (2022-02-16)
 
 ### Added
 
@@ -405,13 +405,13 @@ All notable changes to this project will be documented in this file.
 
 - update deps
 
-## [7.0.1] 2022-01-10
+## [7.0.1] (2022-01-10)
 
 ### Changed
 
 - fix `colors` to uncorrupted version
 
-## [7.0.0] 2021-12-17
+## [7.0.0] (2021-12-17)
 
 ### Added
 
@@ -430,7 +430,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [6.0.0] 2021-07-19
+## [6.0.0] (2021-07-19)
 
 ### Added
 
@@ -473,13 +473,13 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] drop previously deprecated `iexec.orderbook.fetchRequestOrderbook()` returned value `requestOrders` use `orders`
 - [BREAKING] drop previously deprecated `task.waitForTaskStatusChange(taskid, initialStatus)` use `task.obsTask(taskid)`
 
-## [5.3.1] 2021-07-12
+## [5.3.1] (2021-07-12)
 
 ### changed
 
 - set ethers version to ~5.3.1 for pre berlin fork compatibility (iExec sidechains)
 
-## [5.3.0] 2021-05-05
+## [5.3.0] (2021-05-05)
 
 ### changed
 
@@ -489,7 +489,7 @@ All notable changes to this project will be documented in this file.
 
 - [BREAKING] drop support for Node 10
 
-## [5.2.0] 2021-01-22
+## [5.2.0] (2021-01-22)
 
 ### Added
 
@@ -511,7 +511,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [5.1.0] 2020-11-09
+## [5.1.0] (2020-11-09)
 
 ### Added
 
@@ -540,7 +540,7 @@ All notable changes to this project will be documented in this file.
 - undocumented option `beforeTimestamp` removed from `iexec.deal.fetchRequesterDeals()`
 - undocumented output value `openVolume` removed from `iexec.orderbook.fetchWorkerpoolOrderbook()` and `iexec orderbook workerpool`
 
-## [5.0.1] 2020-08-26
+## [5.0.1] (2020-08-26)
 
 ### Added
 
@@ -556,7 +556,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [5.0.0] 2020-07-22
+## [5.0.0] (2020-07-22)
 
 ### Added
 
@@ -612,7 +612,7 @@ All notable changes to this project will be documented in this file.
 
 - [BREAKING] `aes-256-cbc` dataset encryption is removed, only `scone` encryption is supported (use `iexec dataset encrypt --algorithm scone`)
 
-## [4.0.3] 2020-02-27
+## [4.0.3] (2020-02-27)
 
 ### Added
 
@@ -629,7 +629,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [4.0.2] 2020-02-12
+## [4.0.2] (2020-02-12)
 
 ### Added
 
@@ -645,7 +645,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [4.0.1] - 2020-01-17
+## [4.0.1] (2020-01-17)
 
 ### Added
 
@@ -662,7 +662,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [4.0.0] - 2019-12-13
+## [4.0.0] (2019-12-13)
 
 ### Added
 
@@ -697,7 +697,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] curated utils
 - [BREAKING] imports of `wallet`, `account`, `order`, `orderbook`, `deal`, `task`, `hub` are removed.
 
-## [3.1.1] - 2019-10-17
+## [3.1.1] (2019-10-17)
 
 ### Added
 
@@ -712,7 +712,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [3.1.0] - 2019-09-25
+## [3.1.0] (2019-09-25)
 
 ### Added
 
@@ -763,7 +763,7 @@ All notable changes to this project will be documented in this file.
 - [BREAKING] `iexec deal show <dealid> --tasks <...index>` `--tasks` option is removed, as deal's tasks are added to the output.
 - [BREAKING] `iexec tee` subcommands removed and replaced (see changed)
 
-## [3.0.36] - 2019-09-24
+## [3.0.36] (2019-09-24)
 
 ### Added
 
@@ -773,7 +773,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [3.0.35] - 2019-09-23
+## [3.0.35] (2019-09-23)
 
 ### Added
 
@@ -790,7 +790,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-## [3.0.34] - 2019-07-10
+## [3.0.34] (2019-07-10)
 
 ### Added
 
@@ -800,7 +800,7 @@ All notable changes to this project will be documented in this file.
 
 - request orders are no longer initialized with formatted params
 
-## [3.0.33] - 2019-06-25
+## [3.0.33] (2019-06-25)
 
 ### Added
 
@@ -812,7 +812,7 @@ All notable changes to this project will be documented in this file.
 - `iexec tee encrypt-dataset` now supports dataset folders.
 - CLI fix typo
 
-## [3.0.32] - 2019-05-29
+## [3.0.32] (2019-05-29)
 
 ### Added
 
@@ -826,13 +826,13 @@ All notable changes to this project will be documented in this file.
 
 - limit methods exported from `utils` module.
 
-## [3.0.31] - 2019-05-22
+## [3.0.31] (2019-05-22)
 
 ### Changed
 
 - `iexec tee encrypt-dataset` now use nodejs implementation (previously dockerized Openssl 1.1.1b).
 
-## [3.0.30] - 2019-05-17
+## [3.0.30] (2019-05-17)
 
 ### Added
 
@@ -842,6 +842,6 @@ All notable changes to this project will be documented in this file.
 
 - beneficiary keys generated by `iexec tee generate-beneficiary-keys` now use AES 256 (previously AES 128).
 
-## [3.0.29] - 2019-05-15
+## [3.0.29] (2019-05-15)
 
 This is the initial release of iExec v3.
