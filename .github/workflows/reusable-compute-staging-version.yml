@@ -25,10 +25,8 @@ jobs:
           COMMIT_SHA="${{ github.sha }}"
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
           STAGING_VERSION="${CURRENT_VERSION}-${BRANCH}-${COMMIT_SHA::7}"
-          echo "VERSION=${STAGING_VERSION}" >> $GITHUB_OUTPUT
-          echo "DIST_TAG=${BRANCH}" >> $GITHUB_OUTPUT
-          echo "VERSION=${STAGING_VERSION}"
-          echo "DIST_TAG=${BRANCH}"
+          echo "VERSION=${STAGING_VERSION}" | tee -a $GITHUB_OUTPUT
+          echo "DIST_TAG=${BRANCH}" | tee -a $GITHUB_OUTPUT
     outputs:
       version: ${{ steps.set-publish-version.outputs.VERSION }}
       dist-tag: ${{ steps.set-publish-version.outputs.DIST_TAG }}
