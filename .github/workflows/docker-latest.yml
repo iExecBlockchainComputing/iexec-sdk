@@ -1,0 +1,33 @@
+name: docker publish latest
+description: Publish on docker registry when a release is published
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Set publish version
+        id: set-publish-version
+        run: |
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          echo "VERSION=${CURRENT_VERSION}" | tee -a $GITHUB_OUTPUT
+    outputs:
+      version: ${{ steps.set-publish-version.outputs.VERSION }}
+
+  docker-publish:
+    uses: ./.github/workflows/reusable-docker.yml
+    needs: get-version
+    with:
+      tag: ${{ needs.get-version.outputs.version }}
+    secrets:
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker-password: ${{ secrets.DOCKERHUB_TOKEN }}
