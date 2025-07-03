@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.17.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/iexec-v8.16.0...iexec-v8.17.0) (2025-07-03)
+
+
+### Added
+
+* add optional custom voucherAddress to estimateMatchOrder and matchOrders ([e4889d0](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/e4889d0a00394cb170c48a97eb4316ba4954b185))
+* **cli:** update Scone TEE app template to v5.9 ([#441](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/441)) ([f582cf6](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/f582cf6f56c4a1ef9e4963ae9208950a3b5f93ae))
+* experimental networks ([#439](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/439)) ([6264a7b](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/6264a7bcb49d3bb7a0ab5e13f7c0e61fb01f4380))
+* support aes-256-cbc encrypted results decryption ([fc09fe1](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/fc09fe1792400e6e463a2458e6bc822b801df310))
+* support aes-256-cbc encrypted results decryption ([5af1ca5](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/5af1ca5e81673c74e2c2a94927e521ded6ecb58d))
+
+
+### Changed
+
+* move bn.js type to dependency to fix BN type reexport issue ([6fbe489](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/6fbe489eac0c8713b1f9bab327b57b485ff1853a))
+* move bn.js type to dependency to fix BN type reexport issue ([157d85b](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/157d85b2449a0d51c0292b483dc317c667ba481b))
+* move bn.js type to dependency to fix BN type reexport issue ([14300fe](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/14300fe94cfdfdaf441370e2fb7ec4136f8f8282))
+* provide default param to createVoucherType ([c989d72](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/c989d7248969aba212c5da084f58ac04b1b8b50e))
+* reverted VOUCHER_HUB_ADDRESS to 'TO BE DEPLOYED ([6134aac](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/6134aac5a8a2e23537e2e0f58c8ba43e55c7356a))
+
 ## [8.16.0] (2025-06-19)
 
 ### Added
