@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.16.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.16.0...v8.16.1) (2025-07-03)
+
+
+### Changed
+
+* drop support for node 18 ([#449](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/449)) ([4d48d18](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/4d48d18dca4f36e747fb970b7e7519be2a302fb2))
+
 ## [8.16.0] (2025-06-19)
 
 ### Added
