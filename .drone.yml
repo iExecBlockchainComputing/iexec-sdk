@@ -14,7 +14,7 @@ trigger:
 
 steps:
   - name: install
-    image: node:18
+    image: node:20
     pull: always
     commands:
       - node -v
@@ -22,28 +22,28 @@ steps:
       - npm ci
 
   - name: build
-    image: node:18
+    image: node:20
     commands:
       - npm run build
     depends_on:
       - install
 
   - name: format
-    image: node:18.19
+    image: node:20
     commands:
       - npm run check-format
     depends_on:
       - build
 
   - name: lint
-    image: node:18.19
+    image: node:20
     commands:
       - npm run lint
     depends_on:
       - build
 
   - name: set-version-nightly
-    image: node:18
+    image: node:20
     commands:
       - eval npm pkg set version="$(npm pkg get version)-nightly-$DRONE_COMMIT"
 
@@ -98,7 +98,7 @@ trigger:
 
 steps:
   - name: install
-    image: node:18
+    image: node:20
     pull: always
     commands:
       - node -v
@@ -106,21 +106,21 @@ steps:
       - npm ci
 
   - name: build
-    image: node:18
+    image: node:20
     commands:
       - npm run build
     depends_on:
       - install
 
   - name: format
-    image: node:18.19
+    image: node:20
     commands:
       - npm run check-format
     depends_on:
       - build
 
   - name: lint
-    image: node:18.19
+    image: node:20
     commands:
       - npm run lint
     depends_on:

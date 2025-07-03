@@ -31,7 +31,7 @@ jobs:
   test:
     uses: ./.github/workflows/reusable-test.yml
     with:
-      node-version: '18'
+      node-version: '20'
       upload-coverage: true
     secrets:
       infura-project-id: ${{ secrets.INFURA_PROJECT_ID }}
@@ -44,7 +44,7 @@ jobs:
     if: ${{ startsWith('release-please--',  github.ref_name ) }}
     strategy:
       matrix:
-        node-version: ['20', '22', '24']
+        node-version: ['22', '24']
     with:
       node-version:
     secrets:
