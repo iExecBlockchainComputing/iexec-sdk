@@ -12,8 +12,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker.yml
     needs: compute-staging-version
     with:
-      dry-run: true # TODO set to false
       tag: ${{ needs.compute-staging-version.outputs.version }}
     secrets:
-      docker-username: ${{ secrets.DOCKERHUB_USERNAME }} # TODO ensure secret is set
-      docker-password: ${{ secrets.DOCKERHUB_TOKEN }} # TODO ensure secret is set
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker-password: ${{ secrets.DOCKERHUB_TOKEN }}
