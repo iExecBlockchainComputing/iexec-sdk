@@ -42,3 +42,5 @@ errors/**
 # generated files
 docs/
 src/common/generated
+CHANGELOG.md
+.release-please-manifest.json
