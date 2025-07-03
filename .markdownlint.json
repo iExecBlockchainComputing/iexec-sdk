@@ -1,5 +1,8 @@
 {
   "default": true,
+  "MD012": {
+    "maximum": 2
+  },
   "MD013": false,
   "MD024": false,
   "MD033": {
