@@ -64,7 +64,7 @@ current IExecConfig
 
 ### getNetwork
 
-▸ **getNetwork**(): `Promise`<{ `chainId`: `number` ; `isNative`: `boolean`  }\>
+▸ **getNetwork**(): `Promise`<{ `chainId`: `string` ; `isNative`: `boolean`  }\>
 
 get info about the current iExec network
 
@@ -78,7 +78,7 @@ console.log(`working on chain ${chainId}, using native token: ${isNative}`);
 
 #### Returns
 
-`Promise`<{ `chainId`: `number` ; `isNative`: `boolean`  }\>
+`Promise`<{ `chainId`: `string` ; `isNative`: `boolean`  }\>
 
 ___
 

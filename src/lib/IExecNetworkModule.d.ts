@@ -19,7 +19,7 @@ export default class IExecNetworkModule extends IExecModule {
    * console.log(`working on chain ${chainId}, using native token: ${isNative}`);
    * ```
    */
-  getNetwork(): Promise<{ chainId: number; isNative: boolean }>;
+  getNetwork(): Promise<{ chainId: string; isNative: boolean }>;
   /**
    * Create an IExecNetworkModule instance using an IExecConfig instance
    */
