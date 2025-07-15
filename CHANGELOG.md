@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.16.2](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.16.1...v8.16.2) (2025-07-15)
+
+
+### Changed
+
+* typescript fix getNetwork() return type ([#452](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/452)) ([9c747d0](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/9c747d059d7e4159e389156e8706c7f55ea6e90e))
+
 ## [8.16.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.16.0...v8.16.1) (2025-07-03)
 
 
