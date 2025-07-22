@@ -25,9 +25,14 @@ export default class IExecTaskModule extends IExecModule {
     this.fetchLogs = async (taskid) =>
       fetchAllReplicatesLogs(
         await this.config.resolveContractsClient(),
+        await this.config.resolveCompassURL(),
         taskid,
       );
     this.fetchOffchainInfo = async (taskid) =>
-      fetchTaskOffchainInfo(await this.config.resolveContractsClient(), taskid);
+      fetchTaskOffchainInfo(
+        await this.config.resolveContractsClient(),
+        await this.config.resolveCompassURL(),
+        taskid,
+      );
   }
 }

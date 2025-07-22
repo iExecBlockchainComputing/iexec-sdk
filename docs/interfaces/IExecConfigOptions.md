@@ -9,6 +9,7 @@
 - [allowExperimentalNetworks](IExecConfigOptions.md#allowexperimentalnetworks)
 - [bridgeAddress](IExecConfigOptions.md#bridgeaddress)
 - [bridgedNetworkConf](IExecConfigOptions.md#bridgednetworkconf)
+- [compassURL](IExecConfigOptions.md#compassurl)
 - [confirms](IExecConfigOptions.md#confirms)
 - [defaultTeeFramework](IExecConfigOptions.md#defaultteeframework)
 - [ensPublicResolverAddress](IExecConfigOptions.md#enspublicresolveraddress)
@@ -58,6 +59,14 @@ override the bridged network configuration
 | `chainId?` | `string` \| `number` | bridged network chainId |
 | `hubAddress?` | `string` | IExec contract address on bridged network |
 | `rpcURL?` | `string` | bridged network node url |
+
+___
+
+### compassURL
+
+• `Optional` **compassURL**: `string`
+
+override the compass URL to target a custom instance
 
 ___
 

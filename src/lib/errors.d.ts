@@ -150,6 +150,11 @@ export class MarketCallError extends ApiCallError {}
 export class IpfsGatewayCallError extends ApiCallError {}
 
 /**
+ * CompassCallError encapsulates an error occurring during a call to the Compass API such as a network error or a server-side internal error.
+ */
+export class CompassCallError extends ApiCallError {}
+
+/**
  * WorkerpoolCallError encapsulates an error occurring during a call to a workerpool API such as a network error or a server-side internal error.
  */
 export class WorkerpoolCallError extends ApiCallError {}

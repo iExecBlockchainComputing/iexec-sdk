@@ -102,6 +102,12 @@ export interface IExecConfigOptions {
    * override the IExec market URL to target a custom instance
    */
   iexecGatewayURL?: string;
+
+  /**
+   * @experimental
+   * override the compass URL to target a custom instance
+   */
+  compassURL?: string;
   /**
    * override the PoCo subgraph URL to target a custom instance
    */
@@ -186,6 +192,11 @@ export default class IExecConfig {
    * resolve the current IExec market URL
    */
   resolveIexecGatewayURL(): Promise<string>;
+  /**
+   * @experimental
+   * resolve the current Compass URL
+   */
+  resolveCompassURL(): Promise<string | undefined>;
   /**
    * resolve the current IPFS gateway URL
    */

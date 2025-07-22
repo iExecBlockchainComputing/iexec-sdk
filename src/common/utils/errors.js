@@ -118,6 +118,13 @@ export class IpfsGatewayCallError extends ApiCallError {
   }
 }
 
+export class CompassCallError extends ApiCallError {
+  constructor(message, originalError) {
+    super(`Compass API error: ${message}`, originalError);
+    this.name = this.constructor.name;
+  }
+}
+
 export class WorkerpoolCallError extends ApiCallError {
   constructor(message, ...args) {
     super(`Workerpool API error: ${message}`, ...args);

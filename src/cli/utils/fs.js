@@ -33,6 +33,7 @@ const chainConfSchema = () =>
     resultProxy: string(),
     ipfsGateway: string(),
     iexecGateway: string(),
+    compass: string(),
     pocoSubgraph: string(),
     voucherSubgraph: string(),
     native: boolean(),

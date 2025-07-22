@@ -212,7 +212,7 @@ show
               throw e;
             }
           }),
-          getWorkerpoolApiUrl(chain.contracts, addressOrIndex),
+          getWorkerpoolApiUrl(chain.contracts, chain.compass, addressOrIndex),
         ]);
       } else {
         showInfo = await showUserWorkerpool(
@@ -228,7 +228,11 @@ show
               throw e;
             }
           }),
-          getWorkerpoolApiUrl(chain.contracts, showInfo.objAddress),
+          getWorkerpoolApiUrl(
+            chain.contracts,
+            chain.compass,
+            showInfo.objAddress,
+          ),
         ]);
       }
       const { workerpool, objAddress } = showInfo;

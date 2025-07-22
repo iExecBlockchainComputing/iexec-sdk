@@ -5,7 +5,7 @@ import { BN } from 'bn.js';
 import { deployRandomWorkerpool, getTestConfig } from '../lib-test-utils.js';
 import { TEST_CHAINS, getId, getRandomAddress } from '../../test-utils.js';
 import '../../jest-setup.js';
-import { errors } from '../../../src/lib/index.js';
+import { errors, IExec } from '../../../src/lib/index.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 
@@ -233,7 +233,7 @@ describe('workerpool', () => {
   });
 
   describe('getWorkerpoolApiUrl()', () => {
-    test('resolves the url', async () => {
+    test('resolves the url against ENS', async () => {
       const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
         readOnly: true,
       });
@@ -252,6 +252,19 @@ describe('workerpool', () => {
       const resConfigured =
         await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
       expect(resConfigured).toBe(apiUrl);
+    });
+
+    test('resolves the url against Compass', async () => {
+      // TODO include compass in stack instead of using arbitrum-sepolia-testnet
+      const readOnlyIExec = new IExec(
+        { ethProvider: 'arbitrum-sepolia-testnet' },
+        { allowExperimentalNetworks: true },
+      );
+      const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
+        '0x39C3CdD91A7F1c4Ed59108a9da4E79dE9A1C1b59',
+      );
+      expect(typeof apiUrl).toBe('string');
+      expect(apiUrl.startsWith('https://')).toBe(true);
     });
   });
 
