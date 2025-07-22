@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.17.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.16.1...v8.17.0) (2025-07-22)
+
+
+### Added
+
+* add compass service for offchain config resolution ([#454](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/454)) ([31d4a28](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/31d4a28f00d61702883f1854e594ec4b227a88ac))
+
+
+### Changed
+
+* typescript fix getNetwork() return type ([#452](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/452)) ([9c747d0](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/9c747d059d7e4159e389156e8706c7f55ea6e90e))
+
 ## [8.16.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.16.0...v8.16.1) (2025-07-03)
 
 
