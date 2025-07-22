@@ -3,7 +3,13 @@
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { deployRandomWorkerpool, getTestConfig } from '../lib-test-utils.js';
-import { TEST_CHAINS, getId, getRandomAddress } from '../../test-utils.js';
+import {
+  SERVICE_HTTP_500_URL,
+  SERVICE_UNREACHABLE_URL,
+  TEST_CHAINS,
+  getId,
+  getRandomAddress,
+} from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors, IExec } from '../../../src/lib/index.js';
 
@@ -233,38 +239,76 @@ describe('workerpool', () => {
   });
 
   describe('getWorkerpoolApiUrl()', () => {
-    test('resolves the url against ENS', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
-        readOnly: true,
+    describe('on networks with ENS', () => {
+      test('resolves the url against ENS', async () => {
+        const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const { address } = await deployRandomWorkerpool(iexec);
+        const resNoApiUrl =
+          await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
+        expect(resNoApiUrl).toBe(undefined);
+        const label = address.toLowerCase();
+        const domain = 'pools.iexec.eth';
+        const name = `${label}.${domain}`;
+        await iexec.ens.claimName(label, domain);
+        await iexec.ens.configureResolution(name, address);
+        const apiUrl = 'https://my-workerpool.com';
+        await iexec.workerpool.setWorkerpoolApiUrl(address, apiUrl);
+        const resConfigured =
+          await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
+        expect(resConfigured).toBe(apiUrl);
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomWorkerpool(iexec);
-      const resNoApiUrl =
-        await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
-      expect(resNoApiUrl).toBe(undefined);
-      const label = address.toLowerCase();
-      const domain = 'pools.iexec.eth';
-      const name = `${label}.${domain}`;
-      await iexec.ens.claimName(label, domain);
-      await iexec.ens.configureResolution(name, address);
-      const apiUrl = 'https://my-workerpool.com';
-      await iexec.workerpool.setWorkerpoolApiUrl(address, apiUrl);
-      const resConfigured =
-        await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
-      expect(resConfigured).toBe(apiUrl);
     });
 
-    test('resolves the url against Compass', async () => {
-      // TODO include compass in stack instead of using arbitrum-sepolia-testnet
-      const readOnlyIExec = new IExec(
-        { ethProvider: 'arbitrum-sepolia-testnet' },
-        { allowExperimentalNetworks: true },
-      );
-      const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
-        '0x39C3CdD91A7F1c4Ed59108a9da4E79dE9A1C1b59',
-      );
-      expect(typeof apiUrl).toBe('string');
-      expect(apiUrl.startsWith('https://')).toBe(true);
+    describe('on networks relying on compass', () => {
+      test('resolves the url against Compass', async () => {
+        // TODO include compass in stack instead of using arbitrum-sepolia-testnet
+        const readOnlyIExec = new IExec(
+          { ethProvider: 'arbitrum-sepolia-testnet' },
+          { allowExperimentalNetworks: true },
+        );
+        const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
+          '0x39C3CdD91A7F1c4Ed59108a9da4E79dE9A1C1b59',
+        );
+        expect(typeof apiUrl).toBe('string');
+        expect(apiUrl.startsWith('https://')).toBe(true);
+      });
+
+      test('fails with CompassCallError if Compass is not available', async () => {
+        const iexecCompassNotFound = new IExec(
+          { ethProvider: 'arbitrum-sepolia-testnet' },
+          {
+            allowExperimentalNetworks: true,
+            compassURL: SERVICE_UNREACHABLE_URL,
+          },
+        );
+        await expect(
+          iexecCompassNotFound.workerpool.getWorkerpoolApiUrl(
+            getRandomAddress(),
+          ),
+        ).rejects.toThrow(
+          new errors.CompassCallError(
+            `Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+          ),
+        );
+
+        const iexecCompassInternalError = new IExec(
+          { ethProvider: 'arbitrum-sepolia-testnet' },
+          { allowExperimentalNetworks: true, compassURL: SERVICE_HTTP_500_URL },
+        );
+        await expect(
+          iexecCompassInternalError.workerpool.getWorkerpoolApiUrl(
+            getRandomAddress(),
+          ),
+        ).rejects.toThrow(
+          new errors.CompassCallError(
+            `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+            Error('Server internal error: 500 Internal Server Error'),
+          ),
+        );
+      });
     });
   });
 
