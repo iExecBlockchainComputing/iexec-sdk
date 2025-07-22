@@ -29,6 +29,7 @@ export default class IExecConfig {
       resultProxyURL,
       ipfsGatewayURL,
       iexecGatewayURL,
+      compassURL,
       pocoSubgraphURL,
       voucherSubgraphURL,
       defaultTeeFramework,
@@ -300,6 +301,11 @@ export default class IExecConfig {
       throw new ConfigurationError(
         `iexecGatewayURL option not set and no default value for your chain ${chainId}`,
       );
+    };
+
+    this.resolveCompassURL = async () => {
+      const chainConfDefaults = await chainConfDefaultsPromise;
+      return compassURL || chainConfDefaults.compass;
     };
 
     this.resolveIpfsGatewayURL = async () => {

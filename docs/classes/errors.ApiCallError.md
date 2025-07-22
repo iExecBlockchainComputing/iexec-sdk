@@ -20,6 +20,8 @@ ApiCallError encapsulates an error occurring during a call to an API such as a n
 
   ↳↳ [`IpfsGatewayCallError`](errors.IpfsGatewayCallError.md)
 
+  ↳↳ [`CompassCallError`](errors.CompassCallError.md)
+
   ↳↳ [`WorkerpoolCallError`](errors.WorkerpoolCallError.md)
 
 ## Table of contents

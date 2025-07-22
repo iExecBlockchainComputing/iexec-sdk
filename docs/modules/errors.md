@@ -8,6 +8,7 @@
 
 - [ApiCallError](../classes/errors.ApiCallError.md)
 - [BridgeError](../classes/errors.BridgeError.md)
+- [CompassCallError](../classes/errors.CompassCallError.md)
 - [ConfigurationError](../classes/errors.ConfigurationError.md)
 - [IpfsGatewayCallError](../classes/errors.IpfsGatewayCallError.md)
 - [MarketCallError](../classes/errors.MarketCallError.md)

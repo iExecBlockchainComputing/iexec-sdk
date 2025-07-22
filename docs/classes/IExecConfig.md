@@ -29,6 +29,7 @@ const wallet = IExecWalletModule.fromConfig(config);
 - [resolveBridgeBackAddress](IExecConfig.md#resolvebridgebackaddress)
 - [resolveBridgedContractsClient](IExecConfig.md#resolvebridgedcontractsclient)
 - [resolveChainId](IExecConfig.md#resolvechainid)
+- [resolveCompassURL](IExecConfig.md#resolvecompassurl)
 - [resolveContractsClient](IExecConfig.md#resolvecontractsclient)
 - [resolveEnsPublicResolverAddress](IExecConfig.md#resolveenspublicresolveraddress)
 - [resolveIexecGatewayURL](IExecConfig.md#resolveiexecgatewayurl)
@@ -120,6 +121,18 @@ resolve the current chainId
 #### Returns
 
 `Promise`<`number`\>
+
+___
+
+### resolveCompassURL
+
+▸ **resolveCompassURL**(): `Promise`<`undefined` \| `string`\>
+
+resolve the current Compass URL
+
+#### Returns
+
+`Promise`<`undefined` \| `string`\>
 
 ___
 

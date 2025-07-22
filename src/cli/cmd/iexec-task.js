@@ -206,13 +206,18 @@ debugTask
       const onchainData = await show(chain.contracts, taskid);
       const offchainData = await fetchTaskOffchainInfo(
         chain.contracts,
+        chain.compass,
         taskid,
       ).catch((e) => {
         spinner.warn(`Failed to fetch off-chain data: ${e.message}`);
       });
 
       const appLogs = opts.logs
-        ? await fetchAllReplicatesLogs(chain.contracts, taskid).catch((e) => {
+        ? await fetchAllReplicatesLogs(
+            chain.contracts,
+            chain.compass,
+            taskid,
+          ).catch((e) => {
             spinner.warn(`Failed to fetch app logs: ${e.message}`);
           })
         : undefined;

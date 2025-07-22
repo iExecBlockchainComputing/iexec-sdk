@@ -13,12 +13,13 @@ import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant.js';
 import { jsonApi, getAuthorization } from '../utils/api-utils.js';
 import { checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
-import { WorkerpoolCallError } from '../utils/errors.js';
+import { CompassCallError, WorkerpoolCallError } from '../utils/errors.js';
 
 const debug = Debug('iexec:execution:debug');
 
 export const getWorkerpoolApiUrl = async (
   contracts = throwIfMissing(),
+  compassUrl,
   workerpoolAddress,
 ) => {
   try {
@@ -28,6 +29,21 @@ export const getWorkerpoolApiUrl = async (
       .required()
       .label('workerpool address')
       .validate(workerpoolAddress);
+
+    // Compass base workerpool API URL resolution
+    if (compassUrl) {
+      const json = await jsonApi.get({
+        api: compassUrl,
+        endpoint: `/${contracts.chainId}/workerpools/${vAddress}`,
+        ApiCallErrorClass: CompassCallError,
+      });
+      if (!json?.apiUrl) {
+        throw new Error(`No apiUrl found in compass response`);
+      }
+      return json.apiUrl;
+    }
+
+    // ENS based workerpool API URL resolution
     const name = await lookupAddress(contracts, vAddress).catch(() => {
       /** return undefined */
     });
@@ -53,6 +69,7 @@ export const getWorkerpoolApiUrl = async (
 
 const getTaskOffchainApiUrl = async (
   contracts = throwIfMissing(),
+  compassUrl,
   taskid = throwIfMissing(),
 ) => {
   try {
@@ -63,7 +80,11 @@ const getTaskOffchainApiUrl = async (
     if (!workerpool) {
       throw Error(`Cannot find task's workerpool`);
     }
-    const workerpoolApiUrl = await getWorkerpoolApiUrl(contracts, workerpool);
+    const workerpoolApiUrl = await getWorkerpoolApiUrl(
+      contracts,
+      compassUrl,
+      workerpool,
+    );
     if (!workerpoolApiUrl) {
       throw Error(`Impossible to resolve API url for workerpool ${workerpool}`);
     }
@@ -76,11 +97,16 @@ const getTaskOffchainApiUrl = async (
 
 export const fetchTaskOffchainInfo = async (
   contracts = throwIfMissing(),
+  compassURL,
   taskid = throwIfMissing(),
 ) => {
   try {
     const vTaskid = await bytes32Schema().validate(taskid);
-    const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const workerpoolApiUrl = await getTaskOffchainApiUrl(
+      contracts,
+      compassURL,
+      vTaskid,
+    );
     const data = await jsonApi.get({
       api: workerpoolApiUrl,
       endpoint: `/tasks/${vTaskid}`,
@@ -106,12 +132,17 @@ export const fetchTaskOffchainInfo = async (
 
 export const fetchAllReplicatesLogs = async (
   contracts = throwIfMissing(),
+  compassURL,
   taskid = throwIfMissing(),
 ) => {
   try {
     checkSigner(contracts);
     const vTaskid = await bytes32Schema().validate(taskid);
-    const workerpoolApiUrl = await getTaskOffchainApiUrl(contracts, vTaskid);
+    const workerpoolApiUrl = await getTaskOffchainApiUrl(
+      contracts,
+      compassURL,
+      vTaskid,
+    );
     const { dealid } = await taskShow(contracts, vTaskid);
     const { requester } = await dealShow(contracts, dealid);
     const userAddress = await getAddress(contracts);

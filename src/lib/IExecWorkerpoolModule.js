@@ -36,6 +36,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
     this.getWorkerpoolApiUrl = async (workerpoolAddress) =>
       getWorkerpoolApiUrl(
         await this.config.resolveContractsClient(),
+        await this.config.resolveCompassURL(),
         workerpoolAddress,
       );
     this.predictWorkerpoolAddress = async (workerpool) =>
