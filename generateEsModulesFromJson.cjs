@@ -30,11 +30,7 @@ const sources = [
     '@iexec/poco/artifacts/contracts/registries/RegistryEntry.sol/RegistryEntry.json',
     { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
-  [
-    // warn /build/
-    '@iexec/poco/build/contracts-min/ERC1538Proxy.json',
-    { dir: '@iexec/poco', minifier: minifiers.truffleDeployment },
-  ],
+
   [
     '@iexec/poco/artifacts/contracts/IexecInterfaceToken.sol/IexecInterfaceToken.json',
     { dir: '@iexec/poco', minifier: minifiers.abi },
