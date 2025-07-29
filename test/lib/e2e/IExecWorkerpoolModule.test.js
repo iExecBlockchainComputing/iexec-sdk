@@ -263,8 +263,8 @@ describe('workerpool', () => {
     });
 
     describe('on networks relying on compass', () => {
-      test('resolves the url against Compass', async () => {
-        // TODO include compass in stack instead of using arbitrum-sepolia-testnet
+      // TODO include compass in stack instead of using arbitrum-sepolia-testnet
+      test.skip('resolves the url against Compass', async () => {
         const readOnlyIExec = new IExec(
           { ethProvider: 'arbitrum-sepolia-testnet' },
           { allowExperimentalNetworks: true },
