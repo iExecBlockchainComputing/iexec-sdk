@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.17.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.17.0...v8.17.1) (2025-07-29)
+
+
+### Changed
+
+* stop reading poco address from deprecated file ([#455](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/455)) ([0c0f109](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/0c0f109ab049c435b2f1de8a3a3fa3a7c0c81e0d))
+* update arbitrum-sepolia-testnet PoCo address to target latest diamond proxy deployment ([#457](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/457)) ([d8e4094](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/d8e4094f5f9988836fc359f068e3db687bb5b7fe))
+
 ## [8.17.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.16.1...v8.17.0) (2025-07-22)
 
 
