@@ -264,13 +264,13 @@ describe('workerpool', () => {
 
     describe('on networks relying on compass', () => {
       // TODO include compass in stack instead of using arbitrum-sepolia-testnet
-      test.skip('resolves the url against Compass', async () => {
+      test('resolves the url against Compass', async () => {
         const readOnlyIExec = new IExec(
           { ethProvider: 'arbitrum-sepolia-testnet' },
           { allowExperimentalNetworks: true },
         );
         const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
-          '0x39C3CdD91A7F1c4Ed59108a9da4E79dE9A1C1b59',
+          '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
         );
         expect(typeof apiUrl).toBe('string');
         expect(apiUrl.startsWith('https://')).toBe(true);
