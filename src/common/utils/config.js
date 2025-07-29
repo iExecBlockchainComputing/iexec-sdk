@@ -54,7 +54,7 @@ const networkConfigs = [
   {
     id: 421614,
     name: 'arbitrum-sepolia-testnet',
-    hub: '0x14B465079537655E1662F012e99EBa3863c8B9E0',
+    hub: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
     host: 'https://sepolia-rollup.arbitrum.io/rpc',
     ensRegistry: undefined, // not supported
     ensPublicResolver: undefined, // not supported
