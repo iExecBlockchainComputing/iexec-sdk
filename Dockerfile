@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
-ENV NODE_NO_WARNINGS 1
-ENV user node
+ENV NODE_NO_WARNINGS=1
+ENV user=node
 ENV PATH=/home/node/.npm-global/bin:$PATH
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
