@@ -14,8 +14,8 @@ USER $user
 RUN mkdir /home/$user/.npm-global
 
 WORKDIR /home/$user/app
-RUN npm install
-RUN npm run build
-RUN npm -g install . --no-optional
+RUN npm ci && \
+    npm run build && \
+    npm -g install . --no-optional
 
 ENTRYPOINT ["iexec"]
