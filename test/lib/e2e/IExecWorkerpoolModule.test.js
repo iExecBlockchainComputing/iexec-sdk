@@ -263,12 +263,10 @@ describe('workerpool', () => {
     });
 
     describe('on networks relying on compass', () => {
-      // TODO include compass in stack instead of using arbitrum-sepolia-testnet
+      const noEnsTestChain = TEST_CHAINS['custom-token-chain-no-ens'];
+
       test('resolves the url against Compass', async () => {
-        const readOnlyIExec = new IExec(
-          { ethProvider: 'arbitrum-sepolia-testnet' },
-          { allowExperimentalNetworks: true },
-        );
+        const { iexec: readOnlyIExec } = getTestConfig(noEnsTestChain)();
         const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
           '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
         );
@@ -276,14 +274,24 @@ describe('workerpool', () => {
         expect(apiUrl.startsWith('https://')).toBe(true);
       });
 
+      test('throw if the workerpool does not exist in Compass', async () => {
+        const { iexec: readOnlyIExec } = getTestConfig(noEnsTestChain)();
+        const address = getRandomAddress();
+        await expect(
+          readOnlyIExec.workerpool.getWorkerpoolApiUrl(address),
+        ).rejects.toThrow(
+          Error(
+            `API error: Workerpool with address '${address}' not found in chain '${noEnsTestChain.chainId}'`,
+          ),
+        );
+      });
+
       test('fails with CompassCallError if Compass is not available', async () => {
-        const iexecCompassNotFound = new IExec(
-          { ethProvider: 'arbitrum-sepolia-testnet' },
-          {
-            allowExperimentalNetworks: true,
+        const { iexec: iexecCompassNotFound } = getTestConfig(noEnsTestChain)({
+          options: {
             compassURL: SERVICE_UNREACHABLE_URL,
           },
-        );
+        });
         await expect(
           iexecCompassNotFound.workerpool.getWorkerpoolApiUrl(
             getRandomAddress(),
@@ -294,10 +302,13 @@ describe('workerpool', () => {
           ),
         );
 
-        const iexecCompassInternalError = new IExec(
-          { ethProvider: 'arbitrum-sepolia-testnet' },
-          { allowExperimentalNetworks: true, compassURL: SERVICE_HTTP_500_URL },
-        );
+        const { iexec: iexecCompassInternalError } = getTestConfig(
+          noEnsTestChain,
+        )({
+          options: {
+            compassURL: SERVICE_HTTP_500_URL,
+          },
+        });
         await expect(
           iexecCompassInternalError.workerpool.getWorkerpoolApiUrl(
             getRandomAddress(),
