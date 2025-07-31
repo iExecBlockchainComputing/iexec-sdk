@@ -73,6 +73,27 @@ const networkConfigs = [
     shouldRegisterNetwork: false,
     isExperimental: true,
   },
+  {
+    id: 42161,
+    name: 'arbitrum-mainnet',
+    hub: 'TODO', // TODO: replace with actual poco address
+    host: 'https://arb1.arbitrum.io/rpc',
+    ensRegistry: undefined, // not supported
+    ensPublicResolver: undefined, // not supported
+    sms: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-mainnet.iex.ec',
+    },
+    resultProxy: undefined, // not exposed
+    ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
+    iexecGateway: 'https://api-market.arbitrum-mainnet.iex.ec',
+    compass: 'https://compass.arbitrum-mainnet.iex.ec',
+    pocoSubgraph:
+      'https://thegraph.arbitrum-mainnet.iex.ec/api/subgraphs/id/TODO', // TODO: replace with actual subgraph ID
+    voucherHub: undefined, // no voucher
+    voucherSubgraph: undefined, // no voucher
+    bridge: {}, // no bridge
+    shouldRegisterNetwork: false,
+  },
 ];
 
 export const getId = (idOrName, { allowExperimentalNetworks = false } = {}) =>
