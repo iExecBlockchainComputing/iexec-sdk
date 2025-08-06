@@ -1,6 +1,6 @@
-import { Network, EnsPlugin } from 'ethers';
-import { TEE_FRAMEWORKS } from './constant.js';
+import { EnsPlugin, Network } from 'ethers';
 import { address as voucherHubBellecourAddress } from '../generated/@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.js';
+import { TEE_FRAMEWORKS } from './constant.js';
 
 const networkConfigs = [
   {
@@ -72,6 +72,27 @@ const networkConfigs = [
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     isExperimental: true,
+  },
+  {
+    id: 42161,
+    name: 'arbitrum-mainnet',
+    hub: '0x098bFCb1E50ebcA0BaA92C12eA0c3F045A1aD9f0',
+    host: 'https://arb1.arbitrum.io/rpc',
+    ensRegistry: undefined, // not supported
+    ensPublicResolver: undefined, // not supported
+    sms: {
+      [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-mainnet.iex.ec',
+    },
+    resultProxy: undefined, // not exposed
+    ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
+    iexecGateway: 'https://api.market.arbitrum-mainnet.iex.ec',
+    compass: 'https://compass.arbitrum-mainnet.iex.ec',
+    pocoSubgraph:
+      'https://thegraph.arbitrum.iex.ec/api/subgraphs/id/B1comLe9SANBLrjdnoNTJSubbeC7cY7EoNu6zD82HeKy',
+    voucherHub: undefined, // no voucher
+    voucherSubgraph: undefined, // no voucher
+    bridge: {}, // no bridge
+    shouldRegisterNetwork: false,
   },
 ];
 

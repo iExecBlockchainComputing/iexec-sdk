@@ -19,6 +19,7 @@ A web3 Eth provider, a network name, a chain id or an ethers provider
 read-only provider examples:
 - `"mainnet"` or `1` or `"1"` for ethereum mainnet provider
 - `"bellecour"` or `134` or `"134"` for iExec sidechain
+- `"arbitrum-mainnet"` or `42161` or `"42161"` for arbitrum mainnet provider
 - `"http://localhost:8545"` for local chain
 - `new ethers.JsonRpcProvider("https://bellecour.iex.ec")` ethers provider connected to bellecour
 

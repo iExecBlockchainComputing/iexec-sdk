@@ -148,6 +148,7 @@ export const chains = {
   chains: {
     mainnet: {},
     bellecour: {},
+    'arbitrum-mainnet': {},
   },
 };
 
