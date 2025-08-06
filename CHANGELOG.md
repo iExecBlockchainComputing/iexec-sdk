@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.18.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.17.1...v8.18.0) (2025-08-06)
+
+
+### Added
+
+* add support for arbitrum-mainnet ([#460](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/460)) ([8607611](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/8607611e046e53b9cf4b1059a672bfd76c536ff9))
+
 ## [8.17.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.17.0...v8.17.1) (2025-07-29)
 
 
