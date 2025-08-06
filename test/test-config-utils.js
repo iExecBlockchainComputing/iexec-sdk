@@ -21,6 +21,7 @@ export const getTestConfigOptions =
     isNative: options.isNative ?? chain.isNative,
     providerOptions: options.providerOptions ?? chain.providerOptions,
     resultProxyURL: options.resultProxyURL ?? chain.resultProxyURL,
+    compassURL: options.compassURL ?? chain.compassURL,
     smsURL: options.smsURL ?? chain.smsMap,
     useGas: options.useGas ?? chain.useGas,
   });

@@ -1,0 +1,14 @@
+[
+  {
+    "chainId": "65535",
+    "description": "custom-token-chain-no-ens",
+    "iapps": [],
+    "workerpools": [
+      {
+        "name": "custom-token-chain-no-ens-workerpool",
+        "apiUrl": "https://core.custom-token-chain-no-ens.iex.ec",
+        "address": "0xB967057a21dc6A66A29721d96b8Aa7454B7c383F"
+      }
+    ]
+  }
+]

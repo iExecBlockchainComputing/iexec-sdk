@@ -81,6 +81,27 @@ export const TEST_CHAINS = {
     },
     isAnvil: false,
   },
+  'custom-token-chain-no-ens': {
+    rpcURL: 'http://localhost:18545',
+    chainId: '65535',
+    hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
+    pocoAdminWallet: new Wallet(
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+    ),
+    compassURL: 'http://localhost:8069',
+    // TODO use another wallet
+    faucetWallet: new Wallet(
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+    ),
+    provider: new JsonRpcProvider('http://localhost:18545', undefined, {
+      pollingInterval: 100,
+    }),
+    defaults: {
+      isNative: false,
+      useGas: true,
+    },
+    isAnvil: false,
+  },
   'bellecour-fork': {
     rpcURL: 'http://localhost:8545',
     chainId: '134',
