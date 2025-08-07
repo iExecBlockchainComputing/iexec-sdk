@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
-ENV NODE_NO_WARNINGS 1
-ENV user node
+ENV NODE_NO_WARNINGS=1
+ENV user=node
 ENV PATH=/home/node/.npm-global/bin:$PATH
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
@@ -14,8 +14,8 @@ USER $user
 RUN mkdir /home/$user/.npm-global
 
 WORKDIR /home/$user/app
-RUN npm install
-RUN npm run build
-RUN npm -g install . --no-optional
+RUN npm ci && \
+    npm run build && \
+    npm -g install . --no-optional
 
 ENTRYPOINT ["iexec"]
