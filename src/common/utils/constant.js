@@ -43,6 +43,7 @@ export const IEXEC_REQUEST_PARAMS = {
   IEXEC_RESULT_ENCRYPTION: 'iexec_result_encryption',
   IEXEC_RESULT_STORAGE_PROVIDER: 'iexec_result_storage_provider',
   IEXEC_RESULT_STORAGE_PROXY: 'iexec_result_storage_proxy',
+  IEXEC_BULK_CID: 'bulk_cid',
 };
 
 export const ANY = 'any';
