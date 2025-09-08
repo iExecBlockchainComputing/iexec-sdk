@@ -8,6 +8,7 @@
 
 ### Properties
 
+- [bulk\_cid](internal_.RequestorderParams.md#bulk_cid)
 - [iexec\_args](internal_.RequestorderParams.md#iexec_args)
 - [iexec\_input\_files](internal_.RequestorderParams.md#iexec_input_files)
 - [iexec\_result\_encryption](internal_.RequestorderParams.md#iexec_result_encryption)
@@ -16,6 +17,16 @@
 - [iexec\_secrets](internal_.RequestorderParams.md#iexec_secrets)
 
 ## Properties
+
+### bulk\_cid
+
+• `Optional` **bulk\_cid**: `string`
+
+bulk CID for the request
+
+default none
+
+___
 
 ### iexec\_args
 

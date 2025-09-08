@@ -312,6 +312,7 @@ export const objParamsSchema = () =>
   object({
     [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: paramsArgsSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_BULK_CID]: string().notRequired(), // TODO add CID validation
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',
