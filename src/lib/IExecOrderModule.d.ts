@@ -257,6 +257,12 @@ export interface RequestorderParams {
    * result proxy url
    */
   iexec_result_storage_proxy?: string;
+  /**
+   * bulk CID for the request
+   *
+   * default none
+   */
+  bulk_cid?: string;
 }
 
 /**

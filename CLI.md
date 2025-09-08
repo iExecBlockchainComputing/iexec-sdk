@@ -1067,6 +1067,7 @@ Options:
 | --dataset \<address\|"deployed"\> | dataset address, use "deployed" to use last deployed from "deployed.json" |
 | --workerpool \<address\|"deployed"\> | workerpool address, use "deployed" to use last deployed from "deployed.json" |
 | --args \<string\> | specify the arguments to pass to the app |
+| --bulk-cid \<CID\> | specify the bulk CID to use for the request |
 | --input-files \<fileUrl\> | specify the URL of input files to be used by the app<br/>\* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip |
 | --secret \<secretMapping...\> | specify the requester secrets mappings (\<appSecretKey\>=\<requesterSecretName\>) to use in the app (only available for TEE tasks, use with --tag tee)<br/>\* usage: <br/>  \* \[command\] \[args\] --secret 1=login 2=password<br/>  \* \[command\] \[args\] --secret 1=login --secret 2=password<br/>  \* \[command\] --secret 1=login --secret 2=password -- \[args\]<br/>\* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list<br/> |
 | --category \<id\> | id of the task category |
@@ -1109,6 +1110,7 @@ Options:
 | --dataset-price \<amount unit...\> | dataset price per task (default unit nRLC) |
 | --workerpool-price \<amount unit...\> | workerpool price per task (default unit nRLC) |
 | --args \<string\> | specify the arguments to pass to the app |
+| --bulk-cid \<CID\> | specify the bulk CID to use for the request |
 | --input-files \<fileUrl\> | specify the URL of input files to be used by the app<br/>\* usage: --input-files https://example.com/foo.txt,https://example.com/bar.zip |
 | --secret \<secretMapping...\> | specify the requester secrets mappings (\<appSecretKey\>=\<requesterSecretName\>) to use in the app (only available for TEE tasks, use with --tag tee)<br/>\* usage: <br/>  \* \[command\] \[args\] --secret 1=login 2=password<br/>  \* \[command\] \[args\] --secret 1=login --secret 2=password<br/>  \* \[command\] --secret 1=login --secret 2=password -- \[args\]<br/>\* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list<br/> |
 | --category \<id\> | id of the task category |
