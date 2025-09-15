@@ -47,14 +47,10 @@ export const stringNumberSchema = ({ message } = {}) =>
 export const integerSchema = () => number().integer();
 
 export const positiveIntSchema = () =>
-  integerSchema()
-    .min(0)
-    .max(Number.MAX_SAFE_INTEGER - 1);
+  integerSchema().min(0).max(Number.MAX_SAFE_INTEGER);
 
 export const positiveStrictIntSchema = () =>
-  integerSchema()
-    .min(1)
-    .max(Number.MAX_SAFE_INTEGER - 1);
+  integerSchema().min(1).max(Number.MAX_SAFE_INTEGER);
 
 export const hexnumberSchema = () =>
   string()
