@@ -36,6 +36,7 @@ module exposing order methods
 - [hashRequestorder](IExecOrderModule.md#hashrequestorder)
 - [hashWorkerpoolorder](IExecOrderModule.md#hashworkerpoolorder)
 - [matchOrders](IExecOrderModule.md#matchorders)
+- [prepareDatasetBulk](IExecOrderModule.md#preparedatasetbulk)
 - [publishApporder](IExecOrderModule.md#publishapporder)
 - [publishDatasetorder](IExecOrderModule.md#publishdatasetorder)
 - [publishRequestorder](IExecOrderModule.md#publishrequestorder)
@@ -503,6 +504,43 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 #### Returns
 
 `Promise`<{ `dealid`: `string` ; `txHash`: `string` ; `volume`: [`BN`](utils.BN.md)  }\>
+
+___
+
+### prepareDatasetBulk
+
+▸ **prepareDatasetBulk**(`datasetorders`, `options?`): `Promise`<{ `cid`: `string` ; `volume`: `number`  }\>
+
+Prepare a bulk from datasetorders to process multiple datasets with a single requestorder
+
+NB:
+- datasetorders used must authorize the requester to use the dataset in for free with an infinite volume (`utils.DATASET_INFINITE_VOLUME`)
+- depending on the number of datasetorders provided and the `maxDatasetPerTask` option, the bulk might require be splitted into multiple tasks to respect the max dataset per task limit, the returned `volume` is the number of tasks required to process the bulk
+
+example:
+```js
+const { bulkCid, volume } = await prepareDatasetBulk(datasetorders, { maxDatasetPerTask: 5 });
+console.log(`bulk_cid: ${bulkCid}, volume: ${volume}`);
+
+const requestorderTemplate = await createRequestorder({
+  app: appAddress,
+  category: 0,
+  volume: volume, // set the volume
+  params: { bulk_cid: bulkCid } // set the bulk cid in the requestorder params
+});
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `datasetorders` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md)[] |
+| `options?` | `Object` |
+| `options.maxDatasetPerTask?` | `number` |
+
+#### Returns
+
+`Promise`<{ `cid`: `string` ; `volume`: `number`  }\>
 
 ___
 
