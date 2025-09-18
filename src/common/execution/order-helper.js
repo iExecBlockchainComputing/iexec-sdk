@@ -22,8 +22,12 @@ import {
   datasetorderSchema,
   apporderSchema,
   tagSchema,
+  positiveStrictIntSchema,
+  signedDatasetorderBulkSchema,
 } from '../utils/validator.js';
 import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries.js';
+import { add } from '../utils/ipfs.js';
+import { array } from 'yup';
 
 export const resolveTeeFrameworkFromTag = async (tag) => {
   const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
@@ -197,4 +201,45 @@ export const checkAppRequirements = async (
   if (appTeeFramework !== tagTeeFramework) {
     throw new Error('Tag mismatch the TEE framework specified by app');
   }
+};
+
+const MAX_DATASET_PER_TASK = 100; // TODO confirm value
+
+export const prepareDatasetBulk = async ({
+  ipfsNode = throwIfMissing(),
+  ipfsGateway = throwIfMissing(),
+  datasetorders,
+  maxDatasetPerTask = MAX_DATASET_PER_TASK,
+}) => {
+  const vmMaxDatasetPerTask = await positiveStrictIntSchema()
+    .max(MAX_DATASET_PER_TASK)
+    .label('maxDatasetPerTask')
+    .validate(maxDatasetPerTask);
+
+  let vDatasetOrders = await array()
+    .of(signedDatasetorderBulkSchema().stripUnknown())
+    .required()
+    .label('datasetorders')
+    .validate(datasetorders);
+
+  // TODO check orders eligibility?
+
+  const bulkRoot = [];
+  while (vDatasetOrders.length > 0) {
+    const slice = vDatasetOrders.slice(0, vmMaxDatasetPerTask);
+    const sliceCid = await add({
+      content: JSON.stringify(slice),
+      ipfsNode,
+      ipfsGateway,
+    });
+    bulkRoot.push(sliceCid);
+    vDatasetOrders = vDatasetOrders.slice(vmMaxDatasetPerTask);
+  }
+
+  const bulkCid = await add({
+    content: JSON.stringify(bulkRoot),
+    ipfsNode,
+    ipfsGateway,
+  });
+  return { cid: bulkCid, volume: bulkRoot.length };
 };

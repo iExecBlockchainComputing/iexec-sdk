@@ -19,6 +19,7 @@ import {
   IEXEC_REQUEST_PARAMS,
   STORAGE_PROVIDERS,
   ANY,
+  DATASET_INFINITE_VOLUME,
 } from './constant.js';
 
 const debug = Debug('validators');
@@ -501,6 +502,24 @@ export const signedDatasetorderSchema = (opt) =>
   saltedDatasetorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed datasetorder',
+  );
+
+export const signedDatasetorderBulkSchema = () =>
+  object(
+    {
+      dataset: addressSchema().required(),
+      datasetprice: nRlcAmountSchema().oneOf(['0']).required(), // price must be 0 in bulk
+      volume: uint256Schema()
+        .oneOf([DATASET_INFINITE_VOLUME.toString()])
+        .required(), // volume must be infinite in bulk
+      tag: tagSchema().required(), // TODO may have specific tag requirements
+      apprestrict: addressSchema().required(),
+      workerpoolrestrict: addressSchema().required(),
+      requesterrestrict: addressSchema().required(),
+      salt: bytes32Schema().required(),
+      sign: orderSignSchema().required(),
+    },
+    '${originalValue} is not a valid bulk datasetorder',
   );
 
 export const workerpoolorderSchema = (opt) =>

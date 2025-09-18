@@ -109,6 +109,8 @@ export const TEST_CHAINS = {
     gramineSmsURL: 'http://localhost:13309',
     iexecGatewayURL: 'http://localhost:3000',
     resultProxyURL: 'http://localhost:13200',
+    ipfsNodeURL: 'http://localhost:5001',
+    ipfsGatewayURL: 'http://localhost:8080',
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),

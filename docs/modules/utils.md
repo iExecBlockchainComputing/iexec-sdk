@@ -10,6 +10,7 @@
 
 ### Variables
 
+- [DATASET\_INFINITE\_VOLUME](utils.md#dataset_infinite_volume)
 - [NULL\_ADDRESS](utils.md#null_address)
 - [NULL\_BYTES32](utils.md#null_bytes32)
 
@@ -26,6 +27,19 @@
 - [sumTags](utils.md#sumtags)
 
 ## Variables
+
+### DATASET\_INFINITE\_VOLUME
+
+• `Const` **DATASET\_INFINITE\_VOLUME**: `number`
+
+infinite dataset volume
+
+A `Datasetorder` with this volume is considered as having an infinite volume and is eligible to be processed by any number of tasks without decrementing the remaining volume.
+The Dataset owner still can cancel the order at any time.
+
+NB: Infinite volume is represented by the maximum safe integer in JavaScript (`Number.MAX_SAFE_INTEGER`), which is `9007199254740991`.
+
+___
 
 ### NULL\_ADDRESS
 

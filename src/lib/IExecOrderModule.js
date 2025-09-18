@@ -42,6 +42,7 @@ import {
   resolveTeeFrameworkFromTag,
   checkAppRequirements,
   checkDatasetRequirements,
+  prepareDatasetBulk,
 } from '../common/execution/order-helper.js';
 import { NULL_DATASETORDER } from '../common/utils/constant.js';
 import {
@@ -374,7 +375,6 @@ export default class IExecOrderModule extends IExecModule {
         voucherAddress,
       });
     };
-
     this.estimateMatchOrders = async (
       { apporder, datasetorder, workerpoolorder, requestorder },
       { useVoucher = false, voucherAddress } = {},
@@ -390,6 +390,17 @@ export default class IExecOrderModule extends IExecModule {
         requestorder,
         useVoucher,
         voucherAddress,
+      });
+    };
+    this.prepareDatasetBulk = async (
+      datasetorders,
+      { maxDatasetPerTask } = {},
+    ) => {
+      return prepareDatasetBulk({
+        ipfsNode: await this.config.resolveIpfsNodeURL(),
+        ipfsGateway: await this.config.resolveIpfsGatewayURL(),
+        datasetorders,
+        maxDatasetPerTask,
       });
     };
   }
