@@ -41,7 +41,7 @@ export const getSignerFromPrivateKey: (
     /**
      * providers options
      */
-    providers: ProviderOptions;
+    providers?: ProviderOptions;
     /**
      * if true allows using a provider connected to an experimental networks (default false)
      *
