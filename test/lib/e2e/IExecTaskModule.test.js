@@ -18,7 +18,7 @@ import {
   sleep,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
-import { errors } from '../../../src/lib/index.js';
+import { errors, IExec } from '../../../src/lib/index.js';
 import { WorkerpoolCallError } from '../../../src/lib/errors.js';
 
 const { ObjectNotFoundError, IpfsGatewayCallError } = errors;
@@ -63,9 +63,7 @@ describe('task', () => {
     });
 
     test('downloads the result archive from IPFS', async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
-        readOnly: true,
-      });
+      const iexecReadOnly = new IExec({ ethProvider: 'bellecour' });
       const res = await iexecReadOnly.task.fetchResults(
         BELLECOUR_COMPLETED_TASK_ID,
       );

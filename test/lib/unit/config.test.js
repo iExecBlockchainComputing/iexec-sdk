@@ -32,6 +32,7 @@ describe('getChainDefaults', () => {
       hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
       iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
       ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
+      ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
       name: 'bellecour',
       pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
       resultProxy: 'https://result.v8-bellecour.iex.ec',
