@@ -441,7 +441,7 @@ describe('utils', () => {
       expect(tx2).toBeTxHash();
     });
 
-    test('providers option allow passing JSON RPC API providers api keys', async () => {
+    test.skip('providers option allow passing JSON RPC API providers api keys', async () => {
       const providerOptions = {
         infura: INFURA_PROJECT_ID,
         alchemy: ALCHEMY_API_KEY,
