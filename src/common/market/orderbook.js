@@ -20,53 +20,116 @@ const ERROR_GETTING_ORDERBOOK = 'An error occurred while getting orderbook';
 export const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  app = throwIfMissing(),
-  {
-    dataset,
-    workerpool,
-    requester,
-    minTag,
-    maxTag,
-    minVolume,
-    page = 0,
-    pageSize = 20,
-    isDatasetStrict = false,
-    isWorkerpoolStrict = false,
-    isRequesterStrict = false,
-  } = {},
+  appOrOptions = throwIfMissing(),
+  options,
 ) => {
   try {
+    let app;
+    let appOwner;
+    let dataset;
+    let workerpool;
+    let requester;
+    let minTag;
+    let maxTag;
+    let minVolume;
+    let page;
+    let pageSize;
+    let isDatasetStrict;
+    let isWorkerpoolStrict;
+    let isRequesterStrict;
+    if (typeof appOrOptions === 'object' && appOrOptions !== null) {
+      ({
+        app,
+        appOwner,
+        dataset,
+        workerpool,
+        requester,
+        minTag,
+        maxTag,
+        minVolume,
+        page = 0,
+        pageSize = 20,
+        isDatasetStrict = false,
+        isWorkerpoolStrict = false,
+        isRequesterStrict = false,
+      } = appOrOptions);
+    } else {
+      // deprecated
+      app = appOrOptions;
+      ({
+        dataset,
+        workerpool,
+        requester,
+        minTag,
+        maxTag,
+        minVolume,
+        page = 0,
+        pageSize = 20,
+        isDatasetStrict = false,
+        isWorkerpoolStrict = false,
+        isRequesterStrict = false,
+      } = options || {});
+    }
+    if (!app && !appOwner) {
+      throw Error('app or appOwner is required');
+    }
+
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
-      app: await addressOrAnySchema({
-        ethProvider: contracts.provider,
-      }).validate(app),
+      ...(app && {
+        app: await addressOrAnySchema({
+          ethProvider: contracts.provider,
+        })
+          .label('app')
+          .validate(app),
+      }),
+      ...(appOwner && {
+        appOwner: await addressOrAnySchema({
+          ethProvider: contracts.provider,
+        })
+          .label('appOwner')
+          .validate(appOwner),
+      }),
       ...(dataset && {
         dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(dataset),
+        })
+          .label('dataset')
+          .validate(dataset),
       }),
-      isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
+      isDatasetStrict: await booleanSchema()
+        .label('isDatasetStrict')
+        .validate(isDatasetStrict),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(workerpool),
+        })
+          .label('workerpool')
+          .validate(workerpool),
       }),
-      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
+      isWorkerpoolStrict: await booleanSchema()
+        .label('isWorkerpoolStrict')
+        .validate(isWorkerpoolStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(requester),
+        })
+          .label('requester')
+          .validate(requester),
       }),
-      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
+      isRequesterStrict: await booleanSchema()
+        .label('isRequesterStrict')
+        .validate(isRequesterStrict),
       ...(minVolume && {
-        minVolume: await positiveStrictIntSchema().validate(minVolume),
+        minVolume: await positiveStrictIntSchema()
+          .label('minVolume')
+          .validate(minVolume),
       }),
       ...(minTag !== undefined && {
-        minTag: await tagSchema().validate(minTag),
+        minTag: await tagSchema().label('minTag').validate(minTag),
       }),
       ...(maxTag !== undefined && {
-        maxTag: await tagSchema().validate(maxTag),
+        maxTag: await tagSchema().label('maxTag').validate(maxTag),
       }),
       ...(page !== undefined && {
         pageIndex: await positiveIntSchema().label('page').validate(page),
@@ -97,53 +160,116 @@ export const fetchAppOrderbook = async (
 export const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  dataset = throwIfMissing(),
-  {
-    app,
-    workerpool,
-    requester,
-    minTag,
-    maxTag,
-    minVolume,
-    page = 0,
-    pageSize = 20,
-    isAppStrict = false,
-    isWorkerpoolStrict = false,
-    isRequesterStrict = false,
-  } = {},
+  datasetOrOptions = throwIfMissing(),
+  options,
 ) => {
   try {
+    let dataset;
+    let datasetOwner;
+    let app;
+    let workerpool;
+    let requester;
+    let minTag;
+    let maxTag;
+    let minVolume;
+    let page;
+    let pageSize;
+    let isAppStrict;
+    let isWorkerpoolStrict;
+    let isRequesterStrict;
+    if (typeof datasetOrOptions === 'object' && datasetOrOptions !== null) {
+      ({
+        dataset,
+        datasetOwner,
+        app,
+        workerpool,
+        requester,
+        minTag,
+        maxTag,
+        minVolume,
+        page = 0,
+        pageSize = 20,
+        isAppStrict = false,
+        isWorkerpoolStrict = false,
+        isRequesterStrict = false,
+      } = datasetOrOptions);
+    } else {
+      // deprecated
+      dataset = datasetOrOptions;
+      ({
+        app,
+        workerpool,
+        requester,
+        minTag,
+        maxTag,
+        minVolume,
+        page = 0,
+        pageSize = 20,
+        isAppStrict = false,
+        isWorkerpoolStrict = false,
+        isRequesterStrict = false,
+      } = options || {});
+    }
+    if (!dataset && !datasetOwner) {
+      throw Error('dataset or datasetOwner is required');
+    }
+
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
-      dataset: await addressOrAnySchema({
-        ethProvider: contracts.provider,
-      }).validate(dataset),
+      ...(dataset && {
+        dataset: await addressOrAnySchema({
+          ethProvider: contracts.provider,
+        })
+          .label('dataset')
+          .validate(dataset),
+      }),
+      ...(datasetOwner && {
+        datasetOwner: await addressOrAnySchema({
+          ethProvider: contracts.provider,
+        })
+          .label('datasetOwner')
+          .validate(datasetOwner),
+      }),
       ...(app && {
         app: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(app),
-        isAppStrict: await booleanSchema().validate(isAppStrict),
+        })
+          .label('app')
+          .validate(app),
       }),
+      isAppStrict: await booleanSchema()
+        .label('isAppStrict')
+        .validate(isAppStrict),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(workerpool),
+        })
+          .label('workerpool')
+          .validate(workerpool),
       }),
-      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
+      isWorkerpoolStrict: await booleanSchema()
+        .label('isWorkerpoolStrict')
+        .validate(isWorkerpoolStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(requester),
+        })
+          .label('requester')
+          .validate(requester),
       }),
-      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
+      isRequesterStrict: await booleanSchema()
+        .label('isRequesterStrict')
+        .validate(isRequesterStrict),
       ...(minVolume && {
-        minVolume: await positiveStrictIntSchema().validate(minVolume),
+        minVolume: await positiveStrictIntSchema()
+          .label('minVolume')
+          .validate(minVolume),
       }),
       ...(minTag !== undefined && {
-        minTag: await tagSchema().validate(minTag),
+        minTag: await tagSchema().label('minTag').validate(minTag),
       }),
       ...(maxTag !== undefined && {
-        maxTag: await tagSchema().validate(maxTag),
+        maxTag: await tagSchema().label('maxTag').validate(maxTag),
       }),
       ...(page !== undefined && {
         pageIndex: await positiveIntSchema().label('page').validate(page),
@@ -194,33 +320,49 @@ export const fetchWorkerpoolOrderbook = async (
 ) => {
   try {
     const query = {
-      chainId: await chainIdSchema().validate(contracts.chainId),
-      category: await uint256Schema().validate(category),
+      chainId: await chainIdSchema()
+        .label('chainId')
+        .validate(contracts.chainId),
+      category: await uint256Schema().label('category').validate(category),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(workerpool),
+        })
+          .label('workerpool')
+          .validate(workerpool),
       }),
       ...(app && {
         app: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(app),
+        })
+          .label('app')
+          .validate(app),
       }),
-      isAppStrict: await booleanSchema().validate(isAppStrict),
+      isAppStrict: await booleanSchema()
+        .label('isAppStrict')
+        .validate(isAppStrict),
       ...(dataset && {
         dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(dataset),
+        })
+          .label('dataset')
+          .validate(dataset),
       }),
-      isDatasetStrict: await booleanSchema().validate(isDatasetStrict),
+      isDatasetStrict: await booleanSchema()
+        .label('isDatasetStrict')
+        .validate(isDatasetStrict),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(requester),
+        })
+          .label('requester')
+          .validate(requester),
       }),
-      isRequesterStrict: await booleanSchema().validate(isRequesterStrict),
+      isRequesterStrict: await booleanSchema()
+        .label('isRequesterStrict')
+        .validate(isRequesterStrict),
       ...(minTag && {
-        minTag: await tagSchema().validate(minTag),
+        minTag: await tagSchema().label('minTag').validate(minTag),
       }),
       ...(maxTag && {
         maxTag: await tagSchema().validate(maxTag),
@@ -228,13 +370,19 @@ export const fetchWorkerpoolOrderbook = async (
       ...(workerpoolOwner && {
         workerpoolOwner: await addressSchema({
           ethProvider: contracts.provider,
-        }).validate(workerpoolOwner),
+        })
+          .label('workerpoolOwner')
+          .validate(workerpoolOwner),
       }),
       ...(minTrust && {
-        minTrust: await positiveIntSchema().validate(minTrust),
+        minTrust: await positiveIntSchema()
+          .label('minTrust')
+          .validate(minTrust),
       }),
       ...(minVolume && {
-        minVolume: await positiveStrictIntSchema().validate(minVolume),
+        minVolume: await positiveStrictIntSchema()
+          .label('minVolume')
+          .validate(minVolume),
       }),
       ...(page !== undefined && {
         pageIndex: await positiveIntSchema().label('page').validate(page),
@@ -283,45 +431,63 @@ export const fetchRequestOrderbook = async (
 ) => {
   try {
     const query = {
-      chainId: await chainIdSchema().validate(contracts.chainId),
-      category: await uint256Schema().validate(category),
+      chainId: await chainIdSchema()
+        .label('chainId')
+        .validate(contracts.chainId),
+      category: await uint256Schema().label('category').validate(category),
       ...(requester && {
         requester: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(requester),
+        })
+          .label('requester')
+          .validate(requester),
       }),
       ...(beneficiary && {
         beneficiary: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(beneficiary),
+        })
+          .label('beneficiary')
+          .validate(beneficiary),
       }),
       ...(app && {
         app: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(app),
+        })
+          .label('app')
+          .validate(app),
       }),
       ...(dataset && {
         dataset: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(dataset),
+        })
+          .label('dataset')
+          .validate(dataset),
       }),
       ...(workerpool && {
         workerpool: await addressOrAnySchema({
           ethProvider: contracts.provider,
-        }).validate(workerpool),
+        })
+          .label('workerpool')
+          .validate(workerpool),
       }),
-      isWorkerpoolStrict: await booleanSchema().validate(isWorkerpoolStrict),
+      isWorkerpoolStrict: await booleanSchema()
+        .label('isWorkerpoolStrict')
+        .validate(isWorkerpoolStrict),
       ...(minTag !== undefined && {
-        minTag: await tagSchema().validate(minTag),
+        minTag: await tagSchema().label('minTag').validate(minTag),
       }),
       ...(maxTag !== undefined && {
-        maxTag: await tagSchema().validate(maxTag),
+        maxTag: await tagSchema().label('maxTag').validate(maxTag),
       }),
       ...(maxTrust !== undefined && {
-        maxTrust: await positiveIntSchema().validate(maxTrust),
+        maxTrust: await positiveIntSchema()
+          .label('maxTrust')
+          .validate(maxTrust),
       }),
       ...(minVolume && {
-        minVolume: await positiveStrictIntSchema().validate(minVolume),
+        minVolume: await positiveStrictIntSchema()
+          .label('minVolume')
+          .validate(minVolume),
       }),
       ...(page !== undefined && {
         pageIndex: await positiveIntSchema().label('page').validate(page),

@@ -45,18 +45,18 @@ export default class IExecOrderbookModule extends IExecModule {
         await this.config.resolveChainId(),
         requestorderHash,
       );
-    this.fetchAppOrderbook = async (appAddress, options = {}) =>
+    this.fetchAppOrderbook = async (appAddressOrOptions, options) =>
       fetchAppOrderbook(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        appAddress,
+        appAddressOrOptions,
         options,
       );
-    this.fetchDatasetOrderbook = async (datasetAddress, options = {}) =>
+    this.fetchDatasetOrderbook = async (datasetAddressOrOptions, options) =>
       fetchDatasetOrderbook(
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
-        datasetAddress,
+        datasetAddressOrOptions,
         options,
       );
     this.fetchWorkerpoolOrderbook = async (options) =>

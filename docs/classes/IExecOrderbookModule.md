@@ -71,7 +71,7 @@ current IExecConfig
 
 ### fetchAppOrderbook
 
-▸ **fetchAppOrderbook**(`appAddress`, `options?`): `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedApporder`](../interfaces/internal_.PublishedApporder.md)\>\>
+▸ **fetchAppOrderbook**(`appAddressOrOptions`, `options?`): `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedApporder`](../interfaces/internal_.PublishedApporder.md)\>\>
 
 find the cheapest orders for the specified app.
 
@@ -88,8 +88,8 @@ console.log('total orders:', count);
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `appAddress` | `string` | - |
-| `options?` | `Object` | - |
+| `appAddressOrOptions` | `string` \| { `app?`: `string` ; `appOwner?`: `string` ; `dataset?`: `string` ; `isDatasetStrict?`: `boolean` ; `isRequesterStrict?`: `boolean` ; `isWorkerpoolStrict?`: `boolean` ; `maxTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minVolume?`: [`BNish`](../modules.md#bnish) ; `page?`: `number` ; `pageSize?`: `number` ; `requester?`: `string` ; `workerpool?`: `string`  } | - |
+| `options?` | `Object` | **`Deprecated`** use first parameter instead migration: replace `fetchAppOrderbook(appAddress, options)` by `fetchAppOrderbook({ app: appAddress, ...options })` |
 | `options.dataset?` | `string` | include orders restricted to specified dataset (use `'any'` to include any dataset) |
 | `options.isDatasetStrict?` | `boolean` | filters out orders allowing “any” dataset (default: `false`) |
 | `options.isRequesterStrict?` | `boolean` | filters out orders allowing “any” requester (default: `false`) |
@@ -135,7 +135,7 @@ ___
 
 ### fetchDatasetOrderbook
 
-▸ **fetchDatasetOrderbook**(`datasetAddress`, `options?`): `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedDatasetorder`](../interfaces/internal_.PublishedDatasetorder.md)\>\>
+▸ **fetchDatasetOrderbook**(`datasetAddressOrOptions`, `options?`): `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedDatasetorder`](../interfaces/internal_.PublishedDatasetorder.md)\>\>
 
 find the cheapest orders for the specified dataset.
 
@@ -152,8 +152,8 @@ console.log('total orders:', count);
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `datasetAddress` | `string` | - |
-| `options?` | `Object` | - |
+| `datasetAddressOrOptions` | `string` \| { `app?`: `string` ; `dataset?`: `string` ; `datasetOwner?`: `string` ; `isAppStrict?`: `boolean` ; `isRequesterStrict?`: `boolean` ; `isWorkerpoolStrict?`: `boolean` ; `maxTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minVolume?`: [`BNish`](../modules.md#bnish) ; `page?`: `number` ; `pageSize?`: `number` ; `requester?`: `string` ; `workerpool?`: `string`  } | - |
+| `options?` | `Object` | **`Deprecated`** use first parameter instead migration: replace `fetchDatasetOrderbook(datasetAddress, options)` by `fetchDatasetOrderbook({ dataset: datasetAddress, ...options })` |
 | `options.app?` | `string` | include orders restricted to specified app (use `'any'` to include any app) |
 | `options.isAppStrict?` | `boolean` | filters out orders allowing “any” app (default: `false`) |
 | `options.isRequesterStrict?` | `boolean` | filters out orders allowing “any” requester (default: `false`) |

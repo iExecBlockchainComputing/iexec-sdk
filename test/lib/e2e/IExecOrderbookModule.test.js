@@ -286,6 +286,39 @@ describe('orderbook', () => {
         expect(res7.count >= 32).toBe(true);
       });
 
+      test('appOwner returns orders from app owner', async () => {
+        const { iexec: iexecUser, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec: iexecOtherUser } = getTestConfig(iexecTestChain)();
+        const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
+        // publish orders from two different users
+        const orderHash = await deployAndGetApporder(iexecUser, {
+          owner: wallet.address,
+        }).then((o) =>
+          iexecUser.order
+            .signApporder(o)
+            .then((o) => iexecUser.order.publishApporder(o)),
+        );
+
+        await deployAndGetApporder(iexecOtherUser, {
+          owner: wallet.address,
+        }).then((o) =>
+          iexecOtherUser.order
+            .signApporder(o)
+            .then((o) => iexecOtherUser.order.publishApporder(o)),
+        );
+
+        const res = await iexecReadOnly.orderbook.fetchAppOrderbook({
+          appOwner: wallet.address,
+          dataset: 'any',
+          requester: 'any',
+          workerpool: 'any',
+        });
+        expect(res.count).toBe(1);
+        expect(res.orders[0].orderHash).toBe(orderHash);
+      });
+
       test('strict option allow filtering only orders for specified dataset, workerpool or requester', async () => {
         const { iexec } = getTestConfig(iexecTestChain)();
         const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
@@ -548,6 +581,38 @@ describe('orderbook', () => {
           },
         );
         expect(res7.count >= 33).toBe(true);
+      });
+      test('datasetOwner returns orders from dataset owner', async () => {
+        const { iexec: iexecUser, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec: iexecOtherUser } = getTestConfig(iexecTestChain)();
+        const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
+        // publish orders from two different users
+        const orderHash = await deployAndGetDatasetorder(iexecUser, {
+          owner: wallet.address,
+        }).then((o) =>
+          iexecUser.order
+            .signDatasetorder(o)
+            .then((o) => iexecUser.order.publishDatasetorder(o)),
+        );
+
+        await deployAndGetDatasetorder(iexecOtherUser, {
+          owner: wallet.address,
+        }).then((o) =>
+          iexecOtherUser.order
+            .signDatasetorder(o)
+            .then((o) => iexecOtherUser.order.publishDatasetorder(o)),
+        );
+
+        const res = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          datasetOwner: wallet.address,
+          app: 'any',
+          requester: 'any',
+          workerpool: 'any',
+        });
+        expect(res.count).toBe(1);
+        expect(res.orders[0].orderHash).toBe(orderHash);
       });
 
       test('strict option allow filtering only orders for specified app, workerpool or requester', async () => {
