@@ -1,6 +1,6 @@
+import os from 'node:os';
+import path from 'node:path';
 import Debug from 'debug';
-import os from 'os';
-import path from 'path';
 import fsExtra from 'fs-extra';
 import { SigningKey, Wallet } from 'ethers';
 import { checksummedAddress } from '../../common/utils/utils.js';

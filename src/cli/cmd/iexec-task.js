@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
+import { join } from 'node:path';
+import { Readable } from 'node:stream';
+import { finished } from 'node:stream/promises';
 import { program as cli } from 'commander';
 import Debug from 'debug';
-import { join } from 'path';
-import { Readable } from 'stream';
-import { finished } from 'stream/promises';
 import fsExtra from 'fs-extra';
 import { show, claim, obsTask } from '../../common/execution/task.js';
 import { fetchTaskResults } from '../../common/execution/result.js';

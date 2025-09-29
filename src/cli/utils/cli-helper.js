@@ -1,9 +1,9 @@
+import { isAbsolute, join } from 'node:path';
 import Debug from 'debug';
 import { Option } from 'commander';
 import Ora from 'ora';
 import inquirer from 'inquirer';
 import { render } from 'prettyjson';
-import { isAbsolute, join } from 'path';
 import checkForUpdate from 'update-check';
 import isDocker from 'is-docker';
 import {

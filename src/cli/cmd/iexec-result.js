@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
+import { join } from 'node:path';
+import { generateKeyPair } from 'node:crypto';
 import { program as cli } from 'commander';
 import Debug from 'debug';
 import { gt } from 'semver';
 import fsExtra from 'fs-extra';
 import { Buffer } from 'buffer';
-import { join } from 'path';
-import { generateKeyPair } from 'crypto';
 import { decryptResult } from '../../common/utils/result-utils.js';
 import { getResultEncryptionKeyName } from '../../common/utils/secrets-utils.js';
 import { checkWeb2SecretExists } from '../../common/sms/check.js';

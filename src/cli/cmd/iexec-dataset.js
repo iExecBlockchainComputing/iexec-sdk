@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
+import { join } from 'node:path';
 import { program as cli } from 'commander';
 import Debug from 'debug';
 import fsExtra from 'fs-extra';
-import { join } from 'path';
 import {
   checkDeployedDataset,
   deployDataset,
