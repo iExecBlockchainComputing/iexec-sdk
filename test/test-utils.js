@@ -435,9 +435,7 @@ export const createVoucherType =
           await sleep(3000 * tryCount);
           id = await retryableCreateVoucherType(tryCount + 1);
         } else {
-          throw new Error(
-            `Failed to create voucher after ${tryCount} attempts`,
-          );
+          throw Error(`Failed to create voucher after ${tryCount} attempts`);
         }
       }
       return id;
@@ -506,9 +504,7 @@ export const createVoucher =
           await sleep(3000 * tryCount);
           await retryableCreateVoucher(tryCount + 1);
         } else {
-          throw new Error(
-            `Failed to create voucher after ${tryCount} attempts`,
-          );
+          throw Error(`Failed to create voucher after ${tryCount} attempts`);
         }
       }
     };
@@ -562,7 +558,7 @@ export const addVoucherEligibleAsset =
           await sleep(3000 * tryCount);
           await retryableAddEligibleAsset(tryCount + 1);
         } else {
-          throw new Error(
+          throw Error(
             `Failed to add eligible asset to voucher after ${tryCount} attempts`,
           );
         }

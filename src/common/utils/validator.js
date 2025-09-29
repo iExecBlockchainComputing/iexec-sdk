@@ -732,8 +732,7 @@ export const ensDomainSchema = () =>
           const nameArray = value.split('.');
           const hasEmptyLabels =
             nameArray.filter((e) => e.length < 1).length > 0;
-          if (hasEmptyLabels)
-            throw new Error('Domain cannot have empty labels');
+          if (hasEmptyLabels) throw Error('Domain cannot have empty labels');
           return true;
         } catch (e) {
           debug('ensDomainSchema no-empty-label', e);
@@ -778,7 +777,7 @@ export const ensLabelSchema = () =>
       async (value) => {
         try {
           const hasDot = value.indexOf('.') !== -1;
-          if (hasDot) throw new Error('Label cannot have `.`');
+          if (hasDot) throw Error('Label cannot have `.`');
           return true;
         } catch (e) {
           debug('ensLabelSchema no-dot', e);

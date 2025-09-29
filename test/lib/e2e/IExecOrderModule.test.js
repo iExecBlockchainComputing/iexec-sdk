@@ -2859,7 +2859,7 @@ describe('matchOrders()', () => {
             },
             { useVoucher: true, voucherAddress: getRandomAddress() },
           ),
-        ).rejects.toThrow(new Error('Invalid voucher contract address'));
+        ).rejects.toThrow(Error('Invalid voucher contract address'));
       });
 
       test('should throw if user is not allowed to use specified voucherAddress', async () => {
@@ -2896,9 +2896,7 @@ describe('matchOrders()', () => {
             },
             { useVoucher: true, voucherAddress },
           ),
-        ).rejects.toThrow(
-          new Error('User is not authorized to use the voucher'),
-        );
+        ).rejects.toThrow(Error('User is not authorized to use the voucher'));
       });
     });
   });

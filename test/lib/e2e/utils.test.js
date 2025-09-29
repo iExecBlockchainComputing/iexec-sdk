@@ -328,7 +328,7 @@ describe('utils', () => {
         ),
       );
       const err = await utils.decryptResult(encZip, 'foo').catch((e) => e);
-      expect(err).toEqual(new Error('Invalid beneficiary key'));
+      expect(err).toEqual(Error('Invalid beneficiary key'));
     });
 
     test('fails to decrypt the result with the wrong key', async () => {
@@ -345,7 +345,7 @@ describe('utils', () => {
         .decryptResult(encZip, beneficiaryKey)
         .catch((e) => e);
       expect(err).toEqual(
-        new Error('Failed to decrypt results key with beneficiary key'),
+        Error('Failed to decrypt results key with beneficiary key'),
       );
     });
   });

@@ -42,7 +42,7 @@ export const fetchVoucherContract = async (
         vVoucherAddress,
       );
       if (!isVoucher) {
-        throw new Error('Invalid voucher contract address');
+        throw Error('Invalid voucher contract address');
       }
       voucherContract = getVoucherContract(contracts, vVoucherAddress);
       const [userAuthorized, userIsOwner] = await Promise.all([
@@ -52,7 +52,7 @@ export const fetchVoucherContract = async (
         ),
       ]);
       if (!userAuthorized && !userIsOwner) {
-        throw new Error('User is not authorized to use the voucher');
+        throw Error('User is not authorized to use the voucher');
       }
     } else {
       const ownedVoucherAddress = await fetchVoucherAddress(

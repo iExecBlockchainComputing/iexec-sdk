@@ -38,7 +38,7 @@ export const getWorkerpoolApiUrl = async (
         ApiCallErrorClass: CompassCallError,
       });
       if (!json?.apiUrl) {
-        throw new Error(`No apiUrl found in compass response`);
+        throw Error(`No apiUrl found in compass response`);
       }
       return json.apiUrl;
     }

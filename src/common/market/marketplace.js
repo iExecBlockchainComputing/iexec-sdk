@@ -173,7 +173,7 @@ const unpublishOrder = async (
     if (response.ok && response.unpublished) {
       return response.unpublished;
     }
-    throw new Error('An error occurred while unpublishing order');
+    throw Error('An error occurred while unpublishing order');
   } catch (error) {
     debug('unpublishOrder()', error);
     throw error;

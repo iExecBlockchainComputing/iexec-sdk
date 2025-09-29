@@ -130,7 +130,7 @@ export const sweep = async (contracts = throwIfMissing(), to) => {
     const userAddress = await getAddress(contracts);
     const code = await contracts.provider.getCode(vAddressTo);
     if (code !== '0x') {
-      throw new Error('Cannot sweep to a contract');
+      throw Error('Cannot sweep to a contract');
     }
     let balances = await checkBalances(contracts, userAddress);
     const res = {};

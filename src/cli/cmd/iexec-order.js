@@ -210,7 +210,7 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.apporder;
           if (!loadedOrder) {
-            throw new Error(info.missingOrder(APP_ORDER, 'app'));
+            throw Error(info.missingOrder(APP_ORDER, 'app'));
           }
           const orderObj = await createApporder(chain.contracts, loadedOrder);
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
@@ -251,7 +251,7 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.datasetorder;
           if (!loadedOrder) {
-            throw new Error(info.missingOrder(DATASET_ORDER, 'dataset'));
+            throw Error(info.missingOrder(DATASET_ORDER, 'dataset'));
           }
           const orderObj = await createDatasetorder(
             chain.contracts,
@@ -300,7 +300,7 @@ sign
           const loadedOrder =
             iexecConf.order && iexecConf.order.workerpoolorder;
           if (!loadedOrder) {
-            throw new Error(info.missingOrder(WORKERPOOL_ORDER, 'workerpool'));
+            throw Error(info.missingOrder(WORKERPOOL_ORDER, 'workerpool'));
           }
           const orderObj = await createWorkerpoolorder(
             chain.contracts,
@@ -338,7 +338,7 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.requestorder;
           if (!loadedOrder) {
-            throw new Error(info.missingOrder(REQUEST_ORDER, 'request'));
+            throw Error(info.missingOrder(REQUEST_ORDER, 'request'));
           }
           const orderObj = await createRequestorder(
             {
@@ -476,9 +476,9 @@ fill
         : !!datasetorder;
       debug('useDataset', useDataset);
 
-      if (!apporder) throw new Error('Missing apporder');
-      if (!datasetorder && useDataset) throw new Error('Missing datasetorder');
-      if (!workerpoolorder) throw new Error('Missing workerpoolorder');
+      if (!apporder) throw Error('Missing apporder');
+      if (!datasetorder && useDataset) throw Error('Missing datasetorder');
+      if (!workerpoolorder) throw Error('Missing workerpoolorder');
 
       const computeRequestOrder = async () => {
         await connectKeystore(chain, keystore, { txOptions });
@@ -505,7 +505,7 @@ fill
 
       const requestorder = requestOrderInput || (await computeRequestOrder());
       if (!requestorder) {
-        throw new Error('Missing requestorder');
+        throw Error('Missing requestorder');
       }
 
       if (!opts.skipPreflightCheck) {
@@ -618,7 +618,7 @@ publish
     const spinner = Spinner(opts);
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
-        throw new Error(
+        throw Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
@@ -638,7 +638,7 @@ publish
           const orderToPublish =
             signedOrders[chain.id] && signedOrders[chain.id][orderName];
           if (!orderToPublish) {
-            throw new Error(
+            throw Error(
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
@@ -780,7 +780,7 @@ unpublish
     const spinner = Spinner(opts);
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
-        throw new Error(
+        throw Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
@@ -807,7 +807,7 @@ unpublish
             const orderToUnpublish =
               signedOrders[chain.id] && signedOrders[chain.id][orderName];
             if (!orderToUnpublish) {
-              throw new Error(
+              throw Error(
                 `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
               );
             }
@@ -904,7 +904,7 @@ cancel
     const spinner = Spinner(opts);
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
-        throw new Error(
+        throw Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
@@ -923,7 +923,7 @@ cancel
         try {
           const orderToCancel = signedOrders[chain.id][orderName];
           if (!orderToCancel) {
-            throw new Error(
+            throw Error(
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
@@ -995,7 +995,7 @@ show
     const spinner = Spinner(opts);
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
-        throw new Error(
+        throw Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }

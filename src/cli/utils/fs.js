@@ -233,13 +233,13 @@ const loadJSONAndRetry = async (fileName, options = {}) => {
     debug('loadJSONAndRetry', error);
     if (error.code === 'ENOENT') {
       if (options.retry) return options.retry();
-      throw new Error(
+      throw Error(
         options.loadErrorMessage
           ? options.loadErrorMessage(fileName)
           : info.missingConfFile(fileName),
       );
     }
-    throw new Error(`${error} in ${fileName}`);
+    throw Error(`${error} in ${fileName}`);
   }
 };
 export const loadIExecConf = (options) =>

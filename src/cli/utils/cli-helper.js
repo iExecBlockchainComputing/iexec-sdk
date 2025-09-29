@@ -978,7 +978,7 @@ export const isBytes32 = (str, { strict = false } = {}) => {
     str.length !== 66 ||
     str.substring(0, 2) !== '0x'
   ) {
-    if (strict) throw new Error(`${str} is not a valid Bytes32 HexString`);
+    if (strict) throw Error(`${str} is not a valid Bytes32 HexString`);
     return false;
   }
   return true;

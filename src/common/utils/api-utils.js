@@ -95,10 +95,10 @@ const responseToJson = async (response) => {
       .json()
       .then((json) => json && json.error)
       .catch(() => {});
-    if (errorMessage) throw new Error(`API error: ${errorMessage}`);
+    if (errorMessage) throw Error(`API error: ${errorMessage}`);
     throw Error(`API error: ${response.status} ${response.statusText}`);
   }
-  throw new Error('The http response is not of JSON type');
+  throw Error('The http response is not of JSON type');
 };
 
 export const wrapPaginableRequest = (request) => async (args) => {
