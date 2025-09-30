@@ -94,7 +94,7 @@ export const showUserVoucher = async (
       vOwner,
     );
     if (!voucherAddress) {
-      throw Error(`No Voucher found for address ${vOwner}`);
+      throw new Error(`No Voucher found for address ${vOwner}`);
     }
     const voucherContract = await fetchVoucherContract(
       contracts,
@@ -153,13 +153,13 @@ export const authorizeRequester = async (
       userAddress,
     );
     if (!voucherContract) {
-      throw Error(`No Voucher found for address ${userAddress}`);
+      throw new Error(`No Voucher found for address ${userAddress}`);
     }
     const isAuthorized = await wrapCall(
       voucherContract.isAccountAuthorized(vRequester),
     );
     if (isAuthorized) {
-      throw Error(`${vRequester} is already authorized`);
+      throw new Error(`${vRequester} is already authorized`);
     }
     const tx = await wrapSend(
       voucherContract
@@ -194,13 +194,13 @@ export const revokeRequesterAuthorization = async (
       userAddress,
     );
     if (!voucherContract) {
-      throw Error(`No Voucher found for address ${userAddress}`);
+      throw new Error(`No Voucher found for address ${userAddress}`);
     }
     const isAuthorized = await wrapCall(
       voucherContract.isAccountAuthorized(vRequester),
     );
     if (!isAuthorized) {
-      throw Error(`${vRequester} is not authorized`);
+      throw new Error(`${vRequester} is not authorized`);
     }
     const tx = await wrapSend(
       voucherContract

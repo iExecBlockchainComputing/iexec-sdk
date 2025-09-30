@@ -76,7 +76,7 @@ export const httpRequest =
         if (response.status >= 500 && response.status <= 599) {
           throw new ApiCallErrorClass(
             `Server at ${api} encountered an internal error`,
-            Error(
+            new Error(
               `Server internal error: ${response.status} ${response.statusText}`,
             ),
           );
@@ -96,7 +96,7 @@ const responseToJson = async (response) => {
       .then((json) => json && json.error)
       .catch(() => {});
     if (errorMessage) throw new Error(`API error: ${errorMessage}`);
-    throw Error(`API error: ${response.status} ${response.statusText}`);
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
   throw new Error('The http response is not of JSON type');
 };
@@ -140,7 +140,7 @@ export const downloadZipApi = {
       ...{ headers: { Accept: 'application/zip', ...args.headers } },
     }).then((response) => {
       if (!response.ok) {
-        throw Error(
+        throw new Error(
           `API error: ${response.status} ${
             response.statusText ? response.statusText : ''
           }`,
@@ -172,7 +172,7 @@ export const getAuthorization = async ({
     const { domain, message } = typedData || {};
     const { EIP712Domain, ...types } = typedData.types || {};
     if (!domain || !types || !message) {
-      throw Error('Unexpected challenge format');
+      throw new Error('Unexpected challenge format');
     }
     const sign = await wrapSignTypedData(
       signer.signTypedData(domain, types, message),
@@ -186,6 +186,6 @@ export const getAuthorization = async ({
       .concat(address);
   } catch (error) {
     debug('getAuthorization()', error);
-    throw Error(`Failed to get authorization: ${error}`);
+    throw new Error(`Failed to get authorization: ${error}`);
   }
 };

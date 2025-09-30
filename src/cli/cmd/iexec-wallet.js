@@ -142,10 +142,10 @@ show
               spinner.info(`Current wallet address ${userWalletAddress}`);
               displayedWallet = { address: userWalletAddress };
             } else {
-              throw Error('Wallet file not found');
+              throw new Error('Wallet file not found');
             }
           } catch (error) {
-            throw Error(
+            throw new Error(
               `Failed to load wallet address from keystore: ${error.message}`,
             );
           }
@@ -153,7 +153,7 @@ show
       }
 
       if (!userWalletAddress && !address)
-        throw Error('Missing address or wallet');
+        throw new Error('Missing address or wallet');
 
       const chain = await loadChain(opts.chain, { spinner });
       // show address balance
@@ -222,7 +222,7 @@ sendETH
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
-      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
         await prompt.transferETH(
           formatEth(weiAmount),
@@ -273,7 +273,7 @@ sendRLC
         keystore.accounts(),
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
-      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.to) throw new Error('Missing --to option');
       await connectKeystore(chain, keystore, { txOptions });
       if (!opts.force) {
         await prompt.transferRLC(
@@ -325,7 +325,7 @@ sweep
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
       await connectKeystore(chain, keystore, { txOptions });
-      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
         await prompt.sweep(chain.contracts.isNative ? 'RLC' : 'ether and RLC')(
           chain.name,
@@ -380,17 +380,17 @@ bridgeToSidechain
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (chain.contracts.isNative)
-        throw Error('Cannot bridge sidechain to sidechain');
+        throw new Error('Cannot bridge sidechain to sidechain');
       const bridgeConf = getPropertyFormChain(chain, 'bridge');
       const bridgeAddress = bridgeConf && bridgeConf.contract;
       const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
-        throw Error(
+        throw new Error(
           `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!bridgedChainId) {
-        throw Error(
+        throw new Error(
           `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
         );
       }
@@ -467,17 +467,17 @@ bridgeToMainchain
       ]);
       await connectKeystore(chain, keystore, { txOptions });
       if (!chain.contracts.isNative)
-        throw Error('Cannot bridge mainchain to mainchain');
+        throw new Error('Cannot bridge mainchain to mainchain');
       const bridgeConf = getPropertyFormChain(chain, 'bridge');
       const bridgeAddress = bridgeConf && bridgeConf.contract;
       const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
-        throw Error(
+        throw new Error(
           `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
         );
       }
       if (!bridgedChainId) {
-        throw Error(
+        throw new Error(
           `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
         );
       }
@@ -554,7 +554,7 @@ sendNRLC
         keystore.accounts(),
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
-      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.to) throw new Error('Missing --to option');
       await connectKeystore(chain, keystore, { txOptions });
       if (!opts.force) {
         await prompt.transferRLC(

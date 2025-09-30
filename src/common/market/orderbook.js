@@ -87,7 +87,7 @@ export const fetchAppOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error(ERROR_GETTING_ORDERBOOK);
+    throw new Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchAppOrderbook()', error);
     throw error;
@@ -164,7 +164,7 @@ export const fetchDatasetOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error(ERROR_GETTING_ORDERBOOK);
+    throw new Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchDatasetOrderbook()', error);
     throw error;
@@ -255,7 +255,7 @@ export const fetchWorkerpoolOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error(ERROR_GETTING_ORDERBOOK);
+    throw new Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchWorkerpoolOrderbook()', error);
     throw error;
@@ -342,7 +342,7 @@ export const fetchRequestOrderbook = async (
     if (ok) {
       return response;
     }
-    throw Error(ERROR_GETTING_ORDERBOOK);
+    throw new Error(ERROR_GETTING_ORDERBOOK);
   } catch (error) {
     debug('fetchRequestOrderbook()', error);
     throw error;

@@ -66,7 +66,7 @@ const getContractsDescMap = (isNative) => ({
 
 const createClient = ({ ethSigner, ethProvider, hubAddress, isNative }) => {
   const cachedAddresses = {};
-  if (!hubAddress) throw Error('Missing iExec contract address');
+  if (!hubAddress) throw new Error('Missing iExec contract address');
 
   const contractsDescMap = getContractsDescMap(isNative);
 
@@ -74,7 +74,7 @@ const createClient = ({ ethSigner, ethProvider, hubAddress, isNative }) => {
     try {
       const { contractDesc } = contractsDescMap[objName];
       if (!address) {
-        throw Error(`no contract address provided`);
+        throw new Error(`no contract address provided`);
       }
       return new Contract(address, contractDesc.abi, ethSigner || ethProvider);
     } catch (error) {
@@ -164,11 +164,11 @@ class IExecContractsClient {
     confirms = 1,
   } = {}) {
     const stringChainId = `${chainId}`;
-    if (!provider) throw Error('missing provider key');
-    if (!hubAddress) throw Error('missing hubAddress key');
-    if (!stringChainId) throw Error('missing chainId key');
+    if (!provider) throw new Error('missing provider key');
+    if (!hubAddress) throw new Error('missing hubAddress key');
+    if (!stringChainId) throw new Error('missing chainId key');
     if (!Number.isInteger(confirms) || confirms <= 0)
-      throw Error('invalid confirms');
+      throw new Error('invalid confirms');
 
     this._args = {
       provider,

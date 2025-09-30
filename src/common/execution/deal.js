@@ -84,7 +84,7 @@ export const fetchRequesterDeals = async (
     if (response.ok && response.deals) {
       return response;
     }
-    throw Error('An error occurred while getting deals');
+    throw new Error('An error occurred while getting deals');
   } catch (error) {
     debug('fetchRequesterDeals()', error);
     throw error;
@@ -253,7 +253,7 @@ export const claim = async (
     const vDealid = await bytes32Schema().validate(dealid);
     const deal = await show(contracts, vDealid);
     if (!deal.deadlineReached) {
-      throw Error(
+      throw new Error(
         `Cannot claim a deal before reaching the final time: ${new Date(
           1000 * deal.finalTime,
         )}`,
@@ -275,7 +275,7 @@ export const claim = async (
       }),
     );
     if (initialized.length === 0 && notInitialized.length === 0)
-      throw Error('Nothing to claim');
+      throw new Error('Nothing to claim');
 
     initialized.sort(numericStringPropAscSort('idx'));
     notInitialized.sort(numericStringPropAscSort('idx'));
@@ -394,7 +394,7 @@ export const fetchDealsByOrderHash = async (
     if (response.ok && response.deals) {
       return { count: response.count, deals: response.deals };
     }
-    throw Error('An error occurred while getting deals');
+    throw new Error('An error occurred while getting deals');
   } catch (error) {
     debug('fetchDealsByOrderHash()', error);
     throw error;

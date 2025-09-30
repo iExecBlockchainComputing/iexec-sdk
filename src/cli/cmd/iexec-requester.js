@@ -65,7 +65,7 @@ pushSecret
           raw: { isPushed, name: secretName },
         });
       } else {
-        throw Error('Something went wrong');
+        throw new Error('Something went wrong');
       }
     } catch (error) {
       handleError(error, cli, opts);

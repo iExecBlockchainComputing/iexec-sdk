@@ -68,7 +68,7 @@ const publishOrder = async (
     if (response.ok && response.published && response.published.orderHash) {
       return response.published.orderHash;
     }
-    throw Error('An error occurred while publishing order');
+    throw new Error('An error occurred while publishing order');
   } catch (error) {
     debug('publishOrder()', error);
     throw error;
@@ -408,7 +408,7 @@ export const fetchPublishedOrderByHash = async (
     const vChainId = await chainIdSchema().validate(chainId);
     const vOrderHash = await bytes32Schema().validate(orderHash);
     const endpoint = apiEndpoints[orderName];
-    if (!endpoint) throw Error(`Unsupported orderName ${orderName}`);
+    if (!endpoint) throw new Error(`Unsupported orderName ${orderName}`);
     const query = {
       chainId: vChainId,
     };

@@ -34,6 +34,6 @@ export const getVoucherSubgraphClient = (
   try {
     return new GraphQLClient(voucherSubgraphUrl);
   } catch (error) {
-    throw Error(`Failed to create GraphQLClient: ${error.message}`);
+    throw new Error(`Failed to create GraphQLClient: ${error.message}`);
   }
 };

@@ -89,7 +89,7 @@ export const checkRequestRequirements = async (
       reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
     );
     if (!isEncryptionKeySet) {
-      throw Error(
+      throw new Error(
         'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
       );
     }
@@ -109,7 +109,7 @@ export const checkRequestRequirements = async (
       ),
     );
     if (!isStorageTokenSet) {
-      throw Error(
+      throw new Error(
         `Requester storage token is not set for selected provider "${
           paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]
         }". Result archive upload will fail.`,
@@ -125,7 +125,7 @@ export const checkRequestRequirements = async (
       dataset,
     );
     if (!isDatasetSecretSet) {
-      throw Error(
+      throw new Error(
         `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
       );
     }
@@ -142,7 +142,7 @@ export const checkRequestRequirements = async (
             secretName,
           );
           if (!isSecretSet) {
-            throw Error(
+            throw new Error(
               `Requester secret "${secretName}" is not set for requester ${requester} in the SMS. Requester secret provisioning will fail.`,
             );
           }
@@ -174,7 +174,7 @@ export const checkDatasetRequirements = async (
       dataset,
     );
     if (!isDatasetSecretSet) {
-      throw Error(
+      throw new Error(
         `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
       );
     }
@@ -195,6 +195,6 @@ export const checkAppRequirements = async (
     resolveTeeFrameworkFromApp(res.app, { strict: false }),
   );
   if (appTeeFramework !== tagTeeFramework) {
-    throw Error('Tag mismatch the TEE framework specified by app');
+    throw new Error('Tag mismatch the TEE framework specified by app');
   }
 };

@@ -357,7 +357,7 @@ const signOrder = async (
       : await getContractOwner(contracts, orderName, orderObj);
   const address = await getAddress(contracts);
   if (signerAddress !== address) {
-    throw Error(
+    throw new Error(
       `Invalid order signer, must be the ${
         orderName === REQUEST_ORDER ? 'requester' : 'resource owner'
       }`,
@@ -436,7 +436,8 @@ const cancelOrder = async (
       orderName,
       orderObj,
     );
-    if (remainingVolume.isZero()) throw Error(`${orderName} already canceled`);
+    if (remainingVolume.isZero())
+      throw new Error(`${orderName} already canceled`);
     const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
       iexecContract[objDesc[orderName].cancelMethod](
@@ -446,7 +447,7 @@ const cancelOrder = async (
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEventFromLogs(objDesc[orderName].cancelEvent, txReceipt.logs))
-      throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
+      throw new Error(`${objDesc[orderName].cancelEvent} not confirmed`);
     return { order: orderObj, txHash: tx.hash };
   } catch (error) {
     debug('cancelOrder()', error);
@@ -654,7 +655,7 @@ const getMatchableVolume = async (
       sumTags([vRequestOrder.tag, vAppOrder.tag, vDatasetOrder.tag]),
     );
     if (workerpoolMissingTagBits.length > 0) {
-      throw Error(
+      throw new Error(
         `Missing tags [${workerpoolMissingTagBits.map((bit) =>
           tagBitToHuman(bit),
         )}] in workerpoolorder`,
@@ -666,7 +667,7 @@ const getMatchableVolume = async (
       1,
     );
     if (teeAppRequired && !checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
-      throw Error('Missing tag [tee] in apporder');
+      throw new Error('Missing tag [tee] in apporder');
     }
 
     // price check
@@ -705,7 +706,7 @@ const getMatchableVolume = async (
       ? new BN(workerpoolOrder.volume)
       : stake.div(requiredStakePerTask);
     if (workerpoolStakedVolume.isZero()) {
-      throw Error(
+      throw new Error(
         `workerpool required stake (${requiredStakePerTask}) is greater than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
       );
     }
@@ -1064,7 +1065,7 @@ export const matchOrders = async ({
     const matchEvent = 'OrdersMatched';
     const orderMatchedEvent = events.find((event) => event.name === matchEvent);
     if (!orderMatchedEvent) {
-      throw Error(`${matchEvent} not confirmed`);
+      throw new Error(`${matchEvent} not confirmed`);
     }
     const { dealid, volume } = orderMatchedEvent.args;
     return { dealid, volume: bigIntToBn(volume), txHash: tx.hash };

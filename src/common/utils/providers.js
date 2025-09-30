@@ -21,7 +21,7 @@ export const getReadOnlyProvider = (
     typeof resolvedHost !== 'string' ||
     !resolvedHost.startsWith('http')
   ) {
-    throw Error('Invalid provider host name or url');
+    throw new Error('Invalid provider host name or url');
   }
 
   // RPC endpoint

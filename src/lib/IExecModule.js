@@ -4,7 +4,9 @@ import IExecConfig from './IExecConfig.js';
 export default class IExecModule {
   constructor(...args) {
     if (!args[0]) {
-      throw Error(`${this.constructor.name} requires at least one argument`);
+      throw new Error(
+        `${this.constructor.name} requires at least one argument`,
+      );
     }
     if (args[0] instanceof IExecConfig) {
       [this.config] = args;
@@ -16,7 +18,7 @@ export default class IExecModule {
 
   static fromConfig(config) {
     if (!(config instanceof IExecConfig))
-      throw Error('fromConfig requires an instance of IExecConfig');
+      throw new Error('fromConfig requires an instance of IExecConfig');
     return new this.prototype.constructor(config);
   }
 }

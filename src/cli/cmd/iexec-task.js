@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
+import { join } from 'node:path';
+import { Readable } from 'node:stream';
+import { finished } from 'node:stream/promises';
 import { program as cli } from 'commander';
 import Debug from 'debug';
-import { join } from 'path';
-import { Readable } from 'stream';
-import { finished } from 'stream/promises';
 import fsExtra from 'fs-extra';
 import { show, claim, obsTask } from '../../common/execution/task.js';
 import { fetchTaskResults } from '../../common/execution/result.js';
@@ -113,7 +113,7 @@ showTask
             const { beneficiarySecretsFolderPath } = createEncFolderPaths(opts);
             const exists = await pathExists(beneficiarySecretsFolderPath);
             if (!exists) {
-              throw Error(
+              throw new Error(
                 'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
               );
             }
@@ -136,7 +136,7 @@ showTask
               beneficiaryKey = await readFile(beneficiaryKeyPath, 'utf8');
             } catch (error) {
               debug(error);
-              throw Error(
+              throw new Error(
                 `Failed to load beneficiary key from "${beneficiaryKeyPath}"`,
               );
             }

@@ -182,7 +182,7 @@ export const claim = async (
     const taskStatus = task.status;
 
     if ([3, 4].includes(taskStatus)) {
-      throw Error(
+      throw new Error(
         `Cannot claim a task having status ${
           TASK_STATUS_MAP[taskStatus.toString()]
         }`,
@@ -190,7 +190,7 @@ export const claim = async (
     }
 
     if (!task.taskTimedOut) {
-      throw Error(
+      throw new Error(
         `Cannot claim a task before reaching the consensus deadline date: ${new Date(
           1000 * parseInt(task.finalDeadline, 10),
         )}`,
@@ -204,7 +204,7 @@ export const claim = async (
 
     const claimTxReceipt = await wrapWait(claimTx.wait(contracts.confirms));
     if (!checkEventFromLogs('TaskClaimed', claimTxReceipt.logs))
-      throw Error('TaskClaimed not confirmed');
+      throw new Error('TaskClaimed not confirmed');
 
     return claimTx.hash;
   } catch (error) {

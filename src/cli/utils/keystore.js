@@ -1,6 +1,6 @@
+import os from 'node:os';
+import path from 'node:path';
 import Debug from 'debug';
-import os from 'os';
-import path from 'path';
 import fsExtra from 'fs-extra';
 import { SigningKey, Wallet } from 'ethers';
 import { checksummedAddress } from '../../common/utils/utils.js';
@@ -56,9 +56,9 @@ const decrypt = async (encryptedJSON, password) => {
   } catch (error) {
     debug('decrypt()', error);
     if (error.shortMessage) {
-      throw Error(error.shortMessage);
+      throw new Error(error.shortMessage);
     }
-    throw Error('Failed to decrypt wallet');
+    throw new Error('Failed to decrypt wallet');
   }
 };
 
@@ -180,7 +180,7 @@ export const Keystore = ({
         files = await fsExtra.readdir(fileDir);
       } catch (error) {
         debug('getWalletFileName()', error);
-        throw Error(
+        throw new Error(
           `Missing keystore directory ${fileDir}, did you forget to run "iexec wallet create" ?`,
         );
       }
@@ -199,7 +199,7 @@ export const Keystore = ({
       if (match) {
         return match;
       }
-      throw Error(
+      throw new Error(
         `No wallet file matching address ${walletOptions.walletAddress} found in ${fileDir}`,
       );
     }
@@ -225,7 +225,7 @@ export const Keystore = ({
         pk = privateKey;
       } catch (error) {
         debug('try load unencrypted', error);
-        throw Error(
+        throw new Error(
           `Missing option ${option.walletAddress()[0]} or ${
             option.walletFileName()[0]
           } and no wallet.json found in working directory`,

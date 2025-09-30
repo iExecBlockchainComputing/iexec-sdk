@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
+import { join } from 'node:path';
 import { program as cli } from 'commander';
 import Debug from 'debug';
 import fsExtra from 'fs-extra';
-import { join } from 'path';
 import {
   checkDeployedDataset,
   deployDataset,
@@ -145,7 +145,7 @@ deploy
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
-        throw Error(
+        throw new Error(
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
@@ -190,10 +190,10 @@ show
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!isAddress && !userAddress)
-        throw Error(`Missing option ${option.user()[0]} or wallet`);
+        throw new Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex)
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
 
       spinner.start(info.showing(objName));
 
@@ -261,7 +261,7 @@ count
 
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!userAddress)
-        throw Error(`Missing option ${option.user()[0]} or wallet`);
+        throw new Error(`Missing option ${option.user()[0]} or wallet`);
 
       spinner.start(info.counting(objName));
       const objCountBN = await countUserDatasets(chain.contracts, userAddress);
@@ -300,14 +300,14 @@ encryptDataset
       ]);
 
       if (!eDSF || !eODF || !eEDF) {
-        throw Error(
+        throw new Error(
           'Folders for dataset encryption are missing, did you forget to run "iexec dataset init --encrypted"?',
         );
       }
 
       const isDatasetFolderEmpty = await isEmptyDir(originalDatasetFolderPath);
       if (isDatasetFolderEmpty) {
-        throw Error(
+        throw new Error(
           `Input folder "${originalDatasetFolderPath}" is empty, nothing to encrypt`,
         );
       }
@@ -427,7 +427,7 @@ pushSecret
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!resourceAddress) {
-        throw Error(
+        throw new Error(
           'Missing datasetAddress argument and no dataset found in "deployed.json"',
         );
       }
@@ -459,7 +459,7 @@ pushSecret
           raw: {},
         });
       } else {
-        throw Error('Something went wrong');
+        throw new Error('Something went wrong');
       }
     } catch (error) {
       handleError(error, cli, opts);
@@ -483,7 +483,7 @@ checkSecret
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!resourceAddress) {
-        throw Error(
+        throw new Error(
           'Missing datasetAddress argument and no dataset found in "deployed.json"',
         );
       }
@@ -538,7 +538,7 @@ publish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -548,7 +548,7 @@ publish
       }
       spinner.info(`Creating ${objName}order for ${objName} ${address}`);
       if (!(await checkDeployedDataset(chain.contracts, address))) {
-        throw Error(`No ${objName} deployed at address ${address}`);
+        throw new Error(`No ${objName} deployed at address ${address}`);
       }
       const overrides = {
         dataset: address,
@@ -614,7 +614,7 @@ unpublish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -672,7 +672,7 @@ transfer
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
-      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
         await prompt.transferObj(objName, objAddress, opts.to, chain.id);
       }

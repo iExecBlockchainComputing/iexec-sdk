@@ -197,7 +197,7 @@ deploy
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
-        throw Error(
+        throw new Error(
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
@@ -242,10 +242,10 @@ show
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!isAddress && !userAddress)
-        throw Error(`Missing option ${option.user()[0]} or wallet`);
+        throw new Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex)
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
       spinner.start(info.showing(objName));
 
       let res;
@@ -307,7 +307,7 @@ count
       ]);
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!userAddress)
-        throw Error(`Missing option ${option.user()[0]} or wallet`);
+        throw new Error(`Missing option ${option.user()[0]} or wallet`);
       spinner.start(info.counting(objName));
       const objCountBN = await countUserApps(chain.contracts, userAddress);
       spinner.succeed(
@@ -336,7 +336,7 @@ checkSecret
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!resourceAddress) {
-        throw Error(
+        throw new Error(
           'Missing appAddress argument and no app found in "deployed.json"',
         );
       }
@@ -389,7 +389,7 @@ pushSecret
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!resourceAddress) {
-        throw Error(
+        throw new Error(
           'Missing appAddress argument and no app found in "deployed.json"',
         );
       }
@@ -418,7 +418,7 @@ pushSecret
           raw: {},
         });
       } else {
-        throw Error('Something went wrong');
+        throw new Error('Something went wrong');
       }
     } catch (error) {
       handleError(error, cli, opts);
@@ -453,7 +453,7 @@ publish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -463,7 +463,7 @@ publish
       }
       spinner.info(`Creating ${objName}order for ${objName} ${address}`);
       if (!(await checkDeployedApp(chain.contracts, address))) {
-        throw Error(`No ${objName} deployed at address ${address}`);
+        throw new Error(`No ${objName} deployed at address ${address}`);
       }
       const overrides = {
         app: address,
@@ -523,7 +523,7 @@ unpublish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -604,7 +604,7 @@ run
           (deployedApp) => deployedApp && deployedApp[chain.id],
         ));
       if (!app) {
-        throw Error(
+        throw new Error(
           `Missing appAddress and no app found in "deployed.json" for chain ${chain.id}`,
         );
       }
@@ -625,7 +625,7 @@ run
             )
           : opts.dataset);
       if (useDataset && !dataset) {
-        throw Error(
+        throw new Error(
           `No dataset found in "deployed.json" for chain ${chain.id}`,
         );
       }
@@ -653,7 +653,7 @@ run
             )
           : opts.workerpool);
       if (runOnWorkerpool && !workerpool) {
-        throw Error(
+        throw new Error(
           `No workerpool found in "deployed.json" for chain ${chain.id}`,
         );
       }
@@ -748,7 +748,7 @@ run
       const getApporder = async () => {
         spinner.info(`Using app ${app}`);
         if (!(await checkDeployedApp(chain.contracts, app)))
-          throw Error(`No app deployed at address ${app}`);
+          throw new Error(`No app deployed at address ${app}`);
         const appOwner = await getAppOwner(chain.contracts, app);
         const isAppOwner = appOwner.toLowerCase() === requester.toLowerCase();
         if (isAppOwner) {
@@ -785,7 +785,7 @@ run
           },
         );
         const order = orders[0] && orders[0].order;
-        if (!order) throw Error(`No order available for app ${app}`);
+        if (!order) throw new Error(`No order available for app ${app}`);
         return order;
       };
 
@@ -800,7 +800,7 @@ run
         )
           return NULL_DATASETORDER;
         if (!(await checkDeployedDataset(chain.contracts, dataset)))
-          throw Error(`No dataset deployed at address ${dataset}`);
+          throw new Error(`No dataset deployed at address ${dataset}`);
         const datasetOwner = await getDatasetOwner(chain.contracts, dataset);
         const isDatasetOwner =
           datasetOwner.toLowerCase() === requester.toLowerCase();
@@ -828,7 +828,8 @@ run
           },
         );
         const order = orders[0] && orders[0].order;
-        if (!order) throw Error(`No order available for dataset ${dataset}`);
+        if (!order)
+          throw new Error(`No order available for dataset ${dataset}`);
         return order;
       };
 
@@ -850,7 +851,7 @@ run
         debug('minTag', minTag);
         if (runOnWorkerpool) {
           if (!(await checkDeployedWorkerpool(chain.contracts, workerpool)))
-            throw Error(`No workerpool deployed at address ${workerpool}`);
+            throw new Error(`No workerpool deployed at address ${workerpool}`);
           const workerpoolOwner = await getWorkerpoolOwner(
             chain.contracts,
             workerpool,
@@ -912,7 +913,7 @@ run
             return order;
           }
           if (strict) {
-            throw Error(
+            throw new Error(
               `No workerpoolorder matching your conditions available in category ${category}`,
             );
           }
@@ -921,7 +922,7 @@ run
             await showCategory(chain.contracts, nextCatid);
           } catch (error) {
             debug(error);
-            throw Error(
+            throw new Error(
               'No workerpoolorder matching your conditions currently available',
             );
           }
@@ -931,7 +932,9 @@ run
           strict: useCategory,
         });
         if (!order) {
-          throw Error(`No workerpoolorder available in category ${category}`);
+          throw new Error(
+            `No workerpoolorder available in category ${category}`,
+          );
         }
         return order;
       };
@@ -986,7 +989,7 @@ run
           apporder,
           { tagOverride: resolvedTag },
         ).catch((e) => {
-          throw Error(
+          throw new Error(
             `App requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
@@ -1004,7 +1007,7 @@ run
           datasetorder,
           { tagOverride: resolvedTag },
         ).catch((e) => {
-          throw Error(
+          throw new Error(
             `Dataset requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
@@ -1021,7 +1024,7 @@ run
           },
           requestorderToSign,
         ).catch((e) => {
-          throw Error(
+          throw new Error(
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
@@ -1191,7 +1194,7 @@ requestRun
       const chain = await loadChain(opts.chain, { spinner });
       debug('app', app);
       if (!(await checkDeployedApp(chain.contracts, app))) {
-        throw Error(`No app deployed at address ${app}`);
+        throw new Error(`No app deployed at address ${app}`);
       }
       const dataset = opts.dataset || NULL_ADDRESS;
       debug('dataset', dataset);
@@ -1199,7 +1202,7 @@ requestRun
         dataset !== NULL_ADDRESS &&
         !(await checkDeployedDataset(chain.contracts, dataset))
       ) {
-        throw Error(`No dataset deployed at address ${dataset}`);
+        throw new Error(`No dataset deployed at address ${dataset}`);
       }
       const workerpool = opts.workerpool || NULL_ADDRESS;
       debug('workerpool', workerpool);
@@ -1207,7 +1210,7 @@ requestRun
         workerpool !== NULL_ADDRESS &&
         !(await checkDeployedWorkerpool(chain.contracts, workerpool))
       ) {
-        throw Error(`No workerpool deployed at address ${workerpool}`);
+        throw new Error(`No workerpool deployed at address ${workerpool}`);
       }
       const appprice = await nRlcAmountSchema().validate(opts.appPrice || 0);
       debug('appprice', appprice);
@@ -1324,7 +1327,7 @@ requestRun
           },
           requestorderToSign,
         ).catch((e) => {
-          throw Error(
+          throw new Error(
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
@@ -1346,7 +1349,7 @@ requestRun
 
       const { stake } = await checkBalance(chain.contracts, requester);
       if (totalCost.gt(stake)) {
-        throw Error(
+        throw new Error(
           `Not enough RLC on your account (${formatRLC(
             totalCost,
           )} RLC required). Run "iexec account deposit" to topup your account.`,
@@ -1431,7 +1434,7 @@ transfer
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
-      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
         await prompt.transferObj(objName, objAddress, opts.to, chain.id);
       }

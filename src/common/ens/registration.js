@@ -80,7 +80,7 @@ export const registerFifsEns = async (
         contracts.provider.getCode(domainOwner),
       );
       if (domainOwnerCode === '0x') {
-        throw Error(
+        throw new Error(
           `The base domain ${vDomain} owner ${domainOwner} is not a contract`,
         );
       }
@@ -97,7 +97,7 @@ export const registerFifsEns = async (
     } else if (ownedBy.toLowerCase() === address.toLowerCase()) {
       debug(`${name} is already owned by current wallet ${ownedBy}`);
     } else {
-      throw Error(`${name} is already owned by ${ownedBy}`);
+      throw new Error(`${name} is already owned by ${ownedBy}`);
     }
     return {
       registerTxHash,
@@ -154,7 +154,7 @@ export const obsConfigureResolution = (
             contracts.provider.getCode(vAddress),
           );
           if (addressCode === '0x') {
-            throw Error(
+            throw new Error(
               `Target address ${vAddress} is not a contract and don't match current wallet address ${walletAddress}, impossible to setup ENS resolution`,
             );
           } else {
@@ -164,7 +164,7 @@ export const obsConfigureResolution = (
 
         const nameOwner = await getOwner(contracts, vName);
         if (nameOwner.toLowerCase() !== walletAddress.toLowerCase()) {
-          throw Error(
+          throw new Error(
             `The current address ${walletAddress} is not owner of ${vName}`,
           );
         }
@@ -182,7 +182,7 @@ export const obsConfigureResolution = (
               entryOwner.toLowerCase() === walletAddress.toLowerCase()
             )
           ) {
-            throw Error(
+            throw new Error(
               `${walletAddress} is not the owner of ${vAddress}, impossible to setup ENS resolution`,
             );
           }
@@ -199,7 +199,7 @@ export const obsConfigureResolution = (
           contracts.provider.getCode(publicResolverAddress),
         );
         if (resolverCode === '0x') {
-          throw Error(
+          throw new Error(
             `The resolver ${publicResolverAddress} is not a contract`,
           );
         }

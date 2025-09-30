@@ -1,9 +1,9 @@
+import { isAbsolute, join } from 'node:path';
 import Debug from 'debug';
 import { Option } from 'commander';
 import Ora from 'ora';
 import inquirer from 'inquirer';
 import { render } from 'prettyjson';
-import { isAbsolute, join } from 'path';
 import checkForUpdate from 'update-check';
 import isDocker from 'is-docker';
 import {
@@ -547,7 +547,7 @@ const question = async (
     },
   ]);
   if (answer.ok) return true;
-  if (strict) throw Error(error);
+  if (strict) throw new Error(error);
   return false;
 };
 
@@ -564,7 +564,7 @@ const promptPassword = async (
     },
   ]);
   if (answer.pw) return answer.pw;
-  if (strict) throw Error(error);
+  if (strict) throw new Error(error);
   return promptPassword(message, { error, strict });
 };
 
@@ -577,7 +577,7 @@ const promptConfirmedPassword = async (
     error: 'Password mismatch',
   });
   if (pw1 === pw2) return pw1;
-  throw Error('Password mismatch');
+  throw new Error('Password mismatch');
 };
 
 export const prompt = {
@@ -751,7 +751,7 @@ export const computeWalletCreateOptions = async (opts) => {
       );
     }
     if (!pw && !opts.unencrypted) {
-      throw Error('Missing wallet password');
+      throw new Error('Missing wallet password');
     }
     if (pw && opts.unencrypted) {
       spinner.warn('Option --unencrypted will be ignored');
@@ -891,7 +891,9 @@ export const getPropertyFormChain = (
 ) => {
   const value = chain[property];
   if (value === undefined && strict)
-    throw Error(`Missing ${property} in "chain.json" for chain ${chain.id}`);
+    throw new Error(
+      `Missing ${property} in "chain.json" for chain ${chain.id}`,
+    );
   return value;
 };
 
@@ -916,7 +918,7 @@ export const getSmsUrlFromChain = (
     smsUrl = smsUrlOrMap[selectedTeeFramework];
   }
   if (smsUrl === undefined && strict)
-    throw Error(
+    throw new Error(
       `Missing sms for tee framework ${selectedTeeFramework} in "chain.json" for chain ${chain.id}`,
     );
   return smsUrl;
@@ -967,7 +969,7 @@ export const isEthAddress = (address, { strict = false } = {}) => {
     address.substring(address.length - 4) === '.eth';
   const isAddress = isEns || (isHexString && address.length === 42);
   if (!isAddress && strict) {
-    throw Error(`Address ${address} is not a valid Ethereum address`);
+    throw new Error(`Address ${address} is not a valid Ethereum address`);
   }
   return isAddress;
 };

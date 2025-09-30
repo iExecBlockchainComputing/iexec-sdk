@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
+import { join } from 'node:path';
+import { generateKeyPair } from 'node:crypto';
 import { program as cli } from 'commander';
 import Debug from 'debug';
 import { gt } from 'semver';
 import fsExtra from 'fs-extra';
 import { Buffer } from 'buffer';
-import { join } from 'path';
-import { generateKeyPair } from 'crypto';
 import { decryptResult } from '../../common/utils/result-utils.js';
 import { getResultEncryptionKeyName } from '../../common/utils/secrets-utils.js';
 import { checkWeb2SecretExists } from '../../common/sms/check.js';
@@ -55,7 +55,7 @@ generateKeys
     try {
       const nodeMinVersion = 'v10.12.0';
       if (gt(nodeMinVersion, process.version)) {
-        throw Error(
+        throw new Error(
           `Minimum node version to use this command is ${nodeMinVersion}, found ${process.version}`,
         );
       }
@@ -141,7 +141,7 @@ decryptResults
       );
 
       if (!beneficiarySecretFolderExists) {
-        throw Error(
+        throw new Error(
           'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
         );
       }
@@ -178,7 +178,7 @@ decryptResults
         beneficiaryKey = await readFile(beneficiaryKeyPath, 'utf8');
       } catch (error) {
         debug(error);
-        throw Error(
+        throw new Error(
           `Failed to load beneficiary encryption key from "${beneficiaryKeyPath}"`,
         );
       }
@@ -253,7 +253,7 @@ pushSecret
           raw: { isPushed, isUpdated },
         });
       } else {
-        throw Error('Something went wrong');
+        throw new Error('Something went wrong');
       }
     } catch (error) {
       handleError(error, cli, opts);

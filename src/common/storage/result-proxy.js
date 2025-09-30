@@ -32,7 +32,9 @@ export const login = async (
     if (res.ok) {
       return await res.text();
     }
-    throw Error(`Result Proxy login failed: ${res.status} ${res.statusText}`);
+    throw new Error(
+      `Result Proxy login failed: ${res.status} ${res.statusText}`,
+    );
   } catch (error) {
     debug('login()', error);
     throw error;

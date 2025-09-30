@@ -17,7 +17,7 @@ export const getStorageTokenKeyName = (provider) => {
     case STORAGE_PROVIDERS.DROPBOX:
       return reservedSecretKeyName.IEXEC_RESULT_DROPBOX_TOKEN;
     default:
-      throw Error(`"${provider}" not supported`);
+      throw new Error(`"${provider}" not supported`);
   }
 };
 

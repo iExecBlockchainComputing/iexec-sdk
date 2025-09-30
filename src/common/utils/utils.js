@@ -34,7 +34,7 @@ export const formatRLC = (nRLC) => {
     return formatUnits(stringify(nRLC), 9);
   } catch (error) {
     debug('formatRLC()', error);
-    throw Error('Invalid nRLC');
+    throw new Error('Invalid nRLC');
   }
 };
 
@@ -44,14 +44,14 @@ export const parseRLC = (value, defaultUnit = 'RLC') => {
   const [amount, inputUnit] = stringify(value).split(' ');
   const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
   if (!isRlcUnit(unit)) {
-    throw Error('Invalid token unit');
+    throw new Error('Invalid token unit');
   }
   const pow = unit === 'RLC' ? 9 : 0;
   try {
     return bigIntToBn(parseUnits(amount, pow));
   } catch (error) {
     debug('parseRLC()', error);
-    throw Error('Invalid token amount');
+    throw new Error('Invalid token amount');
   }
 };
 
@@ -60,7 +60,7 @@ export const formatEth = (wei) => {
     return formatUnits(BigInt(stringify(wei)));
   } catch (error) {
     debug('formatEth()', error);
-    throw Error('Invalid wei');
+    throw new Error('Invalid wei');
   }
 };
 
@@ -73,13 +73,13 @@ export const parseEth = (value, defaultUnit = 'ether') => {
   const [amount, inputUnit] = stringify(value).split(' ');
   const unit = inputUnit !== undefined ? inputUnit : defaultUnit;
   if (!isEthUnit(unit)) {
-    throw Error('Invalid ether unit');
+    throw new Error('Invalid ether unit');
   }
   try {
     return bigIntToBn(parseUnits(amount, unit === 'eth' ? 'ether' : unit));
   } catch (error) {
     debug('formatEth()', error);
-    throw Error('Invalid ether amount');
+    throw new Error('Invalid ether amount');
   }
 };
 

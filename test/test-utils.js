@@ -244,7 +244,9 @@ const faucetSendWeiToReachTargetBalance =
           tryCount + 1,
         );
       } else {
-        throw Error(`Failed to send Eth from faucet (tried ${tryCount} times)`);
+        throw new Error(
+          `Failed to send Eth from faucet (tried ${tryCount} times)`,
+        );
       }
     }
   };
@@ -301,7 +303,9 @@ const faucetSendNRlcToReachTargetBalance =
           tryCount + 1,
         );
       } else {
-        throw Error(`Failed to send RLC from faucet (tried ${tryCount} times)`);
+        throw new Error(
+          `Failed to send RLC from faucet (tried ${tryCount} times)`,
+        );
       }
     }
   };
@@ -395,7 +399,7 @@ export const adminCreateCategory =
         await sleep(3000 * tryCount);
         res = await adminCreateCategory(chain)(category, tryCount + 1);
       } else {
-        throw Error(
+        throw new Error(
           `Failed to create category with admin wallet (tried ${tryCount} times)`,
         );
       }

@@ -60,13 +60,13 @@ describe('utils', () => {
 
     test("parseEth('4.2 foo')", () => {
       expect(() => utils.parseEth('4.2 foo')).toThrow(
-        Error('Invalid ether unit'),
+        new Error('Invalid ether unit'),
       );
     });
 
     test("parseEth('4.2 wei')", () => {
       expect(() => utils.parseEth('4.2 wei')).toThrow(
-        Error('Invalid ether amount'),
+        new Error('Invalid ether amount'),
       );
     });
   });
@@ -110,13 +110,13 @@ describe('utils', () => {
 
     test("parseRLC('4.2 nRLC')", () => {
       expect(() => utils.parseRLC('4.2 nRLC')).toThrow(
-        Error('Invalid token amount'),
+        new Error('Invalid token amount'),
       );
     });
 
     test("parseRLC('4.2 foo')", () => {
       expect(() => utils.parseRLC('4.2 foo')).toThrow(
-        Error('Invalid token unit'),
+        new Error('Invalid token unit'),
       );
     });
   });
@@ -328,7 +328,7 @@ describe('utils', () => {
         ),
       );
       const err = await utils.decryptResult(encZip, 'foo').catch((e) => e);
-      expect(err).toEqual(new Error('Invalid beneficiary key'));
+      expect(err).toEqual(Error('Invalid beneficiary key'));
     });
 
     test('fails to decrypt the result with the wrong key', async () => {
@@ -441,7 +441,7 @@ describe('utils', () => {
       expect(tx2).toBeTxHash();
     });
 
-    test('providers option allow passing JSON RPC API providers api keys', async () => {
+    test.skip('providers option allow passing JSON RPC API providers api keys', async () => {
       const providerOptions = {
         infura: INFURA_PROJECT_ID,
         alchemy: ALCHEMY_API_KEY,

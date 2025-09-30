@@ -19,7 +19,7 @@ export const approve = async (
     checkSigner(contracts);
     const vAmount = await nRlcAmountSchema().required().validate(amount);
     if (new BN(vAmount).lten(new BN(0)))
-      throw Error('Approve amount must be less than or equals 0');
+      throw new Error('Approve amount must be less than or equals 0');
     const vSpenderAddress = await addressSchema({
       ethProvider: contracts.provider,
     })
@@ -32,7 +32,7 @@ export const approve = async (
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
 
     if (!checkEventFromLogs('Approval', txReceipt.logs))
-      throw Error('Approve not confirmed');
+      throw new Error('Approve not confirmed');
 
     return tx.hash;
   } catch (error) {

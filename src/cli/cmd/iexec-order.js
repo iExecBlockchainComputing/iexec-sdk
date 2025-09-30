@@ -214,7 +214,7 @@ sign
           }
           const orderObj = await createApporder(chain.contracts, loadedOrder);
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
-            throw Error(`No app deployed at address ${orderObj.app}`);
+            throw new Error(`No app deployed at address ${orderObj.app}`);
           if (!opts.skipPreflightCheck) {
             await checkAppRequirements(
               {
@@ -222,7 +222,7 @@ sign
               },
               orderObj,
             ).catch((e) => {
-              throw Error(
+              throw new Error(
                 `App requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
@@ -258,7 +258,9 @@ sign
             loadedOrder,
           );
           if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
-            throw Error(`No dataset deployed at address ${orderObj.dataset}`);
+            throw new Error(
+              `No dataset deployed at address ${orderObj.dataset}`,
+            );
           if (!opts.skipPreflightCheck) {
             await checkDatasetRequirements(
               {
@@ -269,7 +271,7 @@ sign
               },
               orderObj,
             ).catch((e) => {
-              throw Error(
+              throw new Error(
                 `Dataset requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
@@ -312,7 +314,7 @@ sign
               orderObj.workerpool,
             ))
           )
-            throw Error(
+            throw new Error(
               `No workerpool deployed at address ${orderObj.workerpool}`,
             );
           const signedOrder = await signWorkerpoolorder(
@@ -347,7 +349,7 @@ sign
             loadedOrder,
           );
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
-            throw Error(`No app deployed at address ${orderObj.app}`);
+            throw new Error(`No app deployed at address ${orderObj.app}`);
           if (!opts.skipPreflightCheck) {
             await checkRequestRequirements(
               {
@@ -358,7 +360,7 @@ sign
               },
               orderObj,
             ).catch((e) => {
-              throw Error(
+              throw new Error(
                 `Request requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
@@ -445,13 +447,13 @@ fill
             orderHash,
           );
           if (!orderRes) {
-            throw Error(
+            throw new Error(
               `${orderName} ${orderHash} is not published on iexec marketplace`,
             );
           }
           return orderRes.order;
         }
-        throw Error(`Invalid ${orderName} hash`);
+        throw new Error(`Invalid ${orderName} hash`);
       };
       const apporder = opts.app
         ? await getOrderByHash(APP_ORDER, opts.app)
@@ -533,7 +535,7 @@ fill
           apporder,
           { tagOverride: resolvedTag },
         ).catch((e) => {
-          throw Error(
+          throw new Error(
             `App requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
@@ -552,7 +554,7 @@ fill
             datasetorder,
             { tagOverride: resolvedTag },
           ).catch((e) => {
-            throw Error(
+            throw new Error(
               `Dataset requirements check failed: ${
                 e.message
               } (If you consider this is not an issue, use ${
@@ -570,7 +572,7 @@ fill
           },
           requestorder,
         ).catch((e) => {
-          throw Error(
+          throw new Error(
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
@@ -656,7 +658,7 @@ publish
                   },
                   orderToPublish,
                 ).catch((e) => {
-                  throw Error(
+                  throw new Error(
                     `App requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
@@ -684,7 +686,7 @@ publish
                   },
                   orderToPublish,
                 ).catch((e) => {
-                  throw Error(
+                  throw new Error(
                     `Dataset requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
@@ -719,7 +721,7 @@ publish
                   },
                   orderToPublish,
                 ).catch((e) => {
-                  throw Error(
+                  throw new Error(
                     `Request requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
@@ -1013,7 +1015,7 @@ show
             const signedOrders = (await loadSignedOrders())[chain.id];
             const signedOrder = signedOrders && signedOrders[orderName];
             if (!signedOrder) {
-              throw Error(
+              throw new Error(
                 `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
               );
             }

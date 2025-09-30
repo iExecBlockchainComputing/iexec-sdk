@@ -9,14 +9,14 @@ export class EnhancedWallet extends Wallet {
       try {
         BigInt(options.gasPrice);
       } catch {
-        throw Error('Invalid gasPrice option');
+        throw new Error('Invalid gasPrice option');
       }
     }
     if (
       options.getTransactionCount !== undefined &&
       typeof options.getTransactionCount !== 'function'
     ) {
-      throw Error('Invalid getTransactionCount option, must be a function');
+      throw new Error('Invalid getTransactionCount option, must be a function');
     }
   }
 
@@ -58,7 +58,7 @@ export class EnhancedWallet extends Wallet {
 export class BrowserProviderSignerAdapter extends AbstractSigner {
   constructor(browserProvider) {
     if (!(browserProvider instanceof BrowserProvider)) {
-      throw Error('Invalid BrowserProvider');
+      throw new Error('Invalid BrowserProvider');
     }
     super(browserProvider);
   }
@@ -69,7 +69,7 @@ export class BrowserProviderSignerAdapter extends AbstractSigner {
 
   // eslint-disable-next-line class-methods-use-this
   connect() {
-    throw Error('Unsupported');
+    throw new Error('Unsupported');
   }
 
   signMessage(message) {

@@ -388,7 +388,7 @@ export const tagSchema = () =>
           return e;
         }
       }
-      return Error('Invalid tag');
+      return new Error('Invalid tag');
     })
     .test(
       'no-transform-error',
@@ -425,7 +425,7 @@ export const tagSchema = () =>
         try {
           if (isTee) {
             if (teeFrameworks.length < 1) {
-              throw Error(
+              throw new Error(
                 `'tee' tag must be used with a tee framework (${Object.values(
                   TEE_FRAMEWORKS,
                 )
@@ -434,7 +434,7 @@ export const tagSchema = () =>
               );
             }
             if (teeFrameworks.length > 1) {
-              throw Error(
+              throw new Error(
                 `tee framework tags are exclusive (${Object.values(
                   TEE_FRAMEWORKS,
                 )
@@ -443,7 +443,7 @@ export const tagSchema = () =>
               );
             }
           } else if (teeFrameworks.length > 0) {
-            throw Error(
+            throw new Error(
               `'${teeFrameworks[0]}' tag must be used with 'tee' tag`,
             );
           }
@@ -694,7 +694,7 @@ export const fileBufferSchema = () =>
   mixed().transform((value) => {
     try {
       if (typeof value === 'string') {
-        throw Error('unsupported string');
+        throw new Error('unsupported string');
       }
       return Buffer.from(value);
     } catch {
@@ -712,7 +712,7 @@ export const base64Encoded256bitsKeySchema = () =>
       try {
         const keyBuffer = Buffer.from(value, 'base64');
         if (keyBuffer.length !== 32) {
-          throw Error('Invalid key length');
+          throw new Error('Invalid key length');
         }
         return true;
       } catch (e) {
@@ -760,7 +760,7 @@ export const ensDomainSchema = () =>
       (value) => {
         try {
           if (value !== value.toLowerCase()) {
-            throw Error('Domain cannot have uppercase characters');
+            throw new Error('Domain cannot have uppercase characters');
           }
           return true;
         } catch (e) {
@@ -805,7 +805,7 @@ export const ensLabelSchema = () =>
       (value) => {
         try {
           if (value !== value.toLowerCase()) {
-            throw Error('Label cannot have uppercase characters');
+            throw new Error('Label cannot have uppercase characters');
           }
           return true;
         } catch (e) {
