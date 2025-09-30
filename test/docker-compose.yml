@@ -226,7 +226,7 @@ services:
       start_period: 30s
 
   market-watcher:
-    image: iexechub/iexec-market-watcher:6.4
+    image: iexechub/iexec-market-watcher:7.0.0
     restart: unless-stopped
     environment:
       CHAIN: BELLECOUR
@@ -244,7 +244,7 @@ services:
         condition: service_started
 
   market-api:
-    image: iexechub/iexec-market-api:6.4
+    image: iexechub/iexec-market-api:7.0.0
     restart: unless-stopped
     ports:
       - 3000:3000
