@@ -317,12 +317,12 @@ describe('order', () => {
         app: address,
       });
       await expect(iexec.order.signApporder(order)).rejects.toThrow(
-        Error('Tag mismatch the TEE framework specified by app'),
+        new Error('Tag mismatch the TEE framework specified by app'),
       );
       await expect(
         iexec.order.signApporder({ ...order, tag: ['tee', 'scone'] }),
       ).rejects.toThrow(
-        Error('Tag mismatch the TEE framework specified by app'),
+        new Error('Tag mismatch the TEE framework specified by app'),
       );
       await expect(
         iexec.order.signApporder({ ...order, tag: ['tee', 'gramine'] }),
@@ -337,7 +337,7 @@ describe('order', () => {
       await expect(
         iexec.order.signApporder({ ...order, tag: ['tee'] }),
       ).rejects.toThrow(
-        Error(
+        new Error(
           "'tee' tag must be used with a tee framework ('scone'|'gramine')",
         ),
       );
@@ -353,7 +353,7 @@ describe('order', () => {
           tag: ['tee', 'scone', 'gramine'],
         }),
       ).rejects.toThrow(
-        Error("tee framework tags are exclusive ('scone'|'gramine')"),
+        new Error("tee framework tags are exclusive ('scone'|'gramine')"),
       );
     });
   });
@@ -387,7 +387,7 @@ describe('signDatasetorder()', () => {
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
       ),
     );
@@ -401,7 +401,7 @@ describe('signDatasetorder()', () => {
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'gramine'] }),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
       ),
     );
@@ -415,7 +415,9 @@ describe('signDatasetorder()', () => {
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
     ).rejects.toThrow(
-      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')"),
+      new Error(
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
     );
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['scone'] }),
@@ -429,7 +431,7 @@ describe('signDatasetorder()', () => {
         tag: ['tee', 'scone', 'gramine'],
       }),
     ).rejects.toThrow(
-      Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      new Error("tee framework tags are exclusive ('scone'|'gramine')"),
     );
   });
 });
@@ -482,7 +484,9 @@ describe('signRequestorder()', () => {
     await expect(
       iexec.order.signRequestorder({ ...order, tag: ['tee'] }),
     ).rejects.toThrow(
-      Error("'tee' tag must be used with a tee framework ('scone'|'gramine')"),
+      new Error(
+        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+      ),
     );
     await expect(
       iexec.order.signRequestorder({ ...order, tag: ['scone'] }),
@@ -496,7 +500,7 @@ describe('signRequestorder()', () => {
         tag: ['tee', 'scone', 'gramine'],
       }),
     ).rejects.toThrow(
-      Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      new Error("tee framework tags are exclusive ('scone'|'gramine')"),
     );
   });
 
@@ -512,7 +516,7 @@ describe('signRequestorder()', () => {
     });
 
     await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
-      Error(
+      new Error(
         'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
       ),
     );
@@ -539,7 +543,7 @@ describe('signRequestorder()', () => {
       .defaultStorageLogin()
       .then(iexec.storage.pushStorageToken);
     await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
-      Error(
+      new Error(
         'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
       ),
     );
@@ -586,7 +590,7 @@ describe('signRequestorder()', () => {
         })
         .then(iexecDatasetConsumer.order.signRequestorder),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
       ),
     );
@@ -642,7 +646,7 @@ describe('signRequestorder()', () => {
         })
         .then(iexec.order.signRequestorder),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `Requester secret "bar" is not set for requester ${wallet.address} in the SMS. Requester secret provisioning will fail.`,
       ),
     );
@@ -769,7 +773,7 @@ describe('cancelApporder()', () => {
     expect(res.order).toEqual(order);
     expect(res.txHash).toBeTxHash();
     await expect(iexec.order.cancelApporder(order)).rejects.toThrow(
-      Error('apporder already canceled'),
+      new Error('apporder already canceled'),
     );
   });
 });
@@ -782,7 +786,7 @@ describe('cancelDatasetorder()', () => {
     expect(res.order).toEqual(order);
     expect(res.txHash).toBeTxHash();
     await expect(iexec.order.cancelDatasetorder(order)).rejects.toThrow(
-      Error('datasetorder already canceled'),
+      new Error('datasetorder already canceled'),
     );
   });
 });
@@ -795,7 +799,7 @@ describe('cancelWorkerpoolorder()', () => {
     expect(res.order).toEqual(order);
     expect(res.txHash).toBeTxHash();
     await expect(iexec.order.cancelWorkerpoolorder(order)).rejects.toThrow(
-      Error('workerpoolorder already canceled'),
+      new Error('workerpoolorder already canceled'),
     );
   });
 });
@@ -817,7 +821,7 @@ describe('cancelRequestorder()', () => {
     expect(res.order).toEqual(order);
     expect(res.txHash).toBeTxHash();
     await expect(iexec.order.cancelRequestorder(order)).rejects.toThrow(
-      Error('requestorder already canceled'),
+      new Error('requestorder already canceled'),
     );
   });
 });
@@ -885,7 +889,7 @@ describe('publish...order()', () => {
       await expect(
         iexec.order.publishDatasetorder(datasetorder),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Dataset encryption key is not set for dataset ${datasetAddress} in the SMS. Dataset decryption will fail.`,
         ),
       );
@@ -967,7 +971,7 @@ describe('publish...order()', () => {
       await expect(
         iexec.order.publishRequestorder(requestorder),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
         ),
       );
@@ -1013,7 +1017,7 @@ describe('publish...order()', () => {
       await expect(
         iexec.order.publishRequestorder(requestorder),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
         ),
       );
@@ -1057,7 +1061,7 @@ describe('unpublish...order()', () => {
       const unpublishRes = await iexec.order.unpublishApporder(orderHash);
       expect(unpublishRes).toBe(orderHash);
       await expect(iexec.order.unpublishApporder(orderHash)).rejects.toThrow(
-        Error(
+        new Error(
           `API error: apporder with orderHash ${orderHash} is not published`,
         ),
       );
@@ -1076,7 +1080,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishDatasetorder(orderHash),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: datasetorder with orderHash ${orderHash} is not published`,
         ),
       );
@@ -1095,7 +1099,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishWorkerpoolorder(orderHash),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: workerpoolorder with orderHash ${orderHash} is not published`,
         ),
       );
@@ -1131,7 +1135,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishRequestorder(orderHash),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: requestorder with orderHash ${orderHash} is not published`,
         ),
       );
@@ -1156,7 +1160,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishLastApporder(apporder.app),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`,
         ),
       );
@@ -1191,7 +1195,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishLastDatasetorder(datasetorder.dataset),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`,
         ),
       );
@@ -1219,7 +1223,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishLastWorkerpoolorder(workerpoolorder.workerpool),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`,
         ),
       );
@@ -1271,7 +1275,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishLastRequestorder(requestorder.requester),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`,
         ),
       );
@@ -1295,7 +1299,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishAllApporders(apporder.app),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: no open apporder published by signer ${wallet.address} for app ${apporder.app}`,
         ),
       );
@@ -1329,7 +1333,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishAllDatasetorders(datasetorder.dataset),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: no open datasetorder published by signer ${wallet.address} for dataset ${datasetorder.dataset}`,
         ),
       );
@@ -1356,7 +1360,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishAllWorkerpoolorders(workerpoolorder.workerpool),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: no open workerpoolorder published by signer ${wallet.address} for workerpool ${workerpoolorder.workerpool}`,
         ),
       );
@@ -1407,7 +1411,7 @@ describe('unpublish...order()', () => {
       await expect(
         iexec.order.unpublishAllRequestorders(requestorder.requester),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `API error: no open requestorder published by signer ${wallet.address} for requester ${requestorder.requester}`,
         ),
       );
@@ -1887,7 +1891,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(`No workerpool deployed at address ${fakeAddress}`),
+      new Error(`No workerpool deployed at address ${fakeAddress}`),
     );
     // invalid sign
     const apporderInvalidSign = {
@@ -1965,7 +1969,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `app address mismatch between requestorder (${requestorderTemplate.app}) and apporder (${apporderAddressMismatch.app})`,
       ),
     );
@@ -1982,7 +1986,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `dataset address mismatch between requestorder (${requestorderTemplate.dataset}) and datasetorder (${datasetorderAddressMismatch.dataset})`,
       ),
     );
@@ -1999,7 +2003,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `workerpool address mismatch between requestorder (${requestorderTemplate.workerpool}) and workerpoolorder (${workerpoolorderAddressMismatch.workerpool})`,
       ),
     );
@@ -2020,7 +2024,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `category mismatch between requestorder (${requestorderTemplate.category}) and workerpoolorder (${workerpoolorderCategoryMismatch.category})`,
       ),
     );
@@ -2049,7 +2053,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `workerpoolorder trust is too low (expected ${requestorderTrustTooHigh.trust}, got ${workerpoolorderTrustZero.trust})`,
       ),
     );
@@ -2153,7 +2157,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `appmaxprice too low (expected ${apporderTooExpensive.appprice}, got ${requestorderTemplate.appmaxprice})`,
       ),
     );
@@ -2177,7 +2181,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `datasetmaxprice too low (expected ${datasetorderTooExpensive.datasetprice}, got ${requestorderTemplate.datasetmaxprice})`,
       ),
     );
@@ -2198,7 +2202,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         `workerpoolmaxprice too low (expected ${workerpoolorderTooExpensive.workerpoolprice}, got ${requestorderTemplate.workerpoolmaxprice})`,
       ),
     );
@@ -2320,7 +2324,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         "Cost per task (6) is greater than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account",
       ),
     );
@@ -2366,7 +2370,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         "Total cost for 3 tasks (6) is greater than requester account stake (5). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume",
       ),
     );
@@ -2396,7 +2400,7 @@ describe('matchOrders()', () => {
         { preflightCheck: false },
       ),
     ).rejects.toThrow(
-      Error(
+      new Error(
         "workerpool required stake (2) is greater than workerpool owner's account stake (1). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account",
       ),
     );
@@ -2559,7 +2563,7 @@ describe('matchOrders()', () => {
           { useVoucher: true },
         ),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `No voucher available for the requester ${requesterWallet.address}`,
         ),
       );
@@ -2684,7 +2688,7 @@ describe('matchOrders()', () => {
           { useVoucher: true },
         ),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Orders can't be matched. Please approve an additional ${missingAmount} for voucher usage.`,
         ),
       );

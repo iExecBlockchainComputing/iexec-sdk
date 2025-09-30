@@ -20,7 +20,9 @@ const downloadFromIpfs = async (
     if (error instanceof IpfsGatewayCallError) {
       throw error;
     }
-    throw Error(`Failed to download from ${ipfsGatewayURL}: ${error.message}`);
+    throw new Error(
+      `Failed to download from ${ipfsGatewayURL}: ${error.message}`,
+    );
   }
 };
 
@@ -32,16 +34,18 @@ export const fetchTaskResults = async (
   try {
     const vTaskId = await bytes32Schema().validate(taskid);
     const task = await show(contracts, vTaskId);
-    if (task.status !== 3) throw Error('Task is not completed');
+    if (task.status !== 3) throw new Error('Task is not completed');
     const { storage, location } = task.results;
     if (storage === 'none') {
-      throw Error('No result uploaded for this task');
+      throw new Error('No result uploaded for this task');
     }
     if (storage !== 'ipfs') {
-      throw Error(`Task result stored on ${storage}, download not supported`);
+      throw new Error(
+        `Task result stored on ${storage}, download not supported`,
+      );
     }
     if (!location) {
-      throw Error(
+      throw new Error(
         'Missing location key in task results, download not supported',
       );
     }

@@ -20,7 +20,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   try {
     rsaPrivateKey = forgePki.pki.privateKeyFromPem(pemRsaPrivateKey);
   } catch (error) {
-    throw Error('Invalid beneficiary key', { cause: error });
+    throw new Error('Invalid beneficiary key', { cause: error });
   }
 
   const ENC_KEY_FILE_NAME = 'aes-key.rsa';
@@ -45,17 +45,17 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   // eslint-disable-next-line sonarjs/no-unsafe-unzip
   const zip = await new JSZip().loadAsync(encryptedZipBuffer).catch((error) => {
     debug(error);
-    throw Error(`Failed to load encrypted results zip file`);
+    throw new Error(`Failed to load encrypted results zip file`);
   });
 
   // check required files
   const encKeyFileZip = zip.file(ENC_KEY_FILE_NAME);
   if (!encKeyFileZip) {
-    throw Error(`Missing ${ENC_KEY_FILE_NAME} file in zip input file`);
+    throw new Error(`Missing ${ENC_KEY_FILE_NAME} file in zip input file`);
   }
   const encResultsFileZip = zip.file(ENC_RESULTS_FILE_NAME);
   if (!encResultsFileZip) {
-    throw Error(`Missing ${ENC_RESULTS_FILE_NAME} file in zip input file`);
+    throw new Error(`Missing ${ENC_RESULTS_FILE_NAME} file in zip input file`);
   }
 
   // pre allocation best effort check (_data may not exist, uncompressedSize may have an overflow)
@@ -65,7 +65,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     (encKeyFileZip._data.uncompressedSize < 0 ||
       encKeyFileZip._data.uncompressedSize > ENC_KEY_MAX_SIZE)
   ) {
-    throw Error(`${ENC_KEY_FILE_NAME} is too large`);
+    throw new Error(`${ENC_KEY_FILE_NAME} is too large`);
   }
   if (
     encResultsFileZip._data &&
@@ -73,7 +73,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     (encResultsFileZip._data.uncompressedSize < 0 ||
       encResultsFileZip._data.uncompressedSize > ENC_RESULTS_MAX_SIZE)
   ) {
-    throw Error(`${ENC_RESULTS_FILE_NAME} is too large`);
+    throw new Error(`${ENC_RESULTS_FILE_NAME} is too large`);
   }
 
   debug(`loading ${ENC_KEY_FILE_NAME}`);
@@ -81,12 +81,14 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     .async('arraybuffer')
     .then((arrayBuffer) => {
       if (arrayBuffer.byteLength > ENC_KEY_MAX_SIZE) {
-        throw Error(`Unexpected file size (${arrayBuffer.byteLength} bytes)`);
+        throw new Error(
+          `Unexpected file size (${arrayBuffer.byteLength} bytes)`,
+        );
       }
       return arrayBuffer;
     })
     .catch((error) => {
-      throw Error(
+      throw new Error(
         `Failed to load ${ENC_KEY_FILE_NAME} file from zip input file: ${error}`,
       );
     });
@@ -119,7 +121,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
   } catch (error) {
     aesKeyDecryptionErrors.push(error);
     debug(`decryption errors: ${aesKeyDecryptionErrors}`);
-    throw Error('Failed to decrypt results key with beneficiary key');
+    throw new Error('Failed to decrypt results key with beneficiary key');
   }
 
   debug(`loading ${ENC_RESULTS_FILE_NAME}`);
@@ -127,12 +129,14 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     .async('arraybuffer')
     .then((arrayBuffer) => {
       if (arrayBuffer.byteLength > ENC_RESULTS_MAX_SIZE) {
-        throw Error(`Unexpected file size (${arrayBuffer.byteLength} bytes)`);
+        throw new Error(
+          `Unexpected file size (${arrayBuffer.byteLength} bytes)`,
+        );
       }
       return arrayBuffer;
     })
     .catch((error) => {
-      throw Error(
+      throw new Error(
         `Failed to load ${ENC_RESULTS_FILE_NAME} file from zip input file: ${error}`,
       );
     });
@@ -169,7 +173,7 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
         );
         break;
       default:
-        throw Error('Failed to determine result encryption mode');
+        throw new Error('Failed to determine result encryption mode');
     }
 
     const CHUNK_SIZE = 10 * 1000 * 1000;
@@ -191,6 +195,6 @@ export const decryptResult = async (encResultsZipBuffer, beneficiaryKey) => {
     return Buffer.concat([decryptionBuffer, finalizationBuffer]);
   } catch (error) {
     debug(error);
-    throw Error('Failed to decrypt results with decrypted results key');
+    throw new Error('Failed to decrypt results with decrypted results key');
   }
 };

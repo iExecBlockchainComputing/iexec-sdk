@@ -17,7 +17,7 @@ describe('result', () => {
       await expect(
         iexec.result.pushResultEncryptionKey('oops'),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Secret "iexec-result-encryption-public-key" already exists for ${wallet.address}`,
         ),
       );
@@ -26,7 +26,7 @@ describe('result', () => {
           teeFramework: TEE_FRAMEWORKS.SCONE,
         }),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Secret "iexec-result-encryption-public-key" already exists for ${wallet.address}`,
         ),
       );

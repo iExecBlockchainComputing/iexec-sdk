@@ -65,7 +65,7 @@ describe('[IExecConfig]', () => {
             { smsURL: { foo: 'https://foo.com' } },
           );
         expect(createConfig).toThrow(
-          Error('Invalid smsURL: this field has unspecified keys: foo'),
+          new Error('Invalid smsURL: this field has unspecified keys: foo'),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
@@ -79,7 +79,7 @@ describe('[IExecConfig]', () => {
             { defaultTeeFramework: 'foo' },
           );
         expect(createConfig).toThrow(
-          Error(
+          new Error(
             'Invalid defaultTeeFramework: this is not a valid TEE framework',
           ),
         );
@@ -126,7 +126,7 @@ describe('[IExecConfig]', () => {
       test('throw with unsupported chains - IExecConfig({ ethProvider: "kovan" })', () => {
         const createConfig = () => new IExecConfig({ ethProvider: 'kovan' });
         expect(createConfig).toThrow(
-          Error('Invalid ethProvider: Invalid provider host name or url'),
+          new Error('Invalid ethProvider: Invalid provider host name or url'),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
@@ -135,7 +135,7 @@ describe('[IExecConfig]', () => {
           const createConfig = () =>
             new IExecConfig({ ethProvider: 'arbitrum-sepolia-testnet' });
           expect(createConfig).toThrow(
-            Error('Invalid ethProvider: Invalid provider host name or url'),
+            new Error('Invalid ethProvider: Invalid provider host name or url'),
           );
           expect(createConfig).toThrow(errors.ConfigurationError);
         });
@@ -231,14 +231,14 @@ describe('[IExecConfig]', () => {
       test('throw with unsupported chains - IExecConfig({ ethProvider: 42 })', () => {
         const createConfig = () => new IExecConfig({ ethProvider: 42 });
         expect(createConfig).toThrow(
-          Error('Invalid ethProvider: Invalid provider host name or url'),
+          new Error('Invalid ethProvider: Invalid provider host name or url'),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: "42" })', () => {
         const createConfig = () => new IExecConfig({ ethProvider: '42' });
         expect(createConfig).toThrow(
-          Error('Invalid ethProvider: Invalid provider host name or url'),
+          new Error('Invalid ethProvider: Invalid provider host name or url'),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
@@ -246,7 +246,7 @@ describe('[IExecConfig]', () => {
         test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
           const createConfig = () => new IExecConfig({ ethProvider: 421614 });
           expect(createConfig).toThrow(
-            Error('Invalid ethProvider: Invalid provider host name or url'),
+            new Error('Invalid ethProvider: Invalid provider host name or url'),
           );
           expect(createConfig).toThrow(errors.ConfigurationError);
         });
@@ -432,7 +432,7 @@ describe('[IExecConfig]', () => {
           });
 
           await expect(config.resolveContractsClient()).rejects.toThrow(
-            Error(
+            new Error(
               'hubAddress option not set and no default value for your chain 421614',
             ),
           );
@@ -541,7 +541,7 @@ describe('[IExecConfig]', () => {
           });
 
           await expect(config.resolveContractsClient()).rejects.toThrow(
-            Error(
+            new Error(
               'hubAddress option not set and no default value for your chain 421614',
             ),
           );
@@ -624,7 +624,7 @@ describe('[IExecConfig]', () => {
         const createConfig = () =>
           new IExecConfig({ ethProvider: ethersSigner });
         expect(createConfig).toThrow(
-          Error('Missing provider for ethProvider signer'),
+          new Error('Missing provider for ethProvider signer'),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
@@ -799,7 +799,7 @@ describe('[IExecConfig]', () => {
       });
       const promise = config.resolveContractsClient();
       await expect(promise).rejects.toThrow(
-        Error(
+        new Error(
           `hubAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
@@ -855,7 +855,7 @@ describe('[IExecConfig]', () => {
       });
       const promise = config.resolveBridgedContractsClient();
       await expect(promise).rejects.toThrow(
-        Error(
+        new Error(
           `bridgedNetworkConf option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
@@ -981,7 +981,7 @@ describe('[IExecConfig]', () => {
       });
       const promise = config.resolveSmsURL();
       await expect(promise).rejects.toThrow(
-        Error(
+        new Error(
           `smsURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
@@ -1001,7 +1001,7 @@ describe('[IExecConfig]', () => {
       });
       const promise = config.resolveSmsURL({ teeFramework: 'foo' });
       await expect(promise).rejects.toThrow(
-        Error(`teeFramework is not a valid TEE framework`),
+        new Error(`teeFramework is not a valid TEE framework`),
       );
       await expect(promise).rejects.toThrow(errors.ValidationError);
     });
@@ -1045,7 +1045,7 @@ describe('[IExecConfig]', () => {
       });
       const promise = config.resolveResultProxyURL();
       await expect(promise).rejects.toThrow(
-        Error(
+        new Error(
           `resultProxyURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
@@ -1306,7 +1306,7 @@ describe('[IExecConfig]', () => {
       });
       const promise = config.resolveBridgeAddress();
       await expect(promise).rejects.toThrow(
-        Error(
+        new Error(
           `bridgeAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
@@ -1368,7 +1368,7 @@ describe('[IExecConfig]', () => {
       });
       const promise = config.resolveBridgeBackAddress();
       await expect(promise).rejects.toThrow(
-        Error(
+        new Error(
           `bridgedNetworkConf option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );
@@ -1426,7 +1426,7 @@ describe('[IExecConfig]', () => {
       });
       const promise = config.resolveEnsPublicResolverAddress();
       await expect(promise).rejects.toThrow(
-        Error(
+        new Error(
           `ensPublicResolverAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
         ),
       );

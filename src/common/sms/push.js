@@ -48,16 +48,16 @@ const handleNonUpdatablePushSecret = ({
     return true;
   }
   if (response.status === 409) {
-    throw Error(
+    throw new Error(
       `Secret already exists for ${targetAddress} and can't be updated`,
     );
   }
   if (response.status === 401) {
-    throw Error(
+    throw new Error(
       `Wallet ${signerAddress} is not allowed to set secret for ${targetAddress}`,
     );
   }
-  throw Error(
+  throw new Error(
     `SMS answered with unexpected status: ${response.status} ${response.statusText}`,
   );
 };
@@ -127,7 +127,9 @@ export const pushWeb2Secret = async (
       secretName,
     );
     if (secretExists && !forceUpdate) {
-      throw Error(`Secret "${secretName}" already exists for ${ownerAddress}`);
+      throw new Error(
+        `Secret "${secretName}" already exists for ${ownerAddress}`,
+      );
     }
     const update = !!secretExists;
     const challenge = getChallengeForSetWeb2Secret(
@@ -158,7 +160,7 @@ export const pushWeb2Secret = async (
         isUpdated: update,
       };
     }
-    throw Error(
+    throw new Error(
       `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
@@ -185,7 +187,7 @@ export const pushRequesterSecret = async (
       secretName,
     );
     if (secretExists) {
-      throw Error(
+      throw new Error(
         `Secret "${secretName}" already exists for ${requesterAddress}`,
       );
     }
@@ -212,7 +214,7 @@ export const pushRequesterSecret = async (
         isPushed: true,
       };
     }
-    throw Error(
+    throw new Error(
       `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {

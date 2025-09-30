@@ -78,7 +78,7 @@ describe('account', () => {
       const spenderAddress = getRandomAddress();
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.account.approve(10, spenderAddress)).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -92,7 +92,7 @@ describe('account', () => {
       await expect(
         iexec.account.approve(amount, spenderAddress),
       ).rejects.toThrow(
-        Error(`${spenderAddress} is not a valid ethereum address`),
+        new Error(`${spenderAddress} is not a valid ethereum address`),
       );
     });
 
@@ -132,7 +132,7 @@ describe('account', () => {
       await expect(
         iexec.account.checkAllowance(ownerAddress, spenderAddress),
       ).rejects.toThrow(
-        Error(`${ownerAddress} is not a valid ethereum address`),
+        new Error(`${ownerAddress} is not a valid ethereum address`),
       );
     });
 
@@ -144,7 +144,7 @@ describe('account', () => {
       await expect(
         iexec.account.checkAllowance(ownerAddress, spenderAddress),
       ).rejects.toThrow(
-        Error(`${spenderAddress} is not a valid ethereum address`),
+        new Error(`${spenderAddress} is not a valid ethereum address`),
       );
     });
 
@@ -190,7 +190,7 @@ describe('account', () => {
       await expect(
         iexec.account.revokeApproval(spenderAddress),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -203,7 +203,7 @@ describe('account', () => {
       await expect(
         iexec.account.revokeApproval(spenderAddress),
       ).rejects.toThrow(
-        Error(`${spenderAddress} is not a valid ethereum address`),
+        new Error(`${spenderAddress} is not a valid ethereum address`),
       );
     });
 
@@ -228,7 +228,7 @@ describe('account', () => {
     test('require a signer', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.account.deposit(10)).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -237,7 +237,7 @@ describe('account', () => {
     test('prevents deposit 0', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       await expect(iexec.account.deposit(0)).rejects.toThrow(
-        Error('Deposit amount must be greater than 0'),
+        new Error('Deposit amount must be greater than 0'),
       );
     });
 
@@ -315,7 +315,7 @@ describe('account', () => {
           wallet.address,
         );
         await expect(iexec.account.deposit(100)).rejects.toThrow(
-          Error('Deposit amount exceed wallet balance'),
+          new Error('Deposit amount exceed wallet balance'),
         );
         const accountFinalBalance = await iexec.account.checkBalance(
           wallet.address,
@@ -379,7 +379,7 @@ describe('account', () => {
           wallet.address,
         );
         await expect(iexec.account.deposit(100)).rejects.toThrow(
-          Error('Deposit amount exceed wallet balance'),
+          new Error('Deposit amount exceed wallet balance'),
         );
         const accountFinalBalance = await iexec.account.checkBalance(
           wallet.address,
@@ -404,7 +404,7 @@ describe('account', () => {
     test('require a signer', async () => {
       const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(iexec.account.withdraw(10)).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -413,7 +413,7 @@ describe('account', () => {
     test('prevents withdraw 0', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       await expect(iexec.account.withdraw(0)).rejects.toThrow(
-        Error('Withdraw amount must be greater than 0'),
+        new Error('Withdraw amount must be greater than 0'),
       );
     });
 
@@ -492,7 +492,7 @@ describe('account', () => {
         wallet.address,
       );
       await expect(iexec.account.withdraw(100)).rejects.toThrow(
-        Error('Withdraw amount exceed account balance'),
+        new Error('Withdraw amount exceed account balance'),
       );
       const accountFinalBalance = await iexec.account.checkBalance(
         wallet.address,

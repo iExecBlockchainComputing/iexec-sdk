@@ -152,7 +152,7 @@ describe('ens', () => {
       const label = 'users';
       const domain = 'iexec.eth';
       await expect(iexec.ens.claimName(label, domain)).rejects.toThrow(
-        Error(
+        new Error(
           'users.iexec.eth is already owned by 0xc7b2336c1A8932Fb9414356E254edee6A87dd37d',
         ),
       );
@@ -163,7 +163,7 @@ describe('ens', () => {
       const label = 'test';
       const domain = 'no-registrar.iexec.eth';
       await expect(iexec.ens.claimName(label, domain)).rejects.toThrow(
-        Error(
+        new Error(
           'The base domain no-registrar.iexec.eth owner 0x0000000000000000000000000000000000000000 is not a contract',
         ),
       );
@@ -238,7 +238,7 @@ describe('ens', () => {
       await expect(
         iexec.ens.configureResolution('not-owned.eth', wallet.address),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `The current address ${wallet.address} is not owner of not-owned.eth`,
         ),
       );
@@ -254,7 +254,7 @@ describe('ens', () => {
       await expect(
         iexec.ens.configureResolution(name, app.address),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `${wallet.address} is not the owner of ${app.address}, impossible to setup ENS resolution`,
         ),
       );
@@ -270,7 +270,7 @@ describe('ens', () => {
       await expect(
         iexec.ens.configureResolution(name, targetAddress),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Target address ${targetAddress} is not a contract and don't match current wallet address ${wallet.address}, impossible to setup ENS resolution`,
         ),
       );
@@ -338,7 +338,7 @@ describe('ens', () => {
       expect(configureRes.messages.length).toBe(0);
       expect(configureRes.completed).toBe(false);
       expect(configureRes.error).toStrictEqual(
-        Error(
+        new Error(
           `The current address ${wallet.address} is not owner of not-owned.eth`,
         ),
       );
@@ -363,7 +363,7 @@ describe('ens', () => {
       expect(configureRes.messages.length).toBe(0);
       expect(configureRes.completed).toBe(false);
       expect(configureRes.error).toStrictEqual(
-        Error(
+        new Error(
           `${wallet.address} is not the owner of ${app.address}, impossible to setup ENS resolution`,
         ),
       );
@@ -385,7 +385,7 @@ describe('ens', () => {
       expect(configureRes.messages.length).toBe(0);
       expect(configureRes.completed).toBe(false);
       expect(configureRes.error).toStrictEqual(
-        Error(
+        new Error(
           `Target address ${targetAddress} is not a contract and don't match current wallet address ${wallet.address}, impossible to setup ENS resolution`,
         ),
       );
@@ -413,7 +413,7 @@ describe('ens', () => {
       await expect(
         iexecNotOwner.ens.setTextRecord(name, 'key', 'value'),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `${walletNotOwner.address} is not authorised to set a text record for ${name}`,
         ),
       );
@@ -454,7 +454,7 @@ describe('ens', () => {
       const label = `address-${address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
       await expect(iexec.ens.readTextRecord(name, 'key')).rejects.toThrow(
-        Error(`No resolver is configured for ${name}`),
+        new Error(`No resolver is configured for ${name}`),
       );
     });
 

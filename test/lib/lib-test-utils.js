@@ -200,7 +200,7 @@ export const expectAsyncCustomError = async (
   executor,
   { constructor, message },
 ) => {
-  const didNotThrowError = Error('Did not throw');
+  const didNotThrowError = new Error('Did not throw');
   try {
     await executor;
     throw didNotThrowError;

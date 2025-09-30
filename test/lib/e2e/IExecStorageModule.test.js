@@ -82,7 +82,7 @@ describe('storage', () => {
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
       await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-        Error(
+        new Error(
           `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`,
         ),
       );
@@ -103,7 +103,7 @@ describe('storage', () => {
       await expect(
         iexec.storage.pushStorageToken('oops', { provider: 'default' }),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`,
         ),
       );
@@ -119,7 +119,7 @@ describe('storage', () => {
       await expect(
         iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Secret "iexec-result-dropbox-token" already exists for ${wallet.address}`,
         ),
       );

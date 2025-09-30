@@ -55,7 +55,7 @@ describe('secrets', () => {
       await expect(
         iexec.secrets.pushRequesterSecret('foo', 'oops'),
       ).rejects.toThrow(
-        Error(`Secret "foo" already exists for ${wallet.address}`),
+        new Error(`Secret "foo" already exists for ${wallet.address}`),
       );
       const pushForTeeFrameworkRes = await iexec.secrets.pushRequesterSecret(
         'foo',

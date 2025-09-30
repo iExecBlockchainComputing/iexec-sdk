@@ -60,13 +60,13 @@ describe('utils', () => {
 
     test("parseEth('4.2 foo')", () => {
       expect(() => utils.parseEth('4.2 foo')).toThrow(
-        Error('Invalid ether unit'),
+        new Error('Invalid ether unit'),
       );
     });
 
     test("parseEth('4.2 wei')", () => {
       expect(() => utils.parseEth('4.2 wei')).toThrow(
-        Error('Invalid ether amount'),
+        new Error('Invalid ether amount'),
       );
     });
   });
@@ -110,13 +110,13 @@ describe('utils', () => {
 
     test("parseRLC('4.2 nRLC')", () => {
       expect(() => utils.parseRLC('4.2 nRLC')).toThrow(
-        Error('Invalid token amount'),
+        new Error('Invalid token amount'),
       );
     });
 
     test("parseRLC('4.2 foo')", () => {
       expect(() => utils.parseRLC('4.2 foo')).toThrow(
-        Error('Invalid token unit'),
+        new Error('Invalid token unit'),
       );
     });
   });
@@ -345,7 +345,7 @@ describe('utils', () => {
         .decryptResult(encZip, beneficiaryKey)
         .catch((e) => e);
       expect(err).toEqual(
-        Error('Failed to decrypt results key with beneficiary key'),
+        new Error('Failed to decrypt results key with beneficiary key'),
       );
     });
   });

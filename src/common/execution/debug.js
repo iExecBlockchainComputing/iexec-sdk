@@ -38,7 +38,7 @@ export const getWorkerpoolApiUrl = async (
         ApiCallErrorClass: CompassCallError,
       });
       if (!json?.apiUrl) {
-        throw Error(`No apiUrl found in compass response`);
+        throw new Error(`No apiUrl found in compass response`);
       }
       return json.apiUrl;
     }
@@ -78,7 +78,7 @@ const getTaskOffchainApiUrl = async (
     const deal = await dealShow(contracts, dealid);
     const workerpool = deal.workerpool && deal.workerpool.pointer;
     if (!workerpool) {
-      throw Error(`Cannot find task's workerpool`);
+      throw new Error(`Cannot find task's workerpool`);
     }
     const workerpoolApiUrl = await getWorkerpoolApiUrl(
       contracts,
@@ -86,7 +86,9 @@ const getTaskOffchainApiUrl = async (
       workerpool,
     );
     if (!workerpoolApiUrl) {
-      throw Error(`Impossible to resolve API url for workerpool ${workerpool}`);
+      throw new Error(
+        `Impossible to resolve API url for workerpool ${workerpool}`,
+      );
     }
     return workerpoolApiUrl;
   } catch (error) {
@@ -147,7 +149,7 @@ export const fetchAllReplicatesLogs = async (
     const { requester } = await dealShow(contracts, dealid);
     const userAddress = await getAddress(contracts);
     if (requester !== userAddress) {
-      throw Error(
+      throw new Error(
         `Only task requester ${requester} can access replicates logs`,
       );
     }

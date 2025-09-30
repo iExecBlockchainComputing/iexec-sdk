@@ -210,11 +210,11 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.apporder;
           if (!loadedOrder) {
-            throw Error(info.missingOrder(APP_ORDER, 'app'));
+            throw new Error(info.missingOrder(APP_ORDER, 'app'));
           }
           const orderObj = await createApporder(chain.contracts, loadedOrder);
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
-            throw Error(`No app deployed at address ${orderObj.app}`);
+            throw new Error(`No app deployed at address ${orderObj.app}`);
           if (!opts.skipPreflightCheck) {
             await checkAppRequirements(
               {
@@ -222,7 +222,7 @@ sign
               },
               orderObj,
             ).catch((e) => {
-              throw Error(
+              throw new Error(
                 `App requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
@@ -251,14 +251,16 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.datasetorder;
           if (!loadedOrder) {
-            throw Error(info.missingOrder(DATASET_ORDER, 'dataset'));
+            throw new Error(info.missingOrder(DATASET_ORDER, 'dataset'));
           }
           const orderObj = await createDatasetorder(
             chain.contracts,
             loadedOrder,
           );
           if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
-            throw Error(`No dataset deployed at address ${orderObj.dataset}`);
+            throw new Error(
+              `No dataset deployed at address ${orderObj.dataset}`,
+            );
           if (!opts.skipPreflightCheck) {
             await checkDatasetRequirements(
               {
@@ -269,7 +271,7 @@ sign
               },
               orderObj,
             ).catch((e) => {
-              throw Error(
+              throw new Error(
                 `Dataset requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
@@ -300,7 +302,7 @@ sign
           const loadedOrder =
             iexecConf.order && iexecConf.order.workerpoolorder;
           if (!loadedOrder) {
-            throw Error(info.missingOrder(WORKERPOOL_ORDER, 'workerpool'));
+            throw new Error(info.missingOrder(WORKERPOOL_ORDER, 'workerpool'));
           }
           const orderObj = await createWorkerpoolorder(
             chain.contracts,
@@ -312,7 +314,7 @@ sign
               orderObj.workerpool,
             ))
           )
-            throw Error(
+            throw new Error(
               `No workerpool deployed at address ${orderObj.workerpool}`,
             );
           const signedOrder = await signWorkerpoolorder(
@@ -338,7 +340,7 @@ sign
         try {
           const loadedOrder = iexecConf.order && iexecConf.order.requestorder;
           if (!loadedOrder) {
-            throw Error(info.missingOrder(REQUEST_ORDER, 'request'));
+            throw new Error(info.missingOrder(REQUEST_ORDER, 'request'));
           }
           const orderObj = await createRequestorder(
             {
@@ -347,7 +349,7 @@ sign
             loadedOrder,
           );
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
-            throw Error(`No app deployed at address ${orderObj.app}`);
+            throw new Error(`No app deployed at address ${orderObj.app}`);
           if (!opts.skipPreflightCheck) {
             await checkRequestRequirements(
               {
@@ -358,7 +360,7 @@ sign
               },
               orderObj,
             ).catch((e) => {
-              throw Error(
+              throw new Error(
                 `Request requirements check failed: ${
                   e.message
                 } (If you consider this is not an issue, use ${
@@ -445,13 +447,13 @@ fill
             orderHash,
           );
           if (!orderRes) {
-            throw Error(
+            throw new Error(
               `${orderName} ${orderHash} is not published on iexec marketplace`,
             );
           }
           return orderRes.order;
         }
-        throw Error(`Invalid ${orderName} hash`);
+        throw new Error(`Invalid ${orderName} hash`);
       };
       const apporder = opts.app
         ? await getOrderByHash(APP_ORDER, opts.app)
@@ -476,9 +478,9 @@ fill
         : !!datasetorder;
       debug('useDataset', useDataset);
 
-      if (!apporder) throw Error('Missing apporder');
-      if (!datasetorder && useDataset) throw Error('Missing datasetorder');
-      if (!workerpoolorder) throw Error('Missing workerpoolorder');
+      if (!apporder) throw new Error('Missing apporder');
+      if (!datasetorder && useDataset) throw new Error('Missing datasetorder');
+      if (!workerpoolorder) throw new Error('Missing workerpoolorder');
 
       const computeRequestOrder = async () => {
         await connectKeystore(chain, keystore, { txOptions });
@@ -505,7 +507,7 @@ fill
 
       const requestorder = requestOrderInput || (await computeRequestOrder());
       if (!requestorder) {
-        throw Error('Missing requestorder');
+        throw new Error('Missing requestorder');
       }
 
       if (!opts.skipPreflightCheck) {
@@ -533,7 +535,7 @@ fill
           apporder,
           { tagOverride: resolvedTag },
         ).catch((e) => {
-          throw Error(
+          throw new Error(
             `App requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
@@ -552,7 +554,7 @@ fill
             datasetorder,
             { tagOverride: resolvedTag },
           ).catch((e) => {
-            throw Error(
+            throw new Error(
               `Dataset requirements check failed: ${
                 e.message
               } (If you consider this is not an issue, use ${
@@ -570,7 +572,7 @@ fill
           },
           requestorder,
         ).catch((e) => {
-          throw Error(
+          throw new Error(
             `Request requirements check failed: ${
               e.message
             } (If you consider this is not an issue, use ${
@@ -618,7 +620,7 @@ publish
     const spinner = Spinner(opts);
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
-        throw Error(
+        throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
@@ -638,7 +640,7 @@ publish
           const orderToPublish =
             signedOrders[chain.id] && signedOrders[chain.id][orderName];
           if (!orderToPublish) {
-            throw Error(
+            throw new Error(
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
@@ -656,7 +658,7 @@ publish
                   },
                   orderToPublish,
                 ).catch((e) => {
-                  throw Error(
+                  throw new Error(
                     `App requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
@@ -684,7 +686,7 @@ publish
                   },
                   orderToPublish,
                 ).catch((e) => {
-                  throw Error(
+                  throw new Error(
                     `Dataset requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
@@ -719,7 +721,7 @@ publish
                   },
                   orderToPublish,
                 ).catch((e) => {
-                  throw Error(
+                  throw new Error(
                     `Request requirements check failed: ${
                       e.message
                     } (If you consider this is not an issue, use ${
@@ -780,7 +782,7 @@ unpublish
     const spinner = Spinner(opts);
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
-        throw Error(
+        throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
@@ -807,7 +809,7 @@ unpublish
             const orderToUnpublish =
               signedOrders[chain.id] && signedOrders[chain.id][orderName];
             if (!orderToUnpublish) {
-              throw Error(
+              throw new Error(
                 `No orderHash specified and no signed ${orderName} found for chain ${chain.id} in "orders.json"`,
               );
             }
@@ -904,7 +906,7 @@ cancel
     const spinner = Spinner(opts);
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
-        throw Error(
+        throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
@@ -923,7 +925,7 @@ cancel
         try {
           const orderToCancel = signedOrders[chain.id][orderName];
           if (!orderToCancel) {
-            throw Error(
+            throw new Error(
               `Missing signed ${orderName} for chain ${chain.id} in "orders.json"`,
             );
           }
@@ -995,7 +997,7 @@ show
     const spinner = Spinner(opts);
     try {
       if (!(opts.app || opts.dataset || opts.workerpool || opts.request)) {
-        throw Error(
+        throw new Error(
           'No option specified, you should choose one (--app | --dataset | --workerpool | --request)',
         );
       }
@@ -1013,7 +1015,7 @@ show
             const signedOrders = (await loadSignedOrders())[chain.id];
             const signedOrder = signedOrders && signedOrders[orderName];
             if (!signedOrder) {
-              throw Error(
+              throw new Error(
                 `Missing ${orderName} in "orders.json" for chain ${chain.id}`,
               );
             }

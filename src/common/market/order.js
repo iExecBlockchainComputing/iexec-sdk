@@ -357,7 +357,7 @@ const signOrder = async (
       : await getContractOwner(contracts, orderName, orderObj);
   const address = await getAddress(contracts);
   if (signerAddress !== address) {
-    throw Error(
+    throw new Error(
       `Invalid order signer, must be the ${
         orderName === REQUEST_ORDER ? 'requester' : 'resource owner'
       }`,
@@ -436,7 +436,8 @@ const cancelOrder = async (
       orderName,
       orderObj,
     );
-    if (remainingVolume.isZero()) throw Error(`${orderName} already canceled`);
+    if (remainingVolume.isZero())
+      throw new Error(`${orderName} already canceled`);
     const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
       iexecContract[objDesc[orderName].cancelMethod](
@@ -446,7 +447,7 @@ const cancelOrder = async (
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEventFromLogs(objDesc[orderName].cancelEvent, txReceipt.logs))
-      throw Error(`${objDesc[orderName].cancelEvent} not confirmed`);
+      throw new Error(`${objDesc[orderName].cancelEvent} not confirmed`);
     return { order: orderObj, txHash: tx.hash };
   } catch (error) {
     debug('cancelOrder()', error);
@@ -526,7 +527,7 @@ const getMatchableVolume = async (
     // deployment checks
     const checkAppDeployedAsync = async () => {
       if (!(await checkDeployedApp(contracts, vAppOrder.app))) {
-        throw Error(`No app deployed at address ${vAppOrder.app}`);
+        throw new Error(`No app deployed at address ${vAppOrder.app}`);
       }
     };
     const checkDatasetDeployedAsync = async () => {
@@ -534,14 +535,16 @@ const getMatchableVolume = async (
         vDatasetOrder.dataset !== NULL_ADDRESS &&
         !(await checkDeployedDataset(contracts, vDatasetOrder.dataset))
       ) {
-        throw Error(`No dataset deployed at address ${vDatasetOrder.dataset}`);
+        throw new Error(
+          `No dataset deployed at address ${vDatasetOrder.dataset}`,
+        );
       }
     };
     const checkWorkerpoolDeployedAsync = async () => {
       if (
         !(await checkDeployedWorkerpool(contracts, vWorkerpoolOrder.workerpool))
       ) {
-        throw Error(
+        throw new Error(
           `No workerpool deployed at address ${vWorkerpoolOrder.workerpool}`,
         );
       }
@@ -562,7 +565,7 @@ const getMatchableVolume = async (
         vAppOrder.sign,
       );
       if (!isValid) {
-        throw Error('apporder invalid sign');
+        throw new Error('apporder invalid sign');
       }
     };
     const checkDatasetSignAsync = async () => {
@@ -574,7 +577,7 @@ const getMatchableVolume = async (
           vDatasetOrder.sign,
         );
         if (!isValid) {
-          throw Error('datasetorder invalid sign');
+          throw new Error('datasetorder invalid sign');
         }
       }
     };
@@ -586,7 +589,7 @@ const getMatchableVolume = async (
         vWorkerpoolOrder.sign,
       );
       if (!isValid) {
-        throw Error('workerpoolorder invalid sign');
+        throw new Error('workerpoolorder invalid sign');
       }
     };
     const checkRequestSignAsync = async () => {
@@ -597,7 +600,7 @@ const getMatchableVolume = async (
         vRequestOrder.sign,
       );
       if (!isValid) {
-        throw Error('requestorder invalid sign');
+        throw new Error('requestorder invalid sign');
       }
     };
 
@@ -610,7 +613,7 @@ const getMatchableVolume = async (
 
     // address checks
     if (vRequestOrder.app !== vAppOrder.app) {
-      throw Error(
+      throw new Error(
         `app address mismatch between requestorder (${vRequestOrder.app}) and apporder (${vAppOrder.app})`,
       );
     }
@@ -618,7 +621,7 @@ const getMatchableVolume = async (
       vRequestOrder.dataset !== NULL_ADDRESS &&
       vRequestOrder.dataset !== vDatasetOrder.dataset
     ) {
-      throw Error(
+      throw new Error(
         `dataset address mismatch between requestorder (${vRequestOrder.dataset}) and datasetorder (${vDatasetOrder.dataset})`,
       );
     }
@@ -626,7 +629,7 @@ const getMatchableVolume = async (
       vRequestOrder.workerpool !== NULL_ADDRESS &&
       vRequestOrder.workerpool !== vWorkerpoolOrder.workerpool
     ) {
-      throw Error(
+      throw new Error(
         `workerpool address mismatch between requestorder (${vRequestOrder.workerpool}) and workerpoolorder (${vWorkerpoolOrder.workerpool})`,
       );
     }
@@ -634,7 +637,7 @@ const getMatchableVolume = async (
     const requestCat = new BN(vRequestOrder.category);
     const workerpoolCat = new BN(vWorkerpoolOrder.category);
     if (!workerpoolCat.eq(requestCat)) {
-      throw Error(
+      throw new Error(
         `category mismatch between requestorder (${requestCat}) and workerpoolorder (${workerpoolCat})`,
       );
     }
@@ -642,7 +645,7 @@ const getMatchableVolume = async (
     const requestTrust = new BN(vRequestOrder.trust);
     const workerpoolTrust = new BN(vWorkerpoolOrder.trust);
     if (workerpoolTrust.lt(requestTrust)) {
-      throw Error(
+      throw new Error(
         `workerpoolorder trust is too low (expected ${requestTrust}, got ${workerpoolTrust})`,
       );
     }
@@ -652,7 +655,7 @@ const getMatchableVolume = async (
       sumTags([vRequestOrder.tag, vAppOrder.tag, vDatasetOrder.tag]),
     );
     if (workerpoolMissingTagBits.length > 0) {
-      throw Error(
+      throw new Error(
         `Missing tags [${workerpoolMissingTagBits.map((bit) =>
           tagBitToHuman(bit),
         )}] in workerpoolorder`,
@@ -664,7 +667,7 @@ const getMatchableVolume = async (
       1,
     );
     if (teeAppRequired && !checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
-      throw Error('Missing tag [tee] in apporder');
+      throw new Error('Missing tag [tee] in apporder');
     }
 
     // price check
@@ -675,17 +678,17 @@ const getMatchableVolume = async (
     const datasetPrice = new BN(vDatasetOrder.datasetprice);
     const datasetMaxPrice = new BN(vRequestOrder.datasetmaxprice);
     if (appMaxPrice.lt(appPrice)) {
-      throw Error(
+      throw new Error(
         `appmaxprice too low (expected ${appPrice}, got ${appMaxPrice})`,
       );
     }
     if (workerpoolMaxPrice.lt(workerpoolPrice)) {
-      throw Error(
+      throw new Error(
         `workerpoolmaxprice too low (expected ${workerpoolPrice}, got ${workerpoolMaxPrice})`,
       );
     }
     if (datasetMaxPrice.lt(datasetPrice)) {
-      throw Error(
+      throw new Error(
         `datasetmaxprice too low (expected ${datasetPrice}, got ${datasetMaxPrice})`,
       );
     }
@@ -703,7 +706,7 @@ const getMatchableVolume = async (
       ? new BN(workerpoolOrder.volume)
       : stake.div(requiredStakePerTask);
     if (workerpoolStakedVolume.isZero()) {
-      throw Error(
+      throw new Error(
         `workerpool required stake (${requiredStakePerTask}) is greater than workerpool owner's account stake (${stake}). Orders can't be matched. If you are the workerpool owner, you should deposit to top up your account`,
       );
     }
@@ -715,14 +718,14 @@ const getMatchableVolume = async (
             getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
               (volume) => {
                 if (volume.lte(new BN(0)))
-                  throw Error('apporder is fully consumed');
+                  throw new Error('apporder is fully consumed');
                 return volume;
               },
             ),
             getRemainingVolume(contracts, DATASET_ORDER, vDatasetOrder).then(
               (volume) => {
                 if (volume.lte(new BN(0)))
-                  throw Error('datasetorder is fully consumed');
+                  throw new Error('datasetorder is fully consumed');
                 return volume;
               },
             ),
@@ -732,13 +735,13 @@ const getMatchableVolume = async (
               vWorkerpoolOrder,
             ).then((volume) => {
               if (volume.lte(new BN(0)))
-                throw Error('workerpoolorder is fully consumed');
+                throw new Error('workerpoolorder is fully consumed');
               return volume;
             }),
             getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
               (volume) => {
                 if (volume.lte(new BN(0)))
-                  throw Error('requestorder is fully consumed');
+                  throw new Error('requestorder is fully consumed');
                 return volume;
               },
             ),
@@ -747,7 +750,7 @@ const getMatchableVolume = async (
             getRemainingVolume(contracts, APP_ORDER, vAppOrder).then(
               (volume) => {
                 if (volume.lte(new BN(0)))
-                  throw Error('apporder is fully consumed');
+                  throw new Error('apporder is fully consumed');
                 return volume;
               },
             ),
@@ -757,13 +760,13 @@ const getMatchableVolume = async (
               vWorkerpoolOrder,
             ).then((volume) => {
               if (volume.lte(new BN(0)))
-                throw Error('workerpoolorder is fully consumed');
+                throw new Error('workerpoolorder is fully consumed');
               return volume;
             }),
             getRemainingVolume(contracts, REQUEST_ORDER, vRequestOrder).then(
               (volume) => {
                 if (volume.lte(new BN(0)))
-                  throw Error('requestorder is fully consumed');
+                  throw new Error('requestorder is fully consumed');
                 return volume;
               },
             ),
@@ -936,7 +939,7 @@ export const matchOrders = async ({
     await tagSchema()
       .validate(sumTags([vAppOrder.tag, vDatasetOrder.tag, vRequestOrder.tag]))
       .catch((e) => {
-        throw Error(
+        throw new Error(
           `Matching order would produce an invalid deal tag. ${e.message}`,
         );
       });
@@ -964,7 +967,7 @@ export const matchOrders = async ({
         { voucherAddress: vVoucherAddress },
       );
       if (!voucherContract) {
-        throw Error(
+        throw new Error(
           `No voucher available for the requester ${vRequestOrder.requester}`,
         );
       }
@@ -995,19 +998,19 @@ export const matchOrders = async ({
           const requiredAllowance = total.sub(sponsored);
           if (allowance.lt(requiredAllowance)) {
             const missingAmount = requiredAllowance.sub(allowance);
-            throw Error(
+            throw new Error(
               `Orders can't be matched. Please approve an additional ${missingAmount} for voucher usage.`,
             );
           }
         }
       } else {
         if (stake.lt(costPerTask)) {
-          throw Error(
+          throw new Error(
             `Cost per task (${costPerTask}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
           );
         }
         if (stake.lt(totalCost)) {
-          throw Error(
+          throw new Error(
             `Total cost for ${matchableVolume} tasks (${totalCost}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
           );
         }
@@ -1062,7 +1065,7 @@ export const matchOrders = async ({
     const matchEvent = 'OrdersMatched';
     const orderMatchedEvent = events.find((event) => event.name === matchEvent);
     if (!orderMatchedEvent) {
-      throw Error(`${matchEvent} not confirmed`);
+      throw new Error(`${matchEvent} not confirmed`);
     }
     const { dealid, volume } = orderMatchedEvent.args;
     return { dealid, volume: bigIntToBn(volume), txHash: tx.hash };

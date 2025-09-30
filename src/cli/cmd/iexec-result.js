@@ -55,7 +55,7 @@ generateKeys
     try {
       const nodeMinVersion = 'v10.12.0';
       if (gt(nodeMinVersion, process.version)) {
-        throw Error(
+        throw new Error(
           `Minimum node version to use this command is ${nodeMinVersion}, found ${process.version}`,
         );
       }
@@ -141,7 +141,7 @@ decryptResults
       );
 
       if (!beneficiarySecretFolderExists) {
-        throw Error(
+        throw new Error(
           'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
         );
       }
@@ -178,7 +178,7 @@ decryptResults
         beneficiaryKey = await readFile(beneficiaryKeyPath, 'utf8');
       } catch (error) {
         debug(error);
-        throw Error(
+        throw new Error(
           `Failed to load beneficiary encryption key from "${beneficiaryKeyPath}"`,
         );
       }
@@ -253,7 +253,7 @@ pushSecret
           raw: { isPushed, isUpdated },
         });
       } else {
-        throw Error('Something went wrong');
+        throw new Error('Something went wrong');
       }
     } catch (error) {
       handleError(error, cli, opts);

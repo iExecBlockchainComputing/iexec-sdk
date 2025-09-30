@@ -32,7 +32,7 @@ describe('wallet', () => {
         readOnly: true,
       });
       await expect(iexec.wallet.getAddress()).rejects.toThrow(
-        Error('Missing Signer'),
+        new Error('Missing Signer'),
       );
     });
   });
@@ -104,7 +104,7 @@ describe('wallet', () => {
       await expect(
         iexec.wallet.sendETH(10, getRandomAddress()),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -169,7 +169,7 @@ describe('wallet', () => {
         const receiverAddress = getRandomAddress();
         const { iexec } = getTestConfig(iexecTestChain)();
         await expect(iexec.wallet.sendETH(10, receiverAddress)).rejects.toThrow(
-          Error('sendETH() is disabled on sidechain, use sendRLC()'),
+          new Error('sendETH() is disabled on sidechain, use sendRLC()'),
         );
       });
     });
@@ -181,7 +181,7 @@ describe('wallet', () => {
       await expect(
         iexec.wallet.sendRLC(10, getRandomAddress()),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );

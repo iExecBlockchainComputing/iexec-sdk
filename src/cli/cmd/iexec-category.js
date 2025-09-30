@@ -66,7 +66,7 @@ create
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
       if (!iexecConf[objName]) {
-        throw Error(
+        throw new Error(
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }

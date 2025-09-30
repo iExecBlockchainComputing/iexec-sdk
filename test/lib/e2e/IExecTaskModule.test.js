@@ -143,11 +143,15 @@ describe('task', () => {
                 },
                 error: () =>
                   reject(
-                    Error('obsTask unsub before next should not call error'),
+                    new Error(
+                      'obsTask unsub before next should not call error',
+                    ),
                   ),
                 complete: () =>
                   reject(
-                    Error('obsTask unsub before next should not call complete'),
+                    new Error(
+                      'obsTask unsub before next should not call complete',
+                    ),
                   ),
               });
               sleep(10000).then(resolve);
@@ -167,7 +171,7 @@ describe('task', () => {
                     reject(Error('obsTask after init should not call error')),
                   complete: () =>
                     reject(
-                      Error('obsTask after init should not call complete'),
+                      new Error('obsTask after init should not call complete'),
                     ),
                 });
                 sleep(5000).then(resolve);
@@ -288,7 +292,9 @@ describe('task', () => {
                 error: resolve,
                 complete: () =>
                   reject(
-                    Error('obsTask with wrong dealid should not call complete'),
+                    new Error(
+                      'obsTask with wrong dealid should not call complete',
+                    ),
                   ),
               });
             })
@@ -336,11 +342,11 @@ describe('task', () => {
                 },
                 error: () =>
                   reject(
-                    Error('obsTask unsubscribed should nol call complete'),
+                    new Error('obsTask unsubscribed should nol call complete'),
                   ),
                 complete: () =>
                   reject(
-                    Error('obsTask unsubscribed should nol call complete'),
+                    new Error('obsTask unsubscribed should nol call complete'),
                   ),
               });
               sleep(2000).then(resolve);
@@ -424,7 +430,7 @@ describe('task', () => {
           '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
         ),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'Impossible to resolve API url for workerpool 0x13EE8c43Abd7dFAcfa4C42554Dff72d9fbcF3330',
         ),
       );
@@ -488,7 +494,7 @@ describe('task', () => {
         ).rejects.toThrow(
           new WorkerpoolCallError(
             `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-            Error('Server internal error: 500 Internal Server Error'),
+            new Error('Server internal error: 500 Internal Server Error'),
           ),
         );
       });
@@ -503,7 +509,7 @@ describe('task', () => {
           '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
         ),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'Impossible to resolve API url for workerpool 0x13EE8c43Abd7dFAcfa4C42554Dff72d9fbcF3330',
         ),
       );
@@ -550,7 +556,7 @@ describe('task', () => {
           SERVICE_UNREACHABLE_URL,
         );
         await expect(iexec.task.fetchLogs(taskid)).rejects.toThrow(
-          Error(
+          new Error(
             `Only task requester ${await iexecRequester.wallet.getAddress()} can access replicates logs`,
           ),
         );
@@ -576,7 +582,7 @@ describe('task', () => {
         await expect(iexecRequester.task.fetchLogs(taskid)).rejects.toThrow(
           new WorkerpoolCallError(
             `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-            Error('Server internal error: 500 Internal Server Error'),
+            new Error('Server internal error: 500 Internal Server Error'),
           ),
         );
       });

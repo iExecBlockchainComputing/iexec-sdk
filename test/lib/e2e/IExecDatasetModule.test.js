@@ -132,7 +132,7 @@ describe('dataset', () => {
           '0x0000000000000000000000000000000000000000000000000000000000000000',
       };
       await expect(iexec.dataset.deployDataset(dataset)).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -163,7 +163,7 @@ describe('dataset', () => {
       };
       const deployed = await iexec.dataset.deployDataset(dataset);
       await expect(iexec.dataset.deployDataset(dataset)).rejects.toThrow(
-        Error(`Dataset already deployed at address ${deployed.address}`),
+        new Error(`Dataset already deployed at address ${deployed.address}`),
       );
     });
   });
@@ -224,7 +224,7 @@ describe('dataset', () => {
       await expect(
         iexec.dataset.transferDataset(getRandomAddress(), getRandomAddress()),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -244,7 +244,7 @@ describe('dataset', () => {
       await expect(
         iexecRandom.dataset.transferDataset(address, receiverAddress),
       ).rejects.toThrow(
-        Error('Only dataset owner can transfer dataset ownership'),
+        new Error('Only dataset owner can transfer dataset ownership'),
       );
       const res = await iexecDatasetOwner.dataset.transferDataset(
         address,
@@ -466,7 +466,7 @@ describe('dataset', () => {
       await expect(
         iexecRandom.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Wallet ${randomWallet.address} is not allowed to set secret for ${datasetAddress}`,
         ),
       );
@@ -485,7 +485,7 @@ describe('dataset', () => {
           teeFramework: TEE_FRAMEWORKS.SCONE,
         }),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Secret already exists for ${datasetAddress} and can't be updated`,
         ),
       );
@@ -503,7 +503,7 @@ describe('dataset', () => {
       await expect(
         iexecDatasetOwner.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Secret already exists for ${datasetAddress} and can't be updated`,
         ),
       );

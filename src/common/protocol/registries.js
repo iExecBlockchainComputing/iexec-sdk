@@ -113,7 +113,7 @@ const deployObj =
         predictedAddress,
       );
       if (isDeployed) {
-        throw Error(
+        throw new Error(
           `${toUpperFirst(
             objName,
           )} already deployed at address ${predictedAddress}`,
@@ -306,7 +306,8 @@ const showUserObjByIndex =
         .required()
         .validate(userAddress);
       const totalObj = await countUserObj(objName)(contracts, userAddress);
-      if (new BN(vIndex).gte(totalObj)) throw Error(`${objName} not deployed`);
+      if (new BN(vIndex).gte(totalObj))
+        throw new Error(`${objName} not deployed`);
       const registryContract = await wrapCall(
         contracts.fetchRegistryContract(objName),
       );
@@ -448,11 +449,13 @@ const transferObj =
       const walletAddress = await getAddress(contracts);
       const deployed = await checkDeployedObj(objName)(contracts, address);
       if (!deployed) {
-        throw Error(`Invalid ${objName} address`);
+        throw new Error(`Invalid ${objName} address`);
       }
       const objOwner = await getObjOwner(objName)(contracts, address);
       if (walletAddress !== objOwner) {
-        throw Error(`Only ${objName} owner can transfer ${objName} ownership`);
+        throw new Error(
+          `Only ${objName} owner can transfer ${objName} ownership`,
+        );
       }
       const registryContract = await wrapCall(
         contracts.fetchRegistryContract(objName),
@@ -526,7 +529,7 @@ export const resolveTeeFrameworkFromApp = async (
     } catch (err) {
       debug('resolveTeeFrameworkFromApp()', err);
       if (strict) {
-        throw Error('Failed to resolve TEE framework from app');
+        throw new Error('Failed to resolve TEE framework from app');
       }
     }
   }

@@ -23,14 +23,14 @@ export const deposit = async (
     checkSigner(contracts);
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
-      throw Error('Deposit amount must be greater than 0');
+      throw new Error('Deposit amount must be greater than 0');
     let txHash;
     const { nRLC } = await checkBalances(
       contracts,
       await getAddress(contracts),
     );
     if (nRLC.lt(new BN(vAmount)))
-      throw Error('Deposit amount exceed wallet balance');
+      throw new Error('Deposit amount exceed wallet balance');
     const iexecContract = contracts.getIExecContract();
     if (!contracts.isNative) {
       const rlcContract = await wrapCall(contracts.fetchTokenContract());
@@ -44,9 +44,9 @@ export const deposit = async (
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       if (!checkEventFromLogs('Approval', txReceipt.logs))
-        throw Error('Approval not confirmed');
+        throw new Error('Approval not confirmed');
       if (!checkEventFromLogs('Transfer', txReceipt.logs))
-        throw Error('Transfer not confirmed');
+        throw new Error('Transfer not confirmed');
       txHash = tx.hash;
     } else {
       const weiAmount = bnToBigInt(bnNRlcToBnWei(new BN(vAmount)));
@@ -58,7 +58,7 @@ export const deposit = async (
       );
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       if (!checkEventFromLogs('Transfer', txReceipt.logs))
-        throw Error('Deposit not confirmed');
+        throw new Error('Deposit not confirmed');
       txHash = tx.hash;
     }
     return { amount: vAmount, txHash };
@@ -76,20 +76,20 @@ export const withdraw = async (
     checkSigner(contracts);
     const vAmount = await nRlcAmountSchema().validate(amount);
     if (new BN(vAmount).lte(new BN(0)))
-      throw Error('Withdraw amount must be greater than 0');
+      throw new Error('Withdraw amount must be greater than 0');
     const iexecContract = contracts.getIExecContract();
     const { stake } = await checkBalance(
       contracts,
       await getAddress(contracts),
     );
     if (stake.lt(new BN(vAmount)))
-      throw Error('Withdraw amount exceed account balance');
+      throw new Error('Withdraw amount exceed account balance');
     const tx = await wrapSend(
       iexecContract.withdraw(vAmount, contracts.txOptions),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEventFromLogs('Transfer', txReceipt.logs))
-      throw Error('Withdraw not confirmed');
+      throw new Error('Withdraw not confirmed');
     return { amount: vAmount, txHash: tx.hash };
   } catch (error) {
     debug('withdraw()', error);

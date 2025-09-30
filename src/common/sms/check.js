@@ -53,7 +53,7 @@ export const checkWeb3SecretExists = async (
     if (res.status === 404) {
       return false;
     }
-    throw Error(
+    throw new Error(
       `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
@@ -97,7 +97,7 @@ export const checkWeb2SecretExists = async (
     if (res.status === 404) {
       return false;
     }
-    throw Error(
+    throw new Error(
       `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
@@ -134,7 +134,7 @@ export const checkRequesterSecretExists = async (
     if (res.status === 404) {
       return false;
     }
-    throw Error(
+    throw new Error(
       `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {
@@ -172,7 +172,7 @@ export const checkAppSecretExists = async (
     if (res.status === 404) {
       return false;
     }
-    throw Error(
+    throw new Error(
       `SMS answered with unexpected status: ${res.status} ${res.statusText}`,
     );
   } catch (error) {

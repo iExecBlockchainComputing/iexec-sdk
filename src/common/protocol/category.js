@@ -26,7 +26,7 @@ export const createCategory = async (
     const categoryOwner = await wrapCall(iexecContract.owner());
     const userAddress = await getAddress(contracts);
     if (categoryOwner !== userAddress) {
-      throw Error(
+      throw new Error(
         `only category owner ${categoryOwner} can create new categories`,
       );
     }

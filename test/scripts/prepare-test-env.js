@@ -28,5 +28,5 @@ BELLECOUR_FORK_BLOCK=${forkBlockNumber}`,
     );
   })
   .catch((e) => {
-    throw Error(`Failed to get current block number from ${forkUrl}: ${e}`);
+    throw new Error(`Failed to get current block number from ${forkUrl}: ${e}`);
   });

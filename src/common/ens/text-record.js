@@ -31,7 +31,7 @@ export const readTextRecord = async (
       currentResolver.address &&
       currentResolver.address !== NULL_ADDRESS;
     if (!isResolverSet) {
-      throw Error(`No resolver is configured for ${vName}`);
+      throw new Error(`No resolver is configured for ${vName}`);
     }
     const resolverContract = new Contract(
       currentResolver.address,
@@ -64,12 +64,12 @@ export const setTextRecord = async (
       currentResolver.address &&
       currentResolver.address !== NULL_ADDRESS;
     if (!isResolverSet) {
-      throw Error(`No resolver is configured for ${vName}`);
+      throw new Error(`No resolver is configured for ${vName}`);
     }
     const ownedBy = await getOwner(contracts, vName);
     const userAddress = await getAddress(contracts);
     if (ownedBy !== userAddress) {
-      throw Error(
+      throw new Error(
         `${userAddress} is not authorised to set a text record for ${vName}`,
       );
     }

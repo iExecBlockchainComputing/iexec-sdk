@@ -60,7 +60,7 @@ initStorage
         tokenKeyName,
       );
       if (tokenExists && !opts.forceUpdate) {
-        throw Error(
+        throw new Error(
           `${providerName} storage is already initialized, use ${
             option.forceUpdateSecret()[0]
           } option to update your storage token`,
@@ -91,7 +91,7 @@ initStorage
           `${providerName} storage token ${isUpdated ? 'updated' : 'pushed'}`,
         );
       } else {
-        throw Error('Something went wrong');
+        throw new Error('Something went wrong');
       }
       spinner.succeed('Storage initialized', {
         raw: { isInitialized: isPushed, isUpdated },

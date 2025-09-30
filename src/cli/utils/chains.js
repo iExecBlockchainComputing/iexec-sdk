@@ -85,18 +85,20 @@ export const loadChain = async (
           name = alias;
         }
         if (!name)
-          throw Error(`Missing "${chainNameOrId}" chain in "chain.json"`);
+          throw new Error(`Missing "${chainNameOrId}" chain in "chain.json"`);
       }
     } else if (chainsConf.default) {
       if (chainsConf.chains[chainsConf.default]) {
         name = chainsConf.default;
         loadedConf = chainsConf.chains[chainsConf.default];
       } else {
-        throw Error(`Missing "${chainsConf.default}" chain in "chain.json"`);
+        throw new Error(
+          `Missing "${chainsConf.default}" chain in "chain.json"`,
+        );
       }
     }
     if (!name)
-      throw Error('Missing chain parameter. Check your "chain.json" file');
+      throw new Error('Missing chain parameter. Check your "chain.json" file');
 
     const idConf = {
       id:
@@ -116,7 +118,7 @@ export const loadChain = async (
     const conf = { ...idConf, ...defaultConf, ...loadedConf };
     debug('conf', conf);
     if (!conf.host) {
-      throw Error(
+      throw new Error(
         `Missing RPC host, no "host" key in "chain.json" and no default value for chain ${conf.id}`,
       );
     }
@@ -140,7 +142,7 @@ export const loadChain = async (
           bridgeLoadedConf = chainsConf.chains[alias];
         }
         if (!bridgeLoadedConf)
-          throw Error(`Missing "${name}" chain in "chain.json"`);
+          throw new Error(`Missing "${name}" chain in "chain.json"`);
       }
       const bridgeIdConf = {
         id:
@@ -160,7 +162,7 @@ export const loadChain = async (
         ...bridgeLoadedConf,
       };
       if (!bridgeConf.host) {
-        throw Error(
+        throw new Error(
           `Missing RPC host for bridged chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`,
         );
       }

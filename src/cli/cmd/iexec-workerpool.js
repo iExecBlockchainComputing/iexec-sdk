@@ -105,7 +105,7 @@ deploy
         loadIExecConf(),
       ]);
       if (!iexecConf[objName]) {
-        throw Error(
+        throw new Error(
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
@@ -146,11 +146,11 @@ setApiUrl
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       const ens = await lookupAddress(chain.contracts, address);
       if (!ens) {
-        throw Error(info.missingEnsForObjectAtAddress(objName, address));
+        throw new Error(info.missingEnsForObjectAtAddress(objName, address));
       }
 
       await connectKeystore(chain, keystore, { txOptions });
@@ -193,10 +193,10 @@ show
       const isAddress = isEthAddress(addressOrIndex, { strict: false });
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!isAddress && !userAddress)
-        throw Error(`Missing option ${option.user()[0]} or wallet`);
+        throw new Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex)
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
 
       spinner.start(info.showing(objName));
       let showInfo;
@@ -272,7 +272,7 @@ count
 
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
       if (!userAddress)
-        throw Error(`Missing option ${option.user()[0]} or wallet`);
+        throw new Error(`Missing option ${option.user()[0]} or wallet`);
 
       spinner.start(info.counting(objName));
       const objCountBN = await countUserWorkerpools(
@@ -317,7 +317,7 @@ publish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -327,7 +327,7 @@ publish
       }
       spinner.info(`Creating ${objName}order for ${objName} ${address}`);
       if (!(await checkDeployedWorkerpool(chain.contracts, address))) {
-        throw Error(`No ${objName} deployed at address ${address}`);
+        throw new Error(`No ${objName} deployed at address ${address}`);
       }
       const overrides = {
         workerpool: address,
@@ -392,7 +392,7 @@ unpublish
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
       if (!address) {
-        throw Error(info.missingAddressOrDeployed(objName, chain.id));
+        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
       }
       debug('useDeployedObj', useDeployedObj, 'address', address);
       if (useDeployedObj) {
@@ -450,7 +450,7 @@ transfer
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
       await connectKeystore(chain, keystore, { txOptions });
-      if (!opts.to) throw Error('Missing --to option');
+      if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
         await prompt.transferObj(objName, objAddress, opts.to, chain.id);
       }

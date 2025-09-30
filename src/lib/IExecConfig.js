@@ -94,7 +94,7 @@ export default class IExecConfig {
           signer = new BrowserProviderSignerAdapter(provider);
         } catch (err) {
           debug('BrowserProvider', err);
-          throw Error('Unsupported provider');
+          throw new Error('Unsupported provider');
         }
       }
     } catch (err) {
@@ -119,7 +119,7 @@ export default class IExecConfig {
 
     const networkPromise = (async () => {
       const network = await provider.getNetwork().catch((err) => {
-        throw Error(`Failed to detect network: ${err.message}`);
+        throw new Error(`Failed to detect network: ${err.message}`);
       });
       const { chainId, name } = network;
       const ensPlugin = network.getPlugin('org.ethers.plugins.network.Ens');

@@ -108,7 +108,7 @@ describe('app', () => {
       });
       const address = getRandomAddress();
       await expect(readOnlyIExec.app.showUserApp(0, address)).rejects.toThrow(
-        Error('app not deployed'),
+        new Error('app not deployed'),
       );
     });
   });
@@ -142,7 +142,7 @@ describe('app', () => {
           '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
       };
       await expect(iexec.app.deployApp(app)).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -175,7 +175,7 @@ describe('app', () => {
       };
       const deployed = await iexec.app.deployApp(app);
       await expect(iexec.app.deployApp(app)).rejects.toThrow(
-        Error(`App already deployed at address ${deployed.address}`),
+        new Error(`App already deployed at address ${deployed.address}`),
       );
     });
   });
@@ -236,7 +236,7 @@ describe('app', () => {
       await expect(
         iexec.app.transferApp(getRandomAddress(), getRandomAddress()),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -402,7 +402,7 @@ describe('app', () => {
       await expect(
         iexecRandom.app.pushAppSecret(appAddress, 'foo'),
       ).rejects.toThrow(
-        Error(
+        new Error(
           `Wallet ${randomWallet.address} is not allowed to set secret for ${appAddress}`,
         ),
       );
@@ -423,7 +423,9 @@ describe('app', () => {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
         }),
       ).rejects.toThrow(
-        Error(`Secret already exists for ${appAddress} and can't be updated`),
+        new Error(
+          `Secret already exists for ${appAddress} and can't be updated`,
+        ),
       );
     });
 
@@ -440,7 +442,9 @@ describe('app', () => {
       await expect(
         iexecAppOwner.app.pushAppSecret(appAddress, 'foo'),
       ).rejects.toThrow(
-        Error(`Secret already exists for ${appAddress} and can't be updated`),
+        new Error(
+          `Secret already exists for ${appAddress} and can't be updated`,
+        ),
       );
     });
 

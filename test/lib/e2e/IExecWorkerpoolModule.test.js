@@ -118,7 +118,7 @@ describe('workerpool', () => {
       await expect(
         iexec.workerpool.deployWorkerpool(workerpool),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -145,7 +145,7 @@ describe('workerpool', () => {
       await expect(
         iexec.workerpool.deployWorkerpool(workerpool),
       ).rejects.toThrow(
-        Error(`Workerpool already deployed at address ${deployed.address}`),
+        new Error(`Workerpool already deployed at address ${deployed.address}`),
       );
     });
   });
@@ -203,7 +203,7 @@ describe('workerpool', () => {
           getRandomAddress(),
         ),
       ).rejects.toThrow(
-        Error(
+        new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
         ),
       );
@@ -223,7 +223,7 @@ describe('workerpool', () => {
       await expect(
         iexecRandom.workerpool.transferWorkerpool(address, receiverAddress),
       ).rejects.toThrow(
-        Error('Only workerpool owner can transfer workerpool ownership'),
+        new Error('Only workerpool owner can transfer workerpool ownership'),
       );
       const res = await iexecWorkerpoolOwner.workerpool.transferWorkerpool(
         address,
@@ -280,7 +280,7 @@ describe('workerpool', () => {
         await expect(
           readOnlyIExec.workerpool.getWorkerpoolApiUrl(address),
         ).rejects.toThrow(
-          Error(
+          new Error(
             `API error: Workerpool with address '${address}' not found in chain '${noEnsTestChain.chainId}'`,
           ),
         );
@@ -316,7 +316,7 @@ describe('workerpool', () => {
         ).rejects.toThrow(
           new errors.CompassCallError(
             `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-            Error('Server internal error: 500 Internal Server Error'),
+            new Error('Server internal error: 500 Internal Server Error'),
           ),
         );
       });
@@ -333,7 +333,7 @@ describe('workerpool', () => {
           'https://my-workerpool.com',
         ),
       ).rejects.toThrow(
-        Error(`No ENS name reverse resolution configured for ${address}`),
+        new Error(`No ENS name reverse resolution configured for ${address}`),
       );
     });
 

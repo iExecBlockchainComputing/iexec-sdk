@@ -26,7 +26,9 @@ export const setWorkerpoolApiUrl = async (
       .validate(url);
     const name = await lookupAddress(contracts, vAddress);
     if (!name) {
-      throw Error(`No ENS name reverse resolution configured for ${vAddress}`);
+      throw new Error(
+        `No ENS name reverse resolution configured for ${vAddress}`,
+      );
     }
     return await setTextRecord(
       contracts,

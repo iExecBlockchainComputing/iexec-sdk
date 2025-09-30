@@ -89,13 +89,13 @@ export const obsBridgeToSidechain = (
         const vAmount = await nRlcAmountSchema()
           .required()
           .validate(nRlcAmount);
-        if (contracts.isNative) throw Error('Current chain is a sidechain');
+        if (contracts.isNative) throw new Error('Current chain is a sidechain');
         const balance = await getRlcBalance(
           contracts,
           await getAddress(contracts),
         );
         if (balance.lt(new BN(vAmount))) {
-          throw Error('Amount to bridge exceeds wallet balance');
+          throw new Error('Amount to bridge exceeds wallet balance');
         }
 
         // check bridge policy
@@ -121,14 +121,14 @@ export const obsBridgeToSidechain = (
           dailyLimit: bigIntToBn(dailyLimit),
         });
         if (new BN(vAmount).lt(bigIntToBn(minPerTx))) {
-          throw Error(
+          throw new Error(
             `Minimum amount allowed to bridge is ${formatRLC(
               minPerTx.toString(),
             )} RLC`,
           );
         }
         if (new BN(vAmount).gt(bigIntToBn(maxPerTx))) {
-          throw Error(
+          throw new Error(
             `Maximum amount allowed to bridge is ${formatRLC(
               maxPerTx.toString(),
             )} RLC`,
@@ -190,7 +190,7 @@ export const obsBridgeToSidechain = (
           totalSpentPerDay,
         });
         if (!withinLimit) {
-          throw Error(
+          throw new Error(
             `Amount to bridge would exceed bridge daily limit. ${formatRLC(
               totalSpentPerDay,
             )}/${formatRLC(dailyLimit)} RLC already bridged today.`,
@@ -346,13 +346,14 @@ export const obsBridgeToMainchain = (
         const vAmount = await nRlcAmountSchema()
           .required()
           .validate(nRlcAmount);
-        if (!contracts.isNative) throw Error('Current chain is a mainchain');
+        if (!contracts.isNative)
+          throw new Error('Current chain is a mainchain');
         const balance = await getRlcBalance(
           contracts,
           await getAddress(contracts),
         );
         if (balance.lt(new BN(vAmount))) {
-          throw Error('Amount to bridge exceeds wallet balance');
+          throw new Error('Amount to bridge exceeds wallet balance');
         }
         const sidechainBridgeContract = new Contract(
           vBridgeAddress,
@@ -380,14 +381,14 @@ export const obsBridgeToMainchain = (
           dailyLimit: bigIntToBn(dailyLimit),
         });
         if (bnWeiValue.lt(bigIntToBn(minPerTx))) {
-          throw Error(
+          throw new Error(
             `Minimum amount allowed to bridge is ${formatRLC(
               truncateBnWeiToBnNRlc(bigIntToBn(minPerTx)),
             )} RLC`,
           );
         }
         if (bnWeiValue.gt(bigIntToBn(maxPerTx))) {
-          throw Error(
+          throw new Error(
             `Maximum amount allowed to bridge is ${formatRLC(
               truncateBnWeiToBnNRlc(bigIntToBn(maxPerTx)),
             )} RLC`,
@@ -415,7 +416,7 @@ export const obsBridgeToMainchain = (
           totalSpentPerDay: bigIntToBn(totalSpentPerDay),
         });
         if (!withinLimit) {
-          throw Error(
+          throw new Error(
             `Amount to bridge would exceed bridge daily limit. ${formatRLC(
               truncateBnWeiToBnNRlc(bigIntToBn(totalSpentPerDay)),
             )}/${formatRLC(

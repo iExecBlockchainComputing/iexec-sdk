@@ -113,7 +113,7 @@ showTask
             const { beneficiarySecretsFolderPath } = createEncFolderPaths(opts);
             const exists = await pathExists(beneficiarySecretsFolderPath);
             if (!exists) {
-              throw Error(
+              throw new Error(
                 'Beneficiary secrets folder is missing did you forget to run "iexec results generate-encryption-keypair"?',
               );
             }
@@ -136,7 +136,7 @@ showTask
               beneficiaryKey = await readFile(beneficiaryKeyPath, 'utf8');
             } catch (error) {
               debug(error);
-              throw Error(
+              throw new Error(
                 `Failed to load beneficiary key from "${beneficiaryKeyPath}"`,
               );
             }

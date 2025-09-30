@@ -81,10 +81,10 @@ export const sendETH = async (contracts = throwIfMissing(), amount, to) => {
       .validate(to);
     const vAmount = await weiAmountSchema().required().validate(amount);
     if (contracts.isNative)
-      throw Error('sendETH() is disabled on sidechain, use sendRLC()');
+      throw new Error('sendETH() is disabled on sidechain, use sendRLC()');
     const balance = await getEthBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
-      throw Error('Amount to send exceed wallet balance');
+      throw new Error('Amount to send exceed wallet balance');
     }
     return await sendNativeToken(contracts, vAmount, vAddress);
   } catch (error) {
@@ -104,7 +104,7 @@ export const sendRLC = async (contracts = throwIfMissing(), nRlcAmount, to) => {
     const vAmount = await nRlcAmountSchema().required().validate(nRlcAmount);
     const balance = await getRlcBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
-      throw Error('Amount to send exceed wallet balance');
+      throw new Error('Amount to send exceed wallet balance');
     }
     if (contracts.isNative) {
       debug('send native token');
@@ -130,7 +130,7 @@ export const sweep = async (contracts = throwIfMissing(), to) => {
     const userAddress = await getAddress(contracts);
     const code = await contracts.provider.getCode(vAddressTo);
     if (code !== '0x') {
-      throw Error('Cannot sweep to a contract');
+      throw new Error('Cannot sweep to a contract');
     }
     let balances = await checkBalances(contracts, userAddress);
     const res = {};
@@ -146,7 +146,9 @@ export const sweep = async (contracts = throwIfMissing(), to) => {
       } catch (error) {
         debug('error', error);
         errors.push(`Failed to transfer ERC20: ${error.message}`);
-        throw Error(`Failed to sweep ERC20, sweep aborted. errors: ${errors}`);
+        throw new Error(
+          `Failed to sweep ERC20, sweep aborted. errors: ${errors}`,
+        );
       }
       balances = await checkBalances(contracts, userAddress);
     }

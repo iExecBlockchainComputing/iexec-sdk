@@ -108,17 +108,17 @@ show
             userAddress = userWalletAddress;
             spinner.info(`Current account address ${userWalletAddress}`);
           } else {
-            throw Error('Wallet file not found');
+            throw new Error('Wallet file not found');
           }
         } catch (error) {
-          throw Error(
+          throw new Error(
             `Failed to load wallet address from keystore: ${error.message}`,
           );
         }
       } else {
         userAddress = address;
       }
-      if (!userAddress) throw Error('Missing address or wallet');
+      if (!userAddress) throw new Error('Missing address or wallet');
 
       const chain = await loadChain(opts.chain, { spinner });
 
