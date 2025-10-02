@@ -155,6 +155,7 @@ orderbookDataset
   .option(...option.isAppStrict())
   .option(...option.isRequesterStrict())
   .option(...option.isWorkerpoolStrict())
+  .option(...option.bulkOnly())
   .description(desc.showObj('dataset orderbook', 'marketplace'))
   .action(async (dataset, opts) => {
     await checkUpdate(opts);
@@ -175,8 +176,8 @@ orderbookDataset
         isAppStrict,
         isRequesterStrict,
         isWorkerpoolStrict,
+        bulkOnly,
       } = opts;
-
       const request = fetchDatasetOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
@@ -191,6 +192,7 @@ orderbookDataset
           isAppStrict,
           isRequesterStrict,
           isWorkerpoolStrict,
+          bulkOnly,
         },
       );
       const fetchMessage = info.showing(objName);
@@ -205,6 +207,7 @@ orderbookDataset
               apprestrict: e.order.apprestrict,
               workerpoolrestrict: e.order.workerpoolrestrict,
               requesterrestrict: e.order.requesterrestrict,
+              bulk: e.bulk,
             }))
           : [];
       const createResultsMessage = (
@@ -219,6 +222,7 @@ orderbookDataset
             orderHash: e.orderHash,
             price: e.price,
             remaining: e.remaining,
+            ...(e.bulk && { bulk: e.bulk }),
             ...(e.tag !== NULL_BYTES32 && { tag: e.tag }),
             ...(e.apprestrict !== NULL_ADDRESS && {
               apprestrict: e.apprestrict,
