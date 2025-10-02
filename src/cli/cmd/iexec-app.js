@@ -775,8 +775,8 @@ run
         const { orders } = await fetchAppOrderbook(
           chain.contracts,
           getPropertyFormChain(chain, 'iexecGateway'),
-          app,
           {
+            app,
             requester,
             ...(useDataset && { dataset }),
             ...(runOnWorkerpool && { workerpool }),
@@ -819,8 +819,8 @@ run
         const { orders } = await fetchDatasetOrderbook(
           chain.contracts,
           getPropertyFormChain(chain, 'iexecGateway'),
-          dataset,
           {
+            dataset,
             app,
             requester,
             ...(runOnWorkerpool && { workerpool }),

@@ -146,7 +146,70 @@ export default class IExecOrderbookModule extends IExecModule {
    * ```
    */
   fetchAppOrderbook(
-    appAddress: Addressish,
+    appAddressOrOptions:
+      | Addressish
+      | 'any'
+      | {
+          /**
+           * filter by app
+           */
+          app?: Addressish | 'any';
+          /**
+           * filter by app owner
+           */
+          appOwner?: Addressish;
+          /**
+           * include orders restricted to specified dataset (use `'any'` to include any dataset)
+           */
+          dataset?: Addressish | 'any';
+          /**
+           * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
+           */
+          workerpool?: Addressish | 'any';
+          /**
+           * include orders restricted to specified requester (use `'any'` to include any requester)
+           */
+          requester?: Addressish | 'any';
+          /**
+           * filter by minimum volume remaining
+           */
+          minVolume?: BNish;
+          /**
+           * filter by minimum tag required
+           */
+          minTag?: Tag | HumanSingleTag[];
+          /**
+           * filter by maximum tag accepted
+           */
+          maxTag?: Tag | HumanSingleTag[];
+          /**
+           * index of the page to fetch
+           */
+          page?: number;
+          /**
+           * size of the page to fetch
+           */
+          pageSize?: number;
+          /**
+           * filters out orders allowing “any” dataset (default: `false`)
+           */
+          isDatasetStrict?: boolean;
+          /**
+           * filters out orders allowing “any” requester (default: `false`)
+           */
+          isRequesterStrict?: boolean;
+          /**
+           * filters out orders allowing “any” workerpool (default: `false`)
+           */
+          isWorkerpoolStrict?: boolean;
+        },
+    /**
+     * @deprecated use first parameter instead
+     *
+     * migration:
+     *
+     * replace `fetchAppOrderbook(appAddress, options)` by `fetchAppOrderbook({ app: appAddress, ...options })`
+     */
     options?: {
       /**
        * include orders restricted to specified dataset (use `'any'` to include any dataset)
@@ -207,7 +270,70 @@ export default class IExecOrderbookModule extends IExecModule {
    * ```
    */
   fetchDatasetOrderbook(
-    datasetAddress: Addressish,
+    datasetAddressOrOptions:
+      | Addressish
+      | 'any'
+      | {
+          /**
+           * filter by dataset
+           */
+          dataset?: Addressish | 'any';
+          /**
+           * filter by dataset owner
+           */
+          datasetOwner?: Addressish;
+          /**
+           * include orders restricted to specified app (use `'any'` to include any app)
+           */
+          app?: Addressish | 'any';
+          /**
+           * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
+           */
+          workerpool?: Addressish | 'any';
+          /**
+           * include orders restricted to specified requester (use `'any'` to include any requester)
+           */
+          requester?: Addressish | 'any';
+          /**
+           * filter by minimum volume remaining
+           */
+          minVolume?: BNish;
+          /**
+           * filter by minimum tag required
+           */
+          minTag?: Tag | HumanSingleTag[];
+          /**
+           * filter by maximum tag accepted
+           */
+          maxTag?: Tag | HumanSingleTag[];
+          /**
+           * index of the page to fetch
+           */
+          page?: number;
+          /**
+           * size of the page to fetch
+           */
+          pageSize?: number;
+          /**
+           * filters out orders allowing “any” app (default: `false`)
+           */
+          isAppStrict?: boolean;
+          /**
+           * filters out orders allowing “any” requester (default: `false`)
+           */
+          isRequesterStrict?: boolean;
+          /**
+           * filters out orders allowing “any” workerpool (default: `false`)
+           */
+          isWorkerpoolStrict?: boolean;
+        },
+    /**
+     * @deprecated use first parameter instead
+     *
+     * migration:
+     *
+     * replace `fetchDatasetOrderbook(datasetAddress, options)` by `fetchDatasetOrderbook({ dataset: datasetAddress, ...options })`
+     */
     options?: {
       /**
        * include orders restricted to specified app (use `'any'` to include any app)
