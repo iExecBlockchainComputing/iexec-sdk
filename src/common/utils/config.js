@@ -75,6 +75,7 @@ const networkConfigs = [
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     isExperimental: false,
+    uploadBulkForThegraph: true,
   },
   {
     id: 42161,
@@ -97,6 +98,7 @@ const networkConfigs = [
     voucherSubgraph: undefined, // no voucher
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
+    uploadBulkForThegraph: true,
   },
 ];
 
@@ -168,3 +170,9 @@ networkConfigs.forEach((networkConfig) => {
     Network.register(network.name, () => network);
   }
 });
+
+export const shouldUploadBulkForThegraph = (id) =>
+  networkConfigs[id]?.uploadBulkForThegraph || false;
+
+export const THEGRAPH_IPFS_NODE = 'https://ipfs.thegraph.com';
+export const THEGRAPH_IPFS_GATEWAY = THEGRAPH_IPFS_NODE;
