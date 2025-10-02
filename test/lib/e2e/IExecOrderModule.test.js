@@ -69,6 +69,7 @@ describe('order', () => {
     test('prepares a bulk from datasetorders returns cid and volume', async () => {
       const res = await iexecRequester.order.prepareDatasetBulk(datasetorders, {
         maxDatasetPerTask: 3,
+        thegraphUpload: false,
       });
       expect(res).toEqual({
         cid: expect.any(String),

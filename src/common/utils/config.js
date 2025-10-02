@@ -88,6 +88,7 @@ const networkConfigs = [
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     isExperimental: false,
+    uploadBulkForThegraph: true,
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.ENS,
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
@@ -116,6 +117,7 @@ const networkConfigs = [
     voucherSubgraph: undefined, // no voucher
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
+    uploadBulkForThegraph: true,
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.ENS,
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
@@ -207,3 +209,9 @@ networkConfigs.forEach((networkConfig) => {
     Network.register(network.name, () => network);
   }
 });
+
+export const shouldUploadBulkForThegraph = (id) =>
+  networkConfigs[id]?.uploadBulkForThegraph || false;
+
+export const THEGRAPH_IPFS_NODE = 'https://ipfs.thegraph.com';
+export const THEGRAPH_IPFS_GATEWAY = THEGRAPH_IPFS_NODE;

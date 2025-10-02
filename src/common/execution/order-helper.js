@@ -1,3 +1,5 @@
+import Debug from 'debug';
+import { array } from 'yup';
 import {
   checkWeb2SecretExists,
   checkWeb3SecretExists,
@@ -11,6 +13,7 @@ import {
   STORAGE_PROVIDERS,
   TEE_FRAMEWORKS,
 } from '../utils/constant.js';
+import { THEGRAPH_IPFS_NODE, THEGRAPH_IPFS_GATEWAY } from '../utils/config.js';
 import {
   getStorageTokenKeyName,
   reservedSecretKeyName,
@@ -27,7 +30,8 @@ import {
 } from '../utils/validator.js';
 import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries.js';
 import { add } from '../utils/ipfs.js';
-import { array } from 'yup';
+
+const debug = Debug('iexec:execution:order-helper');
 
 export const resolveTeeFrameworkFromTag = async (tag) => {
   const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
@@ -205,11 +209,34 @@ export const checkAppRequirements = async (
 
 const MAX_DATASET_PER_TASK = 100; // TODO confirm value
 
+const ipfsUpload = async ({
+  content,
+  ipfsNode,
+  ipfsGateway,
+  thegraphUpload,
+}) => {
+  const [cid] = await Promise.all([
+    add({ content, ipfsNode, ipfsGateway }),
+    // best effort upload to thegraph ipfs
+    thegraphUpload
+      ? add({
+          content,
+          ipfsNode: THEGRAPH_IPFS_NODE,
+          ipfsGateway: THEGRAPH_IPFS_GATEWAY,
+        }).catch((e) => {
+          debug(`thegraph ipfs add failure: ${e.message}`);
+        })
+      : undefined,
+  ]);
+  return cid;
+};
+
 export const prepareDatasetBulk = async ({
   ipfsNode = throwIfMissing(),
   ipfsGateway = throwIfMissing(),
   datasetorders,
   maxDatasetPerTask = MAX_DATASET_PER_TASK,
+  thegraphUpload = false,
 }) => {
   const vmMaxDatasetPerTask = await positiveStrictIntSchema()
     .max(MAX_DATASET_PER_TASK)
@@ -222,24 +249,24 @@ export const prepareDatasetBulk = async ({
     .label('datasetorders')
     .validate(datasetorders);
 
-  // TODO check orders eligibility?
-
   const bulkRoot = [];
   while (vDatasetOrders.length > 0) {
     const slice = vDatasetOrders.slice(0, vmMaxDatasetPerTask);
-    const sliceCid = await add({
+    const sliceCid = await ipfsUpload({
       content: JSON.stringify(slice),
       ipfsNode,
       ipfsGateway,
+      thegraphUpload,
     });
     bulkRoot.push(sliceCid);
     vDatasetOrders = vDatasetOrders.slice(vmMaxDatasetPerTask);
   }
 
-  const bulkCid = await add({
+  const bulkCid = await ipfsUpload({
     content: JSON.stringify(bulkRoot),
     ipfsNode,
     ipfsGateway,
+    thegraphUpload,
   });
   return { cid: bulkCid, volume: bulkRoot.length };
 };

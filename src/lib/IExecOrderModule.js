@@ -51,6 +51,7 @@ import {
   datasetorderSchema,
 } from '../common/utils/validator.js';
 import { sumTags } from '../common/utils/utils.js';
+import { shouldUploadBulkForThegraph } from '../common/utils/config.js';
 
 export default class IExecOrderModule extends IExecModule {
   constructor(...args) {
@@ -394,13 +395,17 @@ export default class IExecOrderModule extends IExecModule {
     };
     this.prepareDatasetBulk = async (
       datasetorders,
-      { maxDatasetPerTask } = {},
+      { maxDatasetPerTask, thegraphUpload } = {},
     ) => {
       return prepareDatasetBulk({
         ipfsNode: await this.config.resolveIpfsNodeURL(),
         ipfsGateway: await this.config.resolveIpfsGatewayURL(),
         datasetorders,
         maxDatasetPerTask,
+        thegraphUpload:
+          thegraphUpload !== undefined
+            ? thegraphUpload
+            : shouldUploadBulkForThegraph(await this.config.resolveChainId()),
       });
     };
   }
