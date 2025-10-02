@@ -373,7 +373,7 @@ export const fetchWorkerpoolOrderbook = async (
         minTag: await tagSchema().label('minTag').validate(minTag),
       }),
       ...(maxTag && {
-        maxTag: await tagSchema().validate(maxTag),
+        maxTag: await tagSchema().label('maxTag').validate(maxTag),
       }),
       ...(workerpoolOwner && {
         workerpoolOwner: await addressSchema({
