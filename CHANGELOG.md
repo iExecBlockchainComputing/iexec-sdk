@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.19.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.18.0...v8.19.0) (2025-10-02)
+
+
+### Added
+
+* allow searching apporders and datasetorders by asset owner ([#466](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/466)) ([5e1c880](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/5e1c880b2d966c07d58caf61cacfc4f31d766b75))
+
+
+### Changed
+
+* improve maintainability ([#467](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/467)) ([4b02cd5](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/4b02cd5d4a3c6746e57721e074e70543efdcc76d))
+* typing issue on getSignerFromPrivateKey, providers option is optional ([#464](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/464)) ([819bd1a](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/819bd1a56dc68543230d5c899d54a9c874029429))
+
 ## [8.18.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.17.1...v8.18.0) (2025-08-06)
 
 
