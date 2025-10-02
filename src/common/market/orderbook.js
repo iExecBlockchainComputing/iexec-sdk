@@ -181,6 +181,7 @@ export const fetchDatasetOrderbook = async (
     let isAppStrict;
     let isWorkerpoolStrict;
     let isRequesterStrict;
+    let bulkOnly;
     if (typeof datasetOrOptions === 'object' && datasetOrOptions !== null) {
       ({
         dataset,
@@ -196,6 +197,7 @@ export const fetchDatasetOrderbook = async (
         isAppStrict = false,
         isWorkerpoolStrict = false,
         isRequesterStrict = false,
+        bulkOnly = false,
       } = datasetOrOptions);
     } else {
       // deprecated
@@ -216,6 +218,7 @@ export const fetchDatasetOrderbook = async (
         isAppStrict = false,
         isWorkerpoolStrict = false,
         isRequesterStrict = false,
+        bulkOnly = false,
       } = options || {});
     }
     if (!dataset && !datasetOwner) {
@@ -279,6 +282,7 @@ export const fetchDatasetOrderbook = async (
       ...(maxTag !== undefined && {
         maxTag: await tagSchema().label('maxTag').validate(maxTag),
       }),
+      bulkOnly: await booleanSchema().label('bulkOnly').validate(bulkOnly),
       ...(page !== undefined && {
         pageIndex: await positiveIntSchema().label('page').validate(page),
       }),
