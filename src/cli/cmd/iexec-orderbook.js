@@ -66,8 +66,8 @@ orderbookApp
       const request = fetchAppOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
-        app,
         {
+          app,
           dataset,
           workerpool,
           requester,
@@ -180,8 +180,8 @@ orderbookDataset
       const request = fetchDatasetOrderbook(
         chain.contracts,
         getPropertyFormChain(chain, 'iexecGateway'),
-        dataset,
         {
+          dataset,
           app,
           workerpool,
           requester,

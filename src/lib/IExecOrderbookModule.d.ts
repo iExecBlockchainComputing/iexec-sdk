@@ -148,17 +148,14 @@ export default class IExecOrderbookModule extends IExecModule {
   fetchAppOrderbook(
     appAddressOrOptions:
       | Addressish
+      | 'any'
       | {
           /**
            * filter by app
-           *
-           * NB: either `app` or `appOwner` must be specified
            */
-          app?: Addressish;
+          app?: Addressish | 'any';
           /**
            * filter by app owner
-           *
-           * NB: either `app` or `appOwner` must be specified
            */
           appOwner?: Addressish;
           /**
@@ -275,17 +272,14 @@ export default class IExecOrderbookModule extends IExecModule {
   fetchDatasetOrderbook(
     datasetAddressOrOptions:
       | Addressish
+      | 'any'
       | {
           /**
            * filter by dataset
-           *
-           * NB: either `dataset` or `datasetOwner` must be specified
            */
-          dataset?: Addressish;
+          dataset?: Addressish | 'any';
           /**
            * filter by dataset owner
-           *
-           * NB: either `dataset` or `datasetOwner` must be specified
            */
           datasetOwner?: Addressish;
           /**

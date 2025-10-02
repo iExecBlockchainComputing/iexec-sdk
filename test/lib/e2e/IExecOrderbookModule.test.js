@@ -173,7 +173,7 @@ describe('orderbook', () => {
         },
       });
       await expectAsyncCustomError(
-        iexecReadOnly.orderbook.fetchAppOrderbook(getRandomAddress()),
+        iexecReadOnly.orderbook.fetchAppOrderbook({ app: getRandomAddress() }),
         {
           constructor: MarketCallError,
           message: `Market API error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
@@ -189,7 +189,7 @@ describe('orderbook', () => {
         },
       });
       await expectAsyncCustomError(
-        iexecReadOnly.orderbook.fetchAppOrderbook(getRandomAddress()),
+        iexecReadOnly.orderbook.fetchAppOrderbook({ app: getRandomAddress() }),
         {
           constructor: MarketCallError,
           message: `Market API error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
@@ -203,7 +203,9 @@ describe('orderbook', () => {
           readOnly: true,
         });
         const appAddress = getRandomAddress();
-        const res = await iexec.orderbook.fetchAppOrderbook(appAddress);
+        const res = await iexec.orderbook.fetchAppOrderbook({
+          app: appAddress,
+        });
         expect(res.count).toBe(0);
         expect(res.orders).toStrictEqual([]);
         const apporder = await deployAndGetApporder(iexec);
@@ -238,9 +240,9 @@ describe('orderbook', () => {
           iexec.order.publishApporder(o),
         );
 
-        const res1 = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          apporder.app,
-        );
+        const res1 = await iexecReadOnly.orderbook.fetchAppOrderbook({
+          app: apporder.app,
+        });
         expect(res1.count).toBe(22);
         expect(res1.orders.length).toBe(20);
         expect(res1.more).toBeDefined();
@@ -248,42 +250,41 @@ describe('orderbook', () => {
         expect(res2.count).toBe(22);
         expect(res2.orders.length).toBe(2);
         expect(res2.more).toBeUndefined();
-        const res3 = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          apporder.app,
-          {
-            dataset: 'any',
-          },
-        );
+        const res3 = await iexecReadOnly.orderbook.fetchAppOrderbook({
+          app: apporder.app,
+          dataset: 'any',
+        });
         expect(res3.count).toBe(24);
-        const res4 = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          apporder.app,
-          {
-            workerpool: 'any',
-          },
-        );
+        const res4 = await iexecReadOnly.orderbook.fetchAppOrderbook({
+          app: apporder.app,
+          workerpool: 'any',
+        });
         expect(res4.count).toBe(25);
-        const res5 = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          apporder.app,
-          {
-            requester: 'any',
-          },
-        );
+        const res5 = await iexecReadOnly.orderbook.fetchAppOrderbook({
+          app: apporder.app,
+          requester: 'any',
+        });
         expect(res5.count).toBe(26);
-        const res6 = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          apporder.app,
-          {
-            dataset: 'any',
-            requester: 'any',
-            workerpool: 'any',
-          },
-        );
+        const res6 = await iexecReadOnly.orderbook.fetchAppOrderbook({
+          app: apporder.app,
+          dataset: 'any',
+          requester: 'any',
+          workerpool: 'any',
+        });
         expect(res6.count).toBe(31);
-        const res7 = await iexecReadOnly.orderbook.fetchAppOrderbook('any', {
+        const res7 = await iexecReadOnly.orderbook.fetchAppOrderbook({
+          app: 'any',
           dataset: 'any',
           requester: 'any',
           workerpool: 'any',
         });
         expect(res7.count >= 32).toBe(true);
+
+        // backward compatibility: deprecated appAddress parameter
+        const res1deprecated = await iexecReadOnly.orderbook.fetchAppOrderbook(
+          apporder.app,
+        );
+        expect(res1.orders).toLooseEqual(res1deprecated.orders);
       });
 
       test('appOwner returns orders from app owner', async () => {
@@ -364,20 +365,20 @@ describe('orderbook', () => {
         emptyAppOrder.requesterrestrict = NULL_ADDRESS;
 
         // all orders (1,2,3,4,5)
-        const allAppOrders = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          appAddress,
-          {
-            dataset: 'any',
-            requester: 'any',
-            workerpool: 'any',
-          },
-        );
+        const allAppOrders = await iexecReadOnly.orderbook.fetchAppOrderbook({
+          app: appAddress,
+          dataset: 'any',
+          requester: 'any',
+          workerpool: 'any',
+        });
         expect(allAppOrders.count).toBe(5);
         expect(allAppOrders.orders.length).toBe(5);
 
         // all orders without restrictions (1, 2)
         const unrestrictedAppOrders =
-          await iexecReadOnly.orderbook.fetchAppOrderbook(appAddress);
+          await iexecReadOnly.orderbook.fetchAppOrderbook({
+            app: appAddress,
+          });
         expect(unrestrictedAppOrders.count).toBe(2);
         expect(unrestrictedAppOrders.orders.length).toBe(2);
         expect(unrestrictedAppOrders.orders[0].order.datasetrestrict).toEqual(
@@ -401,7 +402,8 @@ describe('orderbook', () => {
 
         // all orders without dataset restriction(1,2) and with dataset restriction(3)
         const datasetRestrictedAppOrders =
-          await iexecReadOnly.orderbook.fetchAppOrderbook(appAddress, {
+          await iexecReadOnly.orderbook.fetchAppOrderbook({
+            app: appAddress,
             dataset: datasetAddress,
           });
         expect(datasetRestrictedAppOrders.count).toBe(3);
@@ -409,7 +411,8 @@ describe('orderbook', () => {
 
         // all orders with dataset restriction and strict(3)
         const datasetStrictAppOrder =
-          await iexecReadOnly.orderbook.fetchAppOrderbook(appAddress, {
+          await iexecReadOnly.orderbook.fetchAppOrderbook({
+            app: appAddress,
             dataset: datasetAddress,
             isDatasetStrict: true,
           });
@@ -421,7 +424,8 @@ describe('orderbook', () => {
 
         // all orders without workerpool restriction(1,2) and with workerpool restriction(4)
         const workerpoolRestrictedAppOrders =
-          await iexecReadOnly.orderbook.fetchAppOrderbook(appAddress, {
+          await iexecReadOnly.orderbook.fetchAppOrderbook({
+            app: appAddress,
             workerpool: workerpoolAddress,
           });
         expect(workerpoolRestrictedAppOrders.count).toBe(3);
@@ -429,7 +433,8 @@ describe('orderbook', () => {
 
         // all orders with workerpool restriction and strict(4)
         const workerpoolStrictAppOrder =
-          await iexecReadOnly.orderbook.fetchAppOrderbook(appAddress, {
+          await iexecReadOnly.orderbook.fetchAppOrderbook({
+            app: appAddress,
             workerpool: workerpoolAddress,
             isWorkerpoolStrict: true,
           });
@@ -441,7 +446,8 @@ describe('orderbook', () => {
 
         // all orders without requester restriction(1,2) and with requester restriction(5)
         const requesterRestrictedAppOrders =
-          await iexecReadOnly.orderbook.fetchAppOrderbook(appAddress, {
+          await iexecReadOnly.orderbook.fetchAppOrderbook({
+            app: appAddress,
             requester: requesterAddress,
           });
         expect(requesterRestrictedAppOrders.count).toBe(3);
@@ -449,7 +455,8 @@ describe('orderbook', () => {
 
         // all orders with requester restriction and strict(5)
         const requesterStrictAppOrders =
-          await iexecReadOnly.orderbook.fetchAppOrderbook(appAddress, {
+          await iexecReadOnly.orderbook.fetchAppOrderbook({
+            app: appAddress,
             requester: requesterAddress,
             isRequesterStrict: true,
           });
@@ -461,7 +468,8 @@ describe('orderbook', () => {
 
         // all orders with requester, dataset, workerpool restriction and not strict (1,2,3,4,5)
         const unstrictAppOrders =
-          await iexecReadOnly.orderbook.fetchAppOrderbook(appAddress, {
+          await iexecReadOnly.orderbook.fetchAppOrderbook({
+            app: appAddress,
             dataset: datasetAddress,
             isDatasetStrict: false,
             requester: requesterAddress,
@@ -474,8 +482,8 @@ describe('orderbook', () => {
 
         // all orders with requester, dataset, workerpool restriction and strict
         const strictAppOrders = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          appAddress,
           {
+            app: appAddress,
             dataset: datasetAddress,
             isDatasetStrict: true,
             requester: requesterAddress,
@@ -496,8 +504,9 @@ describe('orderbook', () => {
           readOnly: true,
         });
         const datasetAddress = getRandomAddress();
-        const res =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress);
+        const res = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          dataset: datasetAddress,
+        });
         expect(res.count).toBe(0);
         expect(res.orders).toStrictEqual([]);
         const datasetorder = await deployAndGetDatasetorder(iexec);
@@ -542,9 +551,9 @@ describe('orderbook', () => {
           iexec.order.publishDatasetorder(o, { preflightCheck: false }),
         );
 
-        const res1 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
-          datasetorder.dataset,
-        );
+        const res1 = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          dataset: datasetorder.dataset,
+        });
         expect(res1.count).toBe(23);
         expect(res1.orders.length).toBe(20);
         expect(res1.more).toBeDefined();
@@ -552,35 +561,42 @@ describe('orderbook', () => {
         expect(res2.count).toBe(23);
         expect(res2.orders.length).toBe(3);
         expect(res2.more).toBeUndefined();
-        const res3 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
-          datasetorder.dataset,
-          { app: 'any' },
-        );
+        const res3 = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          dataset: datasetorder.dataset,
+          app: 'any',
+        });
         expect(res3.count).toBe(25);
-        const res4 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
-          datasetorder.dataset,
-          { workerpool: 'any' },
-        );
+        const res4 = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          dataset: datasetorder.dataset,
+          workerpool: 'any',
+        });
         expect(res4.count).toBe(26);
-        const res5 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
-          datasetorder.dataset,
-          { requester: 'any' },
-        );
+        const res5 = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          dataset: datasetorder.dataset,
+          requester: 'any',
+        });
         expect(res5.count).toBe(27);
-        const res6 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
-          datasetorder.dataset,
-          { app: 'any', workerpool: 'any', requester: 'any' },
-        );
+        const res6 = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          dataset: datasetorder.dataset,
+          app: 'any',
+          workerpool: 'any',
+          requester: 'any',
+        });
         expect(res6.count).toBe(32);
-        const res7 = await iexecReadOnly.orderbook.fetchDatasetOrderbook(
-          'any',
-          {
-            app: 'any',
-            requester: 'any',
-            workerpool: 'any',
-          },
-        );
+        const res7 = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          dataset: 'any',
+          app: 'any',
+          requester: 'any',
+          workerpool: 'any',
+        });
         expect(res7.count >= 33).toBe(true);
+
+        // backward compatibility: deprecated datasetAddress parameter
+        const res1deprecated =
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook(
+            datasetorder.dataset,
+          );
+        expect(res1.orders).toLooseEqual(res1deprecated.orders);
       });
       test('datasetOwner returns orders from dataset owner', async () => {
         const { iexec: iexecUser, wallet } = getTestConfig(iexecTestChain)();
@@ -670,7 +686,8 @@ describe('orderbook', () => {
 
         // all orders (1,2,3,4,5)
         const allADatasetOrders =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             app: 'any',
             requester: 'any',
             workerpool: 'any',
@@ -680,7 +697,9 @@ describe('orderbook', () => {
 
         // all orders without restrictions (1, 2)
         const unrestrictedDatasetOrders =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress);
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
+          });
         expect(unrestrictedDatasetOrders.count).toBe(2);
         expect(unrestrictedDatasetOrders.orders.length).toBe(2);
         expect(unrestrictedDatasetOrders.orders[0].order.apprestrict).toEqual(
@@ -704,7 +723,8 @@ describe('orderbook', () => {
 
         // all orders without app restriction(1,2) and with app restriction(3)
         const appRestrictedAppOrders =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             app: appAddress,
           });
         expect(appRestrictedAppOrders.count).toBe(3);
@@ -712,7 +732,8 @@ describe('orderbook', () => {
 
         // all orders with app restriction and strict(3)
         const appStrictAppOrder =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             app: appAddress,
             isAppStrict: true,
           });
@@ -724,7 +745,8 @@ describe('orderbook', () => {
 
         // all orders without workerpool restriction(1,2) and with workerpool restriction(4)
         const workerpoolRestrictedAppOrders =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             workerpool: workerpoolAddress,
           });
         expect(workerpoolRestrictedAppOrders.count).toBe(3);
@@ -732,7 +754,8 @@ describe('orderbook', () => {
 
         // all orders with workerpool restriction and strict(4)
         const workerpoolStrictAppOrder =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             workerpool: workerpoolAddress,
             isWorkerpoolStrict: true,
           });
@@ -744,7 +767,8 @@ describe('orderbook', () => {
 
         // all orders without requester restriction(1,2) and with requester restriction(5)
         const requesterRestrictedAppOrders =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             requester: requesterAddress,
           });
         expect(requesterRestrictedAppOrders.count).toBe(3);
@@ -752,7 +776,8 @@ describe('orderbook', () => {
 
         // all orders with requester restriction and strict(5)
         const requesterStrictAppOrders =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             requester: requesterAddress,
             isRequesterStrict: true,
           });
@@ -764,7 +789,8 @@ describe('orderbook', () => {
 
         // all orders with app, requester, workerpool restriction and not strict (1,2,3,4,5)
         const unstrictAppOrders =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             app: appAddress,
             isAppStrict: false,
             requester: requesterAddress,
@@ -777,7 +803,8 @@ describe('orderbook', () => {
 
         // all orders with app, requester, workerpool restriction and strict
         const strictAppOrders =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(datasetAddress, {
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
             app: appAddress,
             isAppStrict: true,
             requester: requesterAddress,

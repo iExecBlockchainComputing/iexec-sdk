@@ -55,6 +55,10 @@ export const fetchAppOrderbook = async (
       } = appOrOptions);
     } else {
       // deprecated
+      // eslint-disable-next-line no-console
+      console.warn(
+        'passing app as first argument is deprecated, please pass the options object containing app or appOwner instead',
+      );
       app = appOrOptions;
       ({
         dataset,
@@ -195,6 +199,10 @@ export const fetchDatasetOrderbook = async (
       } = datasetOrOptions);
     } else {
       // deprecated
+      // eslint-disable-next-line no-console
+      console.warn(
+        'passing dataset as first argument is deprecated, please pass the options object containing dataset or datasetOwner instead',
+      );
       dataset = datasetOrOptions;
       ({
         app,
