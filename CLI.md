@@ -1978,6 +1978,7 @@ Options:
 | --app-strict | fetch orders created strictly for the specified app |
 | --requester-strict | fetch orders created strictly for the specified requester |
 | --workerpool-strict | fetch orders created strictly for the specified workerpool |
+| --bulk-only | only include bulk orders |
 
 #### iexec orderbook workerpool
 

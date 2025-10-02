@@ -10,6 +10,7 @@ published sell order for a dataset
 
 ### Properties
 
+- [bulk](internal_.PublishedDatasetorder.md#bulk)
 - [chainId](internal_.PublishedDatasetorder.md#chainid)
 - [order](internal_.PublishedDatasetorder.md#order)
 - [orderHash](internal_.PublishedDatasetorder.md#orderhash)
@@ -19,6 +20,14 @@ published sell order for a dataset
 - [status](internal_.PublishedDatasetorder.md#status)
 
 ## Properties
+
+### bulk
+
+• `Optional` **bulk**: `boolean`
+
+true if the order allows bulk processing
+
+___
 
 ### chainId
 
