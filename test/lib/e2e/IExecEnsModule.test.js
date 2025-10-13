@@ -113,9 +113,8 @@ describe('ens', () => {
       const workerpoolDomain =
         await iexecReadOnly.ens.getDefaultDomain(workerpoolAddress);
       expect(workerpoolDomain).toBe('pools.iexec.eth');
-      const defaultDomain = await iexecReadOnly.ens.getDefaultDomain(
-        getRandomAddress(),
-      );
+      const defaultDomain =
+        await iexecReadOnly.ens.getDefaultDomain(getRandomAddress());
       expect(defaultDomain).toBe('users.iexec.eth');
     });
   });

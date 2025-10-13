@@ -64,9 +64,8 @@ describe('account', () => {
               providerOptions: DEFAULT_PROVIDER_OPTIONS,
             },
           );
-          const res = await iexec.account.checkBridgedBalance(
-            getRandomAddress(),
-          );
+          const res =
+            await iexec.account.checkBridgedBalance(getRandomAddress());
           expect(res.stake).toBeInstanceOf(BN);
           expect(res.locked).toBeInstanceOf(BN);
         });
