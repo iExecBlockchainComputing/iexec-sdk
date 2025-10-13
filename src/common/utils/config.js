@@ -71,7 +71,7 @@ const networkConfigs = [
     voucherSubgraph: undefined, // no voucher
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
-    isExperimental: true,
+    isExperimental: false,
   },
   {
     id: 42161,
