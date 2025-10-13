@@ -15,4 +15,4 @@ jobs:
       tag: ${{ needs.compute-staging-version.outputs.version }}
     secrets:
       docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
-      docker-password: ${{ secrets.DOCKERHUB_TOKEN }}
+      docker-password: ${{ secrets.DOCKERHUB_PAT }}
