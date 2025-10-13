@@ -130,31 +130,6 @@ describe('[IExecConfig]', () => {
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
-      describe('allowExperimentalNetworks', () => {
-        test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
-          const createConfig = () =>
-            new IExecConfig({ ethProvider: 'arbitrum-sepolia-testnet' });
-          expect(createConfig).toThrow(
-            new Error('Invalid ethProvider: Invalid provider host name or url'),
-          );
-          expect(createConfig).toThrow(errors.ConfigurationError);
-        });
-        test('allows experimental chains when allowExperimentalNetworks is enabled', async () => {
-          const config = new IExecConfig(
-            { ethProvider: 'arbitrum-sepolia-testnet' },
-            { allowExperimentalNetworks: true },
-          );
-          const { provider, signer, chainId } =
-            await config.resolveContractsClient();
-          expect(signer).toBeUndefined();
-          expect(provider).toBeDefined();
-          expect(provider).toBeInstanceOf(JsonRpcProvider);
-          expect(chainId).toBe('421614');
-          const network = await provider.getNetwork();
-          expect(network.chainId).toBe(421614n);
-          expect(network.name).toBe('arbitrum-sepolia');
-        });
-      });
     });
 
     describe('read-only ethProvider from network chainId', () => {
@@ -241,30 +216,6 @@ describe('[IExecConfig]', () => {
           new Error('Invalid ethProvider: Invalid provider host name or url'),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
-      });
-      describe('allowExperimentalNetworks', () => {
-        test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
-          const createConfig = () => new IExecConfig({ ethProvider: 421614 });
-          expect(createConfig).toThrow(
-            new Error('Invalid ethProvider: Invalid provider host name or url'),
-          );
-          expect(createConfig).toThrow(errors.ConfigurationError);
-        });
-        test('allows experimental chains when allowExperimentalNetworks is enabled', async () => {
-          const config = new IExecConfig(
-            { ethProvider: 421614 },
-            { allowExperimentalNetworks: true },
-          );
-          const { provider, signer, chainId } =
-            await config.resolveContractsClient();
-          expect(signer).toBeUndefined();
-          expect(provider).toBeDefined();
-          expect(provider).toBeInstanceOf(JsonRpcProvider);
-          expect(chainId).toBe('421614');
-          const network = await provider.getNetwork();
-          expect(network.chainId).toBe(421614n);
-          expect(network.name).toBe('arbitrum-sepolia');
-        });
       });
     });
 
