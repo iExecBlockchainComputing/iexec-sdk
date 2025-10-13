@@ -601,5 +601,21 @@ describe('utils', () => {
         ).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
     });
+    test.skip('allowExperimentalNetworks option allow creating signer connected to an experimental network', async () => {
+      expect(() =>
+        utils.getSignerFromPrivateKey(
+          'arbitrum-sepolia-testnet',
+          getRandomWallet().privateKey,
+        ),
+      ).toThrowError('Invalid provider host name or url');
+
+      const signer = utils.getSignerFromPrivateKey(
+        'arbitrum-sepolia-testnet',
+        getRandomWallet().privateKey,
+        { allowExperimentalNetworks: true },
+      );
+      const nonce = await signer.getNonce();
+      expect(nonce).toBe(0);
+    });
   });
 });
