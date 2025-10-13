@@ -1057,9 +1057,7 @@ export const renderTasksStatus = (
     : '\n';
   const completedMsg =
     completedTasksArray.length > 0
-      ? `${completedTasksArray.length}/${tasksArray.length} tasks completed${
-          completedDetails
-        }`
+      ? `${completedTasksArray.length}/${tasksArray.length} tasks completed${completedDetails}`
       : '';
 
   const failedDetails = detailed
@@ -1071,9 +1069,7 @@ export const renderTasksStatus = (
     : '\n';
   const failedMsg =
     timedoutTasksArray.length > 0
-      ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed${
-          failedDetails
-        }`
+      ? `${timedoutTasksArray.length}/${tasksArray.length} tasks failed${failedDetails}`
       : '';
   const statusMsg =
     runningTasksArray.length > 0
