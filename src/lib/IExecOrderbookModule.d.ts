@@ -331,6 +331,10 @@ export default class IExecOrderbookModule extends IExecModule {
            * filters out orders allowing “any” workerpool (default: `false`)
            */
           isWorkerpoolStrict?: boolean;
+          /**
+           * filters out orders that don't allow bulk processing (default: `false`)
+           */
+          bulkOnly?: boolean;
         },
     /**
      * @deprecated use first parameter instead
