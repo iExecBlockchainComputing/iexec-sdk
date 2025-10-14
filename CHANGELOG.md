@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.20.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.19.0...v8.20.0) (2025-10-14)
+
+
+### Added
+
+* Migrate `arbitrum-sepolia-testnet` from experimental to non-experimental network ([#471](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/471)) ([ab23604](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/ab23604c352483de124ceef991c0edff2c474392))
+
 ## [8.19.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.18.0...v8.19.0) (2025-10-02)
 
 
