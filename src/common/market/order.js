@@ -1129,7 +1129,7 @@ export const createDatasetorder = async (
     .validate(dataset),
   datasetprice: await nRlcAmountSchema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
-  tag: await tagSchema().validate(tag),
+  tag: await tagSchema({ allowAgnosticTee: true }).validate(tag),
   apprestrict: await addressSchema({
     ethProvider: contracts.provider,
   }).validate(apprestrict),
