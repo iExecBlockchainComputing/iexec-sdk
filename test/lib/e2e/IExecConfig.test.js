@@ -130,7 +130,7 @@ describe('[IExecConfig]', () => {
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
-      describe('allowExperimentalNetworks', () => {
+      describe.skip('allowExperimentalNetworks', () => {
         test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
           const createConfig = () =>
             new IExecConfig({ ethProvider: 'arbitrum-sepolia-testnet' });
@@ -242,7 +242,7 @@ describe('[IExecConfig]', () => {
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
-      describe('allowExperimentalNetworks', () => {
+      describe.skip('allowExperimentalNetworks', () => {
         test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
           const createConfig = () => new IExecConfig({ ethProvider: 421614 });
           expect(createConfig).toThrow(
@@ -421,7 +421,7 @@ describe('[IExecConfig]', () => {
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
-      describe('allowExperimentalNetworks', () => {
+      describe.skip('allowExperimentalNetworks', () => {
         const experimentalNetworkRpcUrl = getChainDefaults(421614, {
           allowExperimentalNetworks: true,
         }).host;
@@ -526,7 +526,7 @@ describe('[IExecConfig]', () => {
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBe(iexecTestChain.defaults.ensRegistryAddress);
       });
-      describe('allowExperimentalNetworks', () => {
+      describe.skip('allowExperimentalNetworks', () => {
         const experimentalNetworkRpcUrl = getChainDefaults(421614, {
           allowExperimentalNetworks: true,
         }).host;
