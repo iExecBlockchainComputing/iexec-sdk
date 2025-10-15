@@ -5,16 +5,16 @@ on:
   workflow_call:
     inputs:
       dry-run:
-        description: "Run in dry-run mode (the package will not be published)"
+        description: 'Run in dry-run mode (the package will not be published)'
         default: false
         type: boolean
       version:
-        description: "Version to publish (leave empty to use package.json version)"
-        default: ""
+        description: 'Version to publish (leave empty to use package.json version)'
+        default: ''
         type: string
       tag:
-        description: "npm publish tag (e.g., latest, nightly)"
-        default: ""
+        description: 'npm publish tag (e.g., latest, nightly)'
+        default: ''
         type: string
 
 jobs:
