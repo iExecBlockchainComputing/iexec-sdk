@@ -4,6 +4,11 @@ description: Publish a staging version on npm
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write # Required for OIDC
+  packages: write
+  contents: read
+
 jobs:
   compute-staging-version:
     uses: ./.github/workflows/reusable-compute-staging-version.yml

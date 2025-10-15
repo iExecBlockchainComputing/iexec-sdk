@@ -5,8 +5,13 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write # Required for OIDC
+  packages: write
+  contents: read
+
 jobs:
   npm-publish:
     uses: ./.github/workflows/reusable-npm.yml
     with:
-      tag: 'latest'
+      tag: "latest"
