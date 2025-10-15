@@ -10,5 +10,3 @@ jobs:
     uses: ./.github/workflows/reusable-npm.yml
     with:
       tag: 'latest'
-    secrets:
-      npm-token: ${{ secrets.NPM_TOKEN }}

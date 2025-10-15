@@ -14,5 +14,3 @@ jobs:
     with:
       version: ${{ needs.compute-staging-version.outputs.version }}
       tag: ${{ needs.compute-staging-version.outputs.dist-tag }}
-    secrets:
-      npm-token: ${{ secrets.NPM_TOKEN }}
