@@ -20,10 +20,6 @@ on:
 jobs:
   npm-publish:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@feat/npm-trusted-publisher
-    permissions:
-      id-token: write # Required for OIDC
-      packages: write
-      contents: read
     with:
       install-command: npm ci
       build-command: npm run build

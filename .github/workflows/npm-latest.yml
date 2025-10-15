@@ -14,4 +14,4 @@ jobs:
   npm-publish:
     uses: ./.github/workflows/reusable-npm.yml
     with:
-      tag: "latest"
+      tag: latest
