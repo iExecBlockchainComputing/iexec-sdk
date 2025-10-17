@@ -19,6 +19,7 @@ import {
   IEXEC_REQUEST_PARAMS,
   STORAGE_PROVIDERS,
   ANY,
+  DATASET_INFINITE_VOLUME,
 } from './constant.js';
 
 const debug = Debug('validators');
@@ -47,14 +48,10 @@ export const stringNumberSchema = ({ message } = {}) =>
 export const integerSchema = () => number().integer();
 
 export const positiveIntSchema = () =>
-  integerSchema()
-    .min(0)
-    .max(Number.MAX_SAFE_INTEGER - 1);
+  integerSchema().min(0).max(Number.MAX_SAFE_INTEGER);
 
 export const positiveStrictIntSchema = () =>
-  integerSchema()
-    .min(1)
-    .max(Number.MAX_SAFE_INTEGER - 1);
+  integerSchema().min(1).max(Number.MAX_SAFE_INTEGER);
 
 export const hexnumberSchema = () =>
   string()
@@ -312,6 +309,7 @@ export const objParamsSchema = () =>
   object({
     [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: paramsArgsSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_BULK_CID]: string().notRequired(), // TODO add CID validation
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',
@@ -504,6 +502,24 @@ export const signedDatasetorderSchema = (opt) =>
   saltedDatasetorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed datasetorder',
+  );
+
+export const signedDatasetorderBulkSchema = () =>
+  object(
+    {
+      dataset: addressSchema().required(),
+      datasetprice: nRlcAmountSchema().oneOf(['0']).required(), // price must be 0 in bulk
+      volume: uint256Schema()
+        .oneOf([DATASET_INFINITE_VOLUME.toString()])
+        .required(), // volume must be infinite in bulk
+      tag: tagSchema().required(), // TODO may have specific tag requirements
+      apprestrict: addressSchema().required(),
+      workerpoolrestrict: addressSchema().required(),
+      requesterrestrict: addressSchema().required(),
+      salt: bytes32Schema().required(),
+      sign: orderSignSchema().required(),
+    },
+    '${originalValue} is not a valid bulk datasetorder',
   );
 
 export const workerpoolorderSchema = (opt) =>

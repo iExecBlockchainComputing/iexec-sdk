@@ -152,9 +152,10 @@ console.log('total orders:', count);
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `datasetAddressOrOptions` | `string` \| { `app?`: `string` ; `dataset?`: `string` ; `datasetOwner?`: `string` ; `isAppStrict?`: `boolean` ; `isRequesterStrict?`: `boolean` ; `isWorkerpoolStrict?`: `boolean` ; `maxTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minVolume?`: [`BNish`](../modules.md#bnish) ; `page?`: `number` ; `pageSize?`: `number` ; `requester?`: `string` ; `workerpool?`: `string`  } | - |
+| `datasetAddressOrOptions` | `string` \| { `app?`: `string` ; `bulkOnly?`: `boolean` ; `dataset?`: `string` ; `datasetOwner?`: `string` ; `isAppStrict?`: `boolean` ; `isRequesterStrict?`: `boolean` ; `isWorkerpoolStrict?`: `boolean` ; `maxTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minVolume?`: [`BNish`](../modules.md#bnish) ; `page?`: `number` ; `pageSize?`: `number` ; `requester?`: `string` ; `workerpool?`: `string`  } | - |
 | `options?` | `Object` | **`Deprecated`** use first parameter instead migration: replace `fetchDatasetOrderbook(datasetAddress, options)` by `fetchDatasetOrderbook({ dataset: datasetAddress, ...options })` |
 | `options.app?` | `string` | include orders restricted to specified app (use `'any'` to include any app) |
+| `options.bulkOnly?` | `boolean` | filters out orders that don't allow bulk processing (default: `false`) |
 | `options.isAppStrict?` | `boolean` | filters out orders allowing “any” app (default: `false`) |
 | `options.isRequesterStrict?` | `boolean` | filters out orders allowing “any” requester (default: `false`) |
 | `options.isWorkerpoolStrict?` | `boolean` | filters out orders allowing “any” workerpool (default: `false`) |

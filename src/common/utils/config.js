@@ -16,6 +16,7 @@ const networkConfigs = [
     },
     resultProxy: 'https://result.v8-bellecour.iex.ec',
     ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
+    ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
     iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
     compass: undefined, // no compass using ENS
     pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
@@ -39,6 +40,7 @@ const networkConfigs = [
     sms: undefined, // no protocol running
     resultProxy: undefined, // no protocol running
     ipfsGateway: undefined, // no protocol running
+    ipfsNode: undefined, // no protocol running
     iexecGateway: undefined, // no protocol running
     compass: undefined, // no protocol running
     pocoSubgraph: undefined, // no protocol running
@@ -63,6 +65,7 @@ const networkConfigs = [
     },
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
+    ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
     iexecGateway: 'https://api-market.arbitrum-sepolia-testnet.iex.ec',
     compass: 'https://compass.arbitrum-sepolia-testnet.iex.ec',
     pocoSubgraph:
@@ -72,6 +75,7 @@ const networkConfigs = [
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     isExperimental: false,
+    uploadBulkForThegraph: true,
   },
   {
     id: 42161,
@@ -85,6 +89,7 @@ const networkConfigs = [
     },
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
+    ipfsNode: 'https://ipfs-upload.arbitrum-mainnet.iex.ec',
     iexecGateway: 'https://api.market.arbitrum-mainnet.iex.ec',
     compass: 'https://compass.arbitrum-mainnet.iex.ec',
     pocoSubgraph:
@@ -93,6 +98,7 @@ const networkConfigs = [
     voucherSubgraph: undefined, // no voucher
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
+    uploadBulkForThegraph: true,
   },
 ];
 
@@ -117,6 +123,7 @@ export const getChainDefaults = (
     resultProxy,
     iexecGateway,
     ipfsGateway,
+    ipfsNode,
     compass,
     pocoSubgraph,
     voucherHub,
@@ -139,6 +146,7 @@ export const getChainDefaults = (
     resultProxy,
     iexecGateway,
     ipfsGateway,
+    ipfsNode,
     compass,
     pocoSubgraph,
     voucherHub,
@@ -162,3 +170,9 @@ networkConfigs.forEach((networkConfig) => {
     Network.register(network.name, () => network);
   }
 });
+
+export const shouldUploadBulkForThegraph = (id) =>
+  networkConfigs[id]?.uploadBulkForThegraph || false;
+
+export const THEGRAPH_IPFS_NODE = 'https://ipfs.thegraph.com';
+export const THEGRAPH_IPFS_GATEWAY = THEGRAPH_IPFS_NODE;

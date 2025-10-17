@@ -42,6 +42,7 @@ import {
   resolveTeeFrameworkFromTag,
   checkAppRequirements,
   checkDatasetRequirements,
+  prepareDatasetBulk,
 } from '../common/execution/order-helper.js';
 import { NULL_DATASETORDER } from '../common/utils/constant.js';
 import {
@@ -50,6 +51,7 @@ import {
   datasetorderSchema,
 } from '../common/utils/validator.js';
 import { sumTags } from '../common/utils/utils.js';
+import { shouldUploadBulkForThegraph } from '../common/utils/config.js';
 
 export default class IExecOrderModule extends IExecModule {
   constructor(...args) {
@@ -374,7 +376,6 @@ export default class IExecOrderModule extends IExecModule {
         voucherAddress,
       });
     };
-
     this.estimateMatchOrders = async (
       { apporder, datasetorder, workerpoolorder, requestorder },
       { useVoucher = false, voucherAddress } = {},
@@ -390,6 +391,21 @@ export default class IExecOrderModule extends IExecModule {
         requestorder,
         useVoucher,
         voucherAddress,
+      });
+    };
+    this.prepareDatasetBulk = async (
+      datasetorders,
+      { maxDatasetPerTask, thegraphUpload } = {},
+    ) => {
+      return prepareDatasetBulk({
+        ipfsNode: await this.config.resolveIpfsNodeURL(),
+        ipfsGateway: await this.config.resolveIpfsGatewayURL(),
+        datasetorders,
+        maxDatasetPerTask,
+        thegraphUpload:
+          thegraphUpload !== undefined
+            ? thegraphUpload
+            : shouldUploadBulkForThegraph(await this.config.resolveChainId()),
       });
     };
   }

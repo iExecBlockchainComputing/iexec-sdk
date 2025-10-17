@@ -9,5 +9,9 @@ export {
   sumTags,
 } from '../common/utils/utils.js';
 export { decryptResult } from '../common/utils/result-utils.js';
-export { NULL_ADDRESS, NULL_BYTES32 } from '../common/utils/constant.js';
+export {
+  NULL_ADDRESS,
+  NULL_BYTES32,
+  DATASET_INFINITE_VOLUME,
+} from '../common/utils/constant.js';
 export { getSignerFromPrivateKey } from '../common/utils/signers.js';

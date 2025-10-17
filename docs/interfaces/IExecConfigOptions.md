@@ -16,6 +16,7 @@
 - [hubAddress](IExecConfigOptions.md#hubaddress)
 - [iexecGatewayURL](IExecConfigOptions.md#iexecgatewayurl)
 - [ipfsGatewayURL](IExecConfigOptions.md#ipfsgatewayurl)
+- [ipfsNodeURL](IExecConfigOptions.md#ipfsnodeurl)
 - [isNative](IExecConfigOptions.md#isnative)
 - [pocoSubgraphURL](IExecConfigOptions.md#pocosubgraphurl)
 - [providerOptions](IExecConfigOptions.md#provideroptions)
@@ -115,6 +116,14 @@ ___
 • `Optional` **ipfsGatewayURL**: `string`
 
 override the IPFS gateway URL to target a custom instance
+
+___
+
+### ipfsNodeURL
+
+• `Optional` **ipfsNodeURL**: `string`
+
+override the IPFS node URL to target a custom instance
 
 ___
 

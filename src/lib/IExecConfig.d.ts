@@ -99,6 +99,10 @@ export interface IExecConfigOptions {
    */
   ipfsGatewayURL?: string;
   /**
+   * override the IPFS node URL to target a custom instance
+   */
+  ipfsNodeURL?: string;
+  /**
    * override the IExec market URL to target a custom instance
    */
   iexecGatewayURL?: string;
@@ -201,6 +205,10 @@ export default class IExecConfig {
    * resolve the current IPFS gateway URL
    */
   resolveIpfsGatewayURL(): Promise<string>;
+  /**
+   * resolve the current IPFS node URL
+   */
+  resolveIpfsNodeURL(): Promise<string>;
   /**
    * resolve the current PoCo subgraph URL
    */
