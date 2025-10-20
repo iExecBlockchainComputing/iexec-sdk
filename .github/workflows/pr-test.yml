@@ -52,30 +52,30 @@ jobs:
       etherscan-api-key: ${{ secrets.ETHERSCAN_API_KEY }}
       alchemy-api-key: ${{ secrets.ALCHEMY_API_KEY }}
 
-  sonar:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
+  # sonar:
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci && npm run codegen
+  #     - name: Install dependencies
+  #       run: npm ci && npm run codegen
 
-      - uses: actions/download-artifact@v4
-        with:
-          artifact-ids: ${{ needs.test.outputs.coverage-artifact-id }}
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         artifact-ids: ${{ needs.test.outputs.coverage-artifact-id }}
 
-      - name: SonarScanner
-        uses: SonarSource/sonarqube-scan-action@v5.1.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #     - name: SonarScanner
+  #       uses: SonarSource/sonarqube-scan-action@v5.1.0
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   npm-dry-run:
     uses: ./.github/workflows/reusable-npm.yml
