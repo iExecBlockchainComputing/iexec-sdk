@@ -893,7 +893,11 @@ export const estimateMatchOrders = async ({
     );
   }
 
-  return { total: totalCost, sponsored: sponsoredCost };
+  return {
+    volume: matchableVolume,
+    total: totalCost,
+    sponsored: sponsoredCost,
+  };
 };
 
 export const matchOrders = async ({
