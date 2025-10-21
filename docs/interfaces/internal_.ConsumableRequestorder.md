@@ -18,6 +18,7 @@ signed buy order for computing tasks
 - [dataset](internal_.ConsumableRequestorder.md#dataset)
 - [datasetmaxprice](internal_.ConsumableRequestorder.md#datasetmaxprice)
 - [params](internal_.ConsumableRequestorder.md#params)
+- [requester](internal_.ConsumableRequestorder.md#requester)
 - [salt](internal_.ConsumableRequestorder.md#salt)
 - [sign](internal_.ConsumableRequestorder.md#sign)
 - [tag](internal_.ConsumableRequestorder.md#tag)
@@ -73,6 +74,12 @@ ___
 ### params
 
 • **params**: `string`
+
+___
+
+### requester
+
+• **requester**: `string`
 
 ___
 

@@ -24,6 +24,7 @@ buy order for computing tasks
 - [dataset](internal_.HashableRequestorder.md#dataset)
 - [datasetmaxprice](internal_.HashableRequestorder.md#datasetmaxprice)
 - [params](internal_.HashableRequestorder.md#params)
+- [requester](internal_.HashableRequestorder.md#requester)
 - [salt](internal_.HashableRequestorder.md#salt)
 - [tag](internal_.HashableRequestorder.md#tag)
 - [trust](internal_.HashableRequestorder.md#trust)
@@ -110,6 +111,16 @@ ___
 #### Inherited from
 
 [SignableRequestorder](internal_.SignableRequestorder.md).[params](internal_.SignableRequestorder.md#params)
+
+___
+
+### requester
+
+• **requester**: `string`
+
+#### Inherited from
+
+[SignableRequestorder](internal_.SignableRequestorder.md).[requester](internal_.SignableRequestorder.md#requester)
 
 ___
 

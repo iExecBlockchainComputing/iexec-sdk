@@ -106,6 +106,7 @@ export interface PublishedRequestorder {
     tag: Bytes32;
     category: number;
     trust: number;
+    requester: Address;
     beneficiary: Address;
     callback: Address;
     params: string;

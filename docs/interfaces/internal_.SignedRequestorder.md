@@ -18,6 +18,7 @@ signed buy order for computing tasks
 - [dataset](internal_.SignedRequestorder.md#dataset)
 - [datasetmaxprice](internal_.SignedRequestorder.md#datasetmaxprice)
 - [params](internal_.SignedRequestorder.md#params)
+- [requester](internal_.SignedRequestorder.md#requester)
 - [salt](internal_.SignedRequestorder.md#salt)
 - [sign](internal_.SignedRequestorder.md#sign)
 - [tag](internal_.SignedRequestorder.md#tag)
@@ -73,6 +74,12 @@ ___
 ### params
 
 • **params**: `string`
+
+___
+
+### requester
+
+• **requester**: `string`
 
 ___
 
