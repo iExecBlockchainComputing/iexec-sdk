@@ -273,6 +273,7 @@ export interface RequestorderTemplate {
   tag: Bytes32;
   category: string;
   trust: string;
+  requester: Address;
   beneficiary: Address;
   callback: Address;
   params: RequestorderParams;
@@ -292,6 +293,7 @@ export interface SignableRequestorder {
   tag: Tag;
   category: BNish;
   trust: BNish;
+  requester: Address;
   beneficiary: Address;
   callback: Address;
   params: RequestorderParams | string;
@@ -318,6 +320,7 @@ export interface SignedRequestorder {
   tag: Bytes32;
   category: string;
   trust: string;
+  requester: Address;
   beneficiary: Address;
   callback: Address;
   params: string;
@@ -339,6 +342,7 @@ export interface ConsumableRequestorder {
   tag: Tag;
   category: BNish;
   trust: BNish;
+  requester: Address;
   beneficiary: Address;
   callback: Address;
   params: string;

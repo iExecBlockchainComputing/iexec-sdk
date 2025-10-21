@@ -18,6 +18,7 @@ buy order for computing tasks
 - [dataset](internal_.RequestorderTemplate.md#dataset)
 - [datasetmaxprice](internal_.RequestorderTemplate.md#datasetmaxprice)
 - [params](internal_.RequestorderTemplate.md#params)
+- [requester](internal_.RequestorderTemplate.md#requester)
 - [tag](internal_.RequestorderTemplate.md#tag)
 - [trust](internal_.RequestorderTemplate.md#trust)
 - [volume](internal_.RequestorderTemplate.md#volume)
@@ -71,6 +72,12 @@ ___
 ### params
 
 • **params**: [`RequestorderParams`](internal_.RequestorderParams.md)
+
+___
+
+### requester
+
+• **requester**: `string`
 
 ___
 

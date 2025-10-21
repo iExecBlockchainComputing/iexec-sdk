@@ -42,6 +42,7 @@ ___
 | `dataset` | `string` |
 | `datasetmaxprice` | `number` |
 | `params` | `string` |
+| `requester` | `string` |
 | `salt` | `string` |
 | `sign` | `string` |
 | `tag` | `string` |
