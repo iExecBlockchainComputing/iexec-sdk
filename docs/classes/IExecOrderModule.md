@@ -334,7 +334,7 @@ ___
 
 ### estimateMatchOrders
 
-▸ **estimateMatchOrders**(`orders`, `options?`): `Promise`<{ `sponsored`: [`BN`](utils.BN.md) ; `total`: [`BN`](utils.BN.md)  }\>
+▸ **estimateMatchOrders**(`orders`, `options?`): `Promise`<{ `sponsored`: [`BN`](utils.BN.md) ; `total`: [`BN`](utils.BN.md) ; `volume`: [`BN`](utils.BN.md)  }\>
 
 estimates the cost of matching the provided orders
 
@@ -347,6 +347,7 @@ const orders = {
   requestorder,
 };
 const result = await estimateMatchOrders(orders, {useVoucher: true});
+console.log(`executable volume: ${result.volume} tasks`);
 console.log(`total cost for matching orders: ${result.total} nRLC`);
 console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 ```
@@ -366,7 +367,7 @@ console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 
 #### Returns
 
-`Promise`<{ `sponsored`: [`BN`](utils.BN.md) ; `total`: [`BN`](utils.BN.md)  }\>
+`Promise`<{ `sponsored`: [`BN`](utils.BN.md) ; `total`: [`BN`](utils.BN.md) ; `volume`: [`BN`](utils.BN.md)  }\>
 
 ___
 

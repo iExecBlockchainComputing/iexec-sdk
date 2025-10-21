@@ -1420,7 +1420,7 @@ describe('unpublish...order()', () => {
 });
 
 describe('estimateMatchOrders()', () => {
-  test('estimates the total cost', async () => {
+  test('estimates the total cost and volume', async () => {
     const noVoucherTestChain = TEST_CHAINS['custom-token-chain'];
     const options = {
       resultProxyURL: 'https://result-proxy.iex.ec',
@@ -1467,6 +1467,8 @@ describe('estimateMatchOrders()', () => {
     expect(res.sponsored).toEqual(new BN(0));
     expect(res.total).toBeInstanceOf(BN);
     expect(res.total).toEqual(new BN(35));
+    expect(res.volume).toBeInstanceOf(BN);
+    expect(res.volume).toEqual(new BN(5));
   });
 
   describe('with useVoucher', () => {
@@ -1475,6 +1477,7 @@ describe('estimateMatchOrders()', () => {
     let datasetorderTemplate;
     let workerpoolorderTemplate;
     let voucherTypeId;
+    let matchableVolume;
     let expectedTotal;
 
     beforeAll(async () => {
@@ -1493,7 +1496,7 @@ describe('estimateMatchOrders()', () => {
         { volume: 5, workerpoolprice: 1 },
       );
 
-      const matchableVolume = new BN(5); // min volume among orders
+      matchableVolume = new BN(5); // min volume among orders
       expectedTotal = new BN(5 + 1 + 1).mul(matchableVolume); // volume * orders unit prices
 
       voucherTypeId = await createVoucherType(iexecTestChain)({
@@ -1581,6 +1584,8 @@ describe('estimateMatchOrders()', () => {
       expect(res.sponsored).toEqual(new BN(0));
       expect(res.total).toBeInstanceOf(BN);
       expect(res.total).toEqual(new BN(35));
+      expect(res.volume).toBeInstanceOf(BN);
+      expect(res.volume).toEqual(new BN(5));
     });
 
     test('should have sponsored amount as 0 when useVoucher is false', async () => {
@@ -1613,6 +1618,8 @@ describe('estimateMatchOrders()', () => {
       expect(res.sponsored).toEqual(new BN(0));
       expect(res.total).toBeInstanceOf(BN);
       expect(res.total).toEqual(expectedTotal);
+      expect(res.volume).toBeInstanceOf(BN);
+      expect(res.volume).toEqual(matchableVolume);
     });
 
     test('should return total cost and sponsored amount when using voucher', async () => {
@@ -1647,6 +1654,8 @@ describe('estimateMatchOrders()', () => {
       expect(res.sponsored).toEqual(expectedTotal);
       expect(res.total).toBeInstanceOf(BN);
       expect(res.total).toEqual(expectedTotal);
+      expect(res.volume).toBeInstanceOf(BN);
+      expect(res.volume).toEqual(matchableVolume);
     });
 
     test('should return sponsored amount equal to voucher balance when voucher value is less than total cost', async () => {
@@ -1684,6 +1693,8 @@ describe('estimateMatchOrders()', () => {
       expect(res.sponsored).toEqual(new BN(voucherInfo.balance));
       expect(res.total).toBeInstanceOf(BN);
       expect(res.total).toEqual(expectedTotal);
+      expect(res.volume).toBeInstanceOf(BN);
+      expect(res.volume).toEqual(matchableVolume);
     });
 
     test('should have sponsored amount as 0 when voucher expired', async () => {
@@ -1718,6 +1729,8 @@ describe('estimateMatchOrders()', () => {
       expect(res.sponsored).toEqual(new BN(0));
       expect(res.total).toBeInstanceOf(BN);
       expect(res.total).toEqual(expectedTotal);
+      expect(res.volume).toBeInstanceOf(BN);
+      expect(res.volume).toEqual(matchableVolume);
     });
 
     describe('with custom voucherAddress option', () => {
@@ -1763,6 +1776,8 @@ describe('estimateMatchOrders()', () => {
         expect(res.sponsored).toEqual(expectedTotal);
         expect(res.total).toBeInstanceOf(BN);
         expect(res.total).toEqual(expectedTotal);
+        expect(res.volume).toBeInstanceOf(BN);
+        expect(res.volume).toEqual(matchableVolume);
       });
 
       test('should throw if specified voucherAddress is not a voucher', async () => {

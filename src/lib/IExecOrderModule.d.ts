@@ -1052,6 +1052,7 @@ export default class IExecOrderModule extends IExecModule {
    *   requestorder,
    * };
    * const result = await estimateMatchOrders(orders, {useVoucher: true});
+   * console.log(`executable volume: ${result.volume} tasks`);
    * console.log(`total cost for matching orders: ${result.total} nRLC`);
    * console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
    * ```
@@ -1075,7 +1076,7 @@ export default class IExecOrderModule extends IExecModule {
        */
       voucherAddress?: Addressish;
     },
-  ): Promise<{ total: BN; sponsored: BN }>;
+  ): Promise<{ volume: BN; total: BN; sponsored: BN }>;
   /**
    * Create an IExecOrderModule instance using an IExecConfig instance
    */
