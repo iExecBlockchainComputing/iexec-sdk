@@ -17,8 +17,9 @@ import {
   SERVICE_HTTP_500_URL,
   getRandomBytes32,
 } from '../../test-utils.js';
-import '../../jest-setup.js';
+import { DATASET_INFINITE_VOLUME } from '../../../src/common/utils/constant.js';
 import { errors } from '../../../src/lib/index.js';
+import '../../jest-setup.js';
 
 const { MarketCallError } = errors;
 
@@ -598,6 +599,7 @@ describe('orderbook', () => {
           );
         expect(res1.orders).toLooseEqual(res1deprecated.orders);
       });
+
       test('datasetOwner returns orders from dataset owner', async () => {
         const { iexec: iexecUser, wallet } = getTestConfig(iexecTestChain)();
         const { iexec: iexecOtherUser } = getTestConfig(iexecTestChain)();
@@ -814,6 +816,53 @@ describe('orderbook', () => {
           });
         expect(strictAppOrders.count).toBe(0);
         expect(strictAppOrders.orders.length).toBe(0);
+      });
+
+      test('bulkOnly option allow filtering only orders allowing dataset bulk processing', async () => {
+        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
+        // 1 and 2: orders without any restrictions
+        const datasetOrderTemplate = await deployAndGetDatasetorder(iexec);
+        const datasetAddress = datasetOrderTemplate.dataset;
+
+        await iexec.order
+          .signDatasetorder(datasetOrderTemplate, { preflightCheck: false })
+          .then((o) =>
+            iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+          );
+        await iexec.order
+          .signDatasetorder(
+            {
+              ...datasetOrderTemplate,
+              datasetprice: 0,
+              volume: DATASET_INFINITE_VOLUME,
+            },
+            { preflightCheck: false },
+          )
+          .then((o) =>
+            iexec.order.publishDatasetorder(o, { preflightCheck: false }),
+          );
+
+        const allOrders = await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+          dataset: datasetAddress,
+        });
+        expect(allOrders.count).toBe(2);
+        expect(allOrders.orders.length).toBe(2);
+
+        const bulkOnlyOrders =
+          await iexecReadOnly.orderbook.fetchDatasetOrderbook({
+            dataset: datasetAddress,
+            bulkOnly: true,
+          });
+        expect(bulkOnlyOrders.count).toBe(1);
+        expect(bulkOnlyOrders.orders.length).toBe(1);
+        expect(bulkOnlyOrders.orders[0].order.datasetprice).toBe(0);
+        expect(bulkOnlyOrders.orders[0].order.volume).toBe(
+          DATASET_INFINITE_VOLUME,
+        );
+        expect(bulkOnlyOrders.orders[0].bulk).toBe(true);
       });
     });
 
