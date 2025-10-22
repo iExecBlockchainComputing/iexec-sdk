@@ -369,7 +369,7 @@ export const paramsSchema = () =>
       },
     );
 
-export const tagSchema = () =>
+export const tagSchema = ({ allowAgnosticTee = false } = {}) =>
   mixed()
     .transform((value) => {
       if (Array.isArray(value)) {
@@ -424,7 +424,7 @@ export const tagSchema = () =>
         );
         try {
           if (isTee) {
-            if (teeFrameworks.length < 1) {
+            if (!allowAgnosticTee && teeFrameworks.length < 1) {
               throw new Error(
                 `'tee' tag must be used with a tee framework (${Object.values(
                   TEE_FRAMEWORKS,
@@ -486,7 +486,7 @@ export const datasetorderSchema = (opt) =>
       dataset: addressSchema(opt).required(),
       datasetprice: nRlcAmountSchema().required(),
       volume: uint256Schema().required(),
-      tag: tagSchema().required(),
+      tag: tagSchema({ allowAgnosticTee: true }).required(),
       apprestrict: addressSchema(opt).required(),
       workerpoolrestrict: addressSchema(opt).required(),
       requesterrestrict: addressSchema(opt).required(),
