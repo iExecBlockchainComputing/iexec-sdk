@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.21.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.20.0...v8.21.0) (2025-10-27)
+
+
+### Added
+
+* add estimated volume to estimateMatchOrders ([#479](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/479)) ([3f5dfc1](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/3f5dfc1cc9e196095c20dd8fe8a04c7e1d32671a))
+
+
+### Changed
+
+* add missing requester field in requestorder types ([#477](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/477)) ([1026f45](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/1026f45d57c84ca6ea50285d0898d83d0a29218c))
+* allow TEE datasetorders without framework ([#473](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/473)) ([a5c3e86](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/a5c3e86cedeab094c24718b216738005effe15db))
+
 ## [8.20.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.19.0...v8.20.0) (2025-10-14)
 
 
