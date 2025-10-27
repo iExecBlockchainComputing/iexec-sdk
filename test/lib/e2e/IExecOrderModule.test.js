@@ -113,7 +113,7 @@ describe('order', () => {
         apprestrict,
         workerpoolrestrict,
         requesterrestrict,
-        tag: ['tee', 'scone'],
+        tag: ['tee'],
         volume: 100,
       });
       expect(order).toEqual({
@@ -121,7 +121,7 @@ describe('order', () => {
         datasetprice: '1000000000',
         apprestrict,
         requesterrestrict,
-        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+        tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
         volume: '100',
         workerpoolrestrict,
       });
@@ -385,6 +385,13 @@ describe('signDatasetorder()', () => {
       dataset: address,
     });
     await expect(
+      iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
+    ).rejects.toThrow(
+      new Error(
+        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
+      ),
+    );
+    await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
     ).rejects.toThrow(
       new Error(
@@ -395,6 +402,9 @@ describe('signDatasetorder()', () => {
       address,
       iexec.dataset.generateEncryptionKey(),
     );
+    await expect(
+      iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
+    ).resolves.toBeDefined();
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
     ).resolves.toBeDefined();
@@ -412,13 +422,6 @@ describe('signDatasetorder()', () => {
     const order = await iexec.order.createDatasetorder({
       dataset: getRandomAddress(),
     });
-    await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
-    ).rejects.toThrow(
-      new Error(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
-      ),
-    );
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['scone'] }),
     ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
@@ -883,7 +886,7 @@ describe('publish...order()', () => {
     test('preflightChecks dataset secret exists for tee tag', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const datasetorder = await deployAndGetDatasetorder(iexec, {
-        tag: ['tee', 'scone'],
+        tag: ['tee'],
       });
       const datasetAddress = datasetorder.dataset;
       await expect(
@@ -2456,7 +2459,7 @@ describe('matchOrders()', () => {
     });
     const teeDatasetorder = await deployAndGetDatasetorder(
       iexecResourcesProvider,
-      { tag: ['tee', 'scone'] },
+      { tag: ['tee'] },
     );
     const teeWorkerpoolorder = await deployAndGetWorkerpoolorder(
       iexecResourcesProvider,

@@ -26,7 +26,7 @@ import {
 import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries.js';
 
 export const resolveTeeFrameworkFromTag = async (tag) => {
-  const vTag = await tagSchema().validate(tag);
+  const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
   if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.SCONE])) {
     return TEE_FRAMEWORKS.SCONE;
   }

@@ -865,6 +865,12 @@ describe('[tagSchema]', () => {
     ).rejects.toThrow(
       new ValidationError("'gramine' tag must be used with 'tee' tag"),
     );
+    const agnosticTeeTag = await tagSchema({ allowAgnosticTee: true }).validate(
+      ['tee'],
+    );
+    expect(agnosticTeeTag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000001',
+    );
     await expect(tagSchema().validate('tee,gramine,scone')).rejects.toThrow(
       new ValidationError(
         "tee framework tags are exclusive ('scone'|'gramine')",
