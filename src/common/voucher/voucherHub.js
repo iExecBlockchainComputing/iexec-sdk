@@ -4,6 +4,10 @@ import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { wrapCall } from '../utils/errorWrappers.js';
 import { NULL_ADDRESS } from '../utils/constant.js';
 import { getVoucherHubContract } from '../utils/voucher-utils.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:voucher:voucherHub');
 
@@ -13,6 +17,7 @@ export const fetchVoucherAddress = async (
   owner,
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.VOUCHER);
     const vOwner = await addressSchema({ ethProvider: contracts.provider })
       .required()
       .label('owner')

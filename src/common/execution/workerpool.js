@@ -7,6 +7,10 @@ import {
 import { lookupAddress } from '../ens/resolution.js';
 import { setTextRecord } from '../ens/text-record.js';
 import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:execution:workerpool');
 
@@ -16,6 +20,10 @@ export const setWorkerpoolApiUrl = async (
   url,
 ) => {
   try {
+    checkImplementedOnChain(
+      contracts.chainId,
+      CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
+    );
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     })

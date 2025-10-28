@@ -2,6 +2,14 @@ import { EnsPlugin, Network } from 'ethers';
 import { address as voucherHubBellecourAddress } from '../generated/@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.js';
 import { TEE_FRAMEWORKS } from './constant.js';
 
+export const CHAIN_SPECIFIC_FEATURES = {
+  ENS: 'ENS',
+  WORKERPOOL_API_URL_REGISTRATION: 'Workerpool API Registration',
+  VOUCHER: 'iExec Voucher',
+  COMPASS: 'iExec Compass',
+  XRLC_BRIDGE: 'iExec xRLC Bridge',
+};
+
 const networkConfigs = [
   {
     id: 134,
@@ -28,6 +36,7 @@ const networkConfigs = [
     },
     shouldRegisterNetwork: true,
     isExperimental: false,
+    notImplemented: [CHAIN_SPECIFIC_FEATURES.COMPASS],
   },
   {
     id: 1,
@@ -50,6 +59,10 @@ const networkConfigs = [
     },
     shouldRegisterNetwork: false,
     isExperimental: false,
+    notImplemented: [
+      CHAIN_SPECIFIC_FEATURES.COMPASS,
+      CHAIN_SPECIFIC_FEATURES.VOUCHER,
+    ],
   },
   {
     id: 421614,
@@ -72,6 +85,12 @@ const networkConfigs = [
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     isExperimental: false,
+    notImplemented: [
+      CHAIN_SPECIFIC_FEATURES.ENS,
+      CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
+      CHAIN_SPECIFIC_FEATURES.VOUCHER,
+      CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
+    ],
   },
   {
     id: 42161,
@@ -93,6 +112,12 @@ const networkConfigs = [
     voucherSubgraph: undefined, // no voucher
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
+    notImplemented: [
+      CHAIN_SPECIFIC_FEATURES.ENS,
+      CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
+      CHAIN_SPECIFIC_FEATURES.VOUCHER,
+      CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
+    ],
   },
 ];
 
@@ -145,6 +170,20 @@ export const getChainDefaults = (
     voucherSubgraph,
     bridge,
   };
+};
+
+export const checkImplementedOnChain = (chainId, featureName) => {
+  const networkConfig = networkConfigs.find(
+    (network) => `${network.id}` === `${chainId}`,
+  );
+  if (
+    networkConfig?.notImplemented &&
+    networkConfig.notImplemented.includes(featureName)
+  ) {
+    throw new Error(
+      `${featureName} is not available on network ${networkConfig.name}`,
+    );
+  }
 };
 
 // Register unknown networks and their ENS settings for the ethers library

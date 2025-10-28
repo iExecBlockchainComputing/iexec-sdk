@@ -8,6 +8,10 @@ import {
 } from '../utils/validator.js';
 import { wrapCall } from '../utils/errorWrappers.js';
 import { getEnsRegistryAddress, checkEns } from './registry.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:ens:resolution');
 
@@ -16,6 +20,7 @@ export const getOwner = async (
   name = throwIfMissing(),
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
     const vName = await ensDomainSchema().validate(name);
     const nameHash = namehash(vName);
     const ensAddress = await getEnsRegistryAddress(contracts);
@@ -36,6 +41,7 @@ export const resolveName = async (
   name = throwIfMissing(),
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
     const vName = await ensDomainSchema().validate(name);
     await checkEns(contracts);
     return await wrapCall(contracts.provider.resolveName(vName));
@@ -47,6 +53,7 @@ export const resolveName = async (
 
 export const lookupAddress = async (contracts = throwIfMissing(), address) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     })

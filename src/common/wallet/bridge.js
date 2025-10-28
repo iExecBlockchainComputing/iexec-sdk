@@ -21,6 +21,10 @@ import { abi as HomeBridgeErcToNativeAbi } from './abi/HomeBridgeErcToNative.js'
 import { getAddress } from './address.js';
 import { getRlcBalance } from './balance.js';
 import { sendRLC } from './send.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:wallet:bridge');
 
@@ -69,6 +73,10 @@ export const obsBridgeToSidechain = (
   { sidechainBridgeAddress, bridgedContracts } = {},
 ) =>
   new Observable((observer) => {
+    checkImplementedOnChain(
+      contracts.chainId,
+      CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
+    );
     const safeObserver = new SafeObserver(observer);
     let abort;
     let stopWatchPromise;
@@ -289,6 +297,10 @@ export const bridgeToSidechain = async (
   nRlcAmount = throwIfMissing(),
   { sidechainBridgeAddress, bridgedContracts } = {},
 ) => {
+  checkImplementedOnChain(
+    contracts.chainId,
+    CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
+  );
   checkSigner(contracts);
   let sendTxHash;
   let receiveTxHash;
@@ -326,6 +338,10 @@ export const obsBridgeToMainchain = (
   { mainchainBridgeAddress, bridgedContracts } = {},
 ) =>
   new Observable((observer) => {
+    checkImplementedOnChain(
+      contracts.chainId,
+      CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
+    );
     const safeObserver = new SafeObserver(observer);
     let abort;
     let stopWatchPromise;
@@ -517,6 +533,10 @@ export const bridgeToMainchain = async (
   nRlcAmount = throwIfMissing(),
   { mainchainBridgeAddress, bridgedContracts } = {},
 ) => {
+  checkImplementedOnChain(
+    contracts.chainId,
+    CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
+  );
   checkSigner(contracts);
   let sendTxHash;
   let receiveTxHash;

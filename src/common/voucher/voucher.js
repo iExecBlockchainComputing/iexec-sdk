@@ -10,6 +10,10 @@ import {
   getVoucherContract,
   getVoucherSubgraphClient,
 } from '../utils/voucher-utils.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:voucher:voucher');
 
@@ -78,6 +82,7 @@ export const showUserVoucher = async (
   owner = throwIfMissing(),
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.VOUCHER);
     const vOwner = await addressSchema({
       ethProvider: contracts.provider,
     })
@@ -139,6 +144,7 @@ export const authorizeRequester = async (
   requester,
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.VOUCHER);
     checkSigner(contracts);
     const userAddress = await getAddress(contracts);
     const vRequester = await addressSchema({
@@ -180,6 +186,7 @@ export const revokeRequesterAuthorization = async (
   requester,
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.VOUCHER);
     checkSigner(contracts);
     const userAddress = await getAddress(contracts);
     const vRequester = await addressSchema({
