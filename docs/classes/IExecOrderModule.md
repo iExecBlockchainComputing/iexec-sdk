@@ -532,11 +532,11 @@ const requestorderTemplate = await createRequestorder({
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `datasetorders` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md)[] |
-| `options?` | `Object` |
-| `options.maxDatasetPerTask?` | `number` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `datasetorders` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md)[] | - |
+| `options?` | `Object` | - |
+| `options.maxDatasetPerTask?` | `number` | Maximum number of datasets to include in a single task **`Default`** ```ts 100 ``` |
 
 #### Returns
 

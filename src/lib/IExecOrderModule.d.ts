@@ -1106,6 +1106,10 @@ export default class IExecOrderModule extends IExecModule {
   prepareDatasetBulk(
     datasetorders: ConsumableDatasetorder[],
     options?: {
+      /**
+       * Maximum number of datasets to include in a single task
+       * @default 100
+       */
       maxDatasetPerTask?: number;
     },
   ): Promise<{ cid: string; volume: number }>;

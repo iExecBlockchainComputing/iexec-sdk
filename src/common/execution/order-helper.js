@@ -207,7 +207,7 @@ export const checkAppRequirements = async (
   }
 };
 
-const MAX_DATASET_PER_TASK = 100; // TODO confirm value
+const MAX_DATASET_PER_TASK = 100;
 
 const ipfsUpload = async ({
   content,
