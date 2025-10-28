@@ -295,6 +295,7 @@ console.log('total orders:', count);
 | `options.pageSize?` | `number` | size of the page to fetch |
 | `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
 | `options.workerpool?` | `string` | filter by workerpool |
+| `options.workerpoolOwner?` | `string` | filter by workerpool owner |
 
 #### Returns
 
