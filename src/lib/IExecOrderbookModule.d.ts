@@ -400,6 +400,10 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     workerpool?: Addressish;
     /**
+     * filter by workerpool owner
+     */
+    workerpoolOwner?: Addressish;
+    /**
      * filter by category
      */
     category?: BNish;
