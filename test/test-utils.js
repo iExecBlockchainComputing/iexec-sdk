@@ -65,6 +65,8 @@ export const TEST_CHAINS = {
     hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
     ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
     ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
+    ipfsNodeURL: 'http://localhost:5001',
+    ipfsGatewayURL: 'http://localhost:8080',
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),

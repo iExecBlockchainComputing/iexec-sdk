@@ -40,11 +40,13 @@ const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
 describe('order', () => {
   describe('prepareDatasetBulk()', () => {
-    const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+    const testChain = TEST_CHAINS['custom-token-chain']; // no bulk processing on bellecour;
+    const { iexec: iexecRequester } = getTestConfig(testChain)();
     let datasetorders = [];
 
     beforeAll(async () => {
       const requesterAddress = await iexecRequester.wallet.getAddress();
+      await setBalance(testChain)(requesterAddress, ONE_ETH);
       const { address: appAddress } = await deployRandomApp(iexecRequester);
       datasetorders = await Promise.all(
         Array(10)

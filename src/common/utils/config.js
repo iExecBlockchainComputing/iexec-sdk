@@ -8,6 +8,7 @@ export const CHAIN_SPECIFIC_FEATURES = {
   VOUCHER: 'iExec Voucher',
   COMPASS: 'iExec Compass',
   XRLC_BRIDGE: 'iExec xRLC Bridge',
+  BULK_PROCESSING: 'Bulk processing',
 };
 
 const networkConfigs = [
@@ -37,7 +38,10 @@ const networkConfigs = [
     },
     shouldRegisterNetwork: true,
     isExperimental: false,
-    notImplemented: [CHAIN_SPECIFIC_FEATURES.COMPASS],
+    notImplemented: [
+      CHAIN_SPECIFIC_FEATURES.COMPASS,
+      CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
+    ],
   },
   {
     id: 1,
@@ -64,6 +68,7 @@ const networkConfigs = [
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.COMPASS,
       CHAIN_SPECIFIC_FEATURES.VOUCHER,
+      CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
     ],
   },
   {
@@ -123,6 +128,7 @@ const networkConfigs = [
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
       CHAIN_SPECIFIC_FEATURES.VOUCHER,
       CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
+      CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
     ],
   },
 ];

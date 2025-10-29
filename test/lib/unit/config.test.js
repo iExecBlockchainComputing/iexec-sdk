@@ -166,4 +166,25 @@ describe('checkImplementedOnChain', () => {
       );
     });
   });
+  describe(`feature ${CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING}`, () => {
+    const feature = CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING;
+    test('is not implemented on bellecour', () => {
+      expect(() => checkImplementedOnChain(134, feature)).toThrow(
+        `${feature} is not available on network bellecour`,
+      );
+    });
+    test('is not implemented on mainnet', () => {
+      expect(() => checkImplementedOnChain(1, feature)).toThrow(
+        `${feature} is not available on network mainnet`,
+      );
+    });
+    test('is not implemented on arbitrum-mainnet', () => {
+      expect(() => checkImplementedOnChain(42161, feature)).toThrow(
+        `${feature} is not available on network arbitrum-mainnet`,
+      );
+    });
+    test('is implemented on arbitrum-sepolia-testnet', () => {
+      expect(() => checkImplementedOnChain(421614, feature)).not.toThrow();
+    });
+  });
 });

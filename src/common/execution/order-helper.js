@@ -13,7 +13,12 @@ import {
   STORAGE_PROVIDERS,
   TEE_FRAMEWORKS,
 } from '../utils/constant.js';
-import { THEGRAPH_IPFS_NODE, THEGRAPH_IPFS_GATEWAY } from '../utils/config.js';
+import {
+  THEGRAPH_IPFS_NODE,
+  THEGRAPH_IPFS_GATEWAY,
+  checkImplementedOnChain,
+  CHAIN_SPECIFIC_FEATURES,
+} from '../utils/config.js';
 import {
   getStorageTokenKeyName,
   reservedSecretKeyName,
@@ -234,10 +239,16 @@ const ipfsUpload = async ({
 export const prepareDatasetBulk = async ({
   ipfsNode = throwIfMissing(),
   ipfsGateway = throwIfMissing(),
-  datasetorders,
+  contracts = throwIfMissing(),
+  datasetorders = throwIfMissing(),
   maxDatasetPerTask = MAX_DATASET_PER_TASK,
   thegraphUpload = false,
 }) => {
+  checkImplementedOnChain(
+    contracts.chainId,
+    CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
+  );
+
   const vmMaxDatasetPerTask = await positiveStrictIntSchema()
     .max(MAX_DATASET_PER_TASK)
     .label('maxDatasetPerTask')

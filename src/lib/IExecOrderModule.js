@@ -400,6 +400,7 @@ export default class IExecOrderModule extends IExecModule {
       return prepareDatasetBulk({
         ipfsNode: await this.config.resolveIpfsNodeURL(),
         ipfsGateway: await this.config.resolveIpfsGatewayURL(),
+        contracts: await this.config.resolveContractsClient(),
         datasetorders,
         maxDatasetPerTask,
         thegraphUpload:
