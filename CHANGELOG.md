@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.21.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.21.0...v8.21.1) (2025-10-29)
+
+
+### Changed
+
+* add chain specific feature check errors ([#483](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/483)) ([0d82e47](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/0d82e47c000e1e76fd94520abee4b40a753181a0))
+* TypeScript add missing option in fetchWorkerpoolOrderbook ([#481](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/481)) ([72e2323](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/72e2323946f449cb466d890009fd4ecd75c834d7))
+
 ## [8.21.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.20.0...v8.21.0) (2025-10-27)
 
 
