@@ -63,6 +63,10 @@ import {
 import { getVoucherHubContract } from '../utils/voucher-utils.js';
 import { checkAllowance } from '../account/allowance.js';
 import { fetchVoucherContract } from '../voucher/voucher.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -818,6 +822,9 @@ export const estimateMatchOrders = async ({
       .label('voucherAddress')
       .validate(voucherAddress),
   ]);
+  if (!vUseVoucher) {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.VOUCHER);
+  }
   const matchableVolume = await getMatchableVolume(
     contracts,
     vAppOrder,
@@ -938,6 +945,12 @@ export const matchOrders = async ({
         .label('voucherAddress')
         .validate(voucherAddress),
     ]);
+    if (vUseVoucher) {
+      checkImplementedOnChain(
+        contracts.chainId,
+        CHAIN_SPECIFIC_FEATURES.VOUCHER,
+      );
+    }
 
     // check resulting tag
     await tagSchema()

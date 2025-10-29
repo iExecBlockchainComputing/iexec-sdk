@@ -14,6 +14,10 @@ import { jsonApi, getAuthorization } from '../utils/api-utils.js';
 import { checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
 import { CompassCallError, WorkerpoolCallError } from '../utils/errors.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:execution:debug');
 
@@ -32,6 +36,10 @@ export const getWorkerpoolApiUrl = async (
 
     // Compass base workerpool API URL resolution
     if (compassUrl) {
+      checkImplementedOnChain(
+        contracts.chainId,
+        CHAIN_SPECIFIC_FEATURES.COMPASS,
+      );
       const json = await jsonApi.get({
         api: compassUrl,
         endpoint: `/${contracts.chainId}/workerpools/${vAddress}`,

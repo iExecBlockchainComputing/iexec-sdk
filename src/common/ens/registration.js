@@ -19,6 +19,10 @@ import { checkSigner } from '../utils/utils.js';
 import { NULL_ADDRESS, APP, DATASET, WORKERPOOL } from '../utils/constant.js';
 import { getEnsRegistryAddress } from './registry.js';
 import { getOwner, lookupAddress } from './resolution.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:ens:registration');
 
@@ -34,6 +38,7 @@ export const getDefaultDomain = async (
   address,
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
     const vAddress = await addressSchema({
       ethProvider: contracts.provider,
     })
@@ -66,6 +71,7 @@ export const registerFifsEns = async (
   domain = FIFS_DOMAINS.default,
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
     checkSigner(contracts);
     const vDomain = await ensDomainSchema().validate(domain);
     const vLabel = await ensLabelSchema().validate(label);
@@ -129,12 +135,13 @@ export const obsConfigureResolution = (
   address,
 ) =>
   new Observable((observer) => {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
+    checkSigner(contracts);
+
     const safeObserver = new SafeObserver(observer);
     let abort = false;
-
     const configure = async () => {
       try {
-        checkSigner(contracts);
         const vAddress =
           address !== undefined
             ? await addressSchema({
@@ -367,6 +374,7 @@ export const configureResolution = async (
   address,
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
     checkSigner(contracts);
     const vAddress =
       address !== undefined

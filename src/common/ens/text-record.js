@@ -11,6 +11,10 @@ import { getAddress } from '../wallet/address.js';
 import { wrapSend, wrapWait, wrapCall } from '../utils/errorWrappers.js';
 import { NULL_ADDRESS } from '../utils/constant.js';
 import { getOwner } from './resolution.js';
+import {
+  CHAIN_SPECIFIC_FEATURES,
+  checkImplementedOnChain,
+} from '../utils/config.js';
 
 const debug = Debug('iexec:ens:text-record');
 
@@ -20,6 +24,7 @@ export const readTextRecord = async (
   key,
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
     const vName = await ensDomainSchema().validate(name);
     const vKey = await textRecordKeySchema().validate(key);
     const node = namehash(vName);
@@ -52,6 +57,7 @@ export const setTextRecord = async (
   value = '',
 ) => {
   try {
+    checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.ENS);
     const vName = await ensDomainSchema().validate(name);
     const vKey = await textRecordKeySchema().validate(key);
     const vValue = await textRecordValueSchema().validate(value);
