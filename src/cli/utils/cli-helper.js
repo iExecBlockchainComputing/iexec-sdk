@@ -312,7 +312,6 @@ export const option = {
   minVolume: () => ['--min-volume <integer>', 'specify minimum volume'],
   minTrust: () => ['--min-trust <integer>', 'specify minimum trust'],
   maxTrust: () => ['--max-trust <integer>', 'specify maximum trust'],
-  bulkOnly: () => ['--bulk-only', 'only include bulk orders'],
   password: () => [
     '--password <password>',
     'password used to encrypt the wallet (unsafe)',
@@ -498,10 +497,6 @@ export const orderOption = {
   requestArgs: () => [
     '--args <string>',
     'specify the arguments to pass to the app',
-  ],
-  requestBulkCid: () => [
-    '--bulk-cid <CID>',
-    'specify the bulk CID to use for the request',
   ],
   requestSecrets: () => [
     '--secret <secretMapping...>',

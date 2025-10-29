@@ -19,7 +19,6 @@ import {
   datasetorderSchema,
   apporderSchema,
   requestorderSchema,
-  stringSchema,
 } from '../../common/utils/validator.js';
 import { sconeTeeApp, gramineTeeApp } from '../utils/templates.js';
 import {
@@ -575,7 +574,6 @@ run
   .option(...orderOption.dataset())
   .option(...orderOption.workerpool())
   .option(...orderOption.requestArgs())
-  .option(...orderOption.requestBulkCid())
   .option(...orderOption.requestInputFiles())
   .option(...orderOption.requestSecrets())
   .option(...orderOption.category())
@@ -676,8 +674,6 @@ run
 
       const inputParams = await paramsSchema().validate(opts.params);
       const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
-      // TODO bulkCid validation
-      const inputParamsBulkCid = await stringSchema().validate(opts.bulkCid);
       const inputParamsInputFiles =
         await paramsInputFilesArraySchema().validate(opts.inputFiles);
 
@@ -711,9 +707,6 @@ run
         ...(inputParams !== undefined && JSON.parse(inputParams)),
         ...(inputParamsArgs !== undefined && {
           [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: inputParamsArgs,
-        }),
-        ...(inputParamsBulkCid !== undefined && {
-          [IEXEC_REQUEST_PARAMS.IEXEC_BULK_CID]: inputParamsBulkCid,
         }),
         ...(inputParamsInputFiles !== undefined && {
           [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: inputParamsInputFiles,
@@ -1179,7 +1172,6 @@ requestRun
   .option(...orderOption.datasetprice())
   .option(...orderOption.workerpoolprice())
   .option(...orderOption.requestArgs())
-  .option(...orderOption.requestBulkCid())
   .option(...orderOption.requestInputFiles())
   .option(...orderOption.requestSecrets())
   .option(...orderOption.category())
@@ -1239,8 +1231,6 @@ requestRun
 
       const inputParams = await paramsSchema().validate(opts.params);
       const inputParamsArgs = await paramsArgsSchema().validate(opts.args);
-      // TODO bulkCid validation
-      const inputParamsBulkCid = await stringSchema().validate(opts.bulkCid);
       const inputParamsInputFiles =
         await paramsInputFilesArraySchema().validate(opts.inputFiles);
       const inputParamsSecrets =
@@ -1273,9 +1263,6 @@ requestRun
         ...(inputParams !== undefined && JSON.parse(inputParams)),
         ...(inputParamsArgs !== undefined && {
           [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: inputParamsArgs,
-        }),
-        ...(inputParamsBulkCid !== undefined && {
-          [IEXEC_REQUEST_PARAMS.IEXEC_BULK_CID]: inputParamsBulkCid,
         }),
         ...(inputParamsInputFiles !== undefined && {
           [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: inputParamsInputFiles,
