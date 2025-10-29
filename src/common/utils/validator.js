@@ -512,7 +512,7 @@ export const signedDatasetorderBulkSchema = () =>
       volume: uint256Schema()
         .oneOf([DATASET_INFINITE_VOLUME.toString()])
         .required(), // volume must be infinite in bulk
-      tag: tagSchema().required(), // TODO may have specific tag requirements
+      tag: tagSchema().required(),
       apprestrict: addressSchema().required(),
       workerpoolrestrict: addressSchema().required(),
       requesterrestrict: addressSchema().required(),
