@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.21.2](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.21.1...v8.21.2) (2025-10-30)
+
+
+### Changed
+
+* resole incorrect Voucher check  in estimateMatchOrders ([220dc78](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/220dc7800ffdcd23a2b87fa652e3ae85b24bbc25))
+
 ## [8.21.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.21.0...v8.21.1) (2025-10-29)
 
 
