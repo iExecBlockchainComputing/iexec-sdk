@@ -822,7 +822,7 @@ export const estimateMatchOrders = async ({
       .label('voucherAddress')
       .validate(voucherAddress),
   ]);
-  if (!vUseVoucher) {
+  if (vUseVoucher) {
     checkImplementedOnChain(contracts.chainId, CHAIN_SPECIFIC_FEATURES.VOUCHER);
   }
   const matchableVolume = await getMatchableVolume(
