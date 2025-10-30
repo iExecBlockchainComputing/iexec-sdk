@@ -257,6 +257,12 @@ export interface RequestorderParams {
    * result proxy url
    */
   iexec_result_storage_proxy?: string;
+  /**
+   * bulk CID for the request
+   *
+   * default none
+   */
+  bulk_cid?: string;
 }
 
 /**
@@ -1077,6 +1083,36 @@ export default class IExecOrderModule extends IExecModule {
       voucherAddress?: Addressish;
     },
   ): Promise<{ volume: BN; total: BN; sponsored: BN }>;
+  /**
+   * Prepare a bulk from datasetorders to process multiple datasets with a single requestorder
+   *
+   * NB:
+   * - datasetorders used must authorize the requester to use the dataset in for free with an infinite volume (`utils.DATASET_INFINITE_VOLUME`)
+   * - depending on the number of datasetorders provided and the `maxDatasetPerTask` option, the bulk might require be splitted into multiple tasks to respect the max dataset per task limit, the returned `volume` is the number of tasks required to process the bulk
+   *
+   * example:
+   * ```js
+   * const { bulkCid, volume } = await prepareDatasetBulk(datasetorders, { maxDatasetPerTask: 5 });
+   * console.log(`bulk_cid: ${bulkCid}, volume: ${volume}`);
+   *
+   * const requestorderTemplate = await createRequestorder({
+   *   app: appAddress,
+   *   category: 0,
+   *   volume: volume, // set the volume
+   *   params: { bulk_cid: bulkCid } // set the bulk cid in the requestorder params
+   * });
+   * ```
+   */
+  prepareDatasetBulk(
+    datasetorders: ConsumableDatasetorder[],
+    options?: {
+      /**
+       * Maximum number of datasets to include in a single task
+       * @default 100
+       */
+      maxDatasetPerTask?: number;
+    },
+  ): Promise<{ cid: string; volume: number }>;
   /**
    * Create an IExecOrderModule instance using an IExecConfig instance
    */

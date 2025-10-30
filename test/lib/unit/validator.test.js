@@ -78,7 +78,7 @@ describe('[positiveIntSchema]', () => {
       positiveIntSchema().validate('9007199254740992'),
     ).rejects.toThrow(
       new ValidationError(
-        'this must be less than or equal to 9007199254740990',
+        'this must be less than or equal to 9007199254740991',
       ),
     );
   });
@@ -87,7 +87,7 @@ describe('[positiveIntSchema]', () => {
       positiveIntSchema().validate('0xffffffffffffffffffff'),
     ).rejects.toThrow(
       new ValidationError(
-        'this must be less than or equal to 9007199254740990',
+        'this must be less than or equal to 9007199254740991',
       ),
     );
   });
@@ -96,7 +96,7 @@ describe('[positiveIntSchema]', () => {
       positiveIntSchema().validate(new BN('9007199254740992')),
     ).rejects.toThrow(
       new ValidationError(
-        'this must be less than or equal to 9007199254740990',
+        'this must be less than or equal to 9007199254740991',
       ),
     );
   });
@@ -115,8 +115,8 @@ describe('[positiveStrictIntSchema]', () => {
   });
   test('string int', async () => {
     await expect(
-      positiveStrictIntSchema().validate('9007199254740990'),
-    ).resolves.toBe(9007199254740990);
+      positiveStrictIntSchema().validate('9007199254740991'),
+    ).resolves.toBe(9007199254740991);
   });
   test('hex string', async () => {
     await expect(positiveStrictIntSchema().validate('0xff')).resolves.toBe(255);
@@ -161,7 +161,7 @@ describe('[positiveStrictIntSchema]', () => {
       positiveStrictIntSchema().validate('9007199254740992'),
     ).rejects.toThrow(
       new ValidationError(
-        'this must be less than or equal to 9007199254740990',
+        'this must be less than or equal to 9007199254740991',
       ),
     );
   });
@@ -170,7 +170,7 @@ describe('[positiveStrictIntSchema]', () => {
       positiveStrictIntSchema().validate('0xffffffffffffffffffff'),
     ).rejects.toThrow(
       new ValidationError(
-        'this must be less than or equal to 9007199254740990',
+        'this must be less than or equal to 9007199254740991',
       ),
     );
   });
@@ -179,7 +179,7 @@ describe('[positiveStrictIntSchema]', () => {
       positiveStrictIntSchema().validate(new BN('9007199254740992')),
     ).rejects.toThrow(
       new ValidationError(
-        'this must be less than or equal to 9007199254740990',
+        'this must be less than or equal to 9007199254740991',
       ),
     );
   });
@@ -197,14 +197,14 @@ describe('[uint256Schema]', () => {
     await expect(uint256Schema().validate(48)).resolves.toBe('48');
   });
   test('string int', async () => {
-    await expect(uint256Schema().validate('9007199254740990')).resolves.toBe(
-      '9007199254740990',
+    await expect(uint256Schema().validate('9007199254740991')).resolves.toBe(
+      '9007199254740991',
     );
   });
   test('BN', async () => {
     await expect(
-      uint256Schema().validate(new BN('9007199254740990')),
-    ).resolves.toBe('9007199254740990');
+      uint256Schema().validate(new BN('9007199254740991')),
+    ).resolves.toBe('9007199254740991');
   });
   test('string int > MAX_SAFE_INTEGER', async () => {
     await expect(uint256Schema().validate('9007199254740992')).resolves.toBe(
@@ -242,8 +242,8 @@ describe('[nRlcAmountSchema]', () => {
   });
   test('string int', async () => {
     await expect(
-      nRlcAmountSchema().validate('00009007199254740990'),
-    ).resolves.toBe('9007199254740990');
+      nRlcAmountSchema().validate('00009007199254740991'),
+    ).resolves.toBe('9007199254740991');
   });
   test('defaultUnit RLC', async () => {
     await expect(
@@ -275,8 +275,8 @@ describe('[nRlcAmountSchema]', () => {
   });
   test('BN', async () => {
     await expect(
-      nRlcAmountSchema().validate(new BN('9007199254740990')),
-    ).resolves.toBe('9007199254740990');
+      nRlcAmountSchema().validate(new BN('9007199254740991')),
+    ).resolves.toBe('9007199254740991');
   });
   test('string int > MAX_SAFE_INTEGER', async () => {
     await expect(nRlcAmountSchema().validate('9007199254740992')).resolves.toBe(
@@ -337,8 +337,8 @@ describe('[weiAmountSchema]', () => {
   });
   test('string int', async () => {
     await expect(
-      weiAmountSchema().validate('00009007199254740990'),
-    ).resolves.toBe('9007199254740990');
+      weiAmountSchema().validate('00009007199254740991'),
+    ).resolves.toBe('9007199254740991');
   });
   test('defaultUnit ether', async () => {
     await expect(
@@ -403,8 +403,8 @@ describe('[weiAmountSchema]', () => {
   });
   test('BN', async () => {
     await expect(
-      weiAmountSchema().validate(new BN('9007199254740990')),
-    ).resolves.toBe('9007199254740990');
+      weiAmountSchema().validate(new BN('9007199254740991')),
+    ).resolves.toBe('9007199254740991');
   });
   test('string int > MAX_SAFE_INTEGER', async () => {
     await expect(weiAmountSchema().validate('9007199254740992')).resolves.toBe(

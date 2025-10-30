@@ -28,6 +28,7 @@ export default class IExecConfig {
       smsURL,
       resultProxyURL,
       ipfsGatewayURL,
+      ipfsNodeURL,
       iexecGatewayURL,
       compassURL,
       pocoSubgraphURL,
@@ -317,6 +318,18 @@ export default class IExecConfig {
       }
       throw new ConfigurationError(
         `ipfsGatewayURL option not set and no default value for your chain ${chainId}`,
+      );
+    };
+
+    this.resolveIpfsNodeURL = async () => {
+      const { chainId } = await networkPromise;
+      const chainConfDefaults = await chainConfDefaultsPromise;
+      const value = ipfsNodeURL || chainConfDefaults.ipfsNode;
+      if (value !== undefined) {
+        return value;
+      }
+      throw new ConfigurationError(
+        `ipfsNodeURL option not set and no default value for your chain ${chainId}`,
       );
     };
 

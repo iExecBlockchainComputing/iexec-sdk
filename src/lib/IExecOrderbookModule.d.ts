@@ -47,6 +47,10 @@ export interface PublishedDatasetorder {
   status: string;
   signer: Address;
   publicationTimestamp: string;
+  /**
+   * true if the order allows bulk processing
+   */
+  bulk?: boolean;
   order: {
     dataset: Address;
     datasetprice: number;
@@ -327,6 +331,10 @@ export default class IExecOrderbookModule extends IExecModule {
            * filters out orders allowing “any” workerpool (default: `false`)
            */
           isWorkerpoolStrict?: boolean;
+          /**
+           * filters out orders that don't allow bulk processing (default: `false`)
+           */
+          bulkOnly?: boolean;
         },
     /**
      * @deprecated use first parameter instead
@@ -380,6 +388,10 @@ export default class IExecOrderbookModule extends IExecModule {
        * filters out orders allowing “any” workerpool (default: `false`)
        */
       isWorkerpoolStrict?: boolean;
+      /**
+       * filters out orders that don't allow bulk processing (default: `false`)
+       */
+      bulkOnly?: boolean;
     },
   ): Promise<PaginableOrders<PublishedDatasetorder>>;
   /**
