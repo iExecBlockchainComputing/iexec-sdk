@@ -1,6 +1,6 @@
+// import-js/eslint-plugin-import/issues/2703
 // eslint-disable-next-line import/no-unresolved
 import { create } from 'kubo-rpc-client';
-// TODO fix import lint issue
 
 const add = async ({ content, ipfsNode, ipfsGateway }) => {
   try {

@@ -2,6 +2,9 @@ import { Buffer } from 'buffer';
 import Debug from 'debug';
 import { string, number, object, mixed, boolean, array, lazy } from 'yup';
 import { getAddress, isAddress, namehash } from 'ethers';
+// import-js/eslint-plugin-import/issues/2703
+// eslint-disable-next-line import/no-unresolved
+import { CID } from 'multiformats/cid';
 import {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
@@ -305,11 +308,27 @@ export const paramsRequesterSecretsSchema = () =>
     )
     .nonNullable();
 
+const cidSchema = () =>
+  string().test(
+    'is-cid',
+    '${originalValue} is not a valid CID',
+    (value, { originalValue }) => {
+      try {
+        if (originalValue !== undefined) {
+          CID.parse(value);
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  );
+
 export const objParamsSchema = () =>
   object({
     [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: paramsArgsSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
-    [IEXEC_REQUEST_PARAMS.IEXEC_BULK_CID]: string().notRequired(), // TODO add CID validation
+    [IEXEC_REQUEST_PARAMS.IEXEC_BULK_CID]: cidSchema().notRequired(),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',

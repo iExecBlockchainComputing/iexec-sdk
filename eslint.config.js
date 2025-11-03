@@ -56,9 +56,6 @@ export default [
       'sonarjs/no-nested-functions': 'warn', // todo refactor to enforce error on this rule
       'sonarjs/todo-tag': 'warn',
     },
-    settings: {
-      'import/ignore': ['ethers', 'graphql-request'],
-    },
   },
   {
     // cli specific files using nodejs globals
