@@ -133,6 +133,11 @@ const networkConfigs = [
   },
 ];
 
+const getConfig = (chainId) =>
+  networkConfigs.find(
+    (networkConfig) => `${networkConfig.id}` === `${chainId}`,
+  );
+
 export const getId = (idOrName, { allowExperimentalNetworks = false } = {}) =>
   networkConfigs
     .filter(
@@ -186,10 +191,11 @@ export const getChainDefaults = (
   };
 };
 
+export const shouldUploadBulkForThegraph = (chainId) =>
+  getConfig(chainId)?.uploadBulkForThegraph || false;
+
 export const checkImplementedOnChain = (chainId, featureName) => {
-  const networkConfig = networkConfigs.find(
-    (network) => `${network.id}` === `${chainId}`,
-  );
+  const networkConfig = getConfig(chainId);
   if (
     networkConfig?.notImplemented &&
     networkConfig.notImplemented.includes(featureName)
@@ -215,9 +221,6 @@ networkConfigs.forEach((networkConfig) => {
     Network.register(network.name, () => network);
   }
 });
-
-export const shouldUploadBulkForThegraph = (id) =>
-  networkConfigs[id]?.uploadBulkForThegraph || false;
 
 export const THEGRAPH_IPFS_NODE = 'https://ipfs.thegraph.com';
 export const THEGRAPH_IPFS_GATEWAY = THEGRAPH_IPFS_NODE;
