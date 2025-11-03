@@ -219,7 +219,7 @@ export default class IExecOrderModule extends IExecModule {
         await this.config.resolveContractsClient(),
         await this.config.resolveIexecGatewayURL(),
         preflightCheck === true
-          ? await await checkRequestRequirements(
+          ? await checkRequestRequirements(
               {
                 contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL({
