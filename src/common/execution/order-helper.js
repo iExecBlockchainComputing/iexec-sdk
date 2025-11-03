@@ -257,6 +257,7 @@ export const prepareDatasetBulk = async ({
   let vDatasetOrders = await array()
     .of(signedDatasetorderBulkSchema().stripUnknown())
     .required()
+    .min(1)
     .label('datasetorders')
     .validate(datasetorders);
 
