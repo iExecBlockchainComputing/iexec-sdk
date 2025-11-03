@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.22.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.21.2...v8.22.0) (2025-11-03)
+
+
+### Added
+
+* experimental support for bulk processing on arbitrum-sepolia-testnet ([#463](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/463)) ([afd5480](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/afd54805f2c911c6c8194d3c2390bbd6b59a2864))
+
 ## [8.21.2](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.21.1...v8.21.2) (2025-10-30)
 
 
