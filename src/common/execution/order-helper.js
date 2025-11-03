@@ -1,3 +1,5 @@
+import Debug from 'debug';
+import { array } from 'yup';
 import {
   checkWeb2SecretExists,
   checkWeb3SecretExists,
@@ -12,6 +14,12 @@ import {
   TEE_FRAMEWORKS,
 } from '../utils/constant.js';
 import {
+  THEGRAPH_IPFS_NODE,
+  THEGRAPH_IPFS_GATEWAY,
+  checkImplementedOnChain,
+  CHAIN_SPECIFIC_FEATURES,
+} from '../utils/config.js';
+import {
   getStorageTokenKeyName,
   reservedSecretKeyName,
 } from '../utils/secrets-utils.js';
@@ -22,8 +30,13 @@ import {
   datasetorderSchema,
   apporderSchema,
   tagSchema,
+  positiveStrictIntSchema,
+  signedDatasetorderBulkSchema,
 } from '../utils/validator.js';
 import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries.js';
+import { add } from '../utils/ipfs.js';
+
+const debug = Debug('iexec:execution:order-helper');
 
 export const resolveTeeFrameworkFromTag = async (tag) => {
   const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
@@ -197,4 +210,75 @@ export const checkAppRequirements = async (
   if (appTeeFramework !== tagTeeFramework) {
     throw new Error('Tag mismatch the TEE framework specified by app');
   }
+};
+
+const MAX_DATASET_PER_TASK = 100;
+
+const ipfsUpload = async ({
+  content,
+  ipfsNode,
+  ipfsGateway,
+  thegraphUpload,
+}) => {
+  const [cid] = await Promise.all([
+    add({ content, ipfsNode, ipfsGateway }),
+    // best effort upload to thegraph ipfs
+    thegraphUpload
+      ? add({
+          content,
+          ipfsNode: THEGRAPH_IPFS_NODE,
+          ipfsGateway: THEGRAPH_IPFS_GATEWAY,
+        }).catch((e) => {
+          debug(`thegraph ipfs add failure: ${e.message}`);
+        })
+      : undefined,
+  ]);
+  return cid;
+};
+
+export const prepareDatasetBulk = async ({
+  ipfsNode = throwIfMissing(),
+  ipfsGateway = throwIfMissing(),
+  contracts = throwIfMissing(),
+  datasetorders = throwIfMissing(),
+  maxDatasetPerTask = MAX_DATASET_PER_TASK,
+  thegraphUpload = false,
+}) => {
+  checkImplementedOnChain(
+    contracts.chainId,
+    CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
+  );
+
+  const vmMaxDatasetPerTask = await positiveStrictIntSchema()
+    .max(MAX_DATASET_PER_TASK)
+    .label('maxDatasetPerTask')
+    .validate(maxDatasetPerTask);
+
+  let vDatasetOrders = await array()
+    .of(signedDatasetorderBulkSchema().stripUnknown())
+    .required()
+    .min(1)
+    .label('datasetorders')
+    .validate(datasetorders);
+
+  const bulkRoot = [];
+  while (vDatasetOrders.length > 0) {
+    const slice = vDatasetOrders.slice(0, vmMaxDatasetPerTask);
+    const sliceCid = await ipfsUpload({
+      content: JSON.stringify(slice),
+      ipfsNode,
+      ipfsGateway,
+      thegraphUpload,
+    });
+    bulkRoot.push(sliceCid);
+    vDatasetOrders = vDatasetOrders.slice(vmMaxDatasetPerTask);
+  }
+
+  const bulkCid = await ipfsUpload({
+    content: JSON.stringify(bulkRoot),
+    ipfsNode,
+    ipfsGateway,
+    thegraphUpload,
+  });
+  return { cid: bulkCid, volume: bulkRoot.length };
 };

@@ -8,6 +8,7 @@ export const CHAIN_SPECIFIC_FEATURES = {
   VOUCHER: 'iExec Voucher',
   COMPASS: 'iExec Compass',
   XRLC_BRIDGE: 'iExec xRLC Bridge',
+  BULK_PROCESSING: 'Bulk processing',
 };
 
 const networkConfigs = [
@@ -24,6 +25,7 @@ const networkConfigs = [
     },
     resultProxy: 'https://result.v8-bellecour.iex.ec',
     ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
+    ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
     iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
     compass: undefined, // no compass using ENS
     pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
@@ -36,7 +38,10 @@ const networkConfigs = [
     },
     shouldRegisterNetwork: true,
     isExperimental: false,
-    notImplemented: [CHAIN_SPECIFIC_FEATURES.COMPASS],
+    notImplemented: [
+      CHAIN_SPECIFIC_FEATURES.COMPASS,
+      CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
+    ],
   },
   {
     id: 1,
@@ -48,6 +53,7 @@ const networkConfigs = [
     sms: undefined, // no protocol running
     resultProxy: undefined, // no protocol running
     ipfsGateway: undefined, // no protocol running
+    ipfsNode: undefined, // no protocol running
     iexecGateway: undefined, // no protocol running
     compass: undefined, // no protocol running
     pocoSubgraph: undefined, // no protocol running
@@ -62,6 +68,7 @@ const networkConfigs = [
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.COMPASS,
       CHAIN_SPECIFIC_FEATURES.VOUCHER,
+      CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
     ],
   },
   {
@@ -76,6 +83,7 @@ const networkConfigs = [
     },
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
+    ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
     iexecGateway: 'https://api-market.arbitrum-sepolia-testnet.iex.ec',
     compass: 'https://compass.arbitrum-sepolia-testnet.iex.ec',
     pocoSubgraph:
@@ -85,6 +93,7 @@ const networkConfigs = [
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     isExperimental: false,
+    uploadBulkForThegraph: true,
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.ENS,
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
@@ -104,6 +113,7 @@ const networkConfigs = [
     },
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
+    ipfsNode: 'https://ipfs-upload.arbitrum-mainnet.iex.ec',
     iexecGateway: 'https://api.market.arbitrum-mainnet.iex.ec',
     compass: 'https://compass.arbitrum-mainnet.iex.ec',
     pocoSubgraph:
@@ -112,14 +122,21 @@ const networkConfigs = [
     voucherSubgraph: undefined, // no voucher
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
+    uploadBulkForThegraph: true,
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.ENS,
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
       CHAIN_SPECIFIC_FEATURES.VOUCHER,
       CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
+      CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
     ],
   },
 ];
+
+const getConfig = (chainId) =>
+  networkConfigs.find(
+    (networkConfig) => `${networkConfig.id}` === `${chainId}`,
+  );
 
 export const getId = (idOrName, { allowExperimentalNetworks = false } = {}) =>
   networkConfigs
@@ -142,6 +159,7 @@ export const getChainDefaults = (
     resultProxy,
     iexecGateway,
     ipfsGateway,
+    ipfsNode,
     compass,
     pocoSubgraph,
     voucherHub,
@@ -164,6 +182,7 @@ export const getChainDefaults = (
     resultProxy,
     iexecGateway,
     ipfsGateway,
+    ipfsNode,
     compass,
     pocoSubgraph,
     voucherHub,
@@ -172,10 +191,11 @@ export const getChainDefaults = (
   };
 };
 
+export const shouldUploadBulkForThegraph = (chainId) =>
+  getConfig(chainId)?.uploadBulkForThegraph || false;
+
 export const checkImplementedOnChain = (chainId, featureName) => {
-  const networkConfig = networkConfigs.find(
-    (network) => `${network.id}` === `${chainId}`,
-  );
+  const networkConfig = getConfig(chainId);
   if (
     networkConfig?.notImplemented &&
     networkConfig.notImplemented.includes(featureName)
@@ -201,3 +221,6 @@ networkConfigs.forEach((networkConfig) => {
     Network.register(network.name, () => network);
   }
 });
+
+export const THEGRAPH_IPFS_NODE = 'https://ipfs.thegraph.com';
+export const THEGRAPH_IPFS_GATEWAY = THEGRAPH_IPFS_NODE;

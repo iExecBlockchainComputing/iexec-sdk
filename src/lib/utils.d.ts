@@ -60,6 +60,17 @@ export const NULL_ADDRESS: string;
  */
 export const NULL_BYTES32: string;
 /**
+ * infinite dataset volume
+ *
+ * A `Datasetorder` with this volume is considered as having an infinite volume and is eligible to be processed by any number of tasks without decrementing the remaining volume.
+ * The Dataset owner still can cancel the order at any time.
+ *
+ * NB: Infinite volume is represented by the maximum safe integer in JavaScript (`Number.MAX_SAFE_INTEGER`), which is `9007199254740991`.
+ *
+ */
+export const DATASET_INFINITE_VOLUME: number;
+
+/**
  * parse a string formatted Eht value in wei big number
  *
  * supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' (or 'eth') default unit 'wei'

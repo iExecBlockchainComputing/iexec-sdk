@@ -12,6 +12,8 @@ export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const NULL_BYTES32 =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 
+export const DATASET_INFINITE_VOLUME = Number.MAX_SAFE_INTEGER;
+
 export const NULL_DATASETORDER = {
   dataset: NULL_ADDRESS,
   datasetprice: 0,
@@ -43,6 +45,7 @@ export const IEXEC_REQUEST_PARAMS = {
   IEXEC_RESULT_ENCRYPTION: 'iexec_result_encryption',
   IEXEC_RESULT_STORAGE_PROVIDER: 'iexec_result_storage_provider',
   IEXEC_RESULT_STORAGE_PROXY: 'iexec_result_storage_proxy',
+  IEXEC_BULK_CID: 'bulk_cid',
 };
 
 export const ANY = 'any';

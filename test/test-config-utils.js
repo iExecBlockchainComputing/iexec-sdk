@@ -15,6 +15,7 @@ export const getTestConfigOptions =
     hubAddress: options.hubAddress ?? chain.hubAddress,
     voucherHubAddress: options.voucherHubAddress ?? chain.voucherHubAddress,
     iexecGatewayURL: options.iexecGatewayURL ?? chain.iexecGatewayURL,
+    ipfsNodeURL: options.ipfsNodeURL ?? chain.ipfsNodeURL,
     ipfsGatewayURL: options.ipfsGatewayURL ?? chain.ipfsGatewayURL,
     pocoSubgraphURL: options.pocoSubgraphURL ?? chain.pocoSubgraphURL,
     voucherSubgraphURL: options.voucherSubgraphURL ?? chain.voucherSubgraphURL,

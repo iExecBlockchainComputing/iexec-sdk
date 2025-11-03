@@ -32,6 +32,7 @@ describe('getChainDefaults', () => {
       hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
       iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
       ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
+      ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
       name: 'bellecour',
       pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
       resultProxy: 'https://result.v8-bellecour.iex.ec',
@@ -163,6 +164,27 @@ describe('checkImplementedOnChain', () => {
       expect(() => checkImplementedOnChain(421614, feature)).toThrow(
         `${feature} is not available on network arbitrum-sepolia-testnet`,
       );
+    });
+  });
+  describe(`feature ${CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING}`, () => {
+    const feature = CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING;
+    test('is not implemented on bellecour', () => {
+      expect(() => checkImplementedOnChain(134, feature)).toThrow(
+        `${feature} is not available on network bellecour`,
+      );
+    });
+    test('is not implemented on mainnet', () => {
+      expect(() => checkImplementedOnChain(1, feature)).toThrow(
+        `${feature} is not available on network mainnet`,
+      );
+    });
+    test('is not implemented on arbitrum-mainnet', () => {
+      expect(() => checkImplementedOnChain(42161, feature)).toThrow(
+        `${feature} is not available on network arbitrum-mainnet`,
+      );
+    });
+    test('is implemented on arbitrum-sepolia-testnet', () => {
+      expect(() => checkImplementedOnChain(421614, feature)).not.toThrow();
     });
   });
 });

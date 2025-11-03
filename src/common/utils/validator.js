@@ -2,6 +2,9 @@ import { Buffer } from 'buffer';
 import Debug from 'debug';
 import { string, number, object, mixed, boolean, array, lazy } from 'yup';
 import { getAddress, isAddress, namehash } from 'ethers';
+// import-js/eslint-plugin-import/issues/2703
+// eslint-disable-next-line import/no-unresolved
+import { CID } from 'multiformats/cid';
 import {
   humanToMultiaddrBuffer,
   utf8ToBuffer,
@@ -19,6 +22,7 @@ import {
   IEXEC_REQUEST_PARAMS,
   STORAGE_PROVIDERS,
   ANY,
+  DATASET_INFINITE_VOLUME,
 } from './constant.js';
 
 const debug = Debug('validators');
@@ -47,14 +51,10 @@ export const stringNumberSchema = ({ message } = {}) =>
 export const integerSchema = () => number().integer();
 
 export const positiveIntSchema = () =>
-  integerSchema()
-    .min(0)
-    .max(Number.MAX_SAFE_INTEGER - 1);
+  integerSchema().min(0).max(Number.MAX_SAFE_INTEGER);
 
 export const positiveStrictIntSchema = () =>
-  integerSchema()
-    .min(1)
-    .max(Number.MAX_SAFE_INTEGER - 1);
+  integerSchema().min(1).max(Number.MAX_SAFE_INTEGER);
 
 export const hexnumberSchema = () =>
   string()
@@ -308,10 +308,27 @@ export const paramsRequesterSecretsSchema = () =>
     )
     .nonNullable();
 
+const cidSchema = () =>
+  string().test(
+    'is-cid',
+    '${originalValue} is not a valid CID',
+    (value, { originalValue }) => {
+      try {
+        if (originalValue !== undefined) {
+          CID.parse(value);
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  );
+
 export const objParamsSchema = () =>
   object({
     [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: paramsArgsSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_INPUT_FILES]: paramsInputFilesArraySchema(),
+    [IEXEC_REQUEST_PARAMS.IEXEC_BULK_CID]: cidSchema().notRequired(),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION]: paramsEncryptResultSchema(),
     [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]: string().when(
       '$isCallback',
@@ -504,6 +521,24 @@ export const signedDatasetorderSchema = (opt) =>
   saltedDatasetorderSchema(opt).shape(
     signed(),
     '${originalValue} is not a valid signed datasetorder',
+  );
+
+export const signedDatasetorderBulkSchema = () =>
+  object(
+    {
+      dataset: addressSchema().required(),
+      datasetprice: nRlcAmountSchema().oneOf(['0']).required(), // price must be 0 in bulk
+      volume: uint256Schema()
+        .oneOf([DATASET_INFINITE_VOLUME.toString()])
+        .required(), // volume must be infinite in bulk
+      tag: tagSchema().required(),
+      apprestrict: addressSchema().required(),
+      workerpoolrestrict: addressSchema().required(),
+      requesterrestrict: addressSchema().required(),
+      salt: bytes32Schema().required(),
+      sign: orderSignSchema().required(),
+    },
+    '${originalValue} is not a valid bulk datasetorder',
   );
 
 export const workerpoolorderSchema = (opt) =>

@@ -34,6 +34,7 @@ const wallet = IExecWalletModule.fromConfig(config);
 - [resolveEnsPublicResolverAddress](IExecConfig.md#resolveenspublicresolveraddress)
 - [resolveIexecGatewayURL](IExecConfig.md#resolveiexecgatewayurl)
 - [resolveIpfsGatewayURL](IExecConfig.md#resolveipfsgatewayurl)
+- [resolveIpfsNodeURL](IExecConfig.md#resolveipfsnodeurl)
 - [resolvePocoSubgraphURL](IExecConfig.md#resolvepocosubgraphurl)
 - [resolveResultProxyURL](IExecConfig.md#resolveresultproxyurl)
 - [resolveSmsURL](IExecConfig.md#resolvesmsurl)
@@ -177,6 +178,18 @@ ___
 ▸ **resolveIpfsGatewayURL**(): `Promise`<`string`\>
 
 resolve the current IPFS gateway URL
+
+#### Returns
+
+`Promise`<`string`\>
+
+___
+
+### resolveIpfsNodeURL
+
+▸ **resolveIpfsNodeURL**(): `Promise`<`string`\>
+
+resolve the current IPFS node URL
 
 #### Returns
 
