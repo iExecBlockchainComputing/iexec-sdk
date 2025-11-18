@@ -31,8 +31,10 @@ import {
   smsUrlOrMapSchema,
   teeFrameworkSchema,
   addressOrAnySchema,
+  signedDatasetorderBulkSchema,
 } from '../../../src/common/utils/validator.js';
 import { errors } from '../../../src/lib/index.js';
+import { DATASET_INFINITE_VOLUME } from '../../../src/lib/utils.js';
 
 const { ValidationError } = errors;
 
@@ -1479,6 +1481,84 @@ describe('[teeFrameworkSchema]', () => {
   test('throw with empty string', async () => {
     await expect(teeFrameworkSchema().validate('')).rejects.toThrow(
       'this is not a valid TEE framework',
+    );
+  });
+});
+
+describe('[signedDatasetorderBulkSchema]', () => {
+  test('valid order', async () => {
+    const datasetorder = {
+      dataset: '0x607F4C5BB672230e8672085532f7e901544a7375',
+      volume: DATASET_INFINITE_VOLUME.toString(),
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      datasetprice: '0',
+      workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+      requesterrestrict: '0x0000000000000000000000000000000000000000',
+      apprestrict: '0x0000000000000000000000000000000000000000',
+      salt: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+      sign: '0x1b8e3f4f5c3e2e8f4d5c6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9fa0b1c2d3e4f5061b',
+    };
+    await expect(
+      signedDatasetorderBulkSchema().validate(datasetorder),
+    ).resolves.toStrictEqual(datasetorder);
+  });
+
+  test('valid order (INFINITE_VOLUME - 1) compatibility', async () => {
+    const datasetorder = {
+      dataset: '0x607F4C5BB672230e8672085532f7e901544a7375',
+      volume: (DATASET_INFINITE_VOLUME - 1).toString(),
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      datasetprice: '0',
+      workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+      requesterrestrict: '0x0000000000000000000000000000000000000000',
+      apprestrict: '0x0000000000000000000000000000000000000000',
+      salt: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+      sign: '0x1b8e3f4f5c3e2e8f4d5c6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9fa0b1c2d3e4f5061b',
+    };
+    await expect(
+      signedDatasetorderBulkSchema().validate(datasetorder),
+    ).resolves.toStrictEqual(datasetorder);
+  });
+
+  test('invalid order - volume too low', async () => {
+    const datasetorder = {
+      dataset: '0x607F4C5BB672230e8672085532f7e901544a7375',
+      volume: (DATASET_INFINITE_VOLUME - 2).toString(),
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      datasetprice: '0',
+      workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+      requesterrestrict: '0x0000000000000000000000000000000000000000',
+      apprestrict: '0x0000000000000000000000000000000000000000',
+      salt: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+      sign: '0x1b8e3f4f5c3e2e8f4d5c6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9fa0b1c2d3e4f5061b',
+    };
+    await expect(
+      signedDatasetorderBulkSchema().validate(datasetorder),
+    ).rejects.toThrow(
+      new ValidationError(
+        'volume (9007199254740989) is not valid for bulk datasetorder expected DATASET_INFINITE_VOLUME (9007199254740991)',
+      ),
+    );
+  });
+
+  test('invalid order - price not 0', async () => {
+    const datasetorder = {
+      dataset: '0x607F4C5BB672230e8672085532f7e901544a7375',
+      volume: DATASET_INFINITE_VOLUME.toString(),
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      datasetprice: '1',
+      workerpoolrestrict: '0x0000000000000000000000000000000000000000',
+      requesterrestrict: '0x0000000000000000000000000000000000000000',
+      apprestrict: '0x0000000000000000000000000000000000000000',
+      salt: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+      sign: '0x1b8e3f4f5c3e2e8f4d5c6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60718293a4b5c6d7e8f9fa0b1c2d3e4f5061b',
+    };
+    await expect(
+      signedDatasetorderBulkSchema().validate(datasetorder),
+    ).rejects.toThrow(
+      new ValidationError(
+        'datasetprice (1) is not valid for bulk datasetorder expected 0',
+      ),
     );
   });
 });
