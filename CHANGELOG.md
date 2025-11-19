@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.22.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.0...v8.22.1) (2025-11-19)
+
+
+### Changed
+
+* allow (DATASET_INFINITE_VOLUME - 1) in bulk datasetorders for compatibility with already signed orders ([#487](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/487)) ([06d8406](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/06d8406eab8c18efbf94951eca841e281e5687b9))
+
 ## [8.22.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.21.2...v8.22.0) (2025-11-03)
 
 
