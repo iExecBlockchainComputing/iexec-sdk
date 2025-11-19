@@ -179,9 +179,7 @@ describe('checkImplementedOnChain', () => {
       );
     });
     test('is not implemented on arbitrum-mainnet', () => {
-      expect(() => checkImplementedOnChain(42161, feature)).toThrow(
-        `${feature} is not available on network arbitrum-mainnet`,
-      );
+      expect(() => checkImplementedOnChain(42161, feature)).not.toThrow();
     });
     test('is implemented on arbitrum-sepolia-testnet', () => {
       expect(() => checkImplementedOnChain(421614, feature)).not.toThrow();
