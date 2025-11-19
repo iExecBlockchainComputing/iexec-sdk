@@ -527,10 +527,19 @@ export const signedDatasetorderBulkSchema = () =>
   object(
     {
       dataset: addressSchema().required(),
-      datasetprice: nRlcAmountSchema().oneOf(['0']).required(), // price must be 0 in bulk
+      datasetprice: nRlcAmountSchema()
+        .oneOf(
+          ['0'],
+          '${path} (${originalValue}) is not valid for bulk datasetorder expected 0',
+        )
+        .required(), // price must be 0 in bulk
       volume: uint256Schema()
-        .oneOf([DATASET_INFINITE_VOLUME.toString()])
-        .required(), // volume must be infinite in bulk
+        .test(
+          'is-infinite-volume',
+          '${path} (${originalValue}) is not valid for bulk datasetorder expected DATASET_INFINITE_VOLUME (9007199254740991)',
+          (value) => parseInt(value) >= DATASET_INFINITE_VOLUME - 1, // (DATASET_INFINITE_VOLUME - 1) is accepted for compatibility with already created orders
+        )
+        .required(),
       tag: tagSchema().required(),
       apprestrict: addressSchema().required(),
       workerpoolrestrict: addressSchema().required(),
