@@ -1,6 +1,7 @@
 import { EnsPlugin, Network } from 'ethers';
 import { address as voucherHubBellecourAddress } from '../generated/@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.js';
 import { TEE_FRAMEWORKS } from './constant.js';
+import { ConfigurationError } from './errors.js';
 
 export const CHAIN_SPECIFIC_FEATURES = {
   ENS: 'ENS',
@@ -199,7 +200,7 @@ export const checkImplementedOnChain = (chainId, featureName) => {
     networkConfig?.notImplemented &&
     networkConfig.notImplemented.includes(featureName)
   ) {
-    throw new Error(
+    throw new ConfigurationError(
       `${featureName} is not available on network ${networkConfig.name}`,
     );
   }
