@@ -244,7 +244,7 @@ services:
         condition: service_started
 
   market-api:
-    image: iexechub/iexec-market-api:7.1.1
+    image: iexechub/iexec-market-api:7.1.2
     restart: unless-stopped
     ports:
       - 3000:3000
