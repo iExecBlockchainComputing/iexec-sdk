@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.22.3](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.2...v8.22.3) (2025-11-20)
+
+
+### Changed
+
+* patch regression in CLI on networks without ENS ([#491](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/491)) ([e0f2ee2](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/e0f2ee266f386626c37b99bdc18d26e6e1fa73a9))
+
 ## [8.22.2](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.1...v8.22.2) (2025-11-20)
 
 
