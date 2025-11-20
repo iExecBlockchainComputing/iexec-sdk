@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.22.2](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.1...v8.22.2) (2025-11-20)
+
+
+### Changed
+
+* enable bulk processing on arbitrum-mainnet ([#489](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/489)) ([56c806c](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/56c806c107f08ad9675f00679c380b32129960ad))
+* update poco version ([#469](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/469)) ([83bc857](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/83bc857cd4401a3a323b39d14eddc41df58d2a7c))
+
 ## [8.22.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.0...v8.22.1) (2025-11-19)
 
 
