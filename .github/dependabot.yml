@@ -7,6 +7,8 @@ updates:
     # Check for updates once a week
     schedule:
       interval: 'weekly'
+    # Use the 'increase' versioning strategy to update both package-lock.json and package.json
+    versioning-strategy: 'increase'
 
   # Enable version updates for Docker
   - package-ecosystem: 'docker'
