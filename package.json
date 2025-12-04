@@ -218,7 +218,7 @@
     "prettyjson": "^1.2.5",
     "query-string": "^9.1.1",
     "rlc-faucet-contract": "^1.0.10",
-    "semver": "^7.7.1",
+    "semver": "^7.7.3",
     "update-check": "^1.5.4",
     "yup": "^1.6.1"
   },
