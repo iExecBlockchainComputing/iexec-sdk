@@ -5,7 +5,7 @@ on:
   workflow_call:
     inputs:
       node-version:
-        description: 'Node version to use as specified in actions/setup-node@v4'
+        description: 'Node version to use as specified in actions/setup-node@v6'
         default: '20'
         type: string
       upload-coverage:
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ inputs.node-version }}
           cache: 'npm'
