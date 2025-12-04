@@ -22,7 +22,7 @@ on:
 
 jobs:
   docker-publish:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.3.1
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.4.0
     with:
       image-name: 'iexechub/iexec-sdk'
       registry: 'docker.io'
