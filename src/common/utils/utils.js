@@ -1,19 +1,20 @@
-import Debug from 'debug';
-import { Buffer } from 'buffer';
 import { BN } from 'bn.js';
+import { Buffer } from 'buffer';
+import Debug from 'debug';
 import {
-  getAddress,
-  randomBytes,
+  AbiCoder,
   formatUnits,
-  parseUnits,
+  getAddress,
   hexlify,
+  parseUnits,
+  randomBytes,
   Result,
 } from 'ethers';
 // import-js/eslint-plugin-import/issues/2703
 // eslint-disable-next-line import/no-unresolved
 import { multiaddr } from '@multiformats/multiaddr';
-import { ValidationError, ConfigurationError } from './errors.js';
 import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant.js';
+import { ConfigurationError, ValidationError } from './errors.js';
 
 export { BN } from 'bn.js';
 
@@ -329,4 +330,48 @@ export const checkSigner = (contracts) => {
   }
 };
 
+export function encodeMatchOrders(
+  contracts,
+  appOrderStruct,
+  datasetOrderStruct,
+  workerpoolOrderStruct,
+  requestOrderStruct,
+) {
+  // These types match the typechain-generated structs in IexecLibOrders_v5
+  // AppOrderStruct, DatasetOrderStruct, WorkerpoolOrderStruct, RequestOrderStruct
+  // By using named tuple components, ethers can encode objects with named properties
+  const appOrderType =
+    'tuple(address app, uint256 appprice, uint256 volume, bytes32 tag, address datasetrestrict, address workerpoolrestrict, address requesterrestrict, bytes32 salt, bytes sign)';
+  const datasetOrderType =
+    'tuple(address dataset, uint256 datasetprice, uint256 volume, bytes32 tag, address apprestrict, address workerpoolrestrict, address requesterrestrict, bytes32 salt, bytes sign)';
+  const workerpoolOrderType =
+    'tuple(address workerpool, uint256 workerpoolprice, uint256 volume, bytes32 tag, uint256 category, uint256 trust, address apprestrict, address datasetrestrict, address requesterrestrict, bytes32 salt, bytes sign)';
+  const requestOrderType =
+    'tuple(address app, uint256 appmaxprice, address dataset, uint256 datasetmaxprice, address workerpool, uint256 workerpoolmaxprice, address requester, uint256 volume, bytes32 tag, uint256 category, uint256 trust, address beneficiary, address callback, string params, bytes32 salt, bytes sign)';
+
+  // Encode the function parameters (without selector)
+  const encodedParams = AbiCoder.defaultAbiCoder().encode(
+    [appOrderType, datasetOrderType, workerpoolOrderType, requestOrderType],
+    [
+      appOrderStruct,
+      datasetOrderStruct,
+      workerpoolOrderStruct,
+      requestOrderStruct,
+    ],
+  );
+
+  // Get the matchOrders function selector from the IExec contract interface
+  const iexecContract = contracts.getIExecContract();
+  const matchOrdersFunction =
+    iexecContract.interface.getFunction('matchOrders');
+  if (!matchOrdersFunction) {
+    throw new Error(
+      'matchOrders function not found in IExec contract interface',
+    );
+  }
+  const matchOrdersSelector = matchOrdersFunction.selector;
+
+  // Return selector + encoded parameters (remove '0x' prefix from encodedParams)
+  return matchOrdersSelector + encodedParams.slice(2);
+}
 export const FETCH_INTERVAL = 5000;

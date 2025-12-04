@@ -1,24 +1,10 @@
-import IExecModule from './IExecModule.js';
 import {
-  createApporder,
-  createDatasetorder,
-  createRequestorder,
-  createWorkerpoolorder,
-  signApporder,
-  signDatasetorder,
-  signRequestorder,
-  signWorkerpoolorder,
-  hashApporder,
-  hashDatasetorder,
-  hashRequestorder,
-  hashWorkerpoolorder,
-  cancelApporder,
-  cancelDatasetorder,
-  cancelRequestorder,
-  cancelWorkerpoolorder,
-  matchOrders,
-  estimateMatchOrders,
-} from '../common/market/order.js';
+  checkAppRequirements,
+  checkDatasetRequirements,
+  checkRequestRequirements,
+  prepareDatasetBulk,
+  resolveTeeFrameworkFromTag,
+} from '../common/execution/order-helper.js';
 import {
   publishApporder,
   publishDatasetorder,
@@ -38,20 +24,34 @@ import {
   unpublishWorkerpoolorder,
 } from '../common/market/marketplace.js';
 import {
-  checkRequestRequirements,
-  resolveTeeFrameworkFromTag,
-  checkAppRequirements,
-  checkDatasetRequirements,
-  prepareDatasetBulk,
-} from '../common/execution/order-helper.js';
+  cancelApporder,
+  cancelDatasetorder,
+  cancelRequestorder,
+  cancelWorkerpoolorder,
+  createApporder,
+  createDatasetorder,
+  createRequestorder,
+  createWorkerpoolorder,
+  estimateMatchOrders,
+  hashApporder,
+  hashDatasetorder,
+  hashRequestorder,
+  hashWorkerpoolorder,
+  matchOrders,
+  signApporder,
+  signDatasetorder,
+  signRequestorder,
+  signWorkerpoolorder,
+} from '../common/market/order.js';
+import { shouldUploadBulkForThegraph } from '../common/utils/config.js';
 import { NULL_DATASETORDER } from '../common/utils/constant.js';
+import { sumTags } from '../common/utils/utils.js';
 import {
-  requestorderSchema,
   apporderSchema,
   datasetorderSchema,
+  requestorderSchema,
 } from '../common/utils/validator.js';
-import { sumTags } from '../common/utils/utils.js';
-import { shouldUploadBulkForThegraph } from '../common/utils/config.js';
+import IExecModule from './IExecModule.js';
 
 export default class IExecOrderModule extends IExecModule {
   constructor(...args) {
@@ -310,7 +310,12 @@ export default class IExecOrderModule extends IExecModule {
         workerpoolorder,
         requestorder,
       },
-      { preflightCheck = true, useVoucher = false, voucherAddress } = {},
+      {
+        allowDeposit = false,
+        preflightCheck = true,
+        useVoucher = false,
+        voucherAddress,
+      } = {},
     ) => {
       const contracts = await this.config.resolveContractsClient();
       let voucherHubAddress;
@@ -363,6 +368,7 @@ export default class IExecOrderModule extends IExecModule {
           ).then(() => requestorder),
           useVoucher,
           voucherAddress,
+          allowDeposit,
         });
       }
       return matchOrders({
@@ -374,6 +380,7 @@ export default class IExecOrderModule extends IExecModule {
         requestorder,
         useVoucher,
         voucherAddress,
+        allowDeposit,
       });
     };
     this.estimateMatchOrders = async (
