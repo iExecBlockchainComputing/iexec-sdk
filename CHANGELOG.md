@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.22.4](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.3...v8.22.4) (2025-12-01)
+
+
+### Changed
+
+* disable lifecycle scripts for contributors and CI ([07ba772](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/07ba77279bf08301af02f95d639f1b9aa776b458))
+* reduce deps by moving contracts packages to dev deps ([07ba772](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/07ba77279bf08301af02f95d639f1b9aa776b458))
+* security hardening ([#493](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/493)) ([07ba772](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/07ba77279bf08301af02f95d639f1b9aa776b458))
+* update @ensdomains/buffer ([07ba772](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/07ba77279bf08301af02f95d639f1b9aa776b458))
+* update node-forge ([07ba772](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/07ba77279bf08301af02f95d639f1b9aa776b458))
+
 ## [8.22.3](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.2...v8.22.3) (2025-11-20)
 
 
