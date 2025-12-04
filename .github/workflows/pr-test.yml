@@ -6,6 +6,10 @@ permissions:
   # Allows the workflow to write pull request comments (required for dependabot in docker-dry-run job)
   # https://docs.github.com/en/code-security/dependabot/troubleshooting-dependabot/troubleshooting-dependabot-on-github-actions#changing-github_token-permissions
   pull-requests: write
+  # permissions for build
+  contents: read
+  packages: write
+  id-token: write
 
 concurrency:
   group: ${{ github.ref }}-pr-test
