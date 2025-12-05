@@ -497,6 +497,7 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 | `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) | - |
 | `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) | - |
 | `options?` | `Object` | - |
+| `options.allowDeposit?` | `boolean` | allow automatic deposit from wallet when account balance is insufficient when `true`, automatically deposits nRLC from wallet to account and executes matchOrders in a single transaction using `approveAndCall` _NB_: the requester's wallet must have sufficient nRLC balance before matching orders |
 | `options.preflightCheck?` | `boolean` | - |
 | `options.useVoucher?` | `boolean` | use a voucher contract to sponsor the deal |
 | `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized by the voucher's owner to use it |
