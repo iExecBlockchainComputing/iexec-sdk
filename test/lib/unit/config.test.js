@@ -40,9 +40,6 @@ describe('getChainDefaults', () => {
         gramine: 'https://sms.gramine.v8-bellecour.iex.ec',
         scone: 'https://sms.iex.ec',
       },
-      voucherHub: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda',
-      voucherSubgraph:
-        'https://thegraph.iex.ec/subgraphs/name/bellecour/iexec-voucher',
     });
   });
   test('unknown id returns empty object', () => {
@@ -95,27 +92,6 @@ describe('checkImplementedOnChain', () => {
     });
     test('is implemented on mainnet', () => {
       expect(() => checkImplementedOnChain(1, feature)).not.toThrow();
-    });
-    test('is not implemented on arbitrum-mainnet', () => {
-      expect(() => checkImplementedOnChain(42161, feature)).toThrow(
-        `${feature} is not available on network arbitrum-mainnet`,
-      );
-    });
-    test('is not implemented on arbitrum-sepolia-testnet', () => {
-      expect(() => checkImplementedOnChain(421614, feature)).toThrow(
-        `${feature} is not available on network arbitrum-sepolia-testnet`,
-      );
-    });
-  });
-  describe(`feature ${CHAIN_SPECIFIC_FEATURES.VOUCHER}`, () => {
-    const feature = CHAIN_SPECIFIC_FEATURES.VOUCHER;
-    test('is implemented on bellecour', () => {
-      expect(() => checkImplementedOnChain(134, feature)).not.toThrow();
-    });
-    test('is not implemented on mainnet', () => {
-      expect(() => checkImplementedOnChain(1, feature)).toThrow(
-        `${feature} is not available on network mainnet`,
-      );
     });
     test('is not implemented on arbitrum-mainnet', () => {
       expect(() => checkImplementedOnChain(42161, feature)).toThrow(

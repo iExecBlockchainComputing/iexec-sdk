@@ -48,7 +48,6 @@
 - [SignedRequestorder](../interfaces/internal_.SignedRequestorder.md)
 - [SignedWorkerpoolorder](../interfaces/internal_.SignedWorkerpoolorder.md)
 - [Task](../interfaces/internal_.Task.md)
-- [VoucherInfo](../interfaces/internal_.VoucherInfo.md)
 - [Workerpool](../interfaces/internal_.Workerpool.md)
 - [WorkerpoolDeploymentArgs](../interfaces/internal_.WorkerpoolDeploymentArgs.md)
 - [WorkerpoolorderTemplate](../interfaces/internal_.WorkerpoolorderTemplate.md)

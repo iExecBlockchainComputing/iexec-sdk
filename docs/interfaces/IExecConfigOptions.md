@@ -23,8 +23,6 @@
 - [resultProxyURL](IExecConfigOptions.md#resultproxyurl)
 - [smsURL](IExecConfigOptions.md#smsurl)
 - [useGas](IExecConfigOptions.md#usegas)
-- [voucherHubAddress](IExecConfigOptions.md#voucherhubaddress)
-- [voucherSubgraphURL](IExecConfigOptions.md#vouchersubgraphurl)
 
 ## Properties
 
@@ -172,19 +170,3 @@ ___
 • `Optional` **useGas**: `boolean`
 
 if false set the gasPrice to 0 (default true)
-
-___
-
-### voucherHubAddress
-
-• `Optional` **voucherHubAddress**: `string`
-
-override the VoucherHub contract address to target a custom instance
-
-___
-
-### voucherSubgraphURL
-
-• `Optional` **voucherSubgraphURL**: `string`
-
-override the voucher subgraph URL to target a custom instance

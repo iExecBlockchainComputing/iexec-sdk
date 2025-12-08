@@ -1034,16 +1034,6 @@ export default class IExecOrderModule extends IExecModule {
     },
     options?: {
       preflightCheck?: boolean;
-      /**
-       * use a voucher contract to sponsor the deal
-       */
-      useVoucher?: boolean;
-      /**
-       * override the voucher contract to use, must be combined with `useVoucher: true`
-       *
-       * the user must be authorized by the voucher's owner to use it
-       */
-      voucherAddress?: Addressish;
     },
   ): Promise<{ dealid: Dealid; volume: BN; txHash: TxHash }>;
   /**
@@ -1057,32 +1047,17 @@ export default class IExecOrderModule extends IExecModule {
    *   workerpoolorder,
    *   requestorder,
    * };
-   * const result = await estimateMatchOrders(orders, {useVoucher: true});
+   * const result = await estimateMatchOrders(orders);
    * console.log(`executable volume: ${result.volume} tasks`);
    * console.log(`total cost for matching orders: ${result.total} nRLC`);
-   * console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
    * ```
    */
-  estimateMatchOrders(
-    orders: {
-      apporder: ConsumableApporder;
-      datasetorder?: ConsumableDatasetorder;
-      workerpoolorder: ConsumableWorkerpoolorder;
-      requestorder: ConsumableRequestorder;
-    },
-    options?: {
-      /**
-       * use a voucher contract to sponsor the deal
-       */
-      useVoucher?: boolean;
-      /**
-       * override the voucher contract to use, must be combined with `useVoucher: true`
-       *
-       * the user must be authorized by the voucher's owner to use it
-       */
-      voucherAddress?: Addressish;
-    },
-  ): Promise<{ volume: BN; total: BN; sponsored: BN }>;
+  estimateMatchOrders(orders: {
+    apporder: ConsumableApporder;
+    datasetorder?: ConsumableDatasetorder;
+    workerpoolorder: ConsumableWorkerpoolorder;
+    requestorder: ConsumableRequestorder;
+  }): Promise<{ volume: BN; total: BN; sponsored: BN }>;
   /**
    * Prepare a bulk from datasetorders to process multiple datasets with a single requestorder
    *

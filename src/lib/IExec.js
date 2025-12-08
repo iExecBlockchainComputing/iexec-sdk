@@ -14,7 +14,6 @@ import IExecStorageModule from './IExecStorageModule.js';
 import IExecTaskModule from './IExecTaskModule.js';
 import IExecWalletModule from './IExecWalletModule.js';
 import IExecWorkerpoolModule from './IExecWorkerpoolModule.js';
-import IExecVoucherModule from './IExecVoucherModule.js';
 
 export default class IExec extends IExecModule {
   constructor(...args) {
@@ -34,7 +33,6 @@ export default class IExec extends IExecModule {
     this.secrets = IExecSecretsModule.fromConfig(this.config);
     this.storage = IExecStorageModule.fromConfig(this.config);
     this.ens = IExecENSModule.fromConfig(this.config);
-    this.voucher = IExecVoucherModule.fromConfig(this.config);
     this.network = IExecNetworkModule.fromConfig(this.config);
   }
 }

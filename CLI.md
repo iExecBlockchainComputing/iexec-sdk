@@ -302,7 +302,6 @@ Commands:
 - [init](#iexec-init)
 - [iexec wallet](#iexec-wallet)
 - [iexec account](#iexec-account)
-- [iexec voucher](#iexec-voucher)
 - [iexec app](#iexec-app)
 - [iexec dataset](#iexec-dataset)
 - [iexec workerpool](#iexec-workerpool)
@@ -742,89 +741,6 @@ Options:
 | --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
-### iexec voucher
-
-manage iExec voucher
-
-Usage:
-
-```sh
-iexec voucher <command> [options]
-```
-
-Commands:
-
-- [show](#iexec-voucher-show)
-- [authorize](#iexec-voucher-authorize)
-- [revoke](#iexec-voucher-revoke)
-
-#### iexec voucher show
-
-show voucher iExec details
-
-Usage:
-
-```sh
-iexec voucher show [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --user \<address\> | custom user address |
-
-#### iexec voucher authorize
-
-authorize requester to use the voucher
-
-Usage:
-
-```sh
-iexec voucher authorize <requester> [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-
-#### iexec voucher revoke
-
-revoke authorization to use the voucher
-
-Usage:
-
-```sh
-iexec voucher revoke <requester> [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-
 ### iexec app
 
 manage iExec apps
@@ -1078,8 +994,6 @@ Options:
 | --beneficiary \<address\> | specify the beneficiary of the request (default user address) |
 | --params \<json\> | specify the params of the request<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
 | --skip-preflight-check | skip preflight check, this may result in task execution fail |
-| --use-voucher | use the voucher to cover the costs of matching orders |
-| --voucher-address \<voucherAddress\> | specify the voucher contract to use other than the owned voucher |
 
 #### iexec app request-execution
 
@@ -1794,8 +1708,6 @@ Options:
 | --request \<orderHash\> | specify the requestorder from the marketplace to fill |
 | --params \<json\> | specify the params of the request, existing request order will be ignored<br/>\* usage: --params '{"iexec\_args":"do stuff","iexec\_input\_files":\["https://example.com/file.zip"\]}' |
 | --skip-preflight-check | skip preflight check, this may result in task execution fail |
-| --use-voucher | use the voucher to cover the costs of matching orders |
-| --voucher-address \<voucherAddress\> | specify the voucher contract to use other than the owned voucher |
 
 #### iexec order publish
 
@@ -2700,9 +2612,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `iexecGateway` set the url of the iexec marketplace gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `pocoSubgraph` set the url of the PoCo subgraph used by the SDK cli on each chain (overwrite default value).
-  - optional key `voucherSubgraph` set the url of the voucher subgraph used by the SDK cli on each chain (overwrite default value).
   - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
-  - optional key `voucherHub` set the address of the voucher hub contract used by the SDK cli on each chain (overwrite default value).
   - optional key `native` specify whether or not the chain native token is RLC (overwrite default value: chain value or `false`).
   - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction (overwrite default value: chain value or `true`).
 - optional key `providers` set the backends for public chains

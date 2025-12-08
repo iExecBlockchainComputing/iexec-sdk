@@ -36,8 +36,6 @@ module base
 
   ↳ [`IExecTaskModule`](IExecTaskModule.md)
 
-  ↳ [`IExecVoucherModule`](IExecVoucherModule.md)
-
   ↳ [`IExecWalletModule`](IExecWalletModule.md)
 
   ↳ [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)

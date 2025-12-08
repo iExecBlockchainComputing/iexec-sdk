@@ -335,7 +335,7 @@ ___
 
 ### estimateMatchOrders
 
-▸ **estimateMatchOrders**(`orders`, `options?`): `Promise`<{ `sponsored`: [`BN`](utils.BN.md) ; `total`: [`BN`](utils.BN.md) ; `volume`: [`BN`](utils.BN.md)  }\>
+▸ **estimateMatchOrders**(`orders`): `Promise`<{ `sponsored`: [`BN`](utils.BN.md) ; `total`: [`BN`](utils.BN.md) ; `volume`: [`BN`](utils.BN.md)  }\>
 
 estimates the cost of matching the provided orders
 
@@ -347,24 +347,20 @@ const orders = {
   workerpoolorder,
   requestorder,
 };
-const result = await estimateMatchOrders(orders, {useVoucher: true});
+const result = await estimateMatchOrders(orders);
 console.log(`executable volume: ${result.volume} tasks`);
 console.log(`total cost for matching orders: ${result.total} nRLC`);
-console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 ```
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `orders` | `Object` | - |
-| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) | - |
-| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) | - |
-| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) | - |
-| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) | - |
-| `options?` | `Object` | - |
-| `options.useVoucher?` | `boolean` | use a voucher contract to sponsor the deal |
-| `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized by the voucher's owner to use it |
+| Name | Type |
+| :------ | :------ |
+| `orders` | `Object` |
+| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) |
+| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) |
+| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) |
+| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
 
 #### Returns
 
@@ -489,17 +485,15 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `orders` | `Object` | - |
-| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) | - |
-| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) | - |
-| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) | - |
-| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) | - |
-| `options?` | `Object` | - |
-| `options.preflightCheck?` | `boolean` | - |
-| `options.useVoucher?` | `boolean` | use a voucher contract to sponsor the deal |
-| `options.voucherAddress?` | `string` | override the voucher contract to use, must be combined with `useVoucher: true` the user must be authorized by the voucher's owner to use it |
+| Name | Type |
+| :------ | :------ |
+| `orders` | `Object` |
+| `orders.apporder` | [`ConsumableApporder`](../interfaces/internal_.ConsumableApporder.md) |
+| `orders.datasetorder?` | [`ConsumableDatasetorder`](../interfaces/internal_.ConsumableDatasetorder.md) |
+| `orders.requestorder` | [`ConsumableRequestorder`](../interfaces/internal_.ConsumableRequestorder.md) |
+| `orders.workerpoolorder` | [`ConsumableWorkerpoolorder`](../interfaces/internal_.ConsumableWorkerpoolorder.md) |
+| `options?` | `Object` |
+| `options.preflightCheck?` | `boolean` |
 
 #### Returns
 

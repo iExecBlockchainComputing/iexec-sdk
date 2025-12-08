@@ -1,12 +1,10 @@
 import { EnsPlugin, Network } from 'ethers';
-import { address as voucherHubBellecourAddress } from '../generated/@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.js';
 import { TEE_FRAMEWORKS } from './constant.js';
 import { ConfigurationError } from './errors.js';
 
 export const CHAIN_SPECIFIC_FEATURES = {
   ENS: 'ENS',
   WORKERPOOL_API_URL_REGISTRATION: 'Workerpool API Registration',
-  VOUCHER: 'iExec Voucher',
   COMPASS: 'iExec Compass',
   XRLC_BRIDGE: 'iExec xRLC Bridge',
   BULK_PROCESSING: 'Bulk processing',
@@ -30,9 +28,6 @@ const networkConfigs = [
     iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
     compass: undefined, // no compass using ENS
     pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
-    voucherHub: voucherHubBellecourAddress,
-    voucherSubgraph:
-      'https://thegraph.iex.ec/subgraphs/name/bellecour/iexec-voucher',
     bridge: {
       contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',
       bridgedChainId: '1',
@@ -58,8 +53,6 @@ const networkConfigs = [
     iexecGateway: undefined, // no protocol running
     compass: undefined, // no protocol running
     pocoSubgraph: undefined, // no protocol running
-    voucherHub: undefined, // no voucher
-    voucherSubgraph: undefined, // no voucher
     bridge: {
       contract: '0x4e55c9B8953AB1957ad0A59D413631A66798c6a2',
       bridgedChainId: '134',
@@ -68,7 +61,6 @@ const networkConfigs = [
     isExperimental: false,
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.COMPASS,
-      CHAIN_SPECIFIC_FEATURES.VOUCHER,
       CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING,
     ],
   },
@@ -89,8 +81,6 @@ const networkConfigs = [
     compass: 'https://compass.arbitrum-sepolia-testnet.iex.ec',
     pocoSubgraph:
       'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/2GCj8gzLCihsiEDq8cYvC5nUgK6VfwZ6hm3Wj8A3kcxz',
-    voucherHub: undefined, // no voucher
-    voucherSubgraph: undefined, // no voucher
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     isExperimental: false,
@@ -98,7 +88,6 @@ const networkConfigs = [
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.ENS,
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
-      CHAIN_SPECIFIC_FEATURES.VOUCHER,
       CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
     ],
   },
@@ -119,15 +108,12 @@ const networkConfigs = [
     compass: 'https://compass.arbitrum-mainnet.iex.ec',
     pocoSubgraph:
       'https://thegraph.arbitrum.iex.ec/api/subgraphs/id/B1comLe9SANBLrjdnoNTJSubbeC7cY7EoNu6zD82HeKy',
-    voucherHub: undefined, // no voucher
-    voucherSubgraph: undefined, // no voucher
     bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     uploadBulkForThegraph: true,
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.ENS,
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
-      CHAIN_SPECIFIC_FEATURES.VOUCHER,
       CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
     ],
   },
@@ -162,8 +148,6 @@ export const getChainDefaults = (
     ipfsNode,
     compass,
     pocoSubgraph,
-    voucherHub,
-    voucherSubgraph,
     bridge,
   } =
     networkConfigs
@@ -185,8 +169,6 @@ export const getChainDefaults = (
     ipfsNode,
     compass,
     pocoSubgraph,
-    voucherHub,
-    voucherSubgraph,
     bridge,
   };
 };

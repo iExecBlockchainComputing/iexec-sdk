@@ -38,8 +38,6 @@ const wallet = IExecWalletModule.fromConfig(config);
 - [resolvePocoSubgraphURL](IExecConfig.md#resolvepocosubgraphurl)
 - [resolveResultProxyURL](IExecConfig.md#resolveresultproxyurl)
 - [resolveSmsURL](IExecConfig.md#resolvesmsurl)
-- [resolveVoucherHubAddress](IExecConfig.md#resolvevoucherhubaddress)
-- [resolveVoucherSubgraphURL](IExecConfig.md#resolvevouchersubgraphurl)
 
 ## Constructors
 
@@ -237,29 +235,3 @@ resolve the current SMS URL
 #### Returns
 
 `Promise`<`string`\>
-
-___
-
-### resolveVoucherHubAddress
-
-▸ **resolveVoucherHubAddress**(): `Promise`<``null`` \| `string`\>
-
-resolve the current VoucherHub contract address
-returns `null` if not available
-
-#### Returns
-
-`Promise`<``null`` \| `string`\>
-
-___
-
-### resolveVoucherSubgraphURL
-
-▸ **resolveVoucherSubgraphURL**(): `Promise`<``null`` \| `string`\>
-
-resolve the current voucher subgraph URL
-returns `null` if not available
-
-#### Returns
-
-`Promise`<``null`` \| `string`\>
