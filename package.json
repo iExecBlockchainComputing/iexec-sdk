@@ -200,8 +200,8 @@
   "homepage": "https://github.com/iExecBlockchainComputing/iexec-sdk#readme",
   "dependencies": {
     "@multiformats/multiaddr": "^12.4.0",
-    "@types/bn.js": "^5.1.6",
-    "bn.js": "^5.2.1",
+    "@types/bn.js": "^5.2.0",
+    "bn.js": "^5.2.2",
     "buffer": "^6.0.3",
     "commander": "^13.1.0",
     "debug": "^4.4.0",
