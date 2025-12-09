@@ -1,13 +1,7 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { describe, test, expect, beforeEach } from '@jest/globals';
-import {
-  TEST_CHAINS,
-  addVoucherEligibleAsset,
-  createVoucher,
-  createVoucherType,
-  execAsync,
-} from '../test-utils.js';
+import { describe, test, expect } from '@jest/globals';
+import { TEST_CHAINS, execAsync } from '../test-utils.js';
 import {
   editApporder,
   editDatasetorder,
@@ -16,12 +10,10 @@ import {
   globalSetup,
   globalTeardown,
   iexecPath,
-  runIExecCliRaw,
   setChain,
   setRandomWallet,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
-import { getTestConfig } from '../test-config-utils.js';
 
 const testChain = TEST_CHAINS['bellecour-fork'];
 
@@ -333,110 +325,5 @@ describe('iexec order', () => {
       .then((tx) => {
         expect(tx.gasPrice.toString()).toBe('0');
       });
-  });
-
-  describe('iexec order fill --use-voucher', () => {
-    let workerpoolOrderHash;
-    let datasetOrderHash;
-    let apporderHash;
-    let voucherType;
-
-    beforeAll(async () => {
-      const publishApporder = await runIExecCliRaw(
-        `${iexecPath} app publish ${userApp} --price 0.000000001 RLC --volume 100 --force`,
-      );
-      apporderHash = publishApporder.orderHash;
-      const publishDatasetorder = await runIExecCliRaw(
-        `${iexecPath} dataset publish ${userDataset} --price 0.000000002 RLC --volume 100 --app-restrict ${userApp} --force`,
-      );
-      datasetOrderHash = publishDatasetorder.orderHash;
-
-      const publishWorkerpoolorder = await runIExecCliRaw(
-        `${iexecPath} workerpool publish ${userWorkerpool} --price 0.000000003 RLC --volume 100 --category 0 --force`,
-      );
-      workerpoolOrderHash = publishWorkerpoolorder.orderHash;
-
-      await execAsync(`${iexecPath} order init --request`);
-      await editRequestorder({
-        app: userApp,
-        dataset: userDataset,
-        workerpool: userWorkerpool,
-        appmaxprice: '1000',
-        workerpoolmaxprice: '1000',
-        datasetmaxprice: '1000',
-        category: 0,
-        volume: '1',
-      });
-
-      voucherType = await createVoucherType(testChain)({});
-      await addVoucherEligibleAsset(testChain)(userWorkerpool, voucherType);
-      await addVoucherEligibleAsset(testChain)(userDataset, voucherType);
-      await addVoucherEligibleAsset(testChain)(userApp, voucherType);
-    });
-
-    beforeEach(async () => {
-      await execAsync(
-        `${iexecPath} order sign --request --skip-preflight-check --raw`,
-      );
-    });
-
-    test('fail without voucher', async () => {
-      const raw = await execAsync(
-        `${iexecPath} order fill --use-voucher --app ${apporderHash} --workerpool ${workerpoolOrderHash} --dataset ${datasetOrderHash} --skip-preflight-check --raw`,
-      ).catch((e) => e.message);
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(false);
-      expect(res.error.message).toBe(
-        `No voucher available for the requester ${userWallet.address}`,
-      );
-    });
-
-    test('should match orders with voucher', async () => {
-      const voucherAddress = await createVoucher(testChain)({
-        owner: userWallet.address,
-        voucherType,
-        value: 6, // nRLC
-      });
-      const raw = await execAsync(
-        `${iexecPath} order fill --use-voucher --app ${apporderHash} --workerpool ${workerpoolOrderHash} --dataset ${datasetOrderHash} --skip-preflight-check --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.volume).toBe('1');
-      expect(res.dealid).toBeDefined();
-      expect(res.txHash).toBeDefined();
-      await testChain.provider.getTransaction(res.txHash).then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx.to).toBe(voucherAddress);
-    });
-
-    describe('--voucher-address', () => {
-      test('should match orders with specified voucher', async () => {
-        const { iexec: iexecVoucherOwner, wallet: voucherOwnerWallet } =
-          getTestConfig(testChain)();
-        const voucherAddress = await createVoucher(testChain)({
-          owner: voucherOwnerWallet.address,
-          voucherType,
-          value: 6, // nRLC
-        });
-        await iexecVoucherOwner.voucher.authorizeRequester(userWallet.address);
-
-        const raw = await execAsync(
-          `${iexecPath} order fill --use-voucher --voucher-address ${voucherAddress} --app ${apporderHash} --workerpool ${workerpoolOrderHash} --dataset ${datasetOrderHash} --skip-preflight-check --raw`,
-        );
-        const res = JSON.parse(raw);
-        expect(res.ok).toBe(true);
-        expect(res.volume).toBe('1');
-        expect(res.dealid).toBeDefined();
-        expect(res.txHash).toBeDefined();
-        await testChain.provider.getTransaction(res.txHash).then((tx) => {
-          expect(tx.gasPrice.toString()).toBe('0');
-        });
-        const tx = await testChain.provider.getTransaction(res.txHash);
-        expect(tx.to).toBe(voucherAddress);
-      });
-    });
   });
 });

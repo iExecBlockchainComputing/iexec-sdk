@@ -585,8 +585,6 @@ run
   .option(...orderOption.beneficiary())
   .option(...orderOption.params())
   .option(...option.skipPreflightCheck())
-  .option(...option.useVoucher())
-  .option(...option.voucherAddress())
   .description(desc.appRun())
   .action(async (appAddress, opts) => {
     await checkUpdate(opts);
@@ -1040,64 +1038,60 @@ run
 
       debug('requestorder', requestorder);
 
-      const { total: totalCost, sponsored } = await estimateMatchOrders({
+      const { total: totalCost } = await estimateMatchOrders({
         contracts: chain.contracts,
-        voucherHubAddress: chain.voucherHub,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-        useVoucher: opts.useVoucher,
-        voucherAddress: opts.voucherAddress,
       });
 
       spinner.stop();
 
       if (!opts.force) {
         await prompt.custom(
-          `Do you want to spend ${formatRLC(totalCost)} nRLC ${
-            sponsored > 0 ? `(${sponsored} nRLC sponsored by the voucher)` : ''
-          } to execute the following request: ${pretty({
-            app: `${requestorder.app} (${formatRLC(
-              requestorder.appmaxprice,
-            )} RLC)`,
-            dataset:
-              requestorder.dataset !== NULL_ADDRESS
-                ? `${requestorder.dataset} (${formatRLC(
-                    requestorder.datasetmaxprice,
-                  )} RLC)`
-                : undefined,
-            workerpool: `${requestorder.workerpool} (${formatRLC(
-              requestorder.workerpoolmaxprice,
-            )} RLC)`,
-            params:
-              (requestorder.params && JSON.parse(requestorder.params)) ||
-              undefined,
-            category: requestorder.category,
-            tag:
-              requestorder.tag !== NULL_BYTES32 ? requestorder.tag : undefined,
-            callback:
-              requestorder.callback !== NULL_ADDRESS
-                ? requestorder.callback
-                : undefined,
-            beneficiary:
-              requestorder.beneficiary !== requestorder.requester
-                ? requestorder.beneficiary
-                : undefined,
-          })}`,
+          `Do you want to spend ${formatRLC(totalCost)} nRLC to execute the following request: ${pretty(
+            {
+              app: `${requestorder.app} (${formatRLC(
+                requestorder.appmaxprice,
+              )} RLC)`,
+              dataset:
+                requestorder.dataset !== NULL_ADDRESS
+                  ? `${requestorder.dataset} (${formatRLC(
+                      requestorder.datasetmaxprice,
+                    )} RLC)`
+                  : undefined,
+              workerpool: `${requestorder.workerpool} (${formatRLC(
+                requestorder.workerpoolmaxprice,
+              )} RLC)`,
+              params:
+                (requestorder.params && JSON.parse(requestorder.params)) ||
+                undefined,
+              category: requestorder.category,
+              tag:
+                requestorder.tag !== NULL_BYTES32
+                  ? requestorder.tag
+                  : undefined,
+              callback:
+                requestorder.callback !== NULL_ADDRESS
+                  ? requestorder.callback
+                  : undefined,
+              beneficiary:
+                requestorder.beneficiary !== requestorder.requester
+                  ? requestorder.beneficiary
+                  : undefined,
+            },
+          )}`,
         );
       }
 
       spinner.start('Submitting deal');
       const { dealid, volume, txHash } = await matchOrders({
         contracts: chain.contracts,
-        voucherHubAddress: chain.voucherHub,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-        useVoucher: opts.useVoucher,
-        voucherAddress: opts.voucherAddress,
       });
 
       result.deals.push({ dealid, volume: volume.toString(), txHash });
