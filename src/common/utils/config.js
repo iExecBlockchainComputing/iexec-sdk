@@ -1,5 +1,4 @@
 import { EnsPlugin, Network } from 'ethers';
-import { TEE_FRAMEWORKS } from './constant.js';
 import { ConfigurationError } from './errors.js';
 
 export const CHAIN_SPECIFIC_FEATURES = {
@@ -18,10 +17,7 @@ const networkConfigs = [
     host: 'https://bellecour.iex.ec',
     ensRegistry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
     ensPublicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
-    sms: {
-      [TEE_FRAMEWORKS.SCONE]: 'https://sms.iex.ec',
-      [TEE_FRAMEWORKS.GRAMINE]: 'https://sms.gramine.v8-bellecour.iex.ec',
-    },
+    sms: 'https://sms.iex.ec',
     resultProxy: 'https://result.v8-bellecour.iex.ec',
     ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
     ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
@@ -71,9 +67,7 @@ const networkConfigs = [
     host: 'https://sepolia-rollup.arbitrum.io/rpc',
     ensRegistry: undefined, // not supported
     ensPublicResolver: undefined, // not supported
-    sms: {
-      [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
-    },
+    sms: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
     ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
@@ -98,9 +92,7 @@ const networkConfigs = [
     host: 'https://arb1.arbitrum.io/rpc',
     ensRegistry: undefined, // not supported
     ensPublicResolver: undefined, // not supported
-    sms: {
-      [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-mainnet.iex.ec',
-    },
+    sms: 'https://sms.arbitrum-mainnet.iex.ec',
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
     ipfsNode: 'https://ipfs-upload.arbitrum-mainnet.iex.ec',

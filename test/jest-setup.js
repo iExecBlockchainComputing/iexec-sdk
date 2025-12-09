@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { jest, expect } from '@jest/globals';
 import { getAddress } from 'ethers';
 

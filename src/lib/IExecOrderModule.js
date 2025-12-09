@@ -39,7 +39,6 @@ import {
 } from '../common/market/marketplace.js';
 import {
   checkRequestRequirements,
-  resolveTeeFrameworkFromTag,
   checkAppRequirements,
   checkDatasetRequirements,
   prepareDatasetBulk,
@@ -112,11 +111,7 @@ export default class IExecOrderModule extends IExecModule {
           ? await checkDatasetRequirements(
               {
                 contracts: await this.config.resolveContractsClient(),
-                smsURL: await this.config.resolveSmsURL({
-                  teeFramework: await resolveTeeFrameworkFromTag(
-                    (await datasetorderSchema().validate(datasetorder)).tag,
-                  ),
-                }),
+                smsURL: await this.config.resolveSmsURL(),
               },
               datasetorder,
             ).then(() => datasetorder)
@@ -137,11 +132,7 @@ export default class IExecOrderModule extends IExecModule {
           ? await checkRequestRequirements(
               {
                 contracts: await this.config.resolveContractsClient(),
-                smsURL: await this.config.resolveSmsURL({
-                  teeFramework: await resolveTeeFrameworkFromTag(
-                    (await requestorderSchema().validate(requestorder)).tag,
-                  ),
-                }),
+                smsURL: await this.config.resolveSmsURL(),
               },
               requestorder,
             ).then(() => requestorder)
@@ -194,12 +185,7 @@ export default class IExecOrderModule extends IExecModule {
           ? await checkDatasetRequirements(
               {
                 contracts: await this.config.resolveContractsClient(),
-                smsURL: await this.config.resolveSmsURL({
-                  teeFramework: await resolveTeeFrameworkFromTag(
-                    (await datasetorderSchema().validate(signedDatasetorder))
-                      .tag,
-                  ),
-                }),
+                smsURL: await this.config.resolveSmsURL(),
               },
               signedDatasetorder,
             ).then(() => signedDatasetorder)
@@ -222,12 +208,7 @@ export default class IExecOrderModule extends IExecModule {
           ? await checkRequestRequirements(
               {
                 contracts: await this.config.resolveContractsClient(),
-                smsURL: await this.config.resolveSmsURL({
-                  teeFramework: await resolveTeeFrameworkFromTag(
-                    (await requestorderSchema().validate(signedRequestorder))
-                      .tag,
-                  ),
-                }),
+                smsURL: await this.config.resolveSmsURL(),
               },
               signedRequestorder,
             ).then(() => signedRequestorder)
@@ -339,9 +320,7 @@ export default class IExecOrderModule extends IExecModule {
           datasetorder: await checkDatasetRequirements(
             {
               contracts,
-              smsURL: await this.config.resolveSmsURL({
-                teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
-              }),
+              smsURL: await this.config.resolveSmsURL(),
             },
             datasetorder,
             { tagOverride: resolvedTag },
@@ -350,9 +329,7 @@ export default class IExecOrderModule extends IExecModule {
           requestorder: await checkRequestRequirements(
             {
               contracts,
-              smsURL: await this.config.resolveSmsURL({
-                teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
-              }),
+              smsURL: await this.config.resolveSmsURL(),
             },
             requestorder,
           ).then(() => requestorder),

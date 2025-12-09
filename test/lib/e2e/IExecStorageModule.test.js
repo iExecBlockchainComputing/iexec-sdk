@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { expectAsyncCustomError, getTestConfig } from '../lib-test-utils.js';
 import {
@@ -86,11 +84,6 @@ describe('storage', () => {
           `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`,
         ),
       );
-      const pushForTeeFramework = await iexec.storage.pushStorageToken('oops', {
-        teeFramework: 'gramine',
-      });
-      expect(pushForTeeFramework.isPushed).toBe(true);
-      expect(pushForTeeFramework.isUpdated).toBe(false);
     });
 
     test('provider "default" pushes result proxy ipfs token', async () => {
@@ -195,17 +188,6 @@ describe('storage', () => {
           provider: 'test',
         }),
       ).rejects.toThrow(Error('"test" not supported'));
-      const unsetForTeeFramework =
-        await iexecReadOnly.storage.checkStorageTokenExists(wallet.address, {
-          teeFramework: 'gramine',
-        });
-      expect(unsetForTeeFramework).toBe(false);
-      await iexec.storage.pushStorageToken('oops', { teeFramework: 'gramine' });
-      const setForTeeFramework =
-        await iexecReadOnly.storage.checkStorageTokenExists(wallet.address, {
-          teeFramework: 'gramine',
-        });
-      expect(setForTeeFramework).toBe(true);
     });
   });
 });
