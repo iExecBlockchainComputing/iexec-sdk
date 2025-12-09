@@ -60,12 +60,10 @@ import {
   info,
   isBytes32,
   prompt,
-  getPropertyFormChain,
-  getSmsUrlFromChain,
+  getPropertyFromChain,
 } from '../utils/cli-helper.js';
 import {
   checkRequestRequirements,
-  resolveTeeFrameworkFromTag,
   checkDatasetRequirements,
   checkAppRequirements,
 } from '../../common/execution/order-helper.js';
@@ -265,9 +263,7 @@ sign
             await checkDatasetRequirements(
               {
                 contracts: chain.contracts,
-                smsURL: getSmsUrlFromChain(chain, {
-                  teeFramework: await resolveTeeFrameworkFromTag(orderObj.tag),
-                }),
+                smsURL: getPropertyFromChain(chain, 'sms'),
               },
               orderObj,
             ).catch((e) => {
@@ -354,9 +350,7 @@ sign
             await checkRequestRequirements(
               {
                 contracts: chain.contracts,
-                smsURL: getSmsUrlFromChain(chain, {
-                  teeFramework: await resolveTeeFrameworkFromTag(orderObj.tag),
-                }),
+                smsURL: getPropertyFromChain(chain, 'sms'),
               },
               orderObj,
             ).catch((e) => {
@@ -439,7 +433,7 @@ fill
             `Fetching ${orderName} ${orderHash} from iexec marketplace`,
           );
           const orderRes = await fetchPublishedOrderByHash(
-            getPropertyFormChain(chain, 'iexecGateway'),
+            getPropertyFromChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
             orderHash,
@@ -545,9 +539,7 @@ fill
           await checkDatasetRequirements(
             {
               contracts: chain.contracts,
-              smsURL: getSmsUrlFromChain(chain, {
-                teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
-              }),
+              smsURL: getPropertyFromChain(chain, 'sms'),
             },
             datasetorder,
             { tagOverride: resolvedTag },
@@ -564,9 +556,7 @@ fill
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getSmsUrlFromChain(chain, {
-              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
-            }),
+            smsURL: getPropertyFromChain(chain, 'sms'),
           },
           requestorder,
         ).catch((e) => {
@@ -664,7 +654,7 @@ publish
               }
               orderHash = await publishApporder(
                 chain.contracts,
-                getPropertyFormChain(chain, 'iexecGateway'),
+                getPropertyFromChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
@@ -673,11 +663,7 @@ publish
                 await checkDatasetRequirements(
                   {
                     contracts: chain.contracts,
-                    smsURL: getSmsUrlFromChain(chain, {
-                      teeFramework: await resolveTeeFrameworkFromTag(
-                        orderToPublish.tag,
-                      ),
-                    }),
+                    smsURL: getPropertyFromChain(chain, 'sms'),
                   },
                   orderToPublish,
                 ).catch((e) => {
@@ -692,14 +678,14 @@ publish
               }
               orderHash = await publishDatasetorder(
                 chain.contracts,
-                getPropertyFormChain(chain, 'iexecGateway'),
+                getPropertyFromChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
             case WORKERPOOL_ORDER:
               orderHash = await publishWorkerpoolorder(
                 chain.contracts,
-                getPropertyFormChain(chain, 'iexecGateway'),
+                getPropertyFromChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
@@ -708,11 +694,7 @@ publish
                 await checkRequestRequirements(
                   {
                     contracts: chain.contracts,
-                    smsURL: getSmsUrlFromChain(chain, {
-                      teeFramework: await resolveTeeFrameworkFromTag(
-                        orderToPublish.tag,
-                      ),
-                    }),
+                    smsURL: getPropertyFromChain(chain, 'sms'),
                   },
                   orderToPublish,
                 ).catch((e) => {
@@ -727,7 +709,7 @@ publish
               }
               orderHash = await publishRequestorder(
                 chain.contracts,
-                getPropertyFormChain(chain, 'iexecGateway'),
+                getPropertyFromChain(chain, 'iexecGateway'),
                 orderToPublish,
               );
               break;
@@ -827,28 +809,28 @@ unpublish
             case APP_ORDER:
               unpublished = await unpublishApporder(
                 chain.contracts,
-                getPropertyFormChain(chain, 'iexecGateway'),
+                getPropertyFromChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case DATASET_ORDER:
               unpublished = await unpublishDatasetorder(
                 chain.contracts,
-                getPropertyFormChain(chain, 'iexecGateway'),
+                getPropertyFromChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case WORKERPOOL_ORDER:
               unpublished = await unpublishWorkerpoolorder(
                 chain.contracts,
-                getPropertyFormChain(chain, 'iexecGateway'),
+                getPropertyFromChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
             case REQUEST_ORDER:
               unpublished = await unpublishRequestorder(
                 chain.contracts,
-                getPropertyFormChain(chain, 'iexecGateway'),
+                getPropertyFromChain(chain, 'iexecGateway'),
                 orderHashToUnpublish,
               );
               break;
@@ -1025,7 +1007,7 @@ show
           isBytes32(orderHash);
           spinner.start(info.showing(orderName));
           const orderToShow = await fetchPublishedOrderByHash(
-            getPropertyFormChain(chain, 'iexecGateway'),
+            getPropertyFromChain(chain, 'iexecGateway'),
             orderName,
             chain.id,
             orderHash,
@@ -1033,7 +1015,7 @@ show
           let deals;
           if (opts.deals) {
             deals = await fetchDealsByOrderHash(
-              getPropertyFormChain(chain, 'iexecGateway'),
+              getPropertyFromChain(chain, 'iexecGateway'),
               orderName,
               chain.id,
               orderHash,

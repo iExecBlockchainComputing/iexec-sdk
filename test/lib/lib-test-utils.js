@@ -1,7 +1,5 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { expect } from '@jest/globals';
-import { NULL_ADDRESS, TEE_FRAMEWORKS, getId, sleep } from '../test-utils.js';
+import { NULL_ADDRESS, getId, sleep } from '../test-utils.js';
 export { getTestConfig, getTestConfigOptions } from '../test-config-utils.js';
 
 export const ONE_ETH = 10n ** 18n;
@@ -22,10 +20,8 @@ export const deployRandomApp = async (iexec, { owner, teeFramework } = {}) =>
       framework: teeFramework,
       version: 'v1',
       fingerprint: 'fingerprint',
-      ...(teeFramework.toLowerCase() === TEE_FRAMEWORKS.SCONE && {
-        entrypoint: 'entrypoint.sh',
-        heapSize: 4096,
-      }),
+      entrypoint: 'entrypoint.sh',
+      heapSize: 4096,
     },
   });
 

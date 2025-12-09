@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -441,6 +439,7 @@ describe('utils', () => {
       expect(tx2).toBeTxHash();
     });
 
+    // skipped because reliant on ethers selected providers
     test.skip('providers option allow passing JSON RPC API providers api keys', async () => {
       const providerOptions = {
         infura: INFURA_PROJECT_ID,
@@ -601,6 +600,7 @@ describe('utils', () => {
         ).wallet.checkBalances(NULL_ADDRESS),
       ).resolves.toBeDefined();
     });
+    // skipped because no experimental networks are currently defined
     test.skip('allowExperimentalNetworks option allow creating signer connected to an experimental network', async () => {
       expect(() =>
         utils.getSignerFromPrivateKey(

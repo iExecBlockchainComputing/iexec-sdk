@@ -32,19 +32,32 @@ import {
   tagSchema,
   positiveStrictIntSchema,
   signedDatasetorderBulkSchema,
+  objMrenclaveSchema,
 } from '../utils/validator.js';
-import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries.js';
+import { showApp } from '../protocol/registries.js';
 import { add } from '../utils/ipfs.js';
 
 const debug = Debug('iexec:execution:order-helper');
 
-export const resolveTeeFrameworkFromTag = async (tag) => {
+const resolveTeeFrameworkFromTag = async (tag) => {
   const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
   if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.SCONE])) {
     return TEE_FRAMEWORKS.SCONE;
   }
-  if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.GRAMINE])) {
-    return TEE_FRAMEWORKS.GRAMINE;
+  return undefined;
+};
+
+const resolveTeeFrameworkFromApp = async (app, { strict = true } = {}) => {
+  if (app.appMREnclave) {
+    try {
+      const mrenclave = await objMrenclaveSchema().validate(app.appMREnclave);
+      return mrenclave.framework;
+    } catch (err) {
+      debug('resolveTeeFrameworkFromApp()', err);
+      if (strict) {
+        throw new Error('Failed to resolve TEE framework from app');
+      }
+    }
   }
   return undefined;
 };
