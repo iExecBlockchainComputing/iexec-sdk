@@ -4,9 +4,6 @@ import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils.js';
 import {
-  ALCHEMY_API_KEY,
-  ETHERSCAN_API_KEY,
-  INFURA_PROJECT_ID,
   DEFAULT_PROVIDER_OPTIONS,
   TEST_CHAINS,
   getRandomAddress,
