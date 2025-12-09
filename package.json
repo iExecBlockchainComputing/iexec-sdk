@@ -235,9 +235,9 @@
     "jest": "^29.7.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.1.2",
-    "typedoc": "^0.25.3",
-    "typedoc-plugin-markdown": "^3.16.0",
-    "typedoc-plugin-missing-exports": "^2.1.0",
+    "typedoc": "^0.28.15",
+    "typedoc-plugin-markdown": "^4.9.0",
+    "typedoc-plugin-missing-exports": "^4.1.2",
     "typedoc-plugin-rename-defaults": "^0.7.3",
     "typescript": "^5.2.2"
   }

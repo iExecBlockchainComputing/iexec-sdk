@@ -1,79 +1,60 @@
-[iexec](../README.md) / [Exports](../modules.md) / IExecWalletModule
+[**iexec**](../README.md)
+
+***
+
+[iexec](../globals.md) / IExecWalletModule
 
 # Class: IExecWalletModule
 
 module exposing wallet methods
 
-## Hierarchy
+## Extends
 
 - [`IExecModule`](IExecModule.md)
 
-  ↳ **`IExecWalletModule`**
-
-## Table of contents
-
-### Constructors
-
-- [constructor](IExecWalletModule.md#constructor)
-
-### Properties
-
-- [config](IExecWalletModule.md#config)
-
-### Methods
-
-- [bridgeToMainchain](IExecWalletModule.md#bridgetomainchain)
-- [bridgeToSidechain](IExecWalletModule.md#bridgetosidechain)
-- [checkBalances](IExecWalletModule.md#checkbalances)
-- [checkBridgedBalances](IExecWalletModule.md#checkbridgedbalances)
-- [getAddress](IExecWalletModule.md#getaddress)
-- [obsBridgeToMainchain](IExecWalletModule.md#obsbridgetomainchain)
-- [obsBridgeToSidechain](IExecWalletModule.md#obsbridgetosidechain)
-- [sendETH](IExecWalletModule.md#sendeth)
-- [sendRLC](IExecWalletModule.md#sendrlc)
-- [sweep](IExecWalletModule.md#sweep)
-- [fromConfig](IExecWalletModule.md#fromconfig)
-
 ## Constructors
 
-### constructor
+### Constructor
 
-• **new IExecWalletModule**(`configOrArgs`, `options?`): [`IExecWalletModule`](IExecWalletModule.md)
+> **new IExecWalletModule**(`configOrArgs`, `options?`): `IExecWalletModule`
 
 Create an IExecModule instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+##### configOrArgs
+
+[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
+
+##### options?
+
+[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
 
 #### Returns
 
-[`IExecWalletModule`](IExecWalletModule.md)
+`IExecWalletModule`
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
+[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-• **config**: [`IExecConfig`](IExecConfig.md)
+> **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[config](IExecModule.md#config)
+[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
 ## Methods
 
-### bridgeToMainchain
+### bridgeToMainchain()
 
-▸ **bridgeToMainchain**(`nRLCAmount`): `Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+> **bridgeToMainchain**(`nRLCAmount`): `Promise`\<\{ `receiveTxHash?`: `string`; `sendTxHash`: `string`; \}\>
 
 **SIGNER REQUIRED**
 
@@ -91,19 +72,19 @@ console.log(`sent RLC on sidechain (tx: ${sendTxHash}), wallet credited on mainc
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
+##### nRLCAmount
+
+[`NRLCAmount`](../type-aliases/NRLCAmount.md)
 
 #### Returns
 
-`Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+`Promise`\<\{ `receiveTxHash?`: `string`; `sendTxHash`: `string`; \}\>
 
-___
+***
 
-### bridgeToSidechain
+### bridgeToSidechain()
 
-▸ **bridgeToSidechain**(`nRLCAmount`): `Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+> **bridgeToSidechain**(`nRLCAmount`): `Promise`\<\{ `receiveTxHash?`: `string`; `sendTxHash`: `string`; \}\>
 
 **SIGNER REQUIRED**
 
@@ -121,19 +102,19 @@ console.log(`sent RLC on mainchain (tx: ${sendTxHash}), wallet credited on sidec
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
+##### nRLCAmount
+
+[`NRLCAmount`](../type-aliases/NRLCAmount.md)
 
 #### Returns
 
-`Promise`<{ `receiveTxHash?`: `string` ; `sendTxHash`: `string`  }\>
+`Promise`\<\{ `receiveTxHash?`: `string`; `sendTxHash`: `string`; \}\>
 
-___
+***
 
-### checkBalances
+### checkBalances()
 
-▸ **checkBalances**(`address`): `Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
+> **checkBalances**(`address`): `Promise`\<\{ `nRLC`: [`BN`](../interfaces/BN.md); `wei`: [`BN`](../interfaces/BN.md); \}\>
 
 check the wallet balances (native and iExec token) of specified address
 
@@ -146,19 +127,19 @@ console.log('ethereum wei:', wei.toString());
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `address` | `string` |
+##### address
+
+`string`
 
 #### Returns
 
-`Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
+`Promise`\<\{ `nRLC`: [`BN`](../interfaces/BN.md); `wei`: [`BN`](../interfaces/BN.md); \}\>
 
-___
+***
 
-### checkBridgedBalances
+### checkBridgedBalances()
 
-▸ **checkBridgedBalances**(`address`): `Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
+> **checkBridgedBalances**(`address`): `Promise`\<\{ `nRLC`: [`BN`](../interfaces/BN.md); `wei`: [`BN`](../interfaces/BN.md); \}\>
 
 check the wallet balances (native and iExec token) of specified address on bridged chain
 
@@ -171,19 +152,19 @@ console.log('ethereum wei:', wei.toString());
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `address` | `string` |
+##### address
+
+`string`
 
 #### Returns
 
-`Promise`<{ `nRLC`: [`BN`](utils.BN.md) ; `wei`: [`BN`](utils.BN.md)  }\>
+`Promise`\<\{ `nRLC`: [`BN`](../interfaces/BN.md); `wei`: [`BN`](../interfaces/BN.md); \}\>
 
-___
+***
 
-### getAddress
+### getAddress()
 
-▸ **getAddress**(): `Promise`<`string`\>
+> **getAddress**(): `Promise`\<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -197,13 +178,13 @@ console.log('user address:', userAddress);
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
-___
+***
 
-### obsBridgeToMainchain
+### obsBridgeToMainchain()
 
-▸ **obsBridgeToMainchain**(`nRLCAmount`): `Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
+> **obsBridgeToMainchain**(`nRLCAmount`): `Promise`\<[`BridgeObservable`](../-internal-/classes/BridgeObservable.md)\>
 
 **SIGNER REQUIRED**
 
@@ -221,19 +202,19 @@ const cancel = bridgeObservable.subscribe({
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
+##### nRLCAmount
+
+[`NRLCAmount`](../type-aliases/NRLCAmount.md)
 
 #### Returns
 
-`Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
+`Promise`\<[`BridgeObservable`](../-internal-/classes/BridgeObservable.md)\>
 
-___
+***
 
-### obsBridgeToSidechain
+### obsBridgeToSidechain()
 
-▸ **obsBridgeToSidechain**(`nRLCAmount`): `Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
+> **obsBridgeToSidechain**(`nRLCAmount`): `Promise`\<[`BridgeObservable`](../-internal-/classes/BridgeObservable.md)\>
 
 **SIGNER REQUIRED**
 
@@ -251,19 +232,19 @@ const cancel = bridgeObservable.subscribe({
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
+##### nRLCAmount
+
+[`NRLCAmount`](../type-aliases/NRLCAmount.md)
 
 #### Returns
 
-`Promise`<[`BridgeObservable`](internal_.BridgeObservable.md)\>
+`Promise`\<[`BridgeObservable`](../-internal-/classes/BridgeObservable.md)\>
 
-___
+***
 
-### sendETH
+### sendETH()
 
-▸ **sendETH**(`WeiAmount`, `to`): `Promise`<`string`\>
+> **sendETH**(`WeiAmount`, `to`): `Promise`\<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -277,20 +258,23 @@ console.log('transaction hash:', txHash);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `WeiAmount` | [`WeiAmount`](../modules.md#weiamount) |
-| `to` | `string` |
+##### WeiAmount
+
+[`WeiAmount`](../type-aliases/WeiAmount.md)
+
+##### to
+
+`string`
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
-___
+***
 
-### sendRLC
+### sendRLC()
 
-▸ **sendRLC**(`nRLCAmount`, `to`): `Promise`<`string`\>
+> **sendRLC**(`nRLCAmount`, `to`): `Promise`\<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -304,20 +288,23 @@ console.log('transaction hash:', txHash);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `nRLCAmount` | [`NRLCAmount`](../modules.md#nrlcamount) |
-| `to` | `string` |
+##### nRLCAmount
+
+[`NRLCAmount`](../type-aliases/NRLCAmount.md)
+
+##### to
+
+`string`
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
-___
+***
 
-### sweep
+### sweep()
 
-▸ **sweep**(`to`): `Promise`<{ `sendERC20TxHash`: `string` ; `sendNativeTxHash`: `string`  }\>
+> **sweep**(`to`): `Promise`\<\{ `sendERC20TxHash`: `string`; `sendNativeTxHash`: `string`; \}\>
 
 **SIGNER REQUIRED**
 
@@ -332,32 +319,32 @@ console.log('sweep ether transaction hash:', sendNativeTxHash);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `to` | `string` |
+##### to
+
+`string`
 
 #### Returns
 
-`Promise`<{ `sendERC20TxHash`: `string` ; `sendNativeTxHash`: `string`  }\>
+`Promise`\<\{ `sendERC20TxHash`: `string`; `sendNativeTxHash`: `string`; \}\>
 
-___
+***
 
-### fromConfig
+### fromConfig()
 
-▸ **fromConfig**(`config`): [`IExecWalletModule`](IExecWalletModule.md)
+> `static` **fromConfig**(`config`): `IExecWalletModule`
 
 Create an IExecWalletModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `config` | [`IExecConfig`](IExecConfig.md) |
+##### config
+
+[`IExecConfig`](IExecConfig.md)
 
 #### Returns
 
-[`IExecWalletModule`](IExecWalletModule.md)
+`IExecWalletModule`
 
 #### Overrides
 
-[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
+[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)

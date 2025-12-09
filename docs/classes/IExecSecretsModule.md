@@ -1,71 +1,60 @@
-[iexec](../README.md) / [Exports](../modules.md) / IExecSecretsModule
+[**iexec**](../README.md)
+
+***
+
+[iexec](../globals.md) / IExecSecretsModule
 
 # Class: IExecSecretsModule
 
 module exposing secrets methods
 
-## Hierarchy
+## Extends
 
 - [`IExecModule`](IExecModule.md)
 
-  ↳ **`IExecSecretsModule`**
-
-## Table of contents
-
-### Constructors
-
-- [constructor](IExecSecretsModule.md#constructor)
-
-### Properties
-
-- [config](IExecSecretsModule.md#config)
-
-### Methods
-
-- [checkRequesterSecretExists](IExecSecretsModule.md#checkrequestersecretexists)
-- [pushRequesterSecret](IExecSecretsModule.md#pushrequestersecret)
-- [fromConfig](IExecSecretsModule.md#fromconfig)
-
 ## Constructors
 
-### constructor
+### Constructor
 
-• **new IExecSecretsModule**(`configOrArgs`, `options?`): [`IExecSecretsModule`](IExecSecretsModule.md)
+> **new IExecSecretsModule**(`configOrArgs`, `options?`): `IExecSecretsModule`
 
 Create an IExecModule instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+##### configOrArgs
+
+[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
+
+##### options?
+
+[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
 
 #### Returns
 
-[`IExecSecretsModule`](IExecSecretsModule.md)
+`IExecSecretsModule`
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
+[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-• **config**: [`IExecConfig`](IExecConfig.md)
+> **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[config](IExecModule.md#config)
+[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
 ## Methods
 
-### checkRequesterSecretExists
+### checkRequesterSecretExists()
 
-▸ **checkRequesterSecretExists**(`requesterAddress`, `secretName`, `options?`): `Promise`<`boolean`\>
+> **checkRequesterSecretExists**(`requesterAddress`, `secretName`, `options?`): `Promise`\<`boolean`\>
 
 check if a named secret exists for the requester in the Secret Management Service
 
@@ -77,22 +66,29 @@ console.log('secret "my-password" set:', isSecretSet);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `requesterAddress` | `string` |
-| `secretName` | `String` |
-| `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+##### requesterAddress
+
+`string`
+
+##### secretName
+
+`String`
+
+##### options?
+
+###### teeFramework?
+
+[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
-___
+***
 
-### pushRequesterSecret
+### pushRequesterSecret()
 
-▸ **pushRequesterSecret**(`secretName`, `secretValue`, `options?`): `Promise`<{ `isPushed`: `boolean`  }\>
+> **pushRequesterSecret**(`secretName`, `secretValue`, `options?`): `Promise`\<\{ `isPushed`: `boolean`; \}\>
 
 **SIGNER REQUIRED, ONLY REQUESTER**
 
@@ -110,35 +106,42 @@ console.log('pushed secret "my-password":', isPushed);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `secretName` | `String` |
-| `secretValue` | `String` |
-| `options?` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+##### secretName
+
+`String`
+
+##### secretValue
+
+`String`
+
+##### options?
+
+###### teeFramework?
+
+[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 
-`Promise`<{ `isPushed`: `boolean`  }\>
+`Promise`\<\{ `isPushed`: `boolean`; \}\>
 
-___
+***
 
-### fromConfig
+### fromConfig()
 
-▸ **fromConfig**(`config`): [`IExecSecretsModule`](IExecSecretsModule.md)
+> `static` **fromConfig**(`config`): `IExecSecretsModule`
 
 Create an IExecSecretsModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `config` | [`IExecConfig`](IExecConfig.md) |
+##### config
+
+[`IExecConfig`](IExecConfig.md)
 
 #### Returns
 
-[`IExecSecretsModule`](IExecSecretsModule.md)
+`IExecSecretsModule`
 
 #### Overrides
 
-[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
+[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)

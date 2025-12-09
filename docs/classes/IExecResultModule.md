@@ -1,71 +1,60 @@
-[iexec](../README.md) / [Exports](../modules.md) / IExecResultModule
+[**iexec**](../README.md)
+
+***
+
+[iexec](../globals.md) / IExecResultModule
 
 # Class: IExecResultModule
 
 module exposing result methods
 
-## Hierarchy
+## Extends
 
 - [`IExecModule`](IExecModule.md)
 
-  ↳ **`IExecResultModule`**
-
-## Table of contents
-
-### Constructors
-
-- [constructor](IExecResultModule.md#constructor)
-
-### Properties
-
-- [config](IExecResultModule.md#config)
-
-### Methods
-
-- [checkResultEncryptionKeyExists](IExecResultModule.md#checkresultencryptionkeyexists)
-- [pushResultEncryptionKey](IExecResultModule.md#pushresultencryptionkey)
-- [fromConfig](IExecResultModule.md#fromconfig)
-
 ## Constructors
 
-### constructor
+### Constructor
 
-• **new IExecResultModule**(`configOrArgs`, `options?`): [`IExecResultModule`](IExecResultModule.md)
+> **new IExecResultModule**(`configOrArgs`, `options?`): `IExecResultModule`
 
 Create an IExecModule instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+##### configOrArgs
+
+[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
+
+##### options?
+
+[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
 
 #### Returns
 
-[`IExecResultModule`](IExecResultModule.md)
+`IExecResultModule`
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
+[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-• **config**: [`IExecConfig`](IExecConfig.md)
+> **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[config](IExecModule.md#config)
+[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
 ## Methods
 
-### checkResultEncryptionKeyExists
+### checkResultEncryptionKeyExists()
 
-▸ **checkResultEncryptionKeyExists**(`beneficiaryAddress`, `options`): `Promise`<`boolean`\>
+> **checkResultEncryptionKeyExists**(`beneficiaryAddress`, `options`): `Promise`\<`boolean`\>
 
 check if a beneficiary result encryption key exists in the Secret Management Service
 
@@ -77,21 +66,25 @@ console.log('encryption key available:', isEncryptionKeyAvailable);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `beneficiaryAddress` | `string` |
-| `options` | `Object` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+##### beneficiaryAddress
+
+`string`
+
+##### options
+
+###### teeFramework?
+
+[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
-___
+***
 
-### pushResultEncryptionKey
+### pushResultEncryptionKey()
 
-▸ **pushResultEncryptionKey**(`rsaPublicKey`, `options?`): `Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
+> **pushResultEncryptionKey**(`rsaPublicKey`, `options?`): `Promise`\<\{ `isPushed`: `boolean`; `isUpdated`: `boolean`; \}\>
 
 **SIGNER REQUIRED, ONLY BENEFICIARY**
 
@@ -139,35 +132,42 @@ console.log('encryption key pushed:', isPushed);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `rsaPublicKey` | `string` \| `CryptoKey` |
-| `options?` | `Object` |
-| `options.forceUpdate?` | `boolean` |
-| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
+##### rsaPublicKey
+
+`string` | `CryptoKey`
+
+##### options?
+
+###### forceUpdate?
+
+`boolean`
+
+###### teeFramework?
+
+[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 
-`Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
+`Promise`\<\{ `isPushed`: `boolean`; `isUpdated`: `boolean`; \}\>
 
-___
+***
 
-### fromConfig
+### fromConfig()
 
-▸ **fromConfig**(`config`): [`IExecResultModule`](IExecResultModule.md)
+> `static` **fromConfig**(`config`): `IExecResultModule`
 
 Create an IExecResultModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `config` | [`IExecConfig`](IExecConfig.md) |
+##### config
+
+[`IExecConfig`](IExecConfig.md)
 
 #### Returns
 
-[`IExecResultModule`](IExecResultModule.md)
+`IExecResultModule`
 
 #### Overrides
 
-[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
+[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)

@@ -1,190 +1,187 @@
-[iexec](../README.md) / [Exports](../modules.md) / IExecConfigOptions
+[**iexec**](../README.md)
+
+***
+
+[iexec](../globals.md) / IExecConfigOptions
 
 # Interface: IExecConfigOptions
 
-## Table of contents
-
-### Properties
-
-- [allowExperimentalNetworks](IExecConfigOptions.md#allowexperimentalnetworks)
-- [bridgeAddress](IExecConfigOptions.md#bridgeaddress)
-- [bridgedNetworkConf](IExecConfigOptions.md#bridgednetworkconf)
-- [compassURL](IExecConfigOptions.md#compassurl)
-- [confirms](IExecConfigOptions.md#confirms)
-- [defaultTeeFramework](IExecConfigOptions.md#defaultteeframework)
-- [ensPublicResolverAddress](IExecConfigOptions.md#enspublicresolveraddress)
-- [hubAddress](IExecConfigOptions.md#hubaddress)
-- [iexecGatewayURL](IExecConfigOptions.md#iexecgatewayurl)
-- [ipfsGatewayURL](IExecConfigOptions.md#ipfsgatewayurl)
-- [ipfsNodeURL](IExecConfigOptions.md#ipfsnodeurl)
-- [isNative](IExecConfigOptions.md#isnative)
-- [pocoSubgraphURL](IExecConfigOptions.md#pocosubgraphurl)
-- [providerOptions](IExecConfigOptions.md#provideroptions)
-- [resultProxyURL](IExecConfigOptions.md#resultproxyurl)
-- [smsURL](IExecConfigOptions.md#smsurl)
-- [useGas](IExecConfigOptions.md#usegas)
-- [voucherHubAddress](IExecConfigOptions.md#voucherhubaddress)
-- [voucherSubgraphURL](IExecConfigOptions.md#vouchersubgraphurl)
-
 ## Properties
 
-### allowExperimentalNetworks
+### allowExperimentalNetworks?
 
-• `Optional` **allowExperimentalNetworks**: `boolean`
+> `optional` **allowExperimentalNetworks**: `boolean`
 
 if true allows using a provider connected to an experimental networks (default false)
 
 ⚠️ experimental networks are networks on which the iExec's stack is partially deployed, experimental networks can be subject to instabilities or discontinuity. Access is provided without warranties.
 
-___
+***
 
-### bridgeAddress
+### bridgeAddress?
 
-• `Optional` **bridgeAddress**: `string`
+> `optional` **bridgeAddress**: `string`
 
 override the bridge contract address to target a custom instance
 
-___
+***
 
-### bridgedNetworkConf
+### bridgedNetworkConf?
 
-• `Optional` **bridgedNetworkConf**: `Object`
+> `optional` **bridgedNetworkConf**: `object`
 
 override the bridged network configuration
 
-#### Type declaration
+#### bridgeAddress?
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `bridgeAddress?` | `string` | bridge contract address on bridged network |
-| `chainId?` | `string` \| `number` | bridged network chainId |
-| `hubAddress?` | `string` | IExec contract address on bridged network |
-| `rpcURL?` | `string` | bridged network node url |
+> `optional` **bridgeAddress**: `string`
 
-___
+bridge contract address on bridged network
 
-### compassURL
+#### chainId?
 
-• `Optional` **compassURL**: `string`
+> `optional` **chainId**: `string` \| `number`
+
+bridged network chainId
+
+#### hubAddress?
+
+> `optional` **hubAddress**: `string`
+
+IExec contract address on bridged network
+
+#### rpcURL?
+
+> `optional` **rpcURL**: `string`
+
+bridged network node url
+
+***
+
+### compassURL?
+
+> `optional` **compassURL**: `string`
+
+**`Experimental`**
 
 override the compass URL to target a custom instance
 
-___
+***
 
-### confirms
+### confirms?
 
-• `Optional` **confirms**: `number`
+> `optional` **confirms**: `number`
 
 number of block to wait for transactions confirmation (default 1)
 
-___
+***
 
-### defaultTeeFramework
+### defaultTeeFramework?
 
-• `Optional` **defaultTeeFramework**: [`TeeFramework`](../modules.md#teeframework)
+> `optional` **defaultTeeFramework**: [`TeeFramework`](../type-aliases/TeeFramework.md)
 
 override the TEE framework to use when as default
 
-___
+***
 
-### ensPublicResolverAddress
+### ensPublicResolverAddress?
 
-• `Optional` **ensPublicResolverAddress**: `string`
+> `optional` **ensPublicResolverAddress**: `string`
 
 override the ENS public resolver contract address to target a custom instance
 
-___
+***
 
-### hubAddress
+### hubAddress?
 
-• `Optional` **hubAddress**: `string`
+> `optional` **hubAddress**: `string`
 
 override the IExec contract address to target a custom instance
 
-___
+***
 
-### iexecGatewayURL
+### iexecGatewayURL?
 
-• `Optional` **iexecGatewayURL**: `string`
+> `optional` **iexecGatewayURL**: `string`
 
 override the IExec market URL to target a custom instance
 
-___
+***
 
-### ipfsGatewayURL
+### ipfsGatewayURL?
 
-• `Optional` **ipfsGatewayURL**: `string`
+> `optional` **ipfsGatewayURL**: `string`
 
 override the IPFS gateway URL to target a custom instance
 
-___
+***
 
-### ipfsNodeURL
+### ipfsNodeURL?
 
-• `Optional` **ipfsNodeURL**: `string`
+> `optional` **ipfsNodeURL**: `string`
 
 override the IPFS node URL to target a custom instance
 
-___
+***
 
-### isNative
+### isNative?
 
-• `Optional` **isNative**: `boolean`
+> `optional` **isNative**: `boolean`
 
 true if IExec contract use the chain native token (default false)
 
-___
+***
 
-### pocoSubgraphURL
+### pocoSubgraphURL?
 
-• `Optional` **pocoSubgraphURL**: `string`
+> `optional` **pocoSubgraphURL**: `string`
 
 override the PoCo subgraph URL to target a custom instance
 
-___
+***
 
-### providerOptions
+### providerOptions?
 
-• `Optional` **providerOptions**: [`ProviderOptions`](ProviderOptions.md) \| [`AnyRecord`](../modules.md#anyrecord)
+> `optional` **providerOptions**: [`ProviderOptions`](ProviderOptions.md) \| [`AnyRecord`](../type-aliases/AnyRecord.md)
 
 [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
 
-___
+***
 
-### resultProxyURL
+### resultProxyURL?
 
-• `Optional` **resultProxyURL**: `string`
+> `optional` **resultProxyURL**: `string`
 
 override the result proxy URL to target a custom instance
 
-___
+***
 
-### smsURL
+### smsURL?
 
-• `Optional` **smsURL**: `string` \| `Record`<[`TeeFramework`](../modules.md#teeframework), `string`\>
+> `optional` **smsURL**: `string` \| `Record`\<[`TeeFramework`](../type-aliases/TeeFramework.md), `string`\>
 
 override the SMS URL to target a custom instance
 
-___
+***
 
-### useGas
+### useGas?
 
-• `Optional` **useGas**: `boolean`
+> `optional` **useGas**: `boolean`
 
 if false set the gasPrice to 0 (default true)
 
-___
+***
 
-### voucherHubAddress
+### voucherHubAddress?
 
-• `Optional` **voucherHubAddress**: `string`
+> `optional` **voucherHubAddress**: `string`
 
 override the VoucherHub contract address to target a custom instance
 
-___
+***
 
-### voucherSubgraphURL
+### voucherSubgraphURL?
 
-• `Optional` **voucherSubgraphURL**: `string`
+> `optional` **voucherSubgraphURL**: `string`
 
 override the voucher subgraph URL to target a custom instance
