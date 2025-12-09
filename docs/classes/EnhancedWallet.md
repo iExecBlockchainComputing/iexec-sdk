@@ -1,39 +1,45 @@
-[iexec](../README.md) / [Exports](../modules.md) / EnhancedWallet
+[**iexec**](../README.md)
+
+***
+
+[iexec](../globals.md) / EnhancedWallet
 
 # Class: EnhancedWallet
 
-## Hierarchy
+## Extends
 
 - `Wallet`
 
-  ↳ **`EnhancedWallet`**
-
-## Table of contents
-
-### Constructors
-
-- [constructor](EnhancedWallet.md#constructor)
-
 ## Constructors
 
-### constructor
+### Constructor
 
-• **new EnhancedWallet**(`privateKey`, `provider?`, `options?`): [`EnhancedWallet`](EnhancedWallet.md)
+> **new EnhancedWallet**(`privateKey`, `provider?`, `options?`): `EnhancedWallet`
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `privateKey` | `string` \| `SigningKey` |
-| `provider?` | `Provider` |
-| `options?` | `Object` |
-| `options.gasPrice?` | `string` |
-| `options.getTransactionCount?` | (`blockTag?`: `BlockTag`) => `Promise`<`number`\> |
+##### privateKey
+
+`string` | `SigningKey`
+
+##### provider?
+
+`Provider`
+
+##### options?
+
+###### gasPrice?
+
+`string`
+
+###### getTransactionCount?
+
+(`blockTag?`) => `Promise`\<`number`\>
 
 #### Returns
 
-[`EnhancedWallet`](EnhancedWallet.md)
+`EnhancedWallet`
 
 #### Overrides
 
-Wallet.constructor
+`Wallet.constructor`

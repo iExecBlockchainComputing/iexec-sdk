@@ -1,73 +1,60 @@
-[iexec](../README.md) / [Exports](../modules.md) / IExecHubModule
+[**iexec**](../README.md)
+
+***
+
+[iexec](../globals.md) / IExecHubModule
 
 # Class: IExecHubModule
 
 module exposing hub methods
 
-## Hierarchy
+## Extends
 
 - [`IExecModule`](IExecModule.md)
 
-  ↳ **`IExecHubModule`**
-
-## Table of contents
-
-### Constructors
-
-- [constructor](IExecHubModule.md#constructor)
-
-### Properties
-
-- [config](IExecHubModule.md#config)
-
-### Methods
-
-- [countCategory](IExecHubModule.md#countcategory)
-- [createCategory](IExecHubModule.md#createcategory)
-- [getTimeoutRatio](IExecHubModule.md#gettimeoutratio)
-- [showCategory](IExecHubModule.md#showcategory)
-- [fromConfig](IExecHubModule.md#fromconfig)
-
 ## Constructors
 
-### constructor
+### Constructor
 
-• **new IExecHubModule**(`configOrArgs`, `options?`): [`IExecHubModule`](IExecHubModule.md)
+> **new IExecHubModule**(`configOrArgs`, `options?`): `IExecHubModule`
 
 Create an IExecModule instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+##### configOrArgs
+
+[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
+
+##### options?
+
+[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
 
 #### Returns
 
-[`IExecHubModule`](IExecHubModule.md)
+`IExecHubModule`
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
+[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-• **config**: [`IExecConfig`](IExecConfig.md)
+> **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[config](IExecModule.md#config)
+[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
 ## Methods
 
-### countCategory
+### countCategory()
 
-▸ **countCategory**(): `Promise`<[`BN`](utils.BN.md)\>
+> **countCategory**(): `Promise`\<[`BN`](../interfaces/BN.md)\>
 
 count the created categories.
 
@@ -79,13 +66,13 @@ console.log('category count:', count);
 
 #### Returns
 
-`Promise`<[`BN`](utils.BN.md)\>
+`Promise`\<[`BN`](../interfaces/BN.md)\>
 
-___
+***
 
-### createCategory
+### createCategory()
 
-▸ **createCategory**(`category`): `Promise`<{ `catid`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
+> **createCategory**(`category`): `Promise`\<\{ `catid`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
 
 **SIGNER REQUIRED, ONLY IEXEC OWNER**
 
@@ -103,22 +90,29 @@ console.log('deployed with catid', catid);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `category` | `Object` |
-| `category.description` | `string` |
-| `category.name` | `string` |
-| `category.workClockTimeRef` | [`BNish`](../modules.md#bnish) |
+##### category
+
+###### description
+
+`string`
+
+###### name
+
+`string`
+
+###### workClockTimeRef
+
+[`BNish`](../type-aliases/BNish.md)
 
 #### Returns
 
-`Promise`<{ `catid`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
+`Promise`\<\{ `catid`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
 
-___
+***
 
-### getTimeoutRatio
+### getTimeoutRatio()
 
-▸ **getTimeoutRatio**(): `Promise`<[`BN`](utils.BN.md)\>
+> **getTimeoutRatio**(): `Promise`\<[`BN`](../interfaces/BN.md)\>
 
 get the current `TimeoutRatio`
 
@@ -132,13 +126,13 @@ console.log('timeoutRatio:', timeoutRatio);
 
 #### Returns
 
-`Promise`<[`BN`](utils.BN.md)\>
+`Promise`\<[`BN`](../interfaces/BN.md)\>
 
-___
+***
 
-### showCategory
+### showCategory()
 
-▸ **showCategory**(`catid`): `Promise`<[`Category`](../interfaces/internal_.Category.md)\>
+> **showCategory**(`catid`): `Promise`\<[`Category`](../-internal-/interfaces/Category.md)\>
 
 show category with specified catid.
 
@@ -150,32 +144,32 @@ console.log('category:', category);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `catid` | [`BNish`](../modules.md#bnish) |
+##### catid
+
+[`BNish`](../type-aliases/BNish.md)
 
 #### Returns
 
-`Promise`<[`Category`](../interfaces/internal_.Category.md)\>
+`Promise`\<[`Category`](../-internal-/interfaces/Category.md)\>
 
-___
+***
 
-### fromConfig
+### fromConfig()
 
-▸ **fromConfig**(`config`): [`IExecHubModule`](IExecHubModule.md)
+> `static` **fromConfig**(`config`): `IExecHubModule`
 
 Create an IExecHubModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `config` | [`IExecConfig`](IExecConfig.md) |
+##### config
+
+[`IExecConfig`](IExecConfig.md)
 
 #### Returns
 
-[`IExecHubModule`](IExecHubModule.md)
+`IExecHubModule`
 
 #### Overrides
 
-[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
+[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)

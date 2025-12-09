@@ -1,78 +1,60 @@
-[iexec](../README.md) / [Exports](../modules.md) / IExecDealModule
+[**iexec**](../README.md)
+
+***
+
+[iexec](../globals.md) / IExecDealModule
 
 # Class: IExecDealModule
 
 module exposing deal methods
 
-## Hierarchy
+## Extends
 
 - [`IExecModule`](IExecModule.md)
 
-  ↳ **`IExecDealModule`**
-
-## Table of contents
-
-### Constructors
-
-- [constructor](IExecDealModule.md#constructor)
-
-### Properties
-
-- [config](IExecDealModule.md#config)
-
-### Methods
-
-- [claim](IExecDealModule.md#claim)
-- [computeTaskId](IExecDealModule.md#computetaskid)
-- [fetchDealsByApporder](IExecDealModule.md#fetchdealsbyapporder)
-- [fetchDealsByDatasetorder](IExecDealModule.md#fetchdealsbydatasetorder)
-- [fetchDealsByRequestorder](IExecDealModule.md#fetchdealsbyrequestorder)
-- [fetchDealsByWorkerpoolorder](IExecDealModule.md#fetchdealsbyworkerpoolorder)
-- [fetchRequesterDeals](IExecDealModule.md#fetchrequesterdeals)
-- [obsDeal](IExecDealModule.md#obsdeal)
-- [show](IExecDealModule.md#show)
-- [fromConfig](IExecDealModule.md#fromconfig)
-
 ## Constructors
 
-### constructor
+### Constructor
 
-• **new IExecDealModule**(`configOrArgs`, `options?`): [`IExecDealModule`](IExecDealModule.md)
+> **new IExecDealModule**(`configOrArgs`, `options?`): `IExecDealModule`
 
 Create an IExecModule instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
-| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
+##### configOrArgs
+
+[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
+
+##### options?
+
+[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
 
 #### Returns
 
-[`IExecDealModule`](IExecDealModule.md)
+`IExecDealModule`
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
+[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-• **config**: [`IExecConfig`](IExecConfig.md)
+> **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[IExecModule](IExecModule.md).[config](IExecModule.md#config)
+[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
 ## Methods
 
-### claim
+### claim()
 
-▸ **claim**(`dealid`): `Promise`<{ `claimed`: `Record`<`number`, `string`\> ; `transactions`: { `txHash`: `string` ; `type`: `string`  }[]  }\>
+> **claim**(`dealid`): `Promise`\<\{ `claimed`: `Record`\<[`TaskIndex`](../type-aliases/TaskIndex.md), [`Taskid`](../type-aliases/Taskid.md)\>; `transactions`: `object`[]; \}\>
 
 **SIGNER REQUIRED**
 
@@ -91,19 +73,19 @@ Object.entries(claimed).forEach(([idx, taskid]) => {
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `dealid` | `string` |
+##### dealid
+
+`string`
 
 #### Returns
 
-`Promise`<{ `claimed`: `Record`<`number`, `string`\> ; `transactions`: { `txHash`: `string` ; `type`: `string`  }[]  }\>
+`Promise`\<\{ `claimed`: `Record`\<[`TaskIndex`](../type-aliases/TaskIndex.md), [`Taskid`](../type-aliases/Taskid.md)\>; `transactions`: `object`[]; \}\>
 
-___
+***
 
-### computeTaskId
+### computeTaskId()
 
-▸ **computeTaskId**(`dealid`, `taskIdx`): `Promise`<`string`\>
+> **computeTaskId**(`dealid`, `taskIdx`): `Promise`\<`string`\>
 
 compute the taskid of the task at specified index of specified deal.
 
@@ -115,20 +97,23 @@ console.log('taskid:', taskid)
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `dealid` | `string` |
-| `taskIdx` | [`BNish`](../modules.md#bnish) |
+##### dealid
+
+`string`
+
+##### taskIdx
+
+[`BNish`](../type-aliases/BNish.md)
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
-___
+***
 
-### fetchDealsByApporder
+### fetchDealsByApporder()
 
-▸ **fetchDealsByApporder**(`apporderHash`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+> **fetchDealsByApporder**(`apporderHash`, `options?`): `Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
 fetch the latest deals sealed with a specified apporder.
 
@@ -143,22 +128,33 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `apporderHash` | `string` | - |
-| `options?` | `Object` | - |
-| `options.page?` | `number` | index of the page to fetch |
-| `options.pageSize?` | `number` | size of the page to fetch |
+##### apporderHash
+
+`string`
+
+##### options?
+
+###### page?
+
+`number`
+
+index of the page to fetch
+
+###### pageSize?
+
+`number`
+
+size of the page to fetch
 
 #### Returns
 
-`Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+`Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
-___
+***
 
-### fetchDealsByDatasetorder
+### fetchDealsByDatasetorder()
 
-▸ **fetchDealsByDatasetorder**(`datasetorderHash`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+> **fetchDealsByDatasetorder**(`datasetorderHash`, `options?`): `Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
 fetch the latest deals sealed with a specified datasetorder.
 
@@ -173,22 +169,33 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `datasetorderHash` | `string` | - |
-| `options?` | `Object` | - |
-| `options.page?` | `number` | index of the page to fetch |
-| `options.pageSize?` | `number` | size of the page to fetch |
+##### datasetorderHash
+
+`string`
+
+##### options?
+
+###### page?
+
+`number`
+
+index of the page to fetch
+
+###### pageSize?
+
+`number`
+
+size of the page to fetch
 
 #### Returns
 
-`Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+`Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
-___
+***
 
-### fetchDealsByRequestorder
+### fetchDealsByRequestorder()
 
-▸ **fetchDealsByRequestorder**(`requestorderHash`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+> **fetchDealsByRequestorder**(`requestorderHash`, `options?`): `Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
 fetch the latest deals sealed with a specified requestorder.
 
@@ -203,22 +210,33 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `requestorderHash` | `string` | - |
-| `options?` | `Object` | - |
-| `options.page?` | `number` | index of the page to fetch |
-| `options.pageSize?` | `number` | size of the page to fetch |
+##### requestorderHash
+
+`string`
+
+##### options?
+
+###### page?
+
+`number`
+
+index of the page to fetch
+
+###### pageSize?
+
+`number`
+
+size of the page to fetch
 
 #### Returns
 
-`Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+`Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
-___
+***
 
-### fetchDealsByWorkerpoolorder
+### fetchDealsByWorkerpoolorder()
 
-▸ **fetchDealsByWorkerpoolorder**(`workerpoolorderHash`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+> **fetchDealsByWorkerpoolorder**(`workerpoolorderHash`, `options?`): `Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
 fetch the latest deals sealed with a specified workerpoolorder.
 
@@ -233,22 +251,33 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `workerpoolorderHash` | `string` | - |
-| `options?` | `Object` | - |
-| `options.page?` | `number` | index of the page to fetch |
-| `options.pageSize?` | `number` | size of the page to fetch |
+##### workerpoolorderHash
+
+`string`
+
+##### options?
+
+###### page?
+
+`number`
+
+index of the page to fetch
+
+###### pageSize?
+
+`number`
+
+size of the page to fetch
 
 #### Returns
 
-`Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+`Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
-___
+***
 
-### fetchRequesterDeals
+### fetchRequesterDeals()
 
-▸ **fetchRequesterDeals**(`requesterAddress`, `options?`): `Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+> **fetchRequesterDeals**(`requesterAddress`, `options?`): `Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
 fetch the latest deals of the requester optionally filtered by specified filters.
 
@@ -263,25 +292,51 @@ console.log('last deal:', deals[0]);
 
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `requesterAddress` | `string` | - |
-| `options?` | `Object` | - |
-| `options.appAddress?` | `string` | filter by app |
-| `options.datasetAddress?` | `string` | filter by dataset |
-| `options.page?` | `number` | index of the page to fetch |
-| `options.pageSize?` | `number` | size of the page to fetch |
-| `options.workerpoolAddress?` | `string` | filter by workerpool |
+##### requesterAddress
+
+`string`
+
+##### options?
+
+###### appAddress?
+
+`string`
+
+filter by app
+
+###### datasetAddress?
+
+`string`
+
+filter by dataset
+
+###### page?
+
+`number`
+
+index of the page to fetch
+
+###### pageSize?
+
+`number`
+
+size of the page to fetch
+
+###### workerpoolAddress?
+
+`string`
+
+filter by workerpool
 
 #### Returns
 
-`Promise`<[`PaginableDeals`](../interfaces/internal_.PaginableDeals.md)\>
+`Promise`\<[`PaginableDeals`](../-internal-/interfaces/PaginableDeals.md)\>
 
-___
+***
 
-### obsDeal
+### obsDeal()
 
-▸ **obsDeal**(`dealid`): `Promise`<[`DealObservable`](internal_.DealObservable.md)\>
+> **obsDeal**(`dealid`): `Promise`\<[`DealObservable`](../-internal-/classes/DealObservable.md)\>
 
 return an Observable with a `subscribe` method to monitor the deal status changes.
 
@@ -302,19 +357,19 @@ const unsubscribe = dealObservable.subscribe({
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `dealid` | `string` |
+##### dealid
+
+`string`
 
 #### Returns
 
-`Promise`<[`DealObservable`](internal_.DealObservable.md)\>
+`Promise`\<[`DealObservable`](../-internal-/classes/DealObservable.md)\>
 
-___
+***
 
-### show
+### show()
 
-▸ **show**(`dealid`): `Promise`<{ `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  } ; `beneficiary`: `string` ; `botFirst`: [`BN`](utils.BN.md) ; `botSize`: [`BN`](utils.BN.md) ; `callback`: `string` ; `category`: [`BN`](utils.BN.md) ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  } ; `deadlineReached`: `boolean` ; `dealid`: `string` ; `finalTime`: [`BN`](utils.BN.md) ; `params`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: [`BN`](utils.BN.md) ; `startTime`: [`BN`](utils.BN.md) ; `tag`: `string` ; `tasks`: `Record`<`number`, `string`\> ; `trust`: [`BN`](utils.BN.md) ; `workerStake`: [`BN`](utils.BN.md) ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  }  }\>
+> **show**(`dealid`): `Promise`\<\{ `app`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `beneficiary`: `string`; `botFirst`: [`BN`](../interfaces/BN.md); `botSize`: [`BN`](../interfaces/BN.md); `callback`: `string`; `category`: [`BN`](../interfaces/BN.md); `dataset`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `deadlineReached`: `boolean`; `dealid`: `string`; `finalTime`: [`BN`](../interfaces/BN.md); `params`: `string`; `requester`: `string`; `schedulerRewardRatio`: [`BN`](../interfaces/BN.md); `startTime`: [`BN`](../interfaces/BN.md); `tag`: `string`; `tasks`: `Record`\<[`TaskIndex`](../type-aliases/TaskIndex.md), [`Taskid`](../type-aliases/Taskid.md)\>; `trust`: [`BN`](../interfaces/BN.md); `workerpool`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `workerStake`: [`BN`](../interfaces/BN.md); \}\>
 
 show the details of a deal.
 
@@ -328,32 +383,32 @@ console.log('deal:', deal);
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `dealid` | `string` |
+##### dealid
+
+`string`
 
 #### Returns
 
-`Promise`<{ `app`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  } ; `beneficiary`: `string` ; `botFirst`: [`BN`](utils.BN.md) ; `botSize`: [`BN`](utils.BN.md) ; `callback`: `string` ; `category`: [`BN`](utils.BN.md) ; `dataset`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  } ; `deadlineReached`: `boolean` ; `dealid`: `string` ; `finalTime`: [`BN`](utils.BN.md) ; `params`: `string` ; `requester`: `string` ; `schedulerRewardRatio`: [`BN`](utils.BN.md) ; `startTime`: [`BN`](utils.BN.md) ; `tag`: `string` ; `tasks`: `Record`<`number`, `string`\> ; `trust`: [`BN`](utils.BN.md) ; `workerStake`: [`BN`](utils.BN.md) ; `workerpool`: { `owner`: `string` ; `pointer`: `string` ; `price`: [`BN`](utils.BN.md)  }  }\>
+`Promise`\<\{ `app`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `beneficiary`: `string`; `botFirst`: [`BN`](../interfaces/BN.md); `botSize`: [`BN`](../interfaces/BN.md); `callback`: `string`; `category`: [`BN`](../interfaces/BN.md); `dataset`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `deadlineReached`: `boolean`; `dealid`: `string`; `finalTime`: [`BN`](../interfaces/BN.md); `params`: `string`; `requester`: `string`; `schedulerRewardRatio`: [`BN`](../interfaces/BN.md); `startTime`: [`BN`](../interfaces/BN.md); `tag`: `string`; `tasks`: `Record`\<[`TaskIndex`](../type-aliases/TaskIndex.md), [`Taskid`](../type-aliases/Taskid.md)\>; `trust`: [`BN`](../interfaces/BN.md); `workerpool`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `workerStake`: [`BN`](../interfaces/BN.md); \}\>
 
-___
+***
 
-### fromConfig
+### fromConfig()
 
-▸ **fromConfig**(`config`): [`IExecDealModule`](IExecDealModule.md)
+> `static` **fromConfig**(`config`): `IExecDealModule`
 
 Create an IExecDealModule instance using an IExecConfig instance
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `config` | [`IExecConfig`](IExecConfig.md) |
+##### config
+
+[`IExecConfig`](IExecConfig.md)
 
 #### Returns
 
-[`IExecDealModule`](IExecDealModule.md)
+`IExecDealModule`
 
 #### Overrides
 
-[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
+[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)

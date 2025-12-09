@@ -1,18 +1,16 @@
-[iexec](../README.md) / [Exports](../modules.md) / IExecConfigArgs
+[**iexec**](../README.md)
+
+***
+
+[iexec](../globals.md) / IExecConfigArgs
 
 # Interface: IExecConfigArgs
-
-## Table of contents
-
-### Properties
-
-- [ethProvider](IExecConfigArgs.md#ethprovider)
 
 ## Properties
 
 ### ethProvider
 
-• **ethProvider**: `string` \| `number` \| `AbstractSigner`<``null`` \| `Provider`\> \| `BrowserProvider` \| [`Eip1193Provider`](Eip1193Provider.md) \| `AbstractProvider`
+> **ethProvider**: `string` \| `number` \| `AbstractSigner`\<`Provider` \| `null`\> \| `BrowserProvider` \| [`Eip1193Provider`](Eip1193Provider.md) \| `AbstractProvider`
 
 A web3 Eth provider, a network name, a chain id or an ethers provider
 
