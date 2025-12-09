@@ -19,7 +19,6 @@ export default class IExecConfig {
     {
       hubAddress,
       ensPublicResolverAddress,
-      voucherHubAddress,
       isNative,
       useGas = true,
       confirms,
@@ -32,7 +31,6 @@ export default class IExecConfig {
       iexecGatewayURL,
       compassURL,
       pocoSubgraphURL,
-      voucherSubgraphURL,
       defaultTeeFramework,
       providerOptions,
       allowExperimentalNetworks = false,
@@ -345,15 +343,6 @@ export default class IExecConfig {
       );
     };
 
-    this.resolveVoucherSubgraphURL = async () => {
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = voucherSubgraphURL || chainConfDefaults.voucherSubgraph;
-      if (value !== undefined) {
-        return value;
-      }
-      return null;
-    };
-
     this.resolveBridgeAddress = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
@@ -384,15 +373,6 @@ export default class IExecConfig {
       throw new ConfigurationError(
         `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`,
       );
-    };
-
-    this.resolveVoucherHubAddress = async () => {
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = voucherHubAddress || chainConfDefaults.voucherHub;
-      if (value !== undefined) {
-        return value;
-      }
-      return null;
     };
   }
 }
