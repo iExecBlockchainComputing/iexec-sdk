@@ -11,7 +11,7 @@ import {
   getRandomAddress,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
-import { errors, IExec } from '../../../src/lib/index.js';
+import { errors } from '../../../src/lib/index.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 

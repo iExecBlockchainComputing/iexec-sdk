@@ -40,7 +40,7 @@ expect.extend({
     try {
       getAddress(received);
       pass = true;
-    } catch (e) {
+    } catch {
       /* noop */
     }
     return {
