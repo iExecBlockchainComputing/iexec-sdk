@@ -520,7 +520,7 @@ default `0`
 
 ### estimateMatchOrders()
 
-> **estimateMatchOrders**(`orders`, `options?`): `Promise`\<\{ `sponsored`: [`BN`](../interfaces/BN.md); `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
+> **estimateMatchOrders**(`orders`): `Promise`\<\{ `sponsored`: [`BN`](../interfaces/BN.md); `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
 
 estimates the cost of matching the provided orders
 
@@ -532,10 +532,9 @@ const orders = {
   workerpoolorder,
   requestorder,
 };
-const result = await estimateMatchOrders(orders, {useVoucher: true});
+const result = await estimateMatchOrders(orders);
 console.log(`executable volume: ${result.volume} tasks`);
 console.log(`total cost for matching orders: ${result.total} nRLC`);
-console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 ```
 
 #### Parameters
@@ -557,22 +556,6 @@ console.log(`sponsored cost covered by voucher: ${result.sponsored} nRLC`);
 ###### workerpoolorder
 
 [`ConsumableWorkerpoolorder`](../-internal-/interfaces/ConsumableWorkerpoolorder.md)
-
-##### options?
-
-###### useVoucher?
-
-`boolean`
-
-use a voucher contract to sponsor the deal
-
-###### voucherAddress?
-
-`string`
-
-override the voucher contract to use, must be combined with `useVoucher: true`
-
-the user must be authorized by the voucher's owner to use it
 
 #### Returns
 
@@ -720,20 +703,6 @@ console.log(`created deal ${dealid} in tx ${txHash}`);
 ###### preflightCheck?
 
 `boolean`
-
-###### useVoucher?
-
-`boolean`
-
-use a voucher contract to sponsor the deal
-
-###### voucherAddress?
-
-`string`
-
-override the voucher contract to use, must be combined with `useVoucher: true`
-
-the user must be authorized by the voucher's owner to use it
 
 #### Returns
 
