@@ -30,24 +30,6 @@ services:
       retries: 3
       start_period: 30s
 
-  voucher-subgraph-deployer:
-    restart: 'no'
-    # https://github.com/iExecBlockchainComputing/iexec-voucher-subgraph
-    image: iexechub/voucher-subgraph-deployer:1.0.0
-    environment:
-      RPC_URL: http://bellecour-fork:8545
-      GRAPHNODE_URL: http://graphnode:8020
-      IPFS_URL: http://ipfs:5001
-      VOUCHER_HUB_ADDRESS: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda'
-      VOUCHER_HUB_START_BLOCK: $BELLECOUR_FORK_BLOCK
-    depends_on:
-      bellecour-fork:
-        condition: service_healthy
-      graphnode:
-        condition: service_healthy
-      ipfs:
-        condition: service_healthy
-
   graphnode-postgres:
     image: postgres:12
     restart: unless-stopped
@@ -327,5 +309,3 @@ services:
         condition: service_started
       custom-token-chain-compass:
         condition: service_healthy
-      voucher-subgraph-deployer:
-        condition: service_completed_successfully

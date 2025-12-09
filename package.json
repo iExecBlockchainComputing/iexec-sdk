@@ -111,12 +111,6 @@
       "browser": "./dist/esm/lib/IExecTaskModule.js",
       "default": "./dist/esm/lib/IExecTaskModule.js"
     },
-    "./IExecVoucherModule": {
-      "types": "./dist/esm/lib/IExecVoucherModule.d.ts",
-      "import": "./dist/esm/lib/IExecVoucherModule.js",
-      "browser": "./dist/esm/lib/IExecVoucherModule.js",
-      "default": "./dist/esm/lib/IExecVoucherModule.js"
-    },
     "./IExecWalletModule": {
       "types": "./dist/esm/lib/IExecWalletModule.d.ts",
       "import": "./dist/esm/lib/IExecWalletModule.js",
@@ -182,7 +176,6 @@
     "IExecSecretsModule",
     "IExecStorageModule",
     "IExecTaskModule",
-    "IExecVoucherModule",
     "IExecWalletModule",
     "IExecWorkerpoolModule",
     "errors",
@@ -226,7 +219,6 @@
     "@ensdomains/ens-contracts": "^1.2.5",
     "@eslint/js": "^9.23.0",
     "@iexec/poco": "^6.1.0",
-    "@iexec/voucher-contracts": "^1.0.1",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-import": "^2.32.0",

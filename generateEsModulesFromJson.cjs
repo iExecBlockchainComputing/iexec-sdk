@@ -64,21 +64,6 @@ const sources = [
     { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/voucher-contracts/artifacts/contracts/beacon/Voucher.sol/Voucher.json',
-    { dir: '@iexec/voucher-contracts', minifier: minifiers.abi },
-  ],
-  [
-    '@iexec/voucher-contracts/artifacts/contracts/VoucherHub.sol/VoucherHub.json',
-    { dir: '@iexec/voucher-contracts', minifier: minifiers.abi },
-  ],
-  [
-    '@iexec/voucher-contracts/deployments/bellecour/VoucherHubERC1967Proxy.json',
-    {
-      dir: '@iexec/voucher-contracts/deployments/bellecour',
-      minifier: minifiers.hardhatDeployment,
-    },
-  ],
-  [
     '@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json',
     { dir: '@ensdomains/registry', minifier: minifiers.abi },
   ],

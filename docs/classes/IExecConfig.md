@@ -223,29 +223,3 @@ resolve the current SMS URL
 #### Returns
 
 `Promise`\<`string`\>
-
-***
-
-### resolveVoucherHubAddress()
-
-> **resolveVoucherHubAddress**(): `Promise`\<`string` \| `null`\>
-
-resolve the current VoucherHub contract address
-returns `null` if not available
-
-#### Returns
-
-`Promise`\<`string` \| `null`\>
-
-***
-
-### resolveVoucherSubgraphURL()
-
-> **resolveVoucherSubgraphURL**(): `Promise`\<`string` \| `null`\>
-
-resolve the current voucher subgraph URL
-returns `null` if not available
-
-#### Returns
-
-`Promise`\<`string` \| `null`\>

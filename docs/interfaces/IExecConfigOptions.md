@@ -169,19 +169,3 @@ override the SMS URL to target a custom instance
 > `optional` **useGas**: `boolean`
 
 if false set the gasPrice to 0 (default true)
-
-***
-
-### voucherHubAddress?
-
-> `optional` **voucherHubAddress**: `string`
-
-override the VoucherHub contract address to target a custom instance
-
-***
-
-### voucherSubgraphURL?
-
-> `optional` **voucherSubgraphURL**: `string`
-
-override the voucher subgraph URL to target a custom instance

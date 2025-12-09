@@ -310,13 +310,9 @@ export default class IExecOrderModule extends IExecModule {
         workerpoolorder,
         requestorder,
       },
-      { preflightCheck = true, useVoucher = false, voucherAddress } = {},
+      { preflightCheck = true } = {},
     ) => {
       const contracts = await this.config.resolveContractsClient();
-      let voucherHubAddress;
-      if (useVoucher) {
-        voucherHubAddress = await this.config.resolveVoucherHubAddress();
-      }
       if (preflightCheck === true) {
         const resolvedTag = sumTags([
           (
@@ -335,7 +331,6 @@ export default class IExecOrderModule extends IExecModule {
         ]);
         return matchOrders({
           contracts,
-          voucherHubAddress,
           apporder: await checkAppRequirements(
             {
               contracts,
@@ -363,36 +358,29 @@ export default class IExecOrderModule extends IExecModule {
             },
             requestorder,
           ).then(() => requestorder),
-          useVoucher,
-          voucherAddress,
         });
       }
       return matchOrders({
         contracts,
-        voucherHubAddress,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-        useVoucher,
-        voucherAddress,
       });
     };
-    this.estimateMatchOrders = async (
-      { apporder, datasetorder, workerpoolorder, requestorder },
-      { useVoucher = false, voucherAddress } = {},
-    ) => {
+    this.estimateMatchOrders = async ({
+      apporder,
+      datasetorder,
+      workerpoolorder,
+      requestorder,
+    }) => {
       const contracts = await this.config.resolveContractsClient();
-      const voucherHubAddress = await this.config.resolveVoucherHubAddress();
       return estimateMatchOrders({
         contracts,
-        voucherHubAddress,
         apporder,
         datasetorder,
         workerpoolorder,
         requestorder,
-        useVoucher,
-        voucherAddress,
       });
     };
     this.prepareDatasetBulk = async (

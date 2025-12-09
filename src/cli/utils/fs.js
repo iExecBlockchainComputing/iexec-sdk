@@ -28,14 +28,12 @@ const chainConfSchema = () =>
     hub: string(), // todo address
     ensRegistry: string(), // TODO: DEPRECATED not used anymore
     ensPublicResolver: string(), // todo address
-    voucherHub: string(), // todo address
     sms: smsUrlOrMapSchema(),
     resultProxy: string(),
     ipfsGateway: string(),
     iexecGateway: string(),
     compass: string(),
     pocoSubgraph: string(),
-    voucherSubgraph: string(),
     native: boolean(),
     useGas: boolean().default(true),
     defaultTeeFramework: teeFrameworkSchema(),

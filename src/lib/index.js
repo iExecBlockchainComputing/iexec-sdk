@@ -17,7 +17,6 @@ export { default as IExecResultModule } from './IExecResultModule.js';
 export { default as IExecSecretsModule } from './IExecSecretsModule.js';
 export { default as IExecStorageModule } from './IExecStorageModule.js';
 export { default as IExecTaskModule } from './IExecTaskModule.js';
-export { default as IExecVoucherModule } from './IExecVoucherModule.js';
 export { default as IExecWalletModule } from './IExecWalletModule.js';
 export { default as IExecWorkerpoolModule } from './IExecWorkerpoolModule.js';
 

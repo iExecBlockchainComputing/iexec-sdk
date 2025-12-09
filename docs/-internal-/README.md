@@ -50,7 +50,6 @@
 - [SignedRequestorder](interfaces/SignedRequestorder.md)
 - [SignedWorkerpoolorder](interfaces/SignedWorkerpoolorder.md)
 - [Task](interfaces/Task.md)
-- [VoucherInfo](interfaces/VoucherInfo.md)
 - [Workerpool](interfaces/Workerpool.md)
 - [WorkerpoolDeploymentArgs](interfaces/WorkerpoolDeploymentArgs.md)
 - [WorkerpoolorderTemplate](interfaces/WorkerpoolorderTemplate.md)
