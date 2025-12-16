@@ -1,8 +1,4 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecConfig
+[iexec](../README.md) / [Exports](../modules.md) / IExecConfig
 
 # Class: IExecConfig
 
@@ -21,11 +17,35 @@ const account = IExecAccountModule.fromConfig(config);
 const wallet = IExecWalletModule.fromConfig(config);
 ```
 
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecConfig.md#constructor)
+
+### Methods
+
+- [resolveBridgeAddress](IExecConfig.md#resolvebridgeaddress)
+- [resolveBridgeBackAddress](IExecConfig.md#resolvebridgebackaddress)
+- [resolveBridgedContractsClient](IExecConfig.md#resolvebridgedcontractsclient)
+- [resolveChainId](IExecConfig.md#resolvechainid)
+- [resolveCompassURL](IExecConfig.md#resolvecompassurl)
+- [resolveContractsClient](IExecConfig.md#resolvecontractsclient)
+- [resolveEnsPublicResolverAddress](IExecConfig.md#resolveenspublicresolveraddress)
+- [resolveIexecGatewayURL](IExecConfig.md#resolveiexecgatewayurl)
+- [resolveIpfsGatewayURL](IExecConfig.md#resolveipfsgatewayurl)
+- [resolveIpfsNodeURL](IExecConfig.md#resolveipfsnodeurl)
+- [resolvePocoSubgraphURL](IExecConfig.md#resolvepocosubgraphurl)
+- [resolveResultProxyURL](IExecConfig.md#resolveresultproxyurl)
+- [resolveSmsURL](IExecConfig.md#resolvesmsurl)
+- [resolveVoucherHubAddress](IExecConfig.md#resolvevoucherhubaddress)
+- [resolveVoucherSubgraphURL](IExecConfig.md#resolvevouchersubgraphurl)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecConfig**(`args`, `options?`): `IExecConfig`
+• **new IExecConfig**(`args`, `options?`): [`IExecConfig`](IExecConfig.md)
 
 Create an IExecConfig instance consumable by IExecModules
 
@@ -46,206 +66,200 @@ const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet',
 
 #### Parameters
 
-##### args
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `args` | [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecConfig`
+[`IExecConfig`](IExecConfig.md)
 
 ## Methods
 
-### resolveBridgeAddress()
+### resolveBridgeAddress
 
-> **resolveBridgeAddress**(): `Promise`\<`string`\>
+▸ **resolveBridgeAddress**(): `Promise`<`string`\>
 
 resolve the current bridge contract address
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveBridgeBackAddress()
+### resolveBridgeBackAddress
 
-> **resolveBridgeBackAddress**(): `Promise`\<`string`\>
+▸ **resolveBridgeBackAddress**(): `Promise`<`string`\>
 
 resolve the bridge contract address on bridged chain
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveBridgedContractsClient()
+### resolveBridgedContractsClient
 
-> **resolveBridgedContractsClient**(): `Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
+▸ **resolveBridgedContractsClient**(): `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
 resolve the current bridged IExecContractsClient
 
 #### Returns
 
-`Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
+`Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
-***
+___
 
-### resolveChainId()
+### resolveChainId
 
-> **resolveChainId**(): `Promise`\<`number`\>
+▸ **resolveChainId**(): `Promise`<`number`\>
 
 resolve the current chainId
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`<`number`\>
 
-***
+___
 
-### resolveCompassURL()
+### resolveCompassURL
 
-> **resolveCompassURL**(): `Promise`\<`string` \| `undefined`\>
-
-**`Experimental`**
+▸ **resolveCompassURL**(): `Promise`<`undefined` \| `string`\>
 
 resolve the current Compass URL
 
 #### Returns
 
-`Promise`\<`string` \| `undefined`\>
+`Promise`<`undefined` \| `string`\>
 
-***
+___
 
-### resolveContractsClient()
+### resolveContractsClient
 
-> **resolveContractsClient**(): `Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
+▸ **resolveContractsClient**(): `Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
 resolve the current IExecContractsClient
 
 #### Returns
 
-`Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
+`Promise`<[`IExecContractsClient`](internal_.IExecContractsClient.md)\>
 
-***
+___
 
-### resolveEnsPublicResolverAddress()
+### resolveEnsPublicResolverAddress
 
-> **resolveEnsPublicResolverAddress**(): `Promise`\<`string`\>
+▸ **resolveEnsPublicResolverAddress**(): `Promise`<`string`\>
 
 resolve the current ENS public resolver contract address
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveIexecGatewayURL()
+### resolveIexecGatewayURL
 
-> **resolveIexecGatewayURL**(): `Promise`\<`string`\>
+▸ **resolveIexecGatewayURL**(): `Promise`<`string`\>
 
 resolve the current IExec market URL
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveIpfsGatewayURL()
+### resolveIpfsGatewayURL
 
-> **resolveIpfsGatewayURL**(): `Promise`\<`string`\>
+▸ **resolveIpfsGatewayURL**(): `Promise`<`string`\>
 
 resolve the current IPFS gateway URL
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveIpfsNodeURL()
+### resolveIpfsNodeURL
 
-> **resolveIpfsNodeURL**(): `Promise`\<`string`\>
+▸ **resolveIpfsNodeURL**(): `Promise`<`string`\>
 
 resolve the current IPFS node URL
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolvePocoSubgraphURL()
+### resolvePocoSubgraphURL
 
-> **resolvePocoSubgraphURL**(): `Promise`\<`string`\>
+▸ **resolvePocoSubgraphURL**(): `Promise`<`string`\>
 
 resolve the current PoCo subgraph URL
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveResultProxyURL()
+### resolveResultProxyURL
 
-> **resolveResultProxyURL**(): `Promise`\<`string`\>
+▸ **resolveResultProxyURL**(): `Promise`<`string`\>
 
 resolve the current result proxy URL
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveSmsURL()
+### resolveSmsURL
 
-> **resolveSmsURL**(`options?`): `Promise`\<`string`\>
+▸ **resolveSmsURL**(`options?`): `Promise`<`string`\>
 
 resolve the current SMS URL
 
 #### Parameters
 
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
+| Name | Type |
+| :------ | :------ |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveVoucherHubAddress()
+### resolveVoucherHubAddress
 
-> **resolveVoucherHubAddress**(): `Promise`\<`string` \| `null`\>
+▸ **resolveVoucherHubAddress**(): `Promise`<``null`` \| `string`\>
 
 resolve the current VoucherHub contract address
 returns `null` if not available
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`<``null`` \| `string`\>
 
-***
+___
 
-### resolveVoucherSubgraphURL()
+### resolveVoucherSubgraphURL
 
-> **resolveVoucherSubgraphURL**(): `Promise`\<`string` \| `null`\>
+▸ **resolveVoucherSubgraphURL**(): `Promise`<``null`` \| `string`\>
 
 resolve the current voucher subgraph URL
 returns `null` if not available
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`<``null`` \| `string`\>
