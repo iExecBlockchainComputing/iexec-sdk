@@ -126,7 +126,6 @@ export type HumanSingleTag = string;
  * ```js
  * const gpuTag = ['gpu'];
  * const sconeTeeTag = ['tee', 'scone'];
- * const gramineTeeTag = ['tee', 'gramine'];
  * ```
  */
 export type Tag = Bytes32 | HumanSingleTag[];
@@ -144,7 +143,7 @@ export type Multiaddress = string | Buffer;
 /**
  * Trusted Execution Environment name
  */
-export type TeeFramework = 'scone' | 'gramine' | 'tdx';
+export type TeeFramework = 'scone' | 'tdx';
 
 export type AnyRecord = Record<string, any>;
 

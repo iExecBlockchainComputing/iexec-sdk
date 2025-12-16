@@ -16,9 +16,7 @@ import {
   option,
   prompt,
   Spinner,
-  getPropertyFormChain,
-  getSmsUrlFromChain,
-  optionCreator,
+  getPropertyFromChain,
 } from '../utils/cli-helper.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
 import { Keystore } from '../utils/keystore.js';
@@ -32,7 +30,6 @@ initStorage
   .option(...option.chain())
   .option(...option.forceUpdateSecret())
   .option(...option.storageToken())
-  .addOption(optionCreator.teeFramework())
   .description(desc.initStorage())
   .action(async (provider, opts) => {
     await checkUpdate(opts);
@@ -45,14 +42,10 @@ initStorage
         keystore.accounts(),
       ]);
       const { contracts } = chain;
-      const smsURL = getSmsUrlFromChain(chain, {
-        teeFramework: opts.teeFramework,
-      });
-      const resultProxyURL = getPropertyFormChain(chain, 'resultProxy');
-
+      const smsURL = getPropertyFromChain(chain, 'sms');
+      const resultProxyURL = getPropertyFromChain(chain, 'resultProxy');
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
-
       const tokenExists = await checkWeb2SecretExists(
         contracts,
         smsURL,
@@ -107,7 +100,6 @@ addWalletLoadOptions(checkStorage);
 checkStorage
   .option(...option.chain())
   .option(...option.user())
-  .addOption(optionCreator.teeFramework())
   .description(desc.checkStorage())
   .action(async (provider, opts) => {
     await checkUpdate(opts);
@@ -120,9 +112,7 @@ checkStorage
         keystore.accounts(),
       ]);
       const { contracts } = chain;
-      const smsURL = getSmsUrlFromChain(chain, {
-        teeFramework: opts.teeFramework,
-      });
+      const smsURL = getPropertyFromChain(chain, 'sms');
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
       const userAddress = opts.user || address;

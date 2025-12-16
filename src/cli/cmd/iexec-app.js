@@ -20,7 +20,7 @@ import {
   apporderSchema,
   requestorderSchema,
 } from '../../common/utils/validator.js';
-import { app, sconeTeeApp, gramineTeeApp } from '../utils/templates.js';
+import { app, sconeTeeApp } from '../utils/templates.js';
 import {
   deployApp,
   showApp,
@@ -32,7 +32,6 @@ import {
   checkDeployedApp,
   checkDeployedDataset,
   checkDeployedWorkerpool,
-  resolveTeeFrameworkFromApp,
   transferApp,
 } from '../../common/protocol/registries.js';
 import { showCategory } from '../../common/protocol/category.js';
@@ -86,7 +85,6 @@ import {
 import {
   checkRequestRequirements,
   checkDatasetRequirements,
-  resolveTeeFrameworkFromTag,
   checkAppRequirements,
 } from '../../common/execution/order-helper.js';
 import {
@@ -106,9 +104,7 @@ import {
   info,
   isEthAddress,
   renderTasksStatus,
-  getPropertyFormChain,
-  getDefaultTeeFrameworkFromChain,
-  getSmsUrlFromChain,
+  getPropertyFromChain,
   optionCreator,
 } from '../utils/cli-helper.js';
 import {
@@ -140,7 +136,6 @@ const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
 init
-  .option(...option.initTee())
   .addOption(optionCreator.teeFramework())
   .description(desc.initObj(objName))
   .action(async (opts) => {
@@ -151,18 +146,12 @@ init
       const keystore = Keystore({ ...walletOptions, isSigner: false });
       const [address] = await keystore.accounts();
 
-      const teeFramework =
-        (await teeFrameworkSchema().validate(opts.teeFramework)) ||
-        (opts.tee &&
-          getDefaultTeeFrameworkFromChain(
-            await loadChain(opts.chain, { spinner }),
-          ));
+      const teeFramework = await teeFrameworkSchema().validate(
+        opts.teeFramework,
+      );
       let teeTemplate = {};
       if (teeFramework === TEE_FRAMEWORKS.SCONE) {
         teeTemplate = sconeTeeApp;
-      }
-      if (teeFramework === TEE_FRAMEWORKS.GRAMINE) {
-        teeTemplate = gramineTeeApp;
       }
       if (teeFramework === TEE_FRAMEWORKS.TDX) {
         teeTemplate = app;
@@ -327,7 +316,6 @@ const checkSecret = cli.command('check-secret [appAddress]');
 addGlobalOptions(checkSecret);
 checkSecret
   .option(...option.chain())
-  .addOption(optionCreator.teeFramework())
   .description(desc.checkSecret())
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -345,12 +333,7 @@ checkSecret
         );
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
-      let teeFramework = await teeFrameworkSchema().validate(opts.teeFramework);
-      if (!teeFramework) {
-        const { app } = await showApp(chain.contracts, resourceAddress);
-        teeFramework = await resolveTeeFrameworkFromApp(app);
-      }
-      const sms = getSmsUrlFromChain(chain, { teeFramework });
+      const sms = getPropertyFromChain(chain, 'sms');
       const secretIsSet = await checkAppSecretExists(
         chain.contracts,
         sms,
@@ -376,7 +359,6 @@ addWalletLoadOptions(pushSecret);
 pushSecret
   .option(...option.chain())
   .option(...option.secretValue())
-  .addOption(optionCreator.teeFramework())
   .description('push the app secret to the secret management service')
   .action(async (objAddress, opts) => {
     await checkUpdate(opts);
@@ -398,12 +380,7 @@ pushSecret
         );
       }
       spinner.info(`App ${resourceAddress}`);
-      let teeFramework = await teeFrameworkSchema().validate(opts.teeFramework);
-      if (!teeFramework) {
-        const { app } = await showApp(chain.contracts, resourceAddress);
-        teeFramework = await resolveTeeFrameworkFromApp(app);
-      }
-      const sms = getSmsUrlFromChain(chain, { teeFramework });
+      const sms = getPropertyFromChain(chain, 'sms');
       const secretValue =
         opts.secretValue ||
         (await prompt.password(`Paste your secret`, {
@@ -489,7 +466,7 @@ publish
       const signedOrder = await signApporder(chain.contracts, orderToSign);
       const orderHash = await publishApporder(
         chain.contracts,
-        getPropertyFormChain(chain, 'iexecGateway'),
+        getPropertyFromChain(chain, 'iexecGateway'),
         signedOrder,
       );
       spinner.succeed(
@@ -543,12 +520,12 @@ unpublish
       const unpublished = all
         ? await unpublishAllApporders(
             chain.contracts,
-            getPropertyFormChain(chain, 'iexecGateway'),
+            getPropertyFromChain(chain, 'iexecGateway'),
             address,
           )
         : await unpublishLastApporder(
             chain.contracts,
-            getPropertyFormChain(chain, 'iexecGateway'),
+            getPropertyFromChain(chain, 'iexecGateway'),
             address,
           );
       spinner.succeed(
@@ -765,24 +742,24 @@ run
           }).then((o) => signApporder(chain.contracts, o));
         }
         spinner.info('Fetching apporder from iExec Marketplace');
-        const minTags = [];
+        const appMinTags = [];
         if (checkActiveBitInTag(tag, TAG_MAP.tee)) {
-          minTags.push('tee');
+          appMinTags.push('tee');
         }
         Object.values(TEE_FRAMEWORKS).forEach((teeFrameworkTag) => {
           if (checkActiveBitInTag(tag, TAG_MAP[teeFrameworkTag])) {
-            minTags.push(teeFrameworkTag);
+            appMinTags.push(teeFrameworkTag);
           }
         });
         const { orders } = await fetchAppOrderbook(
           chain.contracts,
-          getPropertyFormChain(chain, 'iexecGateway'),
+          getPropertyFromChain(chain, 'iexecGateway'),
           {
             app,
             requester,
             ...(useDataset && { dataset }),
             ...(runOnWorkerpool && { workerpool }),
-            ...{ minTag: encodeTag(minTags) },
+            ...{ minTag: encodeTag(appMinTags) },
             maxTag: tag,
           },
         );
@@ -820,7 +797,7 @@ run
         spinner.info('Fetching datasetorder from iExec Marketplace');
         const { orders } = await fetchDatasetOrderbook(
           chain.contracts,
-          getPropertyFormChain(chain, 'iexecGateway'),
+          getPropertyFromChain(chain, 'iexecGateway'),
           {
             dataset,
             app,
@@ -886,7 +863,7 @@ run
           debug('try category', catid, 'strict', strict);
           const { orders } = await fetchWorkerpoolOrderbook(
             chain.contracts,
-            getPropertyFormChain(chain, 'iexecGateway'),
+            getPropertyFromChain(chain, 'iexecGateway'),
             {
               category: catid,
               app,
@@ -1006,9 +983,7 @@ run
         await checkDatasetRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getSmsUrlFromChain(chain, {
-              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
-            }),
+            smsURL: getPropertyFromChain(chain, 'sms'),
           },
           datasetorder,
           { tagOverride: resolvedTag },
@@ -1024,9 +999,7 @@ run
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getSmsUrlFromChain(chain, {
-              teeFramework: await resolveTeeFrameworkFromTag(resolvedTag),
-            }),
+            smsURL: getPropertyFromChain(chain, 'sms'),
           },
           requestorderToSign,
         ).catch((e) => {
@@ -1325,7 +1298,7 @@ requestRun
         await checkRequestRequirements(
           {
             contracts: chain.contracts,
-            smsURL: getSmsUrlFromChain(chain),
+            smsURL: getPropertyFromChain(chain, 'sms'),
           },
           requestorderToSign,
         ).catch((e) => {
@@ -1401,7 +1374,7 @@ requestRun
       spinner.start('Publishing requestorder');
       const orderHash = await publishRequestorder(
         chain.contracts,
-        getPropertyFormChain(chain, 'iexecGateway'),
+        getPropertyFromChain(chain, 'iexecGateway'),
         requestorder,
       );
       spinner.succeed(
