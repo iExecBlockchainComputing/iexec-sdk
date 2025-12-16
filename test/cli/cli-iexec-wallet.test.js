@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import {
   TEST_CHAINS,
@@ -59,7 +57,7 @@ describe('iexec wallet', () => {
       expect(res.wallet).toBeDefined();
       expect(res.address).toBe(wallet.address);
       expect(res.fileName).toBeDefined();
-      expect(await checkExists(res.fileName));
+      expect(await checkExists(res.fileName)).toBe(true);
     });
 
     test('--unencrypted', async () => {
@@ -73,7 +71,7 @@ describe('iexec wallet', () => {
       expect(res.wallet.address).toBe(wallet.address);
       expect(res.address).toBe(wallet.address);
       expect(res.fileName.indexOf('/')).toBe(-1);
-      expect(await checkExists(res.fileName));
+      expect(await checkExists(res.fileName)).toBe(true);
     });
 
     test('--keystoredir <path>', async () => {
@@ -84,7 +82,7 @@ describe('iexec wallet', () => {
       expect(res.wallet).toBeDefined();
       expect(res.address).toBe(userWallet.address);
       expect(res.fileName.indexOf('out/keystore/')).not.toBe(-1);
-      expect(await checkExists(res.fileName));
+      expect(await checkExists(res.fileName)).toBe(true);
     });
 
     test('--keystoredir local', async () => {
@@ -95,7 +93,7 @@ describe('iexec wallet', () => {
       expect(res.wallet).toBeDefined();
       expect(res.address).toBe(userWallet.address);
       expect(res.fileName.indexOf('/')).toBe(-1);
-      expect(await checkExists(res.fileName));
+      expect(await checkExists(res.fileName)).toBe(true);
     });
   });
 
@@ -120,7 +118,7 @@ describe('iexec wallet', () => {
       expect(res.wallet.address).toBeDefined();
       expect(res.address).toBeDefined();
       expect(res.fileName.indexOf('/')).toBe(-1);
-      expect(await checkExists(res.fileName));
+      expect(await checkExists(res.fileName)).toBe(true);
     });
 
     test('--keystoredir <path>', async () => {
@@ -131,7 +129,7 @@ describe('iexec wallet', () => {
       expect(res.wallet).toBeDefined();
       expect(res.address).toBeDefined();
       expect(res.fileName.indexOf('out/keystore/')).not.toBe(-1);
-      expect(await checkExists(res.fileName));
+      expect(await checkExists(res.fileName)).toBe(true);
     });
 
     test('--keystoredir local', async () => {
@@ -142,7 +140,7 @@ describe('iexec wallet', () => {
       expect(res.wallet).toBeDefined();
       expect(res.address).toBeDefined();
       expect(res.fileName.indexOf('/')).toBe(-1);
-      expect(await checkExists(res.fileName));
+      expect(await checkExists(res.fileName)).toBe(true);
     });
   });
 

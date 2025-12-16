@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect, beforeAll } from '@jest/globals';
 import {
   deployAndGetApporder,
