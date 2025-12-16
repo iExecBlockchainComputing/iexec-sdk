@@ -5,7 +5,7 @@ on:
   workflow_call:
     inputs:
       node-version:
-        description: 'Node version to use as specified in actions/setup-node@v4'
+        description: 'Node version to use as specified in actions/setup-node@v6'
         default: '20'
         type: string
       upload-coverage:
@@ -30,10 +30,10 @@ jobs:
     outputs:
       coverage-artifact-id: ${{ steps.upload-coverage.outputs.artifact-id }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ inputs.node-version }}
           cache: 'npm'
@@ -64,7 +64,7 @@ jobs:
       - name: Upload coverage
         id: upload-coverage
         if: ${{ inputs.upload-coverage }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage
           path: coverage
