@@ -27,8 +27,7 @@ import {
   DEFAULT_DECRYPTED_RESULTS_NAME,
   publicKeyName,
   privateKeyName,
-  getSmsUrlFromChain,
-  optionCreator,
+  getPropertyFromChain,
 } from '../utils/cli-helper.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
 import { saveTextToFile } from '../utils/fs.js';
@@ -210,7 +209,6 @@ pushSecret
   .option(...option.chain())
   .option(...option.forceUpdateSecret())
   .option(...option.secretPath())
-  .addOption(optionCreator.teeFramework())
   .description(desc.pushResultKey())
   .action(async (opts) => {
     await checkUpdate(opts);
@@ -226,9 +224,7 @@ pushSecret
       ]);
       await connectKeystore(chain, keystore);
       const { contracts } = chain;
-      const sms = getSmsUrlFromChain(chain, {
-        teeFramework: opts.teeFramework,
-      });
+      const sms = getPropertyFromChain(chain, 'sms');
       let secretFilePath;
       if (opts.secretPath) {
         secretFilePath = opts.secretPath;
@@ -267,7 +263,6 @@ addGlobalOptions(checkSecret);
 addWalletLoadOptions(checkSecret);
 checkSecret
   .option(...option.chain())
-  .addOption(optionCreator.teeFramework())
   .description(desc.checkSecret())
   .action(async (address, opts) => {
     await checkUpdate(opts);
@@ -288,9 +283,7 @@ checkSecret
         spinner.info(`Checking encryption key exists for wallet ${keyAddress}`);
       }
       const { contracts } = chain;
-      const sms = getSmsUrlFromChain(chain, {
-        teeFramework: opts.teeFramework,
-      });
+      const sms = getPropertyFromChain(chain, 'sms');
       const secretExists = await checkWeb2SecretExists(
         contracts,
         sms,

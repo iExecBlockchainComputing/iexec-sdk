@@ -208,17 +208,9 @@ resolve the current result proxy URL
 
 ### resolveSmsURL()
 
-> **resolveSmsURL**(`options?`): `Promise`\<`string`\>
+> **resolveSmsURL**(): `Promise`\<`string`\>
 
 resolve the current SMS URL
-
-#### Parameters
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 

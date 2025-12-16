@@ -6,6 +6,6 @@
 
 # Type Alias: TeeFramework
 
-> **TeeFramework** = `"scone"` \| `"gramine"`
+> **TeeFramework** = `"scone"`
 
 Trusted Execution Environment name

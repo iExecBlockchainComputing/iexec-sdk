@@ -2,7 +2,7 @@ export type * from '../common/types.js';
 export type * from './IExecConfig.js';
 
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
-import { AnyRecord, ProviderOptions, TeeFramework } from '../common/types.js';
+import { AnyRecord, ProviderOptions } from '../common/types.js';
 import { AbstractProvider, AbstractSigner, BrowserProvider } from 'ethers';
 
 export interface Eip1193Provider {
@@ -85,11 +85,7 @@ export interface IExecConfigOptions {
   /**
    * override the SMS URL to target a custom instance
    */
-  smsURL?: Record<TeeFramework, string> | string;
-  /**
-   * override the TEE framework to use when as default
-   */
-  defaultTeeFramework?: TeeFramework;
+  smsURL?: string;
   /**
    * override the IPFS gateway URL to target a custom instance
    */
@@ -179,7 +175,7 @@ export default class IExecConfig {
   /**
    * resolve the current SMS URL
    */
-  resolveSmsURL(options?: { teeFramework?: TeeFramework }): Promise<string>;
+  resolveSmsURL(): Promise<string>;
   /**
    * resolve the current result proxy URL
    */
