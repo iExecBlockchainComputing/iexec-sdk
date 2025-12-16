@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect, beforeAll } from '@jest/globals';
 import { BN } from 'bn.js';
 import {
@@ -350,7 +348,7 @@ describe('order', () => {
     test('preflightCheck TEE framework', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const { address } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
+        teeFramework: TEE_FRAMEWORKS.SCONE,
       });
       const order = await iexec.order.createApporder({
         app: address,
@@ -360,11 +358,6 @@ describe('order', () => {
       );
       await expect(
         iexec.order.signApporder({ ...order, tag: ['tee', 'scone'] }),
-      ).rejects.toThrow(
-        new Error('Tag mismatch the TEE framework specified by app'),
-      );
-      await expect(
-        iexec.order.signApporder({ ...order, tag: ['tee', 'gramine'] }),
       ).resolves.toBeDefined();
     });
 
@@ -376,24 +369,11 @@ describe('order', () => {
       await expect(
         iexec.order.signApporder({ ...order, tag: ['tee'] }),
       ).rejects.toThrow(
-        new Error(
-          "'tee' tag must be used with a tee framework ('scone'|'gramine')",
-        ),
+        new Error("'tee' tag must be used with a tee framework ('scone')"),
       );
       await expect(
         iexec.order.signApporder({ ...order, tag: ['scone'] }),
       ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
-      await expect(
-        iexec.order.signApporder({ ...order, tag: ['gramine'] }),
-      ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
-      await expect(
-        iexec.order.signApporder({
-          ...order,
-          tag: ['tee', 'scone', 'gramine'],
-        }),
-      ).rejects.toThrow(
-        new Error("tee framework tags are exclusive ('scone'|'gramine')"),
-      );
     });
   });
 });
@@ -430,13 +410,6 @@ describe('signDatasetorder()', () => {
         `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
       ),
     );
-    await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
-    ).rejects.toThrow(
-      new Error(
-        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
-      ),
-    );
     await iexec.dataset.pushDatasetSecret(
       address,
       iexec.dataset.generateEncryptionKey(),
@@ -444,16 +417,6 @@ describe('signDatasetorder()', () => {
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
     ).resolves.toBeDefined();
-    await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
-    ).resolves.toBeDefined();
-    await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'gramine'] }),
-    ).rejects.toThrow(
-      new Error(
-        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
-      ),
-    );
   });
 
   test('preflightCheck fails with invalid tag', async () => {
@@ -464,17 +427,6 @@ describe('signDatasetorder()', () => {
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['scone'] }),
     ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signDatasetorder({ ...order, tag: ['gramine'] }),
-    ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signDatasetorder({
-        ...order,
-        tag: ['tee', 'scone', 'gramine'],
-      }),
-    ).rejects.toThrow(
-      new Error("tee framework tags are exclusive ('scone'|'gramine')"),
-    );
   });
 });
 
@@ -526,24 +478,11 @@ describe('signRequestorder()', () => {
     await expect(
       iexec.order.signRequestorder({ ...order, tag: ['tee'] }),
     ).rejects.toThrow(
-      new Error(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
-      ),
+      new Error("'tee' tag must be used with a tee framework ('scone')"),
     );
     await expect(
       iexec.order.signRequestorder({ ...order, tag: ['scone'] }),
     ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signRequestorder({ ...order, tag: ['gramine'] }),
-    ).rejects.toThrow(Error("'gramine' tag must be used with 'tee' tag"));
-    await expect(
-      iexec.order.signRequestorder({
-        ...order,
-        tag: ['tee', 'scone', 'gramine'],
-      }),
-    ).rejects.toThrow(
-      new Error("tee framework tags are exclusive ('scone'|'gramine')"),
-    );
   });
 
   test('preflightCheck dropbox storage token exists', async () => {
@@ -719,7 +658,7 @@ describe('hashApporder()', () => {
       app: '0x76fE91568d50C5fF9411223df5A0c50Ec5fa326A',
       appprice: 0,
       volume: 1000000,
-      tag: '0x0000000000000000000000000000000000000000000000000000000000000005',
+      tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
       datasetrestrict: '0x0000000000000000000000000000000000000000',
       workerpoolrestrict: '0x0000000000000000000000000000000000000000',
       requesterrestrict: '0x0000000000000000000000000000000000000000',
@@ -728,7 +667,7 @@ describe('hashApporder()', () => {
     };
     const res = await iexec.order.hashApporder(order);
     expect(res).toBe(
-      '0x210576e452027bc2430a32f6fae97bec8bd1f7bb7a96f59202d6947ec7d6de8f',
+      '0x97f0160eb49618d267b3fd203b488ac09fb50760158455abe1f06cbb8a6edc72',
     );
   });
 });

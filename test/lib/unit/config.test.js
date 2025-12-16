@@ -36,15 +36,13 @@ describe('getChainDefaults', () => {
       name: 'bellecour',
       pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
       resultProxy: 'https://result.v8-bellecour.iex.ec',
-      sms: {
-        gramine: 'https://sms.gramine.v8-bellecour.iex.ec',
-        scone: 'https://sms.iex.ec',
-      },
+      sms: 'https://sms.iex.ec',
     });
   });
   test('unknown id returns empty object', () => {
     expect(getChainDefaults(0)).toEqual({});
   });
+  // skipped because no experimental networks are currently defined
   test.skip('experimental networks are accessible with `allowExperimentalNetworks:true` hidden by default', () => {
     expect(getChainDefaults(421614)).toEqual({});
     expect(

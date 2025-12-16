@@ -6,7 +6,6 @@ import {
   countUserApps,
   predictAppAddress,
   checkDeployedApp,
-  resolveTeeFrameworkFromApp,
   transferApp,
 } from '../common/protocol/registries.js';
 import { checkAppSecretExists } from '../common/sms/check.js';
@@ -28,37 +27,17 @@ export default class IExecAppModule extends IExecModule {
       );
     this.countUserApps = async (address) =>
       countUserApps(await this.config.resolveContractsClient(), address);
-    this.checkAppSecretExists = async (appAddress, { teeFramework } = {}) => {
-      let appTeeFramework = teeFramework;
-      if (appTeeFramework === undefined) {
-        const { app } = await showApp(
-          await this.config.resolveContractsClient(),
-          appAddress,
-        );
-        appTeeFramework = await resolveTeeFrameworkFromApp(app);
-      }
+    this.checkAppSecretExists = async (appAddress) => {
       return checkAppSecretExists(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL({ teeFramework: appTeeFramework }),
+        await this.config.resolveSmsURL(),
         appAddress,
       );
     };
-    this.pushAppSecret = async (
-      appAddress,
-      appSecret,
-      { teeFramework } = {},
-    ) => {
-      let appTeeFramework = teeFramework;
-      if (appTeeFramework === undefined) {
-        const { app } = await showApp(
-          await this.config.resolveContractsClient(),
-          appAddress,
-        );
-        appTeeFramework = await resolveTeeFrameworkFromApp(app);
-      }
+    this.pushAppSecret = async (appAddress, appSecret) => {
       return pushAppSecret(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL({ teeFramework: appTeeFramework }),
+        await this.config.resolveSmsURL(),
         appAddress,
         appSecret,
       );
