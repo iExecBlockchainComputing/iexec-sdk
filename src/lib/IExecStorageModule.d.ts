@@ -3,7 +3,7 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Addressish, TeeFramework } from '../common/types.js';
+import { Addressish } from '../common/types.js';
 
 /**
  * module exposing storage methods
@@ -24,7 +24,6 @@ export default class IExecStorageModule extends IExecModule {
     beneficiaryAddress: Addressish,
     options?: {
       provider?: string;
-      teeFramework?: TeeFramework;
     },
   ): Promise<boolean>;
   /**
@@ -66,7 +65,6 @@ export default class IExecStorageModule extends IExecModule {
     token: string,
     options?: {
       provider?: string;
-      teeFramework?: TeeFramework;
       forceUpdate?: boolean;
     },
   ): Promise<{ isPushed: boolean; isUpdated: boolean }>;

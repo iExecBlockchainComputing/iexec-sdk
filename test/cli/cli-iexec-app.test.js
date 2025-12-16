@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import {
   NULL_ADDRESS,
@@ -55,26 +53,6 @@ describe('iexec app', () => {
       expect(res.app.mrenclave).toBeUndefined();
     });
 
-    test('--tee', async () => {
-      const raw = await execAsync(`${iexecPath} app init --tee --raw`);
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.app).toBeDefined();
-      expect(res.app.mrenclave).toBeDefined();
-      expect(res.app.mrenclave.framework).toBe('SCONE');
-    });
-
-    test('--tee-framework gramine', async () => {
-      const raw = await execAsync(
-        `${iexecPath} app init --tee-framework gramine --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.app).toBeDefined();
-      expect(res.app.mrenclave).toBeDefined();
-      expect(res.app.mrenclave.framework).toBe('GRAMINE');
-    });
-
     test('--tee-framework scone', async () => {
       const raw = await execAsync(
         `${iexecPath} app init --tee-framework scone --raw`,
@@ -99,7 +77,7 @@ describe('iexec app', () => {
 
   describe('deploy', () => {
     test('iexec app deploy', async () => {
-      await execAsync(`${iexecPath} app init --tee --raw`);
+      await execAsync(`${iexecPath} app init --tee-framework scone --raw`);
       await setAppUniqueName();
       const raw = await execAsync(`${iexecPath} app deploy --raw`);
       const res = JSON.parse(raw);
@@ -114,7 +92,7 @@ describe('iexec app', () => {
 
   describe('show', () => {
     test('iexec app show (from deployed.json)', async () => {
-      await execAsync(`${iexecPath} app init --tee --raw`);
+      await execAsync(`${iexecPath} app init --tee-framework scone --raw`);
       await setAppUniqueName();
       const { address } = await execAsync(`${iexecPath} app deploy --raw`).then(
         JSON.parse,
@@ -435,20 +413,6 @@ describe('iexec app', () => {
       );
       expect(resPushed.ok).toBe(true);
       expect(resPushed.isSecretSet).toBe(true);
-
-      const resGramineNotPushed = await runIExecCliRaw(
-        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`,
-      );
-      expect(resGramineNotPushed.ok).toBe(true);
-      expect(resGramineNotPushed.isSecretSet).toBe(false);
-      await runIExecCliRaw(
-        `${iexecPath} app push-secret ${appAddress} --secret-value foo --tee-framework gramine`,
-      );
-      const resGraminePushed = await runIExecCliRaw(
-        `${iexecPath} app check-secret ${appAddress} --tee-framework gramine`,
-      );
-      expect(resGraminePushed.ok).toBe(true);
-      expect(resGraminePushed.isSecretSet).toBe(true);
     });
   });
 

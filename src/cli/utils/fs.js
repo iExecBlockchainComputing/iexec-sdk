@@ -5,9 +5,8 @@ import { object, string, number, boolean, lazy } from 'yup';
 import { APP, DATASET } from '../../common/utils/constant.js';
 import {
   addressSchema,
+  basicUrlSchema,
   chainIdSchema,
-  smsUrlOrMapSchema,
-  teeFrameworkSchema,
 } from '../../common/utils/validator.js';
 import { prompt, info } from './cli-helper.js';
 import templates, {
@@ -28,7 +27,7 @@ const chainConfSchema = () =>
     hub: string(), // todo address
     ensRegistry: string(), // TODO: DEPRECATED not used anymore
     ensPublicResolver: string(), // todo address
-    sms: smsUrlOrMapSchema(),
+    sms: basicUrlSchema(),
     resultProxy: string(),
     ipfsGateway: string(),
     iexecGateway: string(),
@@ -36,7 +35,6 @@ const chainConfSchema = () =>
     pocoSubgraph: string(),
     native: boolean(),
     useGas: boolean().default(true),
-    defaultTeeFramework: teeFrameworkSchema(),
     bridge: object({
       bridgedChainName: string().required(),
       contract: addressSchema().required(),

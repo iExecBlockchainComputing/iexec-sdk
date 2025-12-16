@@ -870,7 +870,7 @@ export const computeTxOptions = async (opts) => {
   return { gasPrice, confirms };
 };
 
-export const getPropertyFormChain = (
+export const getPropertyFromChain = (
   chain,
   property,
   { strict = true } = {},
@@ -881,33 +881,6 @@ export const getPropertyFormChain = (
       `Missing ${property} in "chain.json" for chain ${chain.id}`,
     );
   return value;
-};
-
-export const getDefaultTeeFrameworkFromChain = (chain) =>
-  getPropertyFormChain(chain, 'defaultTeeFramework', { strict: false }) ||
-  TEE_FRAMEWORKS.SCONE;
-
-export const getSmsUrlFromChain = (
-  chain,
-  { teeFramework, strict = true } = {},
-) => {
-  const selectedTeeFramework =
-    teeFramework || getDefaultTeeFrameworkFromChain(chain);
-  let smsUrl;
-  const smsUrlOrMap = getPropertyFormChain(chain, 'sms', { strict });
-  if (typeof smsUrlOrMap === 'string') {
-    smsUrl = smsUrlOrMap;
-  } else if (
-    typeof smsUrlOrMap === 'object' &&
-    smsUrlOrMap[selectedTeeFramework]
-  ) {
-    smsUrl = smsUrlOrMap[selectedTeeFramework];
-  }
-  if (smsUrl === undefined && strict)
-    throw new Error(
-      `Missing sms for tee framework ${selectedTeeFramework} in "chain.json" for chain ${chain.id}`,
-    );
-  return smsUrl;
 };
 
 export const handleError = (error, cli, opts) => {

@@ -104,9 +104,7 @@ export const TEST_CHAINS = {
   'bellecour-fork': {
     rpcURL: 'http://localhost:8545',
     chainId: '134',
-    sconeSmsURL: 'http://localhost:13300',
-    gramineSmsURL: 'http://localhost:13302',
-    tdxSmsURL: 'http://localhost:13303',
+    smsURL: 'http://localhost:13300',
     iexecGatewayURL: 'http://localhost:3000',
     resultProxyURL: 'http://localhost:13200',
     ipfsNodeURL: 'http://localhost:5001',
@@ -131,16 +129,6 @@ export const TEST_CHAINS = {
     isAnvil: true,
   },
 };
-
-Object.keys(TEST_CHAINS).forEach((chain) => {
-  if (!TEST_CHAINS[chain].smsMap) {
-    TEST_CHAINS[chain].smsMap = {
-      gramine: TEST_CHAINS[chain].gramineSmsURL,
-      scone: TEST_CHAINS[chain].sconeSmsURL,
-      tdx: TEST_CHAINS[chain].tdxSmsURL,
-    };
-  }
-});
 
 export const getId = () => randomInt(0, 1000000);
 

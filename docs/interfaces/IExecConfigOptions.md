@@ -76,14 +76,6 @@ number of block to wait for transactions confirmation (default 1)
 
 ***
 
-### defaultTeeFramework?
-
-> `optional` **defaultTeeFramework**: [`TeeFramework`](../type-aliases/TeeFramework.md)
-
-override the TEE framework to use when as default
-
-***
-
 ### ensPublicResolverAddress?
 
 > `optional` **ensPublicResolverAddress**: `string`
@@ -158,7 +150,7 @@ override the result proxy URL to target a custom instance
 
 ### smsURL?
 
-> `optional` **smsURL**: `string` \| `Record`\<[`TeeFramework`](../type-aliases/TeeFramework.md), `string`\>
+> `optional` **smsURL**: `string`
 
 override the SMS URL to target a custom instance
 

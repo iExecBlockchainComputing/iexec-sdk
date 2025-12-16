@@ -27,7 +27,6 @@
 - [Dataset](interfaces/Dataset.md)
 - [DatasetDeploymentArgs](interfaces/DatasetDeploymentArgs.md)
 - [DatasetorderTemplate](interfaces/DatasetorderTemplate.md)
-- [GramineMREnclave](interfaces/GramineMREnclave.md)
 - [HashableApporder](interfaces/HashableApporder.md)
 - [HashableDatasetorder](interfaces/HashableDatasetorder.md)
 - [HashableRequestorder](interfaces/HashableRequestorder.md)

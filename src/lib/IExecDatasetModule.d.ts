@@ -11,7 +11,6 @@ import {
   Bytes32,
   Multiaddress,
   TxHash,
-  TeeFramework,
 } from '../common/types.js';
 
 export interface DatasetDeploymentArgs {
@@ -212,12 +211,7 @@ export default class IExecDatasetModule extends IExecModule {
    * console.log('secret exists:', isSecretSet);
    * ```
    */
-  checkDatasetSecretExists(
-    datasetAddress: Addressish,
-    options?: {
-      teeFramework?: TeeFramework;
-    },
-  ): Promise<boolean>;
+  checkDatasetSecretExists(datasetAddress: Addressish): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
@@ -234,9 +228,6 @@ export default class IExecDatasetModule extends IExecModule {
   pushDatasetSecret(
     datasetAddress: Addressish,
     encryptionKey: string,
-    options?: {
-      teeFramework?: TeeFramework;
-    },
   ): Promise<boolean>;
   /**
    * **ONLY DATASET OWNER**

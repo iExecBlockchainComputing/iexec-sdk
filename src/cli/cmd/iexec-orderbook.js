@@ -19,7 +19,7 @@ import {
   displayPaginableRequest,
   pretty,
   info,
-  getPropertyFormChain,
+  getPropertyFromChain,
 } from '../utils/cli-helper.js';
 import { loadChain } from '../utils/chains.js';
 
@@ -65,7 +65,7 @@ orderbookApp
 
       const request = fetchAppOrderbook(
         chain.contracts,
-        getPropertyFormChain(chain, 'iexecGateway'),
+        getPropertyFromChain(chain, 'iexecGateway'),
         {
           app,
           dataset,
@@ -179,7 +179,7 @@ orderbookDataset
 
       const request = fetchDatasetOrderbook(
         chain.contracts,
-        getPropertyFormChain(chain, 'iexecGateway'),
+        getPropertyFromChain(chain, 'iexecGateway'),
         {
           dataset,
           app,
@@ -297,7 +297,7 @@ orderbookWorkerpool
 
       const request = fetchWorkerpoolOrderbook(
         chain.contracts,
-        getPropertyFormChain(chain, 'iexecGateway'),
+        getPropertyFromChain(chain, 'iexecGateway'),
         {
           category,
           workerpool,
@@ -422,7 +422,7 @@ orderbookRequester
 
       const request = fetchRequestOrderbook(
         chain.contracts,
-        getPropertyFormChain(chain, 'iexecGateway'),
+        getPropertyFromChain(chain, 'iexecGateway'),
         {
           category,
           requester: address,

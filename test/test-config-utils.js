@@ -7,8 +7,6 @@ export const getTestConfigOptions =
     bridgeAddress: options.bridgeAddress ?? chain.bridgeAddress,
     bridgedNetworkConf: options.bridgedNetworkConf ?? chain.bridgedNetworkConf,
     confirms: options.confirms ?? chain.confirms,
-    defaultTeeFramework:
-      options.defaultTeeFramework ?? chain.defaultTeeFramework,
     ensPublicResolverAddress:
       options.ensPublicResolverAddress ?? chain.ensPublicResolverAddress,
     ensRegistryAddress: options.ensRegistryAddress ?? chain.ensRegistryAddress,
@@ -21,7 +19,7 @@ export const getTestConfigOptions =
     providerOptions: options.providerOptions ?? chain.providerOptions,
     resultProxyURL: options.resultProxyURL ?? chain.resultProxyURL,
     compassURL: options.compassURL ?? chain.compassURL,
-    smsURL: options.smsURL ?? chain.smsMap,
+    smsURL: options.smsURL ?? chain.smsURL,
     useGas: options.useGas ?? chain.useGas,
   });
 

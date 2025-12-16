@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { TEST_CHAINS, execAsync } from '../test-utils.js';
 import {
@@ -145,7 +143,7 @@ describe('iexec order', () => {
     expect(failRes.fail).toStrictEqual([
       'apporder: App requirements check failed: Tag mismatch the TEE framework specified by app (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
       `datasetorder: Dataset requirements check failed: Dataset encryption key is not set for dataset ${userDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
-      "workerpoolorder: 'tee' tag must be used with a tee framework ('scone'|'gramine'|'tdx')",
+      "workerpoolorder: 'tee' tag must be used with a tee framework ('scone'|'tdx')",
       `requestorder: Request requirements check failed: Dataset encryption key is not set for dataset ${userDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
     ]);
   });

@@ -38,7 +38,7 @@ import {
   prompt,
   pretty,
   info,
-  getPropertyFormChain,
+  getPropertyFromChain,
 } from '../utils/cli-helper.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
 import { lookupAddress } from '../../common/ens/resolution.js';
@@ -381,7 +381,7 @@ bridgeToSidechain
       await connectKeystore(chain, keystore, { txOptions });
       if (chain.contracts.isNative)
         throw new Error('Cannot bridge sidechain to sidechain');
-      const bridgeConf = getPropertyFormChain(chain, 'bridge');
+      const bridgeConf = getPropertyFromChain(chain, 'bridge');
       const bridgeAddress = bridgeConf && bridgeConf.contract;
       const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {
@@ -468,7 +468,7 @@ bridgeToMainchain
       await connectKeystore(chain, keystore, { txOptions });
       if (!chain.contracts.isNative)
         throw new Error('Cannot bridge mainchain to mainchain');
-      const bridgeConf = getPropertyFormChain(chain, 'bridge');
+      const bridgeConf = getPropertyFromChain(chain, 'bridge');
       const bridgeAddress = bridgeConf && bridgeConf.contract;
       const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
       if (!bridgeAddress) {

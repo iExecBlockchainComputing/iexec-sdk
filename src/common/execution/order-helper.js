@@ -32,8 +32,9 @@ import {
   tagSchema,
   positiveStrictIntSchema,
   signedDatasetorderBulkSchema,
+  objMrenclaveSchema,
 } from '../utils/validator.js';
-import { resolveTeeFrameworkFromApp, showApp } from '../protocol/registries.js';
+import { showApp } from '../protocol/registries.js';
 import { add } from '../utils/ipfs.js';
 
 const debug = Debug('iexec:execution:order-helper');
@@ -46,10 +47,18 @@ export const resolveTeeFrameworkFromTag = async (tag) => {
   if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.TDX])) {
     return TEE_FRAMEWORKS.TDX;
   }
-  if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.GRAMINE])) {
-    return TEE_FRAMEWORKS.GRAMINE;
-  }
+  return undefined;
+};
 
+const resolveTeeFrameworkFromApp = async (app) => {
+  if (app.appMREnclave) {
+    try {
+      const mrenclave = await objMrenclaveSchema().validate(app.appMREnclave);
+      return mrenclave.framework;
+    } catch (err) {
+      debug('resolveTeeFrameworkFromApp()', err);
+    }
+  }
   return undefined;
 };
 
@@ -211,11 +220,11 @@ export const checkAppRequirements = async (
     tagOverride ? await tagSchema().validate(tagOverride) : tag,
   );
   const appTeeFramework = await showApp(contracts, app).then((res) =>
-    resolveTeeFrameworkFromApp(res.app, { strict: false }),
+    resolveTeeFrameworkFromApp(res.app),
   );
   const tagMatchesApp =
     appTeeFramework === tagTeeFramework ||
-    (tagTeeFramework === undefined && appTeeFramework === TEE_FRAMEWORKS.TDX);
+    (tagTeeFramework === TEE_FRAMEWORKS.TDX && appTeeFramework === undefined);
   if (!tagMatchesApp) {
     throw new Error('Tag mismatch the TEE framework specified by app');
   }

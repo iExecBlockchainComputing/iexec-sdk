@@ -18,7 +18,7 @@ app image digest
 
 ### mrenclave?
 
-> `optional` **mrenclave**: [`SconeMREnclave`](SconeMREnclave.md) \| [`GramineMREnclave`](GramineMREnclave.md)
+> `optional` **mrenclave**: [`SconeMREnclave`](SconeMREnclave.md)
 
 optional for TEE apps only, specify the TEE protocol to use
 
