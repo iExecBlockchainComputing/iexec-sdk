@@ -30,7 +30,6 @@ export const WORKERPOOL_URL_TEXT_RECORD_KEY = 'iexec:workerpool-api:url';
 
 export const TEE_FRAMEWORKS = {
   SCONE: 'scone',
-  GRAMINE: 'gramine',
   TDX: 'tdx',
 };
 

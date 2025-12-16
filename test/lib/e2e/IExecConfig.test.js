@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import {
   JsonRpcProvider,
@@ -18,7 +16,6 @@ import {
   INFURA_PROJECT_ID,
   InjectedProvider,
   TEST_CHAINS,
-  TEE_FRAMEWORKS,
   getRandomAddress,
   getRandomWallet,
   DEFAULT_PROVIDER_OPTIONS,
@@ -58,29 +55,12 @@ describe('[IExecConfig]', () => {
     });
 
     describe('throw Invalid option smsURL', () => {
-      test('IExecConfig({ ethProvider }, { smsURL: { foo: "https://foo.com" } })', () => {
+      test('IExecConfig({ ethProvider }, { smsURL: { } })', () => {
         const createConfig = () =>
-          new IExecConfig(
-            { ethProvider: 'bellecour' },
-            { smsURL: { foo: 'https://foo.com' } },
-          );
-        expect(createConfig).toThrow(
-          new Error('Invalid smsURL: this field has unspecified keys: foo'),
-        );
-        expect(createConfig).toThrow(errors.ConfigurationError);
-      });
-    });
-
-    describe('throw Invalid option defaultTeeFramework', () => {
-      test('IExecConfig({ ethProvider }, { defaultTeeFramework: "foo" })', () => {
-        const createConfig = () =>
-          new IExecConfig(
-            { ethProvider: 'bellecour' },
-            { defaultTeeFramework: 'foo' },
-          );
+          new IExecConfig({ ethProvider: 'bellecour' }, { smsURL: {} });
         expect(createConfig).toThrow(
           new Error(
-            'Invalid defaultTeeFramework: this is not a valid TEE framework',
+            'Invalid smsURL: this must be a `string` type, but the final value was: `{}`.',
           ),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
@@ -130,6 +110,7 @@ describe('[IExecConfig]', () => {
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
+      // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
         test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
           const createConfig = () =>
@@ -242,6 +223,7 @@ describe('[IExecConfig]', () => {
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
+      // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
         test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
           const createConfig = () => new IExecConfig({ ethProvider: 421614 });
@@ -421,6 +403,7 @@ describe('[IExecConfig]', () => {
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
+      // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
         const experimentalNetworkRpcUrl = getChainDefaults(421614, {
           allowExperimentalNetworks: true,
@@ -526,6 +509,7 @@ describe('[IExecConfig]', () => {
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBe(iexecTestChain.defaults.ensRegistryAddress);
       });
+      // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
         const experimentalNetworkRpcUrl = getChainDefaults(421614, {
           allowExperimentalNetworks: true,
@@ -881,74 +865,7 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success default resolves to scone', async () => {
-      const defaultSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL();
-      const sconeSmsUrl = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
-      const gramineSmsUrl = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
-      expect(defaultSms).toBe(sconeSmsUrl);
-      expect(defaultSms).not.toBe(gramineSmsUrl);
-    });
-    test('success override defaultTeeFramework', async () => {
-      const defaultSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL();
-      const defaultSmsTeeFrameworkOverride = await new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { defaultTeeFramework: TEE_FRAMEWORKS.GRAMINE },
-      ).resolveSmsURL();
-      const gramineSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
-      expect(defaultSmsTeeFrameworkOverride).toBe(gramineSms);
-      expect(defaultSmsTeeFrameworkOverride).not.toBe(defaultSms);
-    });
-    test('success smsURL object override per teeFramework', async () => {
-      const smsMap = {
-        scone: 'http://foo.io',
-        gramine: 'http://bar.io',
-      };
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { smsURL: smsMap },
-      );
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(smsMap.scone);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsMap.gramine);
-    });
-    test('success smsURL object override only one teeFramework', async () => {
-      const sconeDefaultSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
-      const smsMap = {
-        gramine: 'http://bar.io',
-      };
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { smsURL: smsMap },
-      );
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(sconeDefaultSms);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsMap.gramine);
-    });
-    test('success smsURL string override all teeFramework', async () => {
+    test('success smsURL override default URL', async () => {
       const smsOverride = 'http://sms-override.iex.ec';
       const config = new IExecConfig(
         {
@@ -957,14 +874,9 @@ describe('[IExecConfig]', () => {
         { smsURL: smsOverride },
       );
       await expect(config.resolveSmsURL()).resolves.toBe(smsOverride);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(smsOverride);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsOverride);
+      await expect(config.resolveSmsURL()).resolves.toBe(smsOverride);
     });
-    test('success with smsURL string on custom chain', async () => {
+    test('success smsURL sets the URL on custom chain', async () => {
       const smsOverride = 'http://sms-override.iex.ec';
       const config = new IExecConfig(
         {
@@ -994,16 +906,6 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveSmsURL();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
-    });
-    test('throw with invalid TEE framework', async () => {
-      const config = new IExecConfig({
-        ethProvider: iexecTestChain.rpcURL,
-      });
-      const promise = config.resolveSmsURL({ teeFramework: 'foo' });
-      await expect(promise).rejects.toThrow(
-        new Error(`teeFramework is not a valid TEE framework`),
-      );
-      await expect(promise).rejects.toThrow(errors.ValidationError);
     });
   });
 

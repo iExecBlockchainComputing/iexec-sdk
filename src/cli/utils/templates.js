@@ -39,21 +39,6 @@ export const sconeTeeApp = {
   },
 };
 
-export const gramineTeeApp = {
-  owner: '0x0000000000000000000000000000000000000000',
-  name: 'hello-world-gramine',
-  type: 'DOCKER',
-  multiaddr: 'iexechub/tee-python-hello-world:8.0.3-gramine',
-  checksum:
-    '0x8e13b1592bff2e1651225b1533282ed2e1939ce173c9f0c2c39ed02a4963401f',
-  mrenclave: {
-    framework: 'GRAMINE',
-    version: 'v0',
-    fingerprint:
-      'c879351b3640a21331c4d931d3e32bfbb8373b502966f9c639538666b2cf3641',
-  },
-};
-
 export const buyConf = {
   params: {
     [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',

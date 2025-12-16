@@ -36,7 +36,7 @@ import {
   pretty,
   info,
   prompt,
-  getPropertyFormChain,
+  getPropertyFromChain,
   isEthAddress,
 } from '../utils/cli-helper.js';
 import {
@@ -358,7 +358,7 @@ publish
       );
       const orderHash = await publishWorkerpoolorder(
         chain.contracts,
-        getPropertyFormChain(chain, 'iexecGateway'),
+        getPropertyFromChain(chain, 'iexecGateway'),
         signedOrder,
       );
       spinner.succeed(
@@ -412,12 +412,12 @@ unpublish
       const unpublished = all
         ? await unpublishAllWorkerpoolorders(
             chain.contracts,
-            getPropertyFormChain(chain, 'iexecGateway'),
+            getPropertyFromChain(chain, 'iexecGateway'),
             address,
           )
         : await unpublishLastWorkerpoolorder(
             chain.contracts,
-            getPropertyFormChain(chain, 'iexecGateway'),
+            getPropertyFromChain(chain, 'iexecGateway'),
             address,
           );
       spinner.succeed(
