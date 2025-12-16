@@ -1,7 +1,7 @@
 services:
   custom-token-chain:
     restart: unless-stopped
-    image: 'docker-regis.iex.ec/poco-chain:1.2.2-poco-v6.2.0-contracts-nethermind'
+    image: 'iexechub/poco-chaintest:1.2.2-poco-v6.2.0-contracts-nethermind'
     expose:
       - 8545
     ports:
