@@ -204,7 +204,7 @@
     "bn.js": "^5.2.2",
     "buffer": "^6.0.3",
     "commander": "^13.1.0",
-    "debug": "^4.4.0",
+    "debug": "^4.4.3",
     "ethers": "^6.13.5",
     "fs-extra": "^11.3.0",
     "graphql-request": "^7.3.5",
