@@ -1,24 +1,24 @@
-import { randomInt } from 'crypto';
 import { exec } from 'child_process';
+import { randomInt } from 'crypto';
 import {
-  Wallet,
-  JsonRpcProvider,
-  ethers,
   Contract,
+  JsonRpcProvider,
+  Wallet,
+  ethers,
   hexlify,
   randomBytes,
 } from 'ethers';
+import { abi as voucherHubAbi } from '../src/common/generated/@iexec/voucher-contracts/VoucherHub.js';
+import { getEventFromLogs } from '../src/common/utils/utils.js';
 import { IExec } from '../src/lib/index.js';
 import { getSignerFromPrivateKey } from '../src/lib/utils.js';
-import { getEventFromLogs } from '../src/common/utils/utils.js';
 import { getTestConfig } from './test-config-utils.js';
-import { abi as voucherHubAbi } from '../src/common/generated/@iexec/voucher-contracts/VoucherHub.js';
 
 export {
-  TEE_FRAMEWORKS,
   NULL_ADDRESS,
   NULL_BYTES,
   NULL_BYTES32,
+  TEE_FRAMEWORKS,
 } from '../src/common/utils/constant.js';
 
 export const sleep = (ms) =>
@@ -62,17 +62,17 @@ export const TEST_CHAINS = {
   'custom-token-chain': {
     rpcURL: 'http://localhost:18545',
     chainId: '65535',
-    hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
+    hubAddress: '0xeB196D71Bf359bfDB7Ee54429236A09DBF3966B3',
     ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
     ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
     ipfsNodeURL: 'http://localhost:5001',
     ipfsGatewayURL: 'http://localhost:8080',
     pocoAdminWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+      '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
     ),
     // TODO use another wallet
     faucetWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+      '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
     ),
     provider: new JsonRpcProvider('http://localhost:18545', undefined, {
       pollingInterval: 100,

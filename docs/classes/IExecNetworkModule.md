@@ -1,60 +1,70 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecNetworkModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecNetworkModule
 
 # Class: IExecNetworkModule
 
 module exposing network methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecNetworkModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecNetworkModule.md#constructor)
+
+### Properties
+
+- [config](IExecNetworkModule.md#config)
+
+### Methods
+
+- [getNetwork](IExecNetworkModule.md#getnetwork)
+- [fromConfig](IExecNetworkModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecNetworkModule**(`configOrArgs`, `options?`): `IExecNetworkModule`
+• **new IExecNetworkModule**(`configOrArgs`, `options?`): [`IExecNetworkModule`](IExecNetworkModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecNetworkModule`
+[`IExecNetworkModule`](IExecNetworkModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### getNetwork()
+### getNetwork
 
-> **getNetwork**(): `Promise`\<\{ `chainId`: `string`; `isNative`: `boolean`; \}\>
+▸ **getNetwork**(): `Promise`<{ `chainId`: `string` ; `isNative`: `boolean`  }\>
 
 get info about the current iExec network
 
@@ -68,26 +78,26 @@ console.log(`working on chain ${chainId}, using native token: ${isNative}`);
 
 #### Returns
 
-`Promise`\<\{ `chainId`: `string`; `isNative`: `boolean`; \}\>
+`Promise`<{ `chainId`: `string` ; `isNative`: `boolean`  }\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecNetworkModule`
+▸ **fromConfig**(`config`): [`IExecNetworkModule`](IExecNetworkModule.md)
 
 Create an IExecNetworkModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecNetworkModule`
+[`IExecNetworkModule`](IExecNetworkModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

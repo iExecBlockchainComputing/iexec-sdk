@@ -1,33 +1,44 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / Observable
+[iexec](../README.md) / [Exports](../modules.md) / Observable
 
 # Class: Observable
 
-## Extended by
+## Hierarchy
 
-- [`DealObservable`](../-internal-/classes/DealObservable.md)
-- [`ENSConfigurationObservable`](../-internal-/classes/ENSConfigurationObservable.md)
-- [`TaskObservable`](../-internal-/classes/TaskObservable.md)
-- [`BridgeObservable`](../-internal-/classes/BridgeObservable.md)
+- **`Observable`**
+
+  ↳ [`DealObservable`](internal_.DealObservable.md)
+
+  ↳ [`ENSConfigurationObservable`](internal_.ENSConfigurationObservable.md)
+
+  ↳ [`TaskObservable`](internal_.TaskObservable.md)
+
+  ↳ [`BridgeObservable`](internal_.BridgeObservable.md)
+
+## Table of contents
+
+### Constructors
+
+- [constructor](Observable.md#constructor)
+
+### Methods
+
+- [subscribe](Observable.md#subscribe)
 
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new Observable**(): `Observable`
+• **new Observable**(): [`Observable`](Observable.md)
 
 #### Returns
 
-`Observable`
+[`Observable`](Observable.md)
 
 ## Methods
 
-### subscribe()
+### subscribe
 
-> **subscribe**(`callbacks`): () => `void`
+▸ **subscribe**(`callbacks`): () => `void`
 
 subscribe to a data source events via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
 
@@ -35,35 +46,22 @@ return the `unsubscribe: () => void` method.
 
 #### Parameters
 
-##### callbacks
-
-callbacks to call on specific events
-
-###### complete?
-
-() => `any`
-
-callback to fire when the data emission is done
-
-no other callback is fired after firing `complete()`
-
-###### error?
-
-(`error`) => `any`
-
-callback to fire when a error occurs on the data source
-
-no other callback is fired after firing `error(error: Error)`
-
-###### next?
-
-(`data`) => `any`
-
-callback to fire on incoming data
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `callbacks` | `Object` | callbacks to call on specific events |
+| `callbacks.complete?` | () => `any` | callback to fire when the data emission is done no other callback is fired after firing `complete()` |
+| `callbacks.error?` | (`error`: `Error`) => `any` | callback to fire when a error occurs on the data source no other callback is fired after firing `error(error: Error)` |
+| `callbacks.next?` | (`data`: `Record`<`string`, `any`\> & { `message`: `string`  }) => `any` | callback to fire on incoming data |
 
 #### Returns
 
-> (): `void`
+`fn`
+
+▸ (): `void`
+
+subscribe to a data source events via an Observer until either `complete()` or `error(error: Error)` is called on the Observer or the subscribtion is canceled by calling the returned unsubscribe method.
+
+return the `unsubscribe: () => void` method.
 
 ##### Returns
 

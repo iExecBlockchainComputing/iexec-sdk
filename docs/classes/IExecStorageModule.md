@@ -1,60 +1,72 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecStorageModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecStorageModule
 
 # Class: IExecStorageModule
 
 module exposing storage methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecStorageModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecStorageModule.md#constructor)
+
+### Properties
+
+- [config](IExecStorageModule.md#config)
+
+### Methods
+
+- [checkStorageTokenExists](IExecStorageModule.md#checkstoragetokenexists)
+- [defaultStorageLogin](IExecStorageModule.md#defaultstoragelogin)
+- [pushStorageToken](IExecStorageModule.md#pushstoragetoken)
+- [fromConfig](IExecStorageModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecStorageModule**(`configOrArgs`, `options?`): `IExecStorageModule`
+• **new IExecStorageModule**(`configOrArgs`, `options?`): [`IExecStorageModule`](IExecStorageModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecStorageModule`
+[`IExecStorageModule`](IExecStorageModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### checkStorageTokenExists()
+### checkStorageTokenExists
 
-> **checkStorageTokenExists**(`beneficiaryAddress`, `options?`): `Promise`\<`boolean`\>
+▸ **checkStorageTokenExists**(`beneficiaryAddress`, `options?`): `Promise`<`boolean`\>
 
 check if a storage token exists for the beneficiary in the Secret Management Service
 
@@ -68,29 +80,22 @@ console.log('IPFS storage initialized:', isIpfsStorageInitialized);
 
 #### Parameters
 
-##### beneficiaryAddress
-
-`string`
-
-##### options?
-
-###### provider?
-
-`string`
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
+| Name | Type |
+| :------ | :------ |
+| `beneficiaryAddress` | `string` |
+| `options?` | `Object` |
+| `options.provider?` | `string` |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`<`boolean`\>
 
-***
+___
 
-### defaultStorageLogin()
+### defaultStorageLogin
 
-> **defaultStorageLogin**(): `Promise`\<`string`\>
+▸ **defaultStorageLogin**(): `Promise`<`string`\>
 
 **SIGNER REQUIRED, ONLY BENEFICIARY**
 
@@ -105,13 +110,13 @@ console.log('default storage initialized:', isPushed);
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### pushStorageToken()
+### pushStorageToken
 
-> **pushStorageToken**(`token`, `options?`): `Promise`\<\{ `isPushed`: `boolean`; `isUpdated`: `boolean`; \}\>
+▸ **pushStorageToken**(`token`, `options?`): `Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
 
 **SIGNER REQUIRED, ONLY BENEFICIARY**
 
@@ -136,46 +141,36 @@ console.log('dropbox storage initialized:', isPushed);
 
 #### Parameters
 
-##### token
-
-`string`
-
-##### options?
-
-###### forceUpdate?
-
-`boolean`
-
-###### provider?
-
-`string`
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
+| Name | Type |
+| :------ | :------ |
+| `token` | `string` |
+| `options?` | `Object` |
+| `options.forceUpdate?` | `boolean` |
+| `options.provider?` | `string` |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`\<\{ `isPushed`: `boolean`; `isUpdated`: `boolean`; \}\>
+`Promise`<{ `isPushed`: `boolean` ; `isUpdated`: `boolean`  }\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecStorageModule`
+▸ **fromConfig**(`config`): [`IExecStorageModule`](IExecStorageModule.md)
 
 Create an IExecStorageModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecStorageModule`
+[`IExecStorageModule`](IExecStorageModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

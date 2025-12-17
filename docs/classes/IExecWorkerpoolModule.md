@@ -1,60 +1,78 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecWorkerpoolModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecWorkerpoolModule
 
 # Class: IExecWorkerpoolModule
 
 module exposing workerpool methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecWorkerpoolModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecWorkerpoolModule.md#constructor)
+
+### Properties
+
+- [config](IExecWorkerpoolModule.md#config)
+
+### Methods
+
+- [checkDeployedWorkerpool](IExecWorkerpoolModule.md#checkdeployedworkerpool)
+- [countUserWorkerpools](IExecWorkerpoolModule.md#countuserworkerpools)
+- [deployWorkerpool](IExecWorkerpoolModule.md#deployworkerpool)
+- [getWorkerpoolApiUrl](IExecWorkerpoolModule.md#getworkerpoolapiurl)
+- [predictWorkerpoolAddress](IExecWorkerpoolModule.md#predictworkerpooladdress)
+- [setWorkerpoolApiUrl](IExecWorkerpoolModule.md#setworkerpoolapiurl)
+- [showUserWorkerpool](IExecWorkerpoolModule.md#showuserworkerpool)
+- [showWorkerpool](IExecWorkerpoolModule.md#showworkerpool)
+- [transferWorkerpool](IExecWorkerpoolModule.md#transferworkerpool)
+- [fromConfig](IExecWorkerpoolModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecWorkerpoolModule**(`configOrArgs`, `options?`): `IExecWorkerpoolModule`
+• **new IExecWorkerpoolModule**(`configOrArgs`, `options?`): [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecWorkerpoolModule`
+[`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### checkDeployedWorkerpool()
+### checkDeployedWorkerpool
 
-> **checkDeployedWorkerpool**(`workerpoolAddress`): `Promise`\<`Boolean`\>
+▸ **checkDeployedWorkerpool**(`workerpoolAddress`): `Promise`<`Boolean`\>
 
 check if an workerpool is deployed at a given address
 
@@ -66,19 +84,19 @@ console.log('workerpool deployed', isDeployed);
 
 #### Parameters
 
-##### workerpoolAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`<`Boolean`\>
 
-***
+___
 
-### countUserWorkerpools()
+### countUserWorkerpools
 
-> **countUserWorkerpools**(`userAddress`): `Promise`\<[`BN`](../interfaces/BN.md)\>
+▸ **countUserWorkerpools**(`userAddress`): `Promise`<[`BN`](utils.BN.md)\>
 
 count the workerpools owned by an address.
 
@@ -90,19 +108,19 @@ console.log('workerpool count:', count);
 
 #### Parameters
 
-##### userAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `userAddress` | `string` |
 
 #### Returns
 
-`Promise`\<[`BN`](../interfaces/BN.md)\>
+`Promise`<[`BN`](utils.BN.md)\>
 
-***
+___
 
-### deployWorkerpool()
+### deployWorkerpool
 
-> **deployWorkerpool**(`workerpool`): `Promise`\<\{ `address`: `string`; `txHash`: `string`; \}\>
+▸ **deployWorkerpool**(`workerpool`): `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED**
 
@@ -119,19 +137,19 @@ console.log('deployed at', address);
 
 #### Parameters
 
-##### workerpool
-
-[`WorkerpoolDeploymentArgs`](../-internal-/interfaces/WorkerpoolDeploymentArgs.md)
+| Name | Type |
+| :------ | :------ |
+| `workerpool` | [`WorkerpoolDeploymentArgs`](../interfaces/internal_.WorkerpoolDeploymentArgs.md) |
 
 #### Returns
 
-`Promise`\<\{ `address`: `string`; `txHash`: `string`; \}\>
+`Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
-***
+___
 
-### getWorkerpoolApiUrl()
+### getWorkerpoolApiUrl
 
-> **getWorkerpoolApiUrl**(`workerpoolAddress`): `Promise`\<`string` \| `undefined`\>
+▸ **getWorkerpoolApiUrl**(`workerpoolAddress`): `Promise`<`undefined` \| `string`\>
 
 read the workerpool API url on the blockchain
 
@@ -145,19 +163,19 @@ console.log('workerpool API url:', url);
 
 #### Parameters
 
-##### workerpoolAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
 
 #### Returns
 
-`Promise`\<`string` \| `undefined`\>
+`Promise`<`undefined` \| `string`\>
 
-***
+___
 
-### predictWorkerpoolAddress()
+### predictWorkerpoolAddress
 
-> **predictWorkerpoolAddress**(`workerpool`): `Promise`\<`string`\>
+▸ **predictWorkerpoolAddress**(`workerpool`): `Promise`<`string`\>
 
 predict the workerpool contract address given the workerpool deployment arguments
 
@@ -172,19 +190,19 @@ console.log('address', address);
 
 #### Parameters
 
-##### workerpool
-
-[`WorkerpoolDeploymentArgs`](../-internal-/interfaces/WorkerpoolDeploymentArgs.md)
+| Name | Type |
+| :------ | :------ |
+| `workerpool` | [`WorkerpoolDeploymentArgs`](../interfaces/internal_.WorkerpoolDeploymentArgs.md) |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### setWorkerpoolApiUrl()
+### setWorkerpoolApiUrl
 
-> **setWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`\<`string`\>
+▸ **setWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`<`string`\>
 
 **ONLY WORKERPOOL ENS NAME OWNER**
 
@@ -200,23 +218,20 @@ console.log('txHash:', txHash);
 
 #### Parameters
 
-##### workerpoolAddress
-
-`string`
-
-##### url
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+| `url` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### showUserWorkerpool()
+### showUserWorkerpool
 
-> **showUserWorkerpool**(`index`, `address`): `Promise`\<\{ `objAddress`: `string`; `workerpool`: [`Workerpool`](../-internal-/interfaces/Workerpool.md); \}\>
+▸ **showUserWorkerpool**(`index`, `address`): `Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
 
 show deployed workerpool details by index for specified user user
 
@@ -228,23 +243,20 @@ console.log('workerpool:', workerpool);
 
 #### Parameters
 
-##### index
-
-[`BNish`](../type-aliases/BNish.md)
-
-##### address
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `index` | [`BNish`](../modules.md#bnish) |
+| `address` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `objAddress`: `string`; `workerpool`: [`Workerpool`](../-internal-/interfaces/Workerpool.md); \}\>
+`Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
 
-***
+___
 
-### showWorkerpool()
+### showWorkerpool
 
-> **showWorkerpool**(`workerpoolAddress`): `Promise`\<\{ `objAddress`: `string`; `workerpool`: [`Workerpool`](../-internal-/interfaces/Workerpool.md); \}\>
+▸ **showWorkerpool**(`workerpoolAddress`): `Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
 
 show a deployed workerpool details
 
@@ -256,19 +268,19 @@ console.log('workerpool:', workerpool);
 
 #### Parameters
 
-##### workerpoolAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `objAddress`: `string`; `workerpool`: [`Workerpool`](../-internal-/interfaces/Workerpool.md); \}\>
+`Promise`<{ `objAddress`: `string` ; `workerpool`: [`Workerpool`](../interfaces/internal_.Workerpool.md)  }\>
 
-***
+___
 
-### transferWorkerpool()
+### transferWorkerpool
 
-> **transferWorkerpool**(`workerpoolAddress`, `to`): `Promise`\<\{ `address`: `string`; `to`: `string`; `txHash`: `string`; \}\>
+▸ **transferWorkerpool**(`workerpoolAddress`, `to`): `Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
 **ONLY WORKERPOOL OWNER**
 
@@ -284,36 +296,33 @@ console.log(`workerpool ${address} ownership transferred to ${address} in tx ${t
 
 #### Parameters
 
-##### workerpoolAddress
-
-`string`
-
-##### to
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `workerpoolAddress` | `string` |
+| `to` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `address`: `string`; `to`: `string`; `txHash`: `string`; \}\>
+`Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecWorkerpoolModule`
+▸ **fromConfig**(`config`): [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
 Create an IExecWorkerpoolModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecWorkerpoolModule`
+[`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

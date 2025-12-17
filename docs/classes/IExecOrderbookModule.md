@@ -1,85 +1,77 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecOrderbookModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecOrderbookModule
 
 # Class: IExecOrderbookModule
 
 module exposing orderbook methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecOrderbookModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecOrderbookModule.md#constructor)
+
+### Properties
+
+- [config](IExecOrderbookModule.md#config)
+
+### Methods
+
+- [fetchAppOrderbook](IExecOrderbookModule.md#fetchapporderbook)
+- [fetchApporder](IExecOrderbookModule.md#fetchapporder)
+- [fetchDatasetOrderbook](IExecOrderbookModule.md#fetchdatasetorderbook)
+- [fetchDatasetorder](IExecOrderbookModule.md#fetchdatasetorder)
+- [fetchRequestOrderbook](IExecOrderbookModule.md#fetchrequestorderbook)
+- [fetchRequestorder](IExecOrderbookModule.md#fetchrequestorder)
+- [fetchWorkerpoolOrderbook](IExecOrderbookModule.md#fetchworkerpoolorderbook)
+- [fetchWorkerpoolorder](IExecOrderbookModule.md#fetchworkerpoolorder)
+- [fromConfig](IExecOrderbookModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecOrderbookModule**(`configOrArgs`, `options?`): `IExecOrderbookModule`
+• **new IExecOrderbookModule**(`configOrArgs`, `options?`): [`IExecOrderbookModule`](IExecOrderbookModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecOrderbookModule`
+[`IExecOrderbookModule`](IExecOrderbookModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### fetchApporder()
+### fetchAppOrderbook
 
-> **fetchApporder**(`orderHash`): `Promise`\<[`PublishedApporder`](../-internal-/interfaces/PublishedApporder.md)\>
-
-find a published apporder by orderHash.
-
-example:
-```js
-const { order, remaining } = await fetchApporder(orderHash);
-console.log('order:' order);
-console.log('remaining volume:', remaining);
-```
-
-#### Parameters
-
-##### orderHash
-
-`string`
-
-#### Returns
-
-`Promise`\<[`PublishedApporder`](../-internal-/interfaces/PublishedApporder.md)\>
-
-***
-
-### fetchAppOrderbook()
-
-> **fetchAppOrderbook**(`appAddressOrOptions`, `options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedApporder`](../-internal-/interfaces/PublishedApporder.md)\>\>
+▸ **fetchAppOrderbook**(`appAddressOrOptions`, `options?`): `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedApporder`](../interfaces/internal_.PublishedApporder.md)\>\>
 
 find the cheapest orders for the specified app.
 
@@ -94,200 +86,56 @@ console.log('total orders:', count);
 
 #### Parameters
 
-##### appAddressOrOptions
-
-`string` |
-
-\{ `app?`: `string`; `appOwner?`: `string`; `dataset?`: `string`; `isDatasetStrict?`: `boolean`; `isRequesterStrict?`: `boolean`; `isWorkerpoolStrict?`: `boolean`; `maxTag?`: [`Tag`](../type-aliases/Tag.md) \| `string`[]; `minTag?`: [`Tag`](../type-aliases/Tag.md) \| `string`[]; `minVolume?`: [`BNish`](../type-aliases/BNish.md); `page?`: `number`; `pageSize?`: `number`; `requester?`: `string`; `workerpool?`: `string`; \}
-
-###### app?
-
-`string`
-
-filter by app
-
-###### appOwner?
-
-`string`
-
-filter by app owner
-
-###### dataset?
-
-`string`
-
-include orders restricted to specified dataset (use `'any'` to include any dataset)
-
-###### isDatasetStrict?
-
-`boolean`
-
-filters out orders allowing “any” dataset (default: `false`)
-
-###### isRequesterStrict?
-
-`boolean`
-
-filters out orders allowing “any” requester (default: `false`)
-
-###### isWorkerpoolStrict?
-
-`boolean`
-
-filters out orders allowing “any” workerpool (default: `false`)
-
-###### maxTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by maximum tag accepted
-
-###### minTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by minimum tag required
-
-###### minVolume?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum volume remaining
-
-###### page?
-
-`number`
-
-index of the page to fetch
-
-###### pageSize?
-
-`number`
-
-size of the page to fetch
-
-###### requester?
-
-`string`
-
-include orders restricted to specified requester (use `'any'` to include any requester)
-
-###### workerpool?
-
-`string`
-
-include orders restricted to specified workerpool (use `'any'` to include any workerpool)
-
-##### options?
-
-**Deprecated**
-
-use first parameter instead
-
-migration:
-
-replace `fetchAppOrderbook(appAddress, options)` by `fetchAppOrderbook({ app: appAddress, ...options })`
-
-###### dataset?
-
-`string`
-
-include orders restricted to specified dataset (use `'any'` to include any dataset)
-
-###### isDatasetStrict?
-
-`boolean`
-
-filters out orders allowing “any” dataset (default: `false`)
-
-###### isRequesterStrict?
-
-`boolean`
-
-filters out orders allowing “any” requester (default: `false`)
-
-###### isWorkerpoolStrict?
-
-`boolean`
-
-filters out orders allowing “any” workerpool (default: `false`)
-
-###### maxTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by maximum tag accepted
-
-###### minTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by minimum tag required
-
-###### minVolume?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum volume remaining
-
-###### page?
-
-`number`
-
-index of the page to fetch
-
-###### pageSize?
-
-`number`
-
-size of the page to fetch
-
-###### requester?
-
-`string`
-
-include orders restricted to specified requester (use `'any'` to include any requester)
-
-###### workerpool?
-
-`string`
-
-include orders restricted to specified workerpool (use `'any'` to include any workerpool)
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `appAddressOrOptions` | `string` \| { `app?`: `string` ; `appOwner?`: `string` ; `dataset?`: `string` ; `isDatasetStrict?`: `boolean` ; `isRequesterStrict?`: `boolean` ; `isWorkerpoolStrict?`: `boolean` ; `maxTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minVolume?`: [`BNish`](../modules.md#bnish) ; `page?`: `number` ; `pageSize?`: `number` ; `requester?`: `string` ; `workerpool?`: `string`  } | - |
+| `options?` | `Object` | **`Deprecated`** use first parameter instead migration: replace `fetchAppOrderbook(appAddress, options)` by `fetchAppOrderbook({ app: appAddress, ...options })` |
+| `options.dataset?` | `string` | include orders restricted to specified dataset (use `'any'` to include any dataset) |
+| `options.isDatasetStrict?` | `boolean` | filters out orders allowing “any” dataset (default: `false`) |
+| `options.isRequesterStrict?` | `boolean` | filters out orders allowing “any” requester (default: `false`) |
+| `options.isWorkerpoolStrict?` | `boolean` | filters out orders allowing “any” workerpool (default: `false`) |
+| `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag accepted |
+| `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
+| `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
+| `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
+| `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
 #### Returns
 
-`Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedApporder`](../-internal-/interfaces/PublishedApporder.md)\>\>
+`Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedApporder`](../interfaces/internal_.PublishedApporder.md)\>\>
 
-***
+___
 
-### fetchDatasetorder()
+### fetchApporder
 
-> **fetchDatasetorder**(`orderHash`): `Promise`\<[`PublishedDatasetorder`](../-internal-/interfaces/PublishedDatasetorder.md)\>
+▸ **fetchApporder**(`orderHash`): `Promise`<[`PublishedApporder`](../interfaces/internal_.PublishedApporder.md)\>
 
-find a published datasetorder by orderHash.
+find a published apporder by orderHash.
 
 example:
 ```js
-const { order, remaining } = await fetchDatasetorder(orderHash);
+const { order, remaining } = await fetchApporder(orderHash);
 console.log('order:' order);
 console.log('remaining volume:', remaining);
 ```
 
 #### Parameters
 
-##### orderHash
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `orderHash` | `string` |
 
 #### Returns
 
-`Promise`\<[`PublishedDatasetorder`](../-internal-/interfaces/PublishedDatasetorder.md)\>
+`Promise`<[`PublishedApporder`](../interfaces/internal_.PublishedApporder.md)\>
 
-***
+___
 
-### fetchDatasetOrderbook()
+### fetchDatasetOrderbook
 
-> **fetchDatasetOrderbook**(`datasetAddressOrOptions`, `options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedDatasetorder`](../-internal-/interfaces/PublishedDatasetorder.md)\>\>
+▸ **fetchDatasetOrderbook**(`datasetAddressOrOptions`, `options?`): `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedDatasetorder`](../interfaces/internal_.PublishedDatasetorder.md)\>\>
 
 find the cheapest orders for the specified dataset.
 
@@ -302,212 +150,57 @@ console.log('total orders:', count);
 
 #### Parameters
 
-##### datasetAddressOrOptions
-
-`string` |
-
-\{ `app?`: `string`; `bulkOnly?`: `boolean`; `dataset?`: `string`; `datasetOwner?`: `string`; `isAppStrict?`: `boolean`; `isRequesterStrict?`: `boolean`; `isWorkerpoolStrict?`: `boolean`; `maxTag?`: [`Tag`](../type-aliases/Tag.md) \| `string`[]; `minTag?`: [`Tag`](../type-aliases/Tag.md) \| `string`[]; `minVolume?`: [`BNish`](../type-aliases/BNish.md); `page?`: `number`; `pageSize?`: `number`; `requester?`: `string`; `workerpool?`: `string`; \}
-
-###### app?
-
-`string`
-
-include orders restricted to specified app (use `'any'` to include any app)
-
-###### bulkOnly?
-
-`boolean`
-
-filters out orders that don't allow bulk processing (default: `false`)
-
-###### dataset?
-
-`string`
-
-filter by dataset
-
-###### datasetOwner?
-
-`string`
-
-filter by dataset owner
-
-###### isAppStrict?
-
-`boolean`
-
-filters out orders allowing “any” app (default: `false`)
-
-###### isRequesterStrict?
-
-`boolean`
-
-filters out orders allowing “any” requester (default: `false`)
-
-###### isWorkerpoolStrict?
-
-`boolean`
-
-filters out orders allowing “any” workerpool (default: `false`)
-
-###### maxTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by maximum tag accepted
-
-###### minTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by minimum tag required
-
-###### minVolume?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum volume remaining
-
-###### page?
-
-`number`
-
-index of the page to fetch
-
-###### pageSize?
-
-`number`
-
-size of the page to fetch
-
-###### requester?
-
-`string`
-
-include orders restricted to specified requester (use `'any'` to include any requester)
-
-###### workerpool?
-
-`string`
-
-include orders restricted to specified workerpool (use `'any'` to include any workerpool)
-
-##### options?
-
-**Deprecated**
-
-use first parameter instead
-
-migration:
-
-replace `fetchDatasetOrderbook(datasetAddress, options)` by `fetchDatasetOrderbook({ dataset: datasetAddress, ...options })`
-
-###### app?
-
-`string`
-
-include orders restricted to specified app (use `'any'` to include any app)
-
-###### bulkOnly?
-
-`boolean`
-
-filters out orders that don't allow bulk processing (default: `false`)
-
-###### isAppStrict?
-
-`boolean`
-
-filters out orders allowing “any” app (default: `false`)
-
-###### isRequesterStrict?
-
-`boolean`
-
-filters out orders allowing “any” requester (default: `false`)
-
-###### isWorkerpoolStrict?
-
-`boolean`
-
-filters out orders allowing “any” workerpool (default: `false`)
-
-###### maxTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by maximum tag accepted
-
-###### minTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by minimum tag required
-
-###### minVolume?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum volume remaining
-
-###### page?
-
-`number`
-
-index of the page to fetch
-
-###### pageSize?
-
-`number`
-
-size of the page to fetch
-
-###### requester?
-
-`string`
-
-include orders restricted to specified requester (use `'any'` to include any requester)
-
-###### workerpool?
-
-`string`
-
-include orders restricted to specified workerpool (use `'any'` to include any workerpool)
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `datasetAddressOrOptions` | `string` \| { `app?`: `string` ; `bulkOnly?`: `boolean` ; `dataset?`: `string` ; `datasetOwner?`: `string` ; `isAppStrict?`: `boolean` ; `isRequesterStrict?`: `boolean` ; `isWorkerpoolStrict?`: `boolean` ; `maxTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minTag?`: [`Tag`](../modules.md#tag) \| `string`[] ; `minVolume?`: [`BNish`](../modules.md#bnish) ; `page?`: `number` ; `pageSize?`: `number` ; `requester?`: `string` ; `workerpool?`: `string`  } | - |
+| `options?` | `Object` | **`Deprecated`** use first parameter instead migration: replace `fetchDatasetOrderbook(datasetAddress, options)` by `fetchDatasetOrderbook({ dataset: datasetAddress, ...options })` |
+| `options.app?` | `string` | include orders restricted to specified app (use `'any'` to include any app) |
+| `options.bulkOnly?` | `boolean` | filters out orders that don't allow bulk processing (default: `false`) |
+| `options.isAppStrict?` | `boolean` | filters out orders allowing “any” app (default: `false`) |
+| `options.isRequesterStrict?` | `boolean` | filters out orders allowing “any” requester (default: `false`) |
+| `options.isWorkerpoolStrict?` | `boolean` | filters out orders allowing “any” workerpool (default: `false`) |
+| `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag accepted |
+| `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
+| `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
+| `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
+| `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
 #### Returns
 
-`Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedDatasetorder`](../-internal-/interfaces/PublishedDatasetorder.md)\>\>
+`Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedDatasetorder`](../interfaces/internal_.PublishedDatasetorder.md)\>\>
 
-***
+___
 
-### fetchRequestorder()
+### fetchDatasetorder
 
-> **fetchRequestorder**(`orderHash`): `Promise`\<[`PublishedRequestorder`](../-internal-/interfaces/PublishedRequestorder.md)\>
+▸ **fetchDatasetorder**(`orderHash`): `Promise`<[`PublishedDatasetorder`](../interfaces/internal_.PublishedDatasetorder.md)\>
 
-find a published requestorder by orderHash.
+find a published datasetorder by orderHash.
 
 example:
 ```js
-const { order, remaining } = await fetchRequestorder(orderHash);
+const { order, remaining } = await fetchDatasetorder(orderHash);
 console.log('order:' order);
 console.log('remaining volume:', remaining);
 ```
 
 #### Parameters
 
-##### orderHash
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `orderHash` | `string` |
 
 #### Returns
 
-`Promise`\<[`PublishedRequestorder`](../-internal-/interfaces/PublishedRequestorder.md)\>
+`Promise`<[`PublishedDatasetorder`](../interfaces/internal_.PublishedDatasetorder.md)\>
 
-***
+___
 
-### fetchRequestOrderbook()
+### fetchRequestOrderbook
 
-> **fetchRequestOrderbook**(`options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>\>
+▸ **fetchRequestOrderbook**(`options?`): `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>\>
 
 find the best paying request orders for computing resource.
 
@@ -522,114 +215,56 @@ console.log('total orders:', count);
 
 #### Parameters
 
-##### options?
-
-###### app?
-
-`string`
-
-filter by specified app
-
-###### category?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by category
-
-###### dataset?
-
-`string`
-
-filter by specified dataset
-
-###### isWorkerpoolStrict?
-
-`boolean`
-
-filters out orders allowing “any” workerpool (default: `false`)
-
-###### maxTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by maximum tag accepted
-
-###### maxTrust?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by maximum trust required
-
-###### minTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by minimum tag required
-
-###### minVolume?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum volume remaining
-
-###### page?
-
-`number`
-
-index of the page to fetch
-
-###### pageSize?
-
-`number`
-
-size of the page to fetch
-
-###### requester?
-
-`string`
-
-filter by requester
-
-###### workerpool?
-
-`string`
-
-include orders restricted to specified workerpool (use `'any'` to include any workerpool)
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `options?` | `Object` | - |
+| `options.app?` | `string` | filter by specified app |
+| `options.category?` | [`BNish`](../modules.md#bnish) | filter by category |
+| `options.dataset?` | `string` | filter by specified dataset |
+| `options.isWorkerpoolStrict?` | `boolean` | filters out orders allowing “any” workerpool (default: `false`) |
+| `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag accepted |
+| `options.maxTrust?` | [`BNish`](../modules.md#bnish) | filter by maximum trust required |
+| `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
+| `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
+| `options.requester?` | `string` | filter by requester |
+| `options.workerpool?` | `string` | include orders restricted to specified workerpool (use `'any'` to include any workerpool) |
 
 #### Returns
 
-`Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>\>
+`Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>\>
 
-***
+___
 
-### fetchWorkerpoolorder()
+### fetchRequestorder
 
-> **fetchWorkerpoolorder**(`orderHash`): `Promise`\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>
+▸ **fetchRequestorder**(`orderHash`): `Promise`<[`PublishedRequestorder`](../interfaces/internal_.PublishedRequestorder.md)\>
 
-find a published workerpoolorder by orderHash.
+find a published requestorder by orderHash.
 
 example:
 ```js
-const { order, remaining } = await fetchWorkerpoolorder(orderHash);
+const { order, remaining } = await fetchRequestorder(orderHash);
 console.log('order:' order);
 console.log('remaining volume:', remaining);
 ```
 
 #### Parameters
 
-##### orderHash
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `orderHash` | `string` |
 
 #### Returns
 
-`Promise`\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>
+`Promise`<[`PublishedRequestorder`](../interfaces/internal_.PublishedRequestorder.md)\>
 
-***
+___
 
-### fetchWorkerpoolOrderbook()
+### fetchWorkerpoolOrderbook
 
-> **fetchWorkerpoolOrderbook**(`options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>\>
+▸ **fetchWorkerpoolOrderbook**(`options?`): `Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>\>
 
 find the cheapest orders for the specified computing resource.
 
@@ -644,120 +279,72 @@ console.log('total orders:', count);
 
 #### Parameters
 
-##### options?
-
-###### app?
-
-`string`
-
-include orders restricted to specified app (use `'any'` to include any app)
-
-###### category?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by category
-
-###### dataset?
-
-`string`
-
-include orders restricted to specified dataset (use `'any'` to include any dataset)
-
-###### isAppStrict?
-
-`boolean`
-
-filters out orders allowing “any” app (default: `false`)
-
-###### isDatasetStrict?
-
-`boolean`
-
-filters out orders allowing “any” dataset (default: `false`)
-
-###### isRequesterStrict?
-
-`boolean`
-
-filters out orders allowing “any” requester (default: `false`)
-
-###### maxTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by maximum tag offered
-
-###### minTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by minimum tag required
-
-###### minTrust?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum trust required
-
-###### minVolume?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum volume remaining
-
-###### page?
-
-`number`
-
-index of the page to fetch
-
-###### pageSize?
-
-`number`
-
-size of the page to fetch
-
-###### requester?
-
-`string`
-
-include orders restricted to specified requester (use `'any'` to include any requester)
-
-###### workerpool?
-
-`string`
-
-filter by workerpool
-
-###### workerpoolOwner?
-
-`string`
-
-filter by workerpool owner
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `options?` | `Object` | - |
+| `options.app?` | `string` | include orders restricted to specified app (use `'any'` to include any app) |
+| `options.category?` | [`BNish`](../modules.md#bnish) | filter by category |
+| `options.dataset?` | `string` | include orders restricted to specified dataset (use `'any'` to include any dataset) |
+| `options.isAppStrict?` | `boolean` | filters out orders allowing “any” app (default: `false`) |
+| `options.isDatasetStrict?` | `boolean` | filters out orders allowing “any” dataset (default: `false`) |
+| `options.isRequesterStrict?` | `boolean` | filters out orders allowing “any” requester (default: `false`) |
+| `options.maxTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by maximum tag offered |
+| `options.minTag?` | [`Tag`](../modules.md#tag) \| `string`[] | filter by minimum tag required |
+| `options.minTrust?` | [`BNish`](../modules.md#bnish) | filter by minimum trust required |
+| `options.minVolume?` | [`BNish`](../modules.md#bnish) | filter by minimum volume remaining |
+| `options.page?` | `number` | index of the page to fetch |
+| `options.pageSize?` | `number` | size of the page to fetch |
+| `options.requester?` | `string` | include orders restricted to specified requester (use `'any'` to include any requester) |
+| `options.workerpool?` | `string` | filter by workerpool |
+| `options.workerpoolOwner?` | `string` | filter by workerpool owner |
 
 #### Returns
 
-`Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>\>
+`Promise`<[`PaginableOrders`](../interfaces/internal_.PaginableOrders.md)<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>\>
 
-***
+___
 
-### fromConfig()
+### fetchWorkerpoolorder
 
-> `static` **fromConfig**(`config`): `IExecOrderbookModule`
+▸ **fetchWorkerpoolorder**(`orderHash`): `Promise`<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>
+
+find a published workerpoolorder by orderHash.
+
+example:
+```js
+const { order, remaining } = await fetchWorkerpoolorder(orderHash);
+console.log('order:' order);
+console.log('remaining volume:', remaining);
+```
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `orderHash` | `string` |
+
+#### Returns
+
+`Promise`<[`PublishedWorkerpoolorder`](../interfaces/internal_.PublishedWorkerpoolorder.md)\>
+
+___
+
+### fromConfig
+
+▸ **fromConfig**(`config`): [`IExecOrderbookModule`](IExecOrderbookModule.md)
 
 Create an IExecOrderbookModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecOrderbookModule`
+[`IExecOrderbookModule`](IExecOrderbookModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

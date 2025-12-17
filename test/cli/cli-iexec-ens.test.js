@@ -1,7 +1,7 @@
 // @jest/global comes with jest
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
-import { TEST_CHAINS, execAsync } from '../test-utils.js';
+import { TEST_CHAINS, execAsync, sleep } from '../test-utils.js';
 import {
   globalSetup,
   globalTeardown,
@@ -9,6 +9,7 @@ import {
   runIExecCliRaw,
   setChain,
   setRandomWallet,
+  waitForEnsTransactions,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
@@ -93,6 +94,9 @@ describe('iexec ens', () => {
       expect(res.setAddrTxHash).toBeTxHash();
       expect(res.setNameTxHash).toBeTxHash();
 
+      // Wait for transactions to be confirmed to prevent nonce issues
+      await waitForEnsTransactions(res, testChain);
+
       const showAddressRes = await runIExecCliRaw(
         `${iexecPath} app show ${app}`,
       );
@@ -106,9 +110,22 @@ describe('iexec ens', () => {
 
     test('iexec ens register <name> --for <dataset>', async () => {
       const expectedEns = `${dataset.toLowerCase()}.datasets.iexec.eth`;
-      const res = await runIExecCliRaw(
+
+      // Wait a bit to ensure previous transactions are confirmed
+      await sleep(2000);
+
+      let res = await runIExecCliRaw(
         `${iexecPath} ens register ${dataset.toLowerCase()} --for ${dataset} --raw`,
       );
+
+      // If registration fails due to nonce issue, wait and retry
+      if (!res.ok && res.error && res.error.includes('nonce')) {
+        await sleep(3000);
+        res = await runIExecCliRaw(
+          `${iexecPath} ens register ${dataset.toLowerCase()} --for ${dataset} --raw`,
+        );
+      }
+
       expect(res.ok).toBe(true);
       expect(res.name).toBe(expectedEns);
       expect(res.address).toBe(dataset);
@@ -116,6 +133,10 @@ describe('iexec ens', () => {
       expect(res.setResolverTxHash).toBeTxHash();
       expect(res.setAddrTxHash).toBeTxHash();
       expect(res.setNameTxHash).toBeTxHash();
+
+      // Wait for transactions to be confirmed
+      await waitForEnsTransactions(res, testChain);
+
       const showAddressRes = await runIExecCliRaw(
         `${iexecPath} dataset show ${dataset}`,
       );

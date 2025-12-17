@@ -1,60 +1,76 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecAccountModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecAccountModule
 
 # Class: IExecAccountModule
 
 module exposing account methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecAccountModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecAccountModule.md#constructor)
+
+### Properties
+
+- [config](IExecAccountModule.md#config)
+
+### Methods
+
+- [approve](IExecAccountModule.md#approve)
+- [checkAllowance](IExecAccountModule.md#checkallowance)
+- [checkBalance](IExecAccountModule.md#checkbalance)
+- [checkBridgedBalance](IExecAccountModule.md#checkbridgedbalance)
+- [deposit](IExecAccountModule.md#deposit)
+- [revokeApproval](IExecAccountModule.md#revokeapproval)
+- [withdraw](IExecAccountModule.md#withdraw)
+- [fromConfig](IExecAccountModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecAccountModule**(`configOrArgs`, `options?`): `IExecAccountModule`
+• **new IExecAccountModule**(`configOrArgs`, `options?`): [`IExecAccountModule`](IExecAccountModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecAccountModule`
+[`IExecAccountModule`](IExecAccountModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### approve()
+### approve
 
-> **approve**(`amount`, `spenderAddress`): `Promise`\<`string`\>
+▸ **approve**(`amount`, `spenderAddress`): `Promise`<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -68,23 +84,20 @@ console.log('tx:', txHash);
 
 #### Parameters
 
-##### amount
-
-[`NRLCAmount`](../type-aliases/NRLCAmount.md)
-
-##### spenderAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `amount` | [`NRLCAmount`](../modules.md#nrlcamount) |
+| `spenderAddress` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### checkAllowance()
+### checkAllowance
 
-> **checkAllowance**(`ownerAddress`, `spenderAddress`): `Promise`\<[`NRLCAmount`](../type-aliases/NRLCAmount.md)\>
+▸ **checkAllowance**(`ownerAddress`, `spenderAddress`): `Promise`<[`NRLCAmount`](../modules.md#nrlcamount)\>
 
 checks the amount of allowance approved for the specified spender to use the account of the owner.
 
@@ -96,23 +109,20 @@ console.log('allowance amount:', allowanceAmount);
 
 #### Parameters
 
-##### ownerAddress
-
-`string`
-
-##### spenderAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `ownerAddress` | `string` |
+| `spenderAddress` | `string` |
 
 #### Returns
 
-`Promise`\<[`NRLCAmount`](../type-aliases/NRLCAmount.md)\>
+`Promise`<[`NRLCAmount`](../modules.md#nrlcamount)\>
 
-***
+___
 
-### checkBalance()
+### checkBalance
 
-> **checkBalance**(`address`): `Promise`\<\{ `locked`: [`BN`](../interfaces/BN.md); `stake`: [`BN`](../interfaces/BN.md); \}\>
+▸ **checkBalance**(`address`): `Promise`<{ `locked`: [`BN`](utils.BN.md) ; `stake`: [`BN`](utils.BN.md)  }\>
 
 check the account balance of specified address (stake is available nRLC, locked is escrowed nRLC)
 
@@ -125,19 +135,19 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 #### Parameters
 
-##### address
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `address` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `locked`: [`BN`](../interfaces/BN.md); `stake`: [`BN`](../interfaces/BN.md); \}\>
+`Promise`<{ `locked`: [`BN`](utils.BN.md) ; `stake`: [`BN`](utils.BN.md)  }\>
 
-***
+___
 
-### checkBridgedBalance()
+### checkBridgedBalance
 
-> **checkBridgedBalance**(`address`): `Promise`\<\{ `locked`: [`BN`](../interfaces/BN.md); `stake`: [`BN`](../interfaces/BN.md); \}\>
+▸ **checkBridgedBalance**(`address`): `Promise`<{ `locked`: [`BN`](utils.BN.md) ; `stake`: [`BN`](utils.BN.md)  }\>
 
 check the account balance on bridged chain of specified address ie: when connected to mainnet, check the account ballance on bellecour
 example:
@@ -149,19 +159,19 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 #### Parameters
 
-##### address
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `address` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `locked`: [`BN`](../interfaces/BN.md); `stake`: [`BN`](../interfaces/BN.md); \}\>
+`Promise`<{ `locked`: [`BN`](utils.BN.md) ; `stake`: [`BN`](utils.BN.md)  }\>
 
-***
+___
 
-### deposit()
+### deposit
 
-> **deposit**(`amount`): `Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+▸ **deposit**(`amount`): `Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED**
 
@@ -176,19 +186,19 @@ console.log('tx:', txHash);
 
 #### Parameters
 
-##### amount
-
-[`NRLCAmount`](../type-aliases/NRLCAmount.md)
+| Name | Type |
+| :------ | :------ |
+| `amount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
-`Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+`Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
-***
+___
 
-### revokeApproval()
+### revokeApproval
 
-> **revokeApproval**(`spenderAddress`): `Promise`\<`string`\>
+▸ **revokeApproval**(`spenderAddress`): `Promise`<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -202,19 +212,19 @@ console.log('tx:', txHash);
 
 #### Parameters
 
-##### spenderAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `spenderAddress` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### withdraw()
+### withdraw
 
-> **withdraw**(`amount`): `Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+▸ **withdraw**(`amount`): `Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED**
 
@@ -229,32 +239,32 @@ console.log('tx:', txHash);
 
 #### Parameters
 
-##### amount
-
-[`NRLCAmount`](../type-aliases/NRLCAmount.md)
+| Name | Type |
+| :------ | :------ |
+| `amount` | [`NRLCAmount`](../modules.md#nrlcamount) |
 
 #### Returns
 
-`Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+`Promise`<{ `amount`: [`BN`](utils.BN.md) ; `txHash`: `string`  }\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecAccountModule`
+▸ **fromConfig**(`config`): [`IExecAccountModule`](IExecAccountModule.md)
 
 Create an IExecAccountModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecAccountModule`
+[`IExecAccountModule`](IExecAccountModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

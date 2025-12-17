@@ -1,60 +1,78 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecENSModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecENSModule
 
 # Class: IExecENSModule
 
 module exposing ENS methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecENSModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecENSModule.md#constructor)
+
+### Properties
+
+- [config](IExecENSModule.md#config)
+
+### Methods
+
+- [claimName](IExecENSModule.md#claimname)
+- [configureResolution](IExecENSModule.md#configureresolution)
+- [getDefaultDomain](IExecENSModule.md#getdefaultdomain)
+- [getOwner](IExecENSModule.md#getowner)
+- [lookupAddress](IExecENSModule.md#lookupaddress)
+- [obsConfigureResolution](IExecENSModule.md#obsconfigureresolution)
+- [readTextRecord](IExecENSModule.md#readtextrecord)
+- [resolveName](IExecENSModule.md#resolvename)
+- [setTextRecord](IExecENSModule.md#settextrecord)
+- [fromConfig](IExecENSModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecENSModule**(`configOrArgs`, `options?`): `IExecENSModule`
+• **new IExecENSModule**(`configOrArgs`, `options?`): [`IExecENSModule`](IExecENSModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecENSModule`
+[`IExecENSModule`](IExecENSModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### claimName()
+### claimName
 
-> **claimName**(`label`, `domain?`): `Promise`\<\{ `name`: `string`; `registerTxHash?`: `string`; \}\>
+▸ **claimName**(`label`, `domain?`): `Promise`<{ `name`: `string` ; `registerTxHash?`: `string`  }\>
 
 register a subdomain (label) on an ENS FIFSRegistrar
 
@@ -73,23 +91,20 @@ console.log('registered:', name);
 
 #### Parameters
 
-##### label
-
-`string`
-
-##### domain?
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `label` | `string` |
+| `domain?` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `name`: `string`; `registerTxHash?`: `string`; \}\>
+`Promise`<{ `name`: `string` ; `registerTxHash?`: `string`  }\>
 
-***
+___
 
-### configureResolution()
+### configureResolution
 
-> **configureResolution**(`name`, `address?`): `Promise`\<\{ `address`: `string`; `name`: `string`; `setAddrTxHash?`: `string`; `setNameTxHash?`: `string`; `setResolverTxHash?`: `string`; \}\>
+▸ **configureResolution**(`name`, `address?`): `Promise`<{ `address`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
 
 **SIGNER REQUIRED, ONLY ENS NAME OWNER**
 
@@ -118,23 +133,20 @@ console.log('configured resolution:', address, '<=>', name);
 
 #### Parameters
 
-##### name
-
-`string`
-
-##### address?
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `address?` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `address`: `string`; `name`: `string`; `setAddrTxHash?`: `string`; `setNameTxHash?`: `string`; `setResolverTxHash?`: `string`; \}\>
+`Promise`<{ `address`: `string` ; `name`: `string` ; `setAddrTxHash?`: `string` ; `setNameTxHash?`: `string` ; `setResolverTxHash?`: `string`  }\>
 
-***
+___
 
-### getDefaultDomain()
+### getDefaultDomain
 
-> **getDefaultDomain**(`address`): `Promise`\<`string`\>
+▸ **getDefaultDomain**(`address`): `Promise`<`string`\>
 
 get the default free to use ENS domain given an address
 
@@ -150,19 +162,19 @@ console.log('default domain:', domain);
 
 #### Parameters
 
-##### address
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `address` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### getOwner()
+### getOwner
 
-> **getOwner**(`name`): `Promise`\<`string` \| `null`\>
+▸ **getOwner**(`name`): `Promise`<``null`` \| `string`\>
 
 get the address of the ENS name's owner.
 
@@ -174,19 +186,19 @@ console.log('iexec.eth owner:', owner);
 
 #### Parameters
 
-##### name
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`<``null`` \| `string`\>
 
-***
+___
 
-### lookupAddress()
+### lookupAddress
 
-> **lookupAddress**(`address`): `Promise`\<`string` \| `null`\>
+▸ **lookupAddress**(`address`): `Promise`<``null`` \| `string`\>
 
 lookup to find the ENS name of an ethereum address
 
@@ -198,19 +210,19 @@ console.log('ENS name:', name);
 
 #### Parameters
 
-##### address
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `address` | `string` |
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`<``null`` \| `string`\>
 
-***
+___
 
-### obsConfigureResolution()
+### obsConfigureResolution
 
-> **obsConfigureResolution**(`name`, `address?`): `Promise`\<[`ENSConfigurationObservable`](../-internal-/classes/ENSConfigurationObservable.md)\>
+▸ **obsConfigureResolution**(`name`, `address?`): `Promise`<[`ENSConfigurationObservable`](internal_.ENSConfigurationObservable.md)\>
 
 **SIGNER REQUIRED, ONLY ENS NAME OWNER**
 
@@ -253,23 +265,20 @@ configureResolutionObservable.subscribe({
 
 #### Parameters
 
-##### name
-
-`string`
-
-##### address?
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `address?` | `string` |
 
 #### Returns
 
-`Promise`\<[`ENSConfigurationObservable`](../-internal-/classes/ENSConfigurationObservable.md)\>
+`Promise`<[`ENSConfigurationObservable`](internal_.ENSConfigurationObservable.md)\>
 
-***
+___
 
-### readTextRecord()
+### readTextRecord
 
-> **readTextRecord**(`name`, `key`): `Promise`\<`string`\>
+▸ **readTextRecord**(`name`, `key`): `Promise`<`string`\>
 
 read an ENS text record associated to an ENS name
 
@@ -281,23 +290,20 @@ console.log('email record:', value);
 
 #### Parameters
 
-##### name
-
-`string`
-
-##### key
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `key` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### resolveName()
+### resolveName
 
-> **resolveName**(`name`): `Promise`\<`string` \| `null`\>
+▸ **resolveName**(`name`): `Promise`<``null`` \| `string`\>
 
 resolve the ENS name to an ethereum address if a resolver is configured for the name
 
@@ -309,19 +315,19 @@ console.log('me.users.iexec.eth:', address);
 
 #### Parameters
 
-##### name
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`<``null`` \| `string`\>
 
-***
+___
 
-### setTextRecord()
+### setTextRecord
 
-> **setTextRecord**(`name`, `key`, `value?`): `Promise`\<`string`\>
+▸ **setTextRecord**(`name`, `key`, `value?`): `Promise`<`string`\>
 
 **ONLY ENS NAME OWNER**
 
@@ -342,40 +348,34 @@ console.log('txHash:', txHash);
 
 #### Parameters
 
-##### name
-
-`string`
-
-##### key
-
-`string`
-
-##### value?
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `key` | `string` |
+| `value?` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecENSModule`
+▸ **fromConfig**(`config`): [`IExecENSModule`](IExecENSModule.md)
 
 Create an IExecENSModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecENSModule`
+[`IExecENSModule`](IExecENSModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

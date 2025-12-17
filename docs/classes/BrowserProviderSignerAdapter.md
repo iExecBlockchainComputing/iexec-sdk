@@ -1,53 +1,60 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / BrowserProviderSignerAdapter
+[iexec](../README.md) / [Exports](../modules.md) / BrowserProviderSignerAdapter
 
 # Class: BrowserProviderSignerAdapter
 
 BrowserProvider wrapped in an AbstractSigner
 
-## Extends
+## Hierarchy
 
 - `AbstractSigner`
 
+  ↳ **`BrowserProviderSignerAdapter`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](BrowserProviderSignerAdapter.md#constructor)
+
+### Methods
+
+- [connect](BrowserProviderSignerAdapter.md#connect)
+- [getAddress](BrowserProviderSignerAdapter.md#getaddress)
+- [signMessage](BrowserProviderSignerAdapter.md#signmessage)
+- [signTransaction](BrowserProviderSignerAdapter.md#signtransaction)
+- [signTypedData](BrowserProviderSignerAdapter.md#signtypeddata)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new BrowserProviderSignerAdapter**(`browserProvider`): `BrowserProviderSignerAdapter`
+• **new BrowserProviderSignerAdapter**(`browserProvider`): [`BrowserProviderSignerAdapter`](BrowserProviderSignerAdapter.md)
 
 #### Parameters
 
-##### browserProvider
-
-`BrowserProvider`
+| Name | Type |
+| :------ | :------ |
+| `browserProvider` | `BrowserProvider` |
 
 #### Returns
 
-`BrowserProviderSignerAdapter`
+[`BrowserProviderSignerAdapter`](BrowserProviderSignerAdapter.md)
 
 #### Overrides
 
-`AbstractSigner.constructor`
+AbstractSigner.constructor
 
 ## Methods
 
-### connect()
+### connect
 
-> **connect**(`provider`): `Signer`
-
-Returns the signer connected to %%provider%%.
-
- This may throw, for example, a Signer connected over a Socket or
- to a specific instance of a node may not be transferrable.
+▸ **connect**(`provider`): `Signer`
 
 #### Parameters
 
-##### provider
-
-`Provider` | `null`
+| Name | Type |
+| :------ | :------ |
+| `provider` | ``null`` \| `Provider` |
 
 #### Returns
 
@@ -55,88 +62,80 @@ Returns the signer connected to %%provider%%.
 
 #### Overrides
 
-`AbstractSigner.connect`
+AbstractSigner.connect
 
-***
+___
 
-### getAddress()
+### getAddress
 
-> **getAddress**(): `Promise`\<`string`\>
-
-Resolves to the Signer address.
+▸ **getAddress**(): `Promise`<`string`\>
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
 #### Overrides
 
-`AbstractSigner.getAddress`
+AbstractSigner.getAddress
 
-***
+___
 
-### signMessage()
+### signMessage
 
-> **signMessage**(`message`): `Promise`\<`string`\>
+▸ **signMessage**(`message`): `Promise`<`string`\>
 
 #### Parameters
 
-##### message
-
-`string` | `Uint8Array`
+| Name | Type |
+| :------ | :------ |
+| `message` | `string` \| `Uint8Array` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
 #### Overrides
 
-`AbstractSigner.signMessage`
+AbstractSigner.signMessage
 
-***
+___
 
-### signTransaction()
+### signTransaction
 
-> **signTransaction**(`tx`): `Promise`\<`string`\>
+▸ **signTransaction**(`tx`): `Promise`<`string`\>
 
 #### Parameters
 
-##### tx
-
-`TransactionRequest`
+| Name | Type |
+| :------ | :------ |
+| `tx` | `TransactionRequest` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
 #### Overrides
 
-`AbstractSigner.signTransaction`
+AbstractSigner.signTransaction
 
-***
+___
 
-### signTypedData()
+### signTypedData
 
-> **signTypedData**(`domain`, `types`, `value`): `Promise`\<`string`\>
+▸ **signTypedData**(`domain`, `types`, `value`): `Promise`<`string`\>
 
 #### Parameters
 
-##### domain
-
-`TypedDataDomain`
-
-##### types
-
-`Record`\<`string`, `TypedDataField`[]\>
-
-##### value
-
-`Record`\<`string`, `any`\>
+| Name | Type |
+| :------ | :------ |
+| `domain` | `TypedDataDomain` |
+| `types` | `Record`<`string`, `TypedDataField`[]\> |
+| `value` | `Record`<`string`, `any`\> |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
 #### Overrides
 
-`AbstractSigner.signTypedData`
+AbstractSigner.signTypedData

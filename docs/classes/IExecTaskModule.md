@@ -1,60 +1,75 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecTaskModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecTaskModule
 
 # Class: IExecTaskModule
 
 module exposing task methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecTaskModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecTaskModule.md#constructor)
+
+### Properties
+
+- [config](IExecTaskModule.md#config)
+
+### Methods
+
+- [claim](IExecTaskModule.md#claim)
+- [fetchLogs](IExecTaskModule.md#fetchlogs)
+- [fetchOffchainInfo](IExecTaskModule.md#fetchoffchaininfo)
+- [fetchResults](IExecTaskModule.md#fetchresults)
+- [obsTask](IExecTaskModule.md#obstask)
+- [show](IExecTaskModule.md#show)
+- [fromConfig](IExecTaskModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecTaskModule**(`configOrArgs`, `options?`): `IExecTaskModule`
+• **new IExecTaskModule**(`configOrArgs`, `options?`): [`IExecTaskModule`](IExecTaskModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecTaskModule`
+[`IExecTaskModule`](IExecTaskModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### claim()
+### claim
 
-> **claim**(`taskid`): `Promise`\<`string`\>
+▸ **claim**(`taskid`): `Promise`<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -68,19 +83,19 @@ console.log('task claimed:', claimTxHash);
 
 #### Parameters
 
-##### taskid
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `taskid` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### fetchLogs()
+### fetchLogs
 
-> **fetchLogs**(`taskid`): `Promise`\<`object`[]\>
+▸ **fetchLogs**(`taskid`): `Promise`<{ `stderr`: `string` ; `stdout`: `string` ; `worker`: `string`  }[]\>
 
 **SIGNER REQUIRED, ONLY REQUESTER**
 
@@ -100,19 +115,19 @@ logsArray.forEach(({ worker, stdout, stderr }) => {
 
 #### Parameters
 
-##### taskid
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `taskid` | `string` |
 
 #### Returns
 
-`Promise`\<`object`[]\>
+`Promise`<{ `stderr`: `string` ; `stdout`: `string` ; `worker`: `string`  }[]\>
 
-***
+___
 
-### fetchOffchainInfo()
+### fetchOffchainInfo
 
-> **fetchOffchainInfo**(`taskid`): `Promise`\<\{ `replicates`: `object`[]; `task`: \{ `status`: `string`; `statusHistory`: `object`[]; \}; \}\>
+▸ **fetchOffchainInfo**(`taskid`): `Promise`<{ `replicates`: { `exitCode?`: `number` ; `status`: `string` ; `statusHistory`: { `cause?`: `string` ; `date`: `string` ; `status`: `string`  }[] ; `worker`: `string`  }[] ; `task`: { `status`: `string` ; `statusHistory`: { `cause?`: `string` ; `date`: `string` ; `status`: `string`  }[]  }  }\>
 
 get off-chain status information for specified task.
 
@@ -130,19 +145,19 @@ replicates.forEach(({ worker, status }) =>
 
 #### Parameters
 
-##### taskid
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `taskid` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `replicates`: `object`[]; `task`: \{ `status`: `string`; `statusHistory`: `object`[]; \}; \}\>
+`Promise`<{ `replicates`: { `exitCode?`: `number` ; `status`: `string` ; `statusHistory`: { `cause?`: `string` ; `date`: `string` ; `status`: `string`  }[] ; `worker`: `string`  }[] ; `task`: { `status`: `string` ; `statusHistory`: { `cause?`: `string` ; `date`: `string` ; `status`: `string`  }[]  }  }\>
 
-***
+___
 
-### fetchResults()
+### fetchResults
 
-> **fetchResults**(`taskid`): `Promise`\<`Response`\>
+▸ **fetchResults**(`taskid`): `Promise`<`Response`\>
 
 **IPFS stored results only**
 
@@ -156,19 +171,19 @@ const binary = await response.blob();
 
 #### Parameters
 
-##### taskid
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `taskid` | `string` |
 
 #### Returns
 
-`Promise`\<`Response`\>
+`Promise`<`Response`\>
 
-***
+___
 
-### obsTask()
+### obsTask
 
-> **obsTask**(`taskid`, `optional?`): `Promise`\<[`TaskObservable`](../-internal-/classes/TaskObservable.md)\>
+▸ **obsTask**(`taskid`, `optional?`): `Promise`<[`TaskObservable`](internal_.TaskObservable.md)\>
 
 return an Observable with a `subscribe` method to monitor the task status changes.
 
@@ -204,25 +219,21 @@ const task = await waitFinalState(
 
 #### Parameters
 
-##### taskid
-
-`string`
-
-##### optional?
-
-###### dealid?
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `taskid` | `string` |
+| `optional?` | `Object` |
+| `optional.dealid?` | `string` |
 
 #### Returns
 
-`Promise`\<[`TaskObservable`](../-internal-/classes/TaskObservable.md)\>
+`Promise`<[`TaskObservable`](internal_.TaskObservable.md)\>
 
-***
+___
 
-### show()
+### show
 
-> **show**(`taskid`): `Promise`\<[`Task`](../-internal-/interfaces/Task.md)\>
+▸ **show**(`taskid`): `Promise`<[`Task`](../interfaces/internal_.Task.md)\>
 
 show the details of a task.
 
@@ -236,32 +247,32 @@ console.log('task:', task);
 
 #### Parameters
 
-##### taskid
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `taskid` | `string` |
 
 #### Returns
 
-`Promise`\<[`Task`](../-internal-/interfaces/Task.md)\>
+`Promise`<[`Task`](../interfaces/internal_.Task.md)\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecTaskModule`
+▸ **fromConfig**(`config`): [`IExecTaskModule`](IExecTaskModule.md)
 
 Create an IExecTaskModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecTaskModule`
+[`IExecTaskModule`](IExecTaskModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

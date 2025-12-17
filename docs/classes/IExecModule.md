@@ -1,77 +1,102 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecModule
 
 # Class: IExecModule
 
 module base
 
-## Extended by
+## Hierarchy
 
-- [`IExec`](IExec.md)
-- [`IExecAccountModule`](IExecAccountModule.md)
-- [`IExecAppModule`](IExecAppModule.md)
-- [`IExecDatasetModule`](IExecDatasetModule.md)
-- [`IExecDealModule`](IExecDealModule.md)
-- [`IExecENSModule`](IExecENSModule.md)
-- [`IExecHubModule`](IExecHubModule.md)
-- [`IExecNetworkModule`](IExecNetworkModule.md)
-- [`IExecOrderModule`](IExecOrderModule.md)
-- [`IExecOrderbookModule`](IExecOrderbookModule.md)
-- [`IExecResultModule`](IExecResultModule.md)
-- [`IExecSecretsModule`](IExecSecretsModule.md)
-- [`IExecStorageModule`](IExecStorageModule.md)
-- [`IExecTaskModule`](IExecTaskModule.md)
-- [`IExecVoucherModule`](IExecVoucherModule.md)
-- [`IExecWalletModule`](IExecWalletModule.md)
-- [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
+- **`IExecModule`**
+
+  ↳ [`IExec`](IExec.md)
+
+  ↳ [`IExecAccountModule`](IExecAccountModule.md)
+
+  ↳ [`IExecAppModule`](IExecAppModule.md)
+
+  ↳ [`IExecDatasetModule`](IExecDatasetModule.md)
+
+  ↳ [`IExecDealModule`](IExecDealModule.md)
+
+  ↳ [`IExecENSModule`](IExecENSModule.md)
+
+  ↳ [`IExecHubModule`](IExecHubModule.md)
+
+  ↳ [`IExecNetworkModule`](IExecNetworkModule.md)
+
+  ↳ [`IExecOrderModule`](IExecOrderModule.md)
+
+  ↳ [`IExecOrderbookModule`](IExecOrderbookModule.md)
+
+  ↳ [`IExecResultModule`](IExecResultModule.md)
+
+  ↳ [`IExecSecretsModule`](IExecSecretsModule.md)
+
+  ↳ [`IExecStorageModule`](IExecStorageModule.md)
+
+  ↳ [`IExecTaskModule`](IExecTaskModule.md)
+
+  ↳ [`IExecVoucherModule`](IExecVoucherModule.md)
+
+  ↳ [`IExecWalletModule`](IExecWalletModule.md)
+
+  ↳ [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecModule.md#constructor)
+
+### Properties
+
+- [config](IExecModule.md#config)
+
+### Methods
+
+- [fromConfig](IExecModule.md#fromconfig)
 
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecModule**(`configOrArgs`, `options?`): `IExecModule`
+• **new IExecModule**(`configOrArgs`, `options?`): [`IExecModule`](IExecModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecModule`
+[`IExecModule`](IExecModule.md)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 ## Methods
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecModule`
+▸ **fromConfig**(`config`): [`IExecModule`](IExecModule.md)
 
 Create an IExecModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecModule`
+[`IExecModule`](IExecModule.md)

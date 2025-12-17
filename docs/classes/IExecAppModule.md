@@ -1,60 +1,78 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecAppModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecAppModule
 
 # Class: IExecAppModule
 
 module exposing app methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecAppModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecAppModule.md#constructor)
+
+### Properties
+
+- [config](IExecAppModule.md#config)
+
+### Methods
+
+- [checkAppSecretExists](IExecAppModule.md#checkappsecretexists)
+- [checkDeployedApp](IExecAppModule.md#checkdeployedapp)
+- [countUserApps](IExecAppModule.md#countuserapps)
+- [deployApp](IExecAppModule.md#deployapp)
+- [predictAppAddress](IExecAppModule.md#predictappaddress)
+- [pushAppSecret](IExecAppModule.md#pushappsecret)
+- [showApp](IExecAppModule.md#showapp)
+- [showUserApp](IExecAppModule.md#showuserapp)
+- [transferApp](IExecAppModule.md#transferapp)
+- [fromConfig](IExecAppModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecAppModule**(`configOrArgs`, `options?`): `IExecAppModule`
+• **new IExecAppModule**(`configOrArgs`, `options?`): [`IExecAppModule`](IExecAppModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecAppModule`
+[`IExecAppModule`](IExecAppModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### checkAppSecretExists()
+### checkAppSecretExists
 
-> **checkAppSecretExists**(`appAddress`, `options?`): `Promise`\<`boolean`\>
+▸ **checkAppSecretExists**(`appAddress`, `options?`): `Promise`<`boolean`\>
 
 check if a secret exists for the app in the Secret Management Service
 
@@ -68,25 +86,21 @@ _NB_:
 
 #### Parameters
 
-##### appAddress
-
-`string`
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`<`boolean`\>
 
-***
+___
 
-### checkDeployedApp()
+### checkDeployedApp
 
-> **checkDeployedApp**(`appAddress`): `Promise`\<`Boolean`\>
+▸ **checkDeployedApp**(`appAddress`): `Promise`<`Boolean`\>
 
 check if an app is deployed at a given address
 
@@ -98,19 +112,19 @@ console.log('app deployed', isDeployed);
 
 #### Parameters
 
-##### appAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`<`Boolean`\>
 
-***
+___
 
-### countUserApps()
+### countUserApps
 
-> **countUserApps**(`userAddress`): `Promise`\<[`BN`](../interfaces/BN.md)\>
+▸ **countUserApps**(`userAddress`): `Promise`<[`BN`](utils.BN.md)\>
 
 count the apps owned by an address.
 
@@ -122,19 +136,19 @@ console.log('app count:', count);
 
 #### Parameters
 
-##### userAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `userAddress` | `string` |
 
 #### Returns
 
-`Promise`\<[`BN`](../interfaces/BN.md)\>
+`Promise`<[`BN`](utils.BN.md)\>
 
-***
+___
 
-### deployApp()
+### deployApp
 
-> **deployApp**(`app`): `Promise`\<\{ `address`: `string`; `txHash`: `string`; \}\>
+▸ **deployApp**(`app`): `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED**
 
@@ -154,19 +168,19 @@ console.log('deployed at', address);
 
 #### Parameters
 
-##### app
-
-[`AppDeploymentArgs`](../-internal-/interfaces/AppDeploymentArgs.md)
+| Name | Type |
+| :------ | :------ |
+| `app` | [`AppDeploymentArgs`](../interfaces/internal_.AppDeploymentArgs.md) |
 
 #### Returns
 
-`Promise`\<\{ `address`: `string`; `txHash`: `string`; \}\>
+`Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
-***
+___
 
-### predictAppAddress()
+### predictAppAddress
 
-> **predictAppAddress**(`app`): `Promise`\<`string`\>
+▸ **predictAppAddress**(`app`): `Promise`<`string`\>
 
 predict the app contract address given the app deployment arguments
 
@@ -184,19 +198,19 @@ console.log('address', address);
 
 #### Parameters
 
-##### app
-
-[`AppDeploymentArgs`](../-internal-/interfaces/AppDeploymentArgs.md)
+| Name | Type |
+| :------ | :------ |
+| `app` | [`AppDeploymentArgs`](../interfaces/internal_.AppDeploymentArgs.md) |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### pushAppSecret()
+### pushAppSecret
 
-> **pushAppSecret**(`appAddress`, `secretValue`, `options?`): `Promise`\<`boolean`\>
+▸ **pushAppSecret**(`appAddress`, `secretValue`, `options?`): `Promise`<`boolean`\>
 
 **SIGNER REQUIRED, ONLY APP OWNER**
 
@@ -215,29 +229,22 @@ console.log('pushed App secret:', isPushed);
 
 #### Parameters
 
-##### appAddress
-
-`string`
-
-##### secretValue
-
-`String`
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+| `secretValue` | `String` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`<`boolean`\>
 
-***
+___
 
-### showApp()
+### showApp
 
-> **showApp**(`appAddress`): `Promise`\<\{ `app`: [`App`](../-internal-/interfaces/App.md); `objAddress`: `string`; \}\>
+▸ **showApp**(`appAddress`): `Promise`<{ `app`: [`App`](../interfaces/internal_.App.md) ; `objAddress`: `string`  }\>
 
 show a deployed app details
 
@@ -249,19 +256,19 @@ console.log('app:', app);
 
 #### Parameters
 
-##### appAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `app`: [`App`](../-internal-/interfaces/App.md); `objAddress`: `string`; \}\>
+`Promise`<{ `app`: [`App`](../interfaces/internal_.App.md) ; `objAddress`: `string`  }\>
 
-***
+___
 
-### showUserApp()
+### showUserApp
 
-> **showUserApp**(`index`, `address`): `Promise`\<\{ `app`: [`App`](../-internal-/interfaces/App.md); `objAddress`: `string`; \}\>
+▸ **showUserApp**(`index`, `address`): `Promise`<{ `app`: [`App`](../interfaces/internal_.App.md) ; `objAddress`: `string`  }\>
 
 show deployed app details by index for specified user user
 
@@ -273,23 +280,20 @@ console.log('app:', app);
 
 #### Parameters
 
-##### index
-
-[`BNish`](../type-aliases/BNish.md)
-
-##### address
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `index` | [`BNish`](../modules.md#bnish) |
+| `address` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `app`: [`App`](../-internal-/interfaces/App.md); `objAddress`: `string`; \}\>
+`Promise`<{ `app`: [`App`](../interfaces/internal_.App.md) ; `objAddress`: `string`  }\>
 
-***
+___
 
-### transferApp()
+### transferApp
 
-> **transferApp**(`appAddress`, `to`): `Promise`\<\{ `address`: `string`; `to`: `string`; `txHash`: `string`; \}\>
+▸ **transferApp**(`appAddress`, `to`): `Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
 **ONLY APP OWNER**
 
@@ -305,36 +309,33 @@ console.log(`app ${address} ownership transferred to ${address} in tx ${txHash}`
 
 #### Parameters
 
-##### appAddress
-
-`string`
-
-##### to
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `appAddress` | `string` |
+| `to` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `address`: `string`; `to`: `string`; `txHash`: `string`; \}\>
+`Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecAppModule`
+▸ **fromConfig**(`config`): [`IExecAppModule`](IExecAppModule.md)
 
 Create an IExecAppModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecAppModule`
+[`IExecAppModule`](IExecAppModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

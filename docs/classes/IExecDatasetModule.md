@@ -1,60 +1,81 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecDatasetModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecDatasetModule
 
 # Class: IExecDatasetModule
 
 module exposing dataset methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecDatasetModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecDatasetModule.md#constructor)
+
+### Properties
+
+- [config](IExecDatasetModule.md#config)
+
+### Methods
+
+- [checkDatasetSecretExists](IExecDatasetModule.md#checkdatasetsecretexists)
+- [checkDeployedDataset](IExecDatasetModule.md#checkdeployeddataset)
+- [computeEncryptedFileChecksum](IExecDatasetModule.md#computeencryptedfilechecksum)
+- [countUserDatasets](IExecDatasetModule.md#countuserdatasets)
+- [deployDataset](IExecDatasetModule.md#deploydataset)
+- [encrypt](IExecDatasetModule.md#encrypt)
+- [generateEncryptionKey](IExecDatasetModule.md#generateencryptionkey)
+- [predictDatasetAddress](IExecDatasetModule.md#predictdatasetaddress)
+- [pushDatasetSecret](IExecDatasetModule.md#pushdatasetsecret)
+- [showDataset](IExecDatasetModule.md#showdataset)
+- [showUserDataset](IExecDatasetModule.md#showuserdataset)
+- [transferDataset](IExecDatasetModule.md#transferdataset)
+- [fromConfig](IExecDatasetModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecDatasetModule**(`configOrArgs`, `options?`): `IExecDatasetModule`
+• **new IExecDatasetModule**(`configOrArgs`, `options?`): [`IExecDatasetModule`](IExecDatasetModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecDatasetModule`
+[`IExecDatasetModule`](IExecDatasetModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### checkDatasetSecretExists()
+### checkDatasetSecretExists
 
-> **checkDatasetSecretExists**(`datasetAddress`, `options?`): `Promise`\<`boolean`\>
+▸ **checkDatasetSecretExists**(`datasetAddress`, `options?`): `Promise`<`boolean`\>
 
 check if a the dataset secret exists in the Secret Management Service
 
@@ -66,25 +87,21 @@ console.log('secret exists:', isSecretSet);
 
 #### Parameters
 
-##### datasetAddress
-
-`string`
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
+| Name | Type |
+| :------ | :------ |
+| `datasetAddress` | `string` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`<`boolean`\>
 
-***
+___
 
-### checkDeployedDataset()
+### checkDeployedDataset
 
-> **checkDeployedDataset**(`datasetAddress`): `Promise`\<`Boolean`\>
+▸ **checkDeployedDataset**(`datasetAddress`): `Promise`<`Boolean`\>
 
 check if an dataset is deployed at a given address
 
@@ -96,19 +113,19 @@ console.log('dataset deployed', isDeployed);
 
 #### Parameters
 
-##### datasetAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `datasetAddress` | `string` |
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`<`Boolean`\>
 
-***
+___
 
-### computeEncryptedFileChecksum()
+### computeEncryptedFileChecksum
 
-> **computeEncryptedFileChecksum**(`encryptedFile`): `Promise`\<`string`\>
+▸ **computeEncryptedFileChecksum**(`encryptedFile`): `Promise`<`string`\>
 
 compute the encrypted dataset file's checksum required for dataset deployment
 
@@ -131,19 +148,19 @@ const checksum = await computeEncryptedFileChecksum(
 
 #### Parameters
 
-##### encryptedFile
-
-`Buffer` | `Uint8Array` | `ArrayBuffer`
+| Name | Type |
+| :------ | :------ |
+| `encryptedFile` | `Buffer` \| `Uint8Array` \| `ArrayBuffer` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### countUserDatasets()
+### countUserDatasets
 
-> **countUserDatasets**(`userAddress`): `Promise`\<[`BN`](../interfaces/BN.md)\>
+▸ **countUserDatasets**(`userAddress`): `Promise`<[`BN`](utils.BN.md)\>
 
 count the datasets owned by an address.
 
@@ -155,19 +172,19 @@ console.log('dataset count:', count);
 
 #### Parameters
 
-##### userAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `userAddress` | `string` |
 
 #### Returns
 
-`Promise`\<[`BN`](../interfaces/BN.md)\>
+`Promise`<[`BN`](utils.BN.md)\>
 
-***
+___
 
-### deployDataset()
+### deployDataset
 
-> **deployDataset**(`dataset`): `Promise`\<\{ `address`: `string`; `txHash`: `string`; \}\>
+▸ **deployDataset**(`dataset`): `Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
 **SIGNER REQUIRED**
 
@@ -186,19 +203,19 @@ console.log('deployed at', address);
 
 #### Parameters
 
-##### dataset
-
-[`DatasetDeploymentArgs`](../-internal-/interfaces/DatasetDeploymentArgs.md)
+| Name | Type |
+| :------ | :------ |
+| `dataset` | [`DatasetDeploymentArgs`](../interfaces/internal_.DatasetDeploymentArgs.md) |
 
 #### Returns
 
-`Promise`\<\{ `address`: `string`; `txHash`: `string`; \}\>
+`Promise`<{ `address`: `string` ; `txHash`: `string`  }\>
 
-***
+___
 
-### encrypt()
+### encrypt
 
-> **encrypt**(`datasetFile`, `encyptionKey`): `Promise`\<`Buffer`\>
+▸ **encrypt**(`datasetFile`, `encyptionKey`): `Promise`<`Buffer`\>
 
 encrypt the dataset file with the specified key using AES-256-CBC
 
@@ -223,23 +240,20 @@ const binary = new Blob([encryptedDataset]);
 
 #### Parameters
 
-##### datasetFile
-
-`Buffer` | `Uint8Array` | `ArrayBuffer`
-
-##### encyptionKey
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `datasetFile` | `Buffer` \| `Uint8Array` \| `ArrayBuffer` |
+| `encyptionKey` | `string` |
 
 #### Returns
 
-`Promise`\<`Buffer`\>
+`Promise`<`Buffer`\>
 
-***
+___
 
-### generateEncryptionKey()
+### generateEncryptionKey
 
-> **generateEncryptionKey**(): `string`
+▸ **generateEncryptionKey**(): `string`
 
 generate an encryption key to encrypt a dataset
 
@@ -255,11 +269,11 @@ console.log('encryption key:', encryptionKey);
 
 `string`
 
-***
+___
 
-### predictDatasetAddress()
+### predictDatasetAddress
 
-> **predictDatasetAddress**(`dataset`): `Promise`\<`string`\>
+▸ **predictDatasetAddress**(`dataset`): `Promise`<`string`\>
 
 predict the dataset contract address given the dataset deployment arguments
 
@@ -276,19 +290,19 @@ console.log('address', address);
 
 #### Parameters
 
-##### dataset
-
-[`DatasetDeploymentArgs`](../-internal-/interfaces/DatasetDeploymentArgs.md)
+| Name | Type |
+| :------ | :------ |
+| `dataset` | [`DatasetDeploymentArgs`](../interfaces/internal_.DatasetDeploymentArgs.md) |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### pushDatasetSecret()
+### pushDatasetSecret
 
-> **pushDatasetSecret**(`datasetAddress`, `encryptionKey`, `options?`): `Promise`\<`boolean`\>
+▸ **pushDatasetSecret**(`datasetAddress`, `encryptionKey`, `options?`): `Promise`<`boolean`\>
 
 **SIGNER REQUIRED, ONLY DATASET OWNER**
 
@@ -304,29 +318,22 @@ console.log('secret pushed:', pushed);
 
 #### Parameters
 
-##### datasetAddress
-
-`string`
-
-##### encryptionKey
-
-`string`
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
+| Name | Type |
+| :------ | :------ |
+| `datasetAddress` | `string` |
+| `encryptionKey` | `string` |
+| `options?` | `Object` |
+| `options.teeFramework?` | [`TeeFramework`](../modules.md#teeframework) |
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`<`boolean`\>
 
-***
+___
 
-### showDataset()
+### showDataset
 
-> **showDataset**(`datasetAddress`): `Promise`\<\{ `dataset`: [`Dataset`](../-internal-/interfaces/Dataset.md); `objAddress`: `string`; \}\>
+▸ **showDataset**(`datasetAddress`): `Promise`<{ `dataset`: [`Dataset`](../interfaces/internal_.Dataset.md) ; `objAddress`: `string`  }\>
 
 show a deployed dataset details
 
@@ -338,19 +345,19 @@ console.log('dataset:', dataset);
 
 #### Parameters
 
-##### datasetAddress
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `datasetAddress` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `dataset`: [`Dataset`](../-internal-/interfaces/Dataset.md); `objAddress`: `string`; \}\>
+`Promise`<{ `dataset`: [`Dataset`](../interfaces/internal_.Dataset.md) ; `objAddress`: `string`  }\>
 
-***
+___
 
-### showUserDataset()
+### showUserDataset
 
-> **showUserDataset**(`index`, `address`): `Promise`\<\{ `dataset`: [`Dataset`](../-internal-/interfaces/Dataset.md); `objAddress`: `string`; \}\>
+▸ **showUserDataset**(`index`, `address`): `Promise`<{ `dataset`: [`Dataset`](../interfaces/internal_.Dataset.md) ; `objAddress`: `string`  }\>
 
 show deployed dataset details by index for specified user user
 
@@ -362,23 +369,20 @@ console.log('dataset:', dataset);
 
 #### Parameters
 
-##### index
-
-[`BNish`](../type-aliases/BNish.md)
-
-##### address
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `index` | [`BNish`](../modules.md#bnish) |
+| `address` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `dataset`: [`Dataset`](../-internal-/interfaces/Dataset.md); `objAddress`: `string`; \}\>
+`Promise`<{ `dataset`: [`Dataset`](../interfaces/internal_.Dataset.md) ; `objAddress`: `string`  }\>
 
-***
+___
 
-### transferDataset()
+### transferDataset
 
-> **transferDataset**(`datasetAddress`, `to`): `Promise`\<\{ `address`: `string`; `to`: `string`; `txHash`: `string`; \}\>
+▸ **transferDataset**(`datasetAddress`, `to`): `Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
 **ONLY DATASET OWNER**
 
@@ -394,36 +398,33 @@ console.log(`dataset ${address} ownership transferred to ${address} in tx ${txHa
 
 #### Parameters
 
-##### datasetAddress
-
-`string`
-
-##### to
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `datasetAddress` | `string` |
+| `to` | `string` |
 
 #### Returns
 
-`Promise`\<\{ `address`: `string`; `to`: `string`; `txHash`: `string`; \}\>
+`Promise`<{ `address`: `string` ; `to`: `string` ; `txHash`: `string`  }\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecDatasetModule`
+▸ **fromConfig**(`config`): [`IExecDatasetModule`](IExecDatasetModule.md)
 
 Create an IExecDatasetModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecDatasetModule`
+[`IExecDatasetModule`](IExecDatasetModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)
