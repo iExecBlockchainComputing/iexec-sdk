@@ -2993,7 +2993,7 @@ describe('estimateMatchOrders()', () => {
         requesterWallet = requesterConfig.wallet;
 
         apporderTemplate = await deployAndGetApporder(iexecProvider, {
-          volume: 10,
+          volume: 20,
           appprice: 5,
         });
         await sleep(1000);
