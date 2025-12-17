@@ -3004,7 +3004,7 @@ describe('estimateMatchOrders()', () => {
         await sleep(1000);
         workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
           iexecProvider,
-          { volume: 5, workerpoolprice: 1 },
+          { volume: 20, workerpoolprice: 1 },
         );
       });
 
