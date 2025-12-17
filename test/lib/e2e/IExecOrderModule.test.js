@@ -3064,16 +3064,36 @@ describe('estimateMatchOrders()', () => {
       });
 
       test('should fail when account balance is insufficient and allowDeposit is true but wallet has not enough RLC', async () => {
+        // Wait a bit to ensure previous test transactions are confirmed
+        await sleep(2000);
+
+        // Create new orders to ensure volume is available
+        const apporder = await deployAndGetApporder(iexecProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(iexecProvider, {
+          volume: 10,
+          datasetprice: 1,
+        });
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecProvider,
+          { volume: 10, workerpoolprice: 1 },
+        );
+
+        // Wait a bit for orders to be properly registered
+        await sleep(1000);
+
         const requestorder = await getMatchableRequestorder(iexecRequester, {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
+          apporder,
+          datasetorder,
+          workerpoolorder,
         });
 
         const { total } = await iexecRequester.order.estimateMatchOrders({
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
+          apporder,
+          datasetorder,
+          workerpoolorder,
           requestorder,
         });
 
@@ -3086,9 +3106,9 @@ describe('estimateMatchOrders()', () => {
         await expect(
           iexecRequester.order.matchOrders(
             {
-              apporder: apporderTemplate,
-              datasetorder: datasetorderTemplate,
-              workerpoolorder: workerpoolorderTemplate,
+              apporder,
+              datasetorder,
+              workerpoolorder,
               requestorder,
             },
             { allowDeposit: true, preflightCheck: false },
@@ -3102,16 +3122,36 @@ describe('estimateMatchOrders()', () => {
           1000n * ONE_RLC,
         );
 
+        // Wait a bit to ensure previous test transactions are confirmed
+        await sleep(2000);
+
+        // Create new orders to ensure volume is available
+        const apporder = await deployAndGetApporder(iexecProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(iexecProvider, {
+          volume: 10,
+          datasetprice: 1,
+        });
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecProvider,
+          { volume: 10, workerpoolprice: 1 },
+        );
+
+        // Wait a bit for orders to be properly registered
+        await sleep(1000);
+
         const requestorder = await getMatchableRequestorder(iexecRequester, {
-          apporder: apporderTemplate,
-          datasetorder: datasetorderTemplate,
-          workerpoolorder: workerpoolorderTemplate,
+          apporder,
+          datasetorder,
+          workerpoolorder,
         });
 
         const costPerTask =
-          Number(apporderTemplate.appprice) +
-          Number(datasetorderTemplate.datasetprice) +
-          Number(workerpoolorderTemplate.workerpoolprice);
+          Number(apporder.appprice) +
+          Number(datasetorder.datasetprice) +
+          Number(workerpoolorder.workerpoolprice);
         const { stake } = await iexecRequester.account.checkBalance(
           requesterWallet.address,
         );
@@ -3119,9 +3159,9 @@ describe('estimateMatchOrders()', () => {
         await expect(
           iexecRequester.order.matchOrders(
             {
-              apporder: apporderTemplate,
-              datasetorder: datasetorderTemplate,
-              workerpoolorder: workerpoolorderTemplate,
+              apporder,
+              datasetorder,
+              workerpoolorder,
               requestorder,
             },
             { allowDeposit: false, preflightCheck: false },
