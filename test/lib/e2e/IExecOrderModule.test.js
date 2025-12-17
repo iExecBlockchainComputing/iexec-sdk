@@ -2998,7 +2998,7 @@ describe('estimateMatchOrders()', () => {
         });
         await sleep(1000);
         datasetorderTemplate = await deployAndGetDatasetorder(iexecProvider, {
-          volume: 7,
+          volume: 20,
           datasetprice: 1,
         });
         await sleep(1000);
