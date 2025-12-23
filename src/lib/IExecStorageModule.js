@@ -13,24 +13,21 @@ export default class IExecStorageModule extends IExecModule {
         await this.config.resolveContractsClient(),
         await this.config.resolveResultProxyURL(),
       );
-    this.checkStorageTokenExists = async (
-      address,
-      { provider, teeFramework } = {},
-    ) =>
+    this.checkStorageTokenExists = async (address, { provider } = {}) =>
       checkWeb2SecretExists(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL({ teeFramework }),
+        await this.config.resolveSmsURL(),
         address,
         getStorageTokenKeyName(provider),
       );
 
     this.pushStorageToken = async (
       token,
-      { provider, teeFramework, forceUpdate = false } = {},
+      { provider, forceUpdate = false } = {},
     ) =>
       pushWeb2Secret(
         await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL({ teeFramework }),
+        await this.config.resolveSmsURL(),
         getStorageTokenKeyName(provider),
         token,
         { forceUpdate },

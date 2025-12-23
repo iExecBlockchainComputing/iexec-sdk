@@ -1,12 +1,5 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
-import {
-  TEST_CHAINS,
-  TEE_FRAMEWORKS,
-  execAsync,
-  getRandomAddress,
-} from '../test-utils.js';
+import { TEST_CHAINS, execAsync, getRandomAddress } from '../test-utils.js';
 import {
   globalSetup,
   globalTeardown,
@@ -79,21 +72,6 @@ describe('iexec result', () => {
       ).catch((e) => e.message);
       const resAlreadyExists = JSON.parse(rawAlreadyExists);
       expect(resAlreadyExists.ok).toBe(false);
-      const rawAlreadyExistsForTeeFramework = await execAsync(
-        `${iexecPath} result push-encryption-key --tee-framework scone --raw`,
-      ).catch((e) => e.message);
-      const resAlreadyExistsForTeeFramework = JSON.parse(
-        rawAlreadyExistsForTeeFramework,
-      );
-      expect(resAlreadyExistsForTeeFramework.ok).toBe(false);
-      const resNotExistsForTeeFramework = JSON.parse(
-        await execAsync(
-          `${iexecPath} result push-encryption-key --tee-framework gramine --raw`,
-        ),
-      );
-      expect(resNotExistsForTeeFramework.ok).toBe(true);
-      expect(resNotExistsForTeeFramework.isPushed).toBe(true);
-      expect(resNotExistsForTeeFramework.isUpdated).toBe(false);
     });
 
     test('iexec result push-encryption-key --force-update', async () => {
@@ -144,20 +122,6 @@ describe('iexec result', () => {
       const resExists = JSON.parse(rawExists);
       expect(resExists.ok).toBe(true);
       expect(resExists.isEncryptionKeySet).toBe(true);
-
-      const rawExistsOnTeeFramework = await execAsync(
-        `${iexecPath} result check-encryption-key --tee-framework ${TEE_FRAMEWORKS.SCONE} --raw`,
-      );
-      const resExistsOnTeeFramework = JSON.parse(rawExistsOnTeeFramework);
-      expect(resExistsOnTeeFramework.ok).toBe(true);
-      expect(resExistsOnTeeFramework.isEncryptionKeySet).toBe(true);
-
-      const rawNotExistsOnTeeFramework = await execAsync(
-        `${iexecPath} result check-encryption-key --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
-      );
-      const resNotExistsOnTeeFramework = JSON.parse(rawNotExistsOnTeeFramework);
-      expect(resNotExistsOnTeeFramework.ok).toBe(true);
-      expect(resNotExistsOnTeeFramework.isEncryptionKeySet).toBe(false);
     });
 
     test('check-secret (v4 legacy name)', async () => {
