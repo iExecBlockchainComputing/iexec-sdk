@@ -239,6 +239,6 @@
     "typedoc-plugin-markdown": "^4.9.0",
     "typedoc-plugin-missing-exports": "^4.1.2",
     "typedoc-plugin-rename-defaults": "^0.7.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.9.3"
   }
 }
