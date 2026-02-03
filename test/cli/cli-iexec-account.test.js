@@ -41,14 +41,12 @@ describe('iexec account', () => {
   describe('deposit', () => {
     test('1000 (nRLC)', async () => {
       const initialWalletBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} wallet show --raw`),
-        ).balance.nRLC,
+        JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
+          .nRLC,
       );
       const initialAccountBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} account show --raw`),
-        ).balance.stake,
+        JSON.parse(await execAsync(`${iexecPath} account show --raw`)).balance
+          .stake,
       );
       const amount = '1000';
       const raw = await execAsync(
@@ -64,14 +62,12 @@ describe('iexec account', () => {
 
       const bnAmount = new BN(amount);
       const finalWalletBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} wallet show --raw`),
-        ).balance.nRLC,
+        JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
+          .nRLC,
       );
       const finalAccountBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} account show --raw`),
-        ).balance.stake,
+        JSON.parse(await execAsync(`${iexecPath} account show --raw`)).balance
+          .stake,
       );
       expect(initialWalletBalance.sub(bnAmount).eq(finalWalletBalance)).toBe(
         true,
@@ -83,14 +79,12 @@ describe('iexec account', () => {
 
     test('10 RLC', async () => {
       const initialWalletBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} wallet show --raw`),
-        ).balance.nRLC,
+        JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
+          .nRLC,
       );
       const initialAccountBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} account show --raw`),
-        ).balance.stake,
+        JSON.parse(await execAsync(`${iexecPath} account show --raw`)).balance
+          .stake,
       );
       const amount = '10';
       const raw = await execAsync(
@@ -102,14 +96,12 @@ describe('iexec account', () => {
       expect(res.amount).toBe(bnAmount.toString());
       expect(res.txHash).toBeDefined();
       const finalWalletBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} wallet show --raw`),
-        ).balance.nRLC,
+        JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
+          .nRLC,
       );
       const finalAccountBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} account show --raw`),
-        ).balance.stake,
+        JSON.parse(await execAsync(`${iexecPath} account show --raw`)).balance
+          .stake,
       );
       expect(initialWalletBalance.sub(bnAmount).eq(finalWalletBalance)).toBe(
         true,
@@ -166,14 +158,12 @@ describe('iexec account', () => {
 
     test('500 (nRLC)', async () => {
       const initialWalletBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} wallet show --raw`),
-        ).balance.nRLC,
+        JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
+          .nRLC,
       );
       const initialAccountBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} account show --raw`),
-        ).balance.stake,
+        JSON.parse(await execAsync(`${iexecPath} account show --raw`)).balance
+          .stake,
       );
       const amount = '500';
       const raw = await execAsync(
@@ -188,14 +178,12 @@ describe('iexec account', () => {
       expect(tx.gasPrice.toString()).toBe('0');
       const bnAmount = new BN(amount);
       const finalWalletBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} wallet show --raw`),
-        ).balance.nRLC,
+        JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
+          .nRLC,
       );
       const finalAccountBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} account show --raw`),
-        ).balance.stake,
+        JSON.parse(await execAsync(`${iexecPath} account show --raw`)).balance
+          .stake,
       );
       expect(initialWalletBalance.add(bnAmount).eq(finalWalletBalance)).toBe(
         true,
@@ -207,14 +195,12 @@ describe('iexec account', () => {
 
     test('5 RLC', async () => {
       const initialWalletBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} wallet show --raw`),
-        ).balance.nRLC,
+        JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
+          .nRLC,
       );
       const initialAccountBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} account show --raw`),
-        ).balance.stake,
+        JSON.parse(await execAsync(`${iexecPath} account show --raw`)).balance
+          .stake,
       );
       const amount = '5';
       const raw = await execAsync(
@@ -226,14 +212,12 @@ describe('iexec account', () => {
       expect(res.amount).toBe(bnAmount.toString());
       expect(res.txHash).toBeDefined();
       const finalWalletBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} wallet show --raw`),
-        ).balance.nRLC,
+        JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
+          .nRLC,
       );
       const finalAccountBalance = new BN(
-        JSON.parse(
-          await execAsync(`${iexecPath} account show --raw`),
-        ).balance.stake,
+        JSON.parse(await execAsync(`${iexecPath} account show --raw`)).balance
+          .stake,
       );
       expect(initialWalletBalance.add(bnAmount).eq(finalWalletBalance)).toBe(
         true,
