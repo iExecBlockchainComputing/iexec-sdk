@@ -50,7 +50,7 @@ import {
   apporderSchema,
   datasetorderSchema,
 } from '../common/utils/validator.js';
-import { sumTags } from '../common/utils/utils.js';
+import { stripTeeFrameworkFromTag, sumTags } from '../common/utils/utils.js';
 import { shouldUploadBulkForThegraph } from '../common/utils/config.js';
 
 export default class IExecOrderModule extends IExecModule {
@@ -325,11 +325,13 @@ export default class IExecOrderModule extends IExecModule {
               .validate(requestorder)
           ).tag,
           (await apporderSchema().label('apporder').validate(apporder)).tag,
-          (
-            await datasetorderSchema()
-              .label('datasetorder')
-              .validate(datasetorder)
-          ).tag,
+          stripTeeFrameworkFromTag(
+            (
+              await datasetorderSchema()
+                .label('datasetorder')
+                .validate(datasetorder)
+            ).tag,
+          ),
         ]);
         return matchOrders({
           contracts,

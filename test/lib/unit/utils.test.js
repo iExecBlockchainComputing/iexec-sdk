@@ -1,0 +1,24 @@
+import { stripTeeFrameworkFromTag } from '../../../src/common/utils/utils.js';
+
+describe('utils', () => {
+  describe('stripTeeFrameworkFromTag', () => {
+    test('should strip TEE framework bits from tag', async () => {
+      // 256 bits set to 1
+      const maxTag =
+        `0x` +
+        BigInt(
+          '0b1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111',
+        ).toString(16);
+
+      // bits 2,3,4 represent TEE frameworks disabled
+      const expectedStrippedTag =
+        `0x` +
+        BigInt(
+          '0b1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110001',
+        ).toString(16);
+
+      const strippedTag = stripTeeFrameworkFromTag(maxTag);
+      expect(strippedTag).toBe(expectedStrippedTag);
+    });
+  });
+});

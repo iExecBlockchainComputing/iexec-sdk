@@ -13,7 +13,7 @@ import {
 // eslint-disable-next-line import/no-unresolved
 import { multiaddr } from '@multiformats/multiaddr';
 import { ValidationError, ConfigurationError } from './errors.js';
-import { NULL_BYTES32, TEE_FRAMEWORKS } from './constant.js';
+import { TEE_FRAMEWORKS } from './constant.js';
 
 export { BN } from 'bn.js';
 
@@ -236,14 +236,13 @@ export const encodeTag = (tags) => {
     (acc, curr) => (curr ? `1${acc}` : `0${acc}`),
     '',
   );
-  const hex = new BN(binString, 2).toString('hex');
-  return NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
+  return '0x' + BigInt(`0b${binString}`).toString(16).padStart(64, '0');
 };
 
 export const decodeTag = (tag) => {
   if (typeof tag !== 'string' || !bytes32Regex.test(tag))
     throw new ValidationError('tag must be bytes32 hex string');
-  const binString = new BN(tag.substring(2), 'hex').toString(2);
+  const binString = BigInt(tag).toString(2);
   const tags = [];
   for (let i = 0; i < binString.length; i += 1) {
     const current = binString.charAt(binString.length - i - 1);
@@ -259,9 +258,9 @@ export const decodeTag = (tag) => {
 
 export const sumTags = (tagArray) => {
   const binStringArray = tagArray.map((hexTag) => {
-    if (typeof hexTag !== 'string' || !hexTag.match(bytes32Regex))
+    if (typeof hexTag !== 'string' || !bytes32Regex.test(hexTag))
       throw new ValidationError('tag must be bytes32 hex string');
-    return new BN(hexTag.substring(2), 'hex').toString(2);
+    return BigInt(hexTag).toString(2);
   });
   let summedTagsBinString = '';
   for (let i = 0; i < 255; i += 1) {
@@ -273,8 +272,29 @@ export const sumTags = (tagArray) => {
     });
     summedTagsBinString = currentBit + summedTagsBinString;
   }
-  const hex = new BN(summedTagsBinString, 2).toString('hex');
-  return NULL_BYTES32.substring(0, 66 - hex.length).concat(hex);
+  return (
+    '0x' + BigInt(`0b${summedTagsBinString}`).toString(16).padStart(64, '0')
+  );
+};
+
+export const stripTeeFrameworkFromTag = (tag) => {
+  if (typeof tag !== 'string' || !bytes32Regex.test(tag))
+    throw new ValidationError('tag must be bytes32 hex string');
+  const binString = BigInt(tag).toString(2);
+  let strippedBinString = '';
+  for (let i = 0; i < binString.length; i += 1) {
+    if (
+      i === 1 ||
+      i === 2 ||
+      i === 3 // bits 2,3,4 represent TEE frameworks
+    ) {
+      strippedBinString = '0' + strippedBinString;
+    } else {
+      strippedBinString =
+        binString.charAt(binString.length - i - 1) + strippedBinString;
+    }
+  }
+  return '0x' + BigInt(`0b${strippedBinString}`).toString(16).padStart(64, '0');
 };
 
 export const findMissingBitsInTag = (tag, requiredTag) => {
@@ -282,10 +302,8 @@ export const findMissingBitsInTag = (tag, requiredTag) => {
     throw new ValidationError('tag must be bytes32 hex string');
   if (typeof requiredTag !== 'string' || !bytes32Regex.test(requiredTag))
     throw new ValidationError('requiredTag must be bytes32 hex string');
-  const tagBinString = new BN(tag.substring(2), 'hex').toString(2);
-  const requiredTagBinString = new BN(requiredTag.substring(2), 'hex').toString(
-    2,
-  );
+  const tagBinString = BigInt(tag).toString(2);
+  const requiredTagBinString = BigInt(requiredTag).toString(2);
   const missingBits = [];
   for (let i = 0; i < requiredTagBinString.length; i += 1) {
     if (
@@ -304,7 +322,7 @@ export const checkActiveBitInTag = (tag, bit) => {
     throw new ValidationError('tag must be bytes32 hex string');
   if (typeof bit !== 'number' || bit < 0 || bit > 255)
     throw new ValidationError('Invalid bit tag');
-  const binString = new BN(tag.substring(2), 'hex').toString(2);
+  const binString = BigInt(tag).toString(2);
   return binString.charAt(binString.length - bit - 1) === '1';
 };
 
