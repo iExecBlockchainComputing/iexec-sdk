@@ -527,13 +527,6 @@ describe('signRequestorder()', () => {
       category: 5,
     });
     await expect(
-      iexec.order.signRequestorder({ ...order, tag: ['tee'] }),
-    ).rejects.toThrow(
-      new Error(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
-      ),
-    );
-    await expect(
       iexec.order.signRequestorder({ ...order, tag: ['scone'] }),
     ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
     await expect(

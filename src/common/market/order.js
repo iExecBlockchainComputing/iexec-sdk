@@ -1232,7 +1232,7 @@ export const createRequestorder = async (
     volume: await uint256Schema().validate(volume),
     params: await createObjParams({
       params,
-      tag: await tagSchema().validate(tag),
+      tag: await tagSchema({ allowAgnosticTee: true }).validate(tag),
       callback: await addressSchema({
         ethProvider: contracts.provider,
       }).validate(callback),
@@ -1245,6 +1245,6 @@ export const createRequestorder = async (
       .label('category')
       .validate(category),
     trust: await uint256Schema().validate(trust),
-    tag: await tagSchema().validate(tag),
+    tag: await tagSchema({ allowAgnosticTee: true }).validate(tag),
   };
 };

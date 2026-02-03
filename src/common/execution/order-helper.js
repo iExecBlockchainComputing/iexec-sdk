@@ -176,7 +176,9 @@ export const checkDatasetRequirements = async (
   const vDatasetorder = await datasetorderSchema().validate(datasetorder);
   const { tag, dataset } = vDatasetorder;
   const isTee = checkActiveBitInTag(
-    tagOverride ? await tagSchema().validate(tagOverride) : tag,
+    tagOverride
+      ? await tagSchema({ allowAgnosticTee: true }).validate(tagOverride)
+      : tag,
     TAG_MAP.tee,
   );
   // check tee dataset encryption key
