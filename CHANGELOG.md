@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.22.5](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.4...v8.22.5) (2026-02-04)
+
+
+### Changed
+
+* allow TEE tag without framework in orders and search params ([#532](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/532)) ([90381b6](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/90381b657f805c2032575165e4c5e1e5e3713e71))
+
 ## [8.22.4](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.3...v8.22.4) (2025-12-01)
 
 
