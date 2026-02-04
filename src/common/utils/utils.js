@@ -284,9 +284,10 @@ export const stripTeeFrameworkFromTag = (tag) => {
   let strippedBinString = '';
   for (let i = 0; i < binString.length; i += 1) {
     if (
+      // bits 1,2,3 represent TEE frameworks
       i === 1 ||
       i === 2 ||
-      i === 3 // bits 2,3,4 represent TEE frameworks
+      i === 3
     ) {
       strippedBinString = '0' + strippedBinString;
     } else {
