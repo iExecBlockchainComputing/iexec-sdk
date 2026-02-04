@@ -1207,6 +1207,7 @@ export const createRequestorder = async (
   } = {},
 ) => {
   const requesterOrUser = requester || (await getAddress(contracts));
+  const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
   return {
     app: await addressSchema({
       ethProvider: contracts.provider,
@@ -1232,7 +1233,7 @@ export const createRequestorder = async (
     volume: await uint256Schema().validate(volume),
     params: await createObjParams({
       params,
-      tag: await tagSchema().validate(tag),
+      tag: vTag,
       callback: await addressSchema({
         ethProvider: contracts.provider,
       }).validate(callback),
@@ -1245,6 +1246,6 @@ export const createRequestorder = async (
       .label('category')
       .validate(category),
     trust: await uint256Schema().validate(trust),
-    tag: await tagSchema().validate(tag),
+    tag: vTag,
   };
 };

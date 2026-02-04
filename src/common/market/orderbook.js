@@ -130,10 +130,14 @@ export const fetchAppOrderbook = async (
           .validate(minVolume),
       }),
       ...(minTag !== undefined && {
-        minTag: await tagSchema().label('minTag').validate(minTag),
+        minTag: await tagSchema({ allowAgnosticTee: true })
+          .label('minTag')
+          .validate(minTag),
       }),
       ...(maxTag !== undefined && {
-        maxTag: await tagSchema().label('maxTag').validate(maxTag),
+        maxTag: await tagSchema({ allowAgnosticTee: true })
+          .label('maxTag')
+          .validate(maxTag),
       }),
       ...(page !== undefined && {
         pageIndex: await positiveIntSchema().label('page').validate(page),
@@ -277,10 +281,14 @@ export const fetchDatasetOrderbook = async (
           .validate(minVolume),
       }),
       ...(minTag !== undefined && {
-        minTag: await tagSchema().label('minTag').validate(minTag),
+        minTag: await tagSchema({ allowAgnosticTee: true })
+          .label('minTag')
+          .validate(minTag),
       }),
       ...(maxTag !== undefined && {
-        maxTag: await tagSchema().label('maxTag').validate(maxTag),
+        maxTag: await tagSchema({ allowAgnosticTee: true })
+          .label('maxTag')
+          .validate(maxTag),
       }),
       bulkOnly: await booleanSchema().label('bulkOnly').validate(bulkOnly),
       ...(page !== undefined && {
@@ -374,10 +382,14 @@ export const fetchWorkerpoolOrderbook = async (
         .label('isRequesterStrict')
         .validate(isRequesterStrict),
       ...(minTag && {
-        minTag: await tagSchema().label('minTag').validate(minTag),
+        minTag: await tagSchema({ allowAgnosticTee: true })
+          .label('minTag')
+          .validate(minTag),
       }),
       ...(maxTag && {
-        maxTag: await tagSchema().label('maxTag').validate(maxTag),
+        maxTag: await tagSchema({ allowAgnosticTee: true })
+          .label('maxTag')
+          .validate(maxTag),
       }),
       ...(workerpoolOwner && {
         workerpoolOwner: await addressSchema({
@@ -486,10 +498,14 @@ export const fetchRequestOrderbook = async (
         .label('isWorkerpoolStrict')
         .validate(isWorkerpoolStrict),
       ...(minTag !== undefined && {
-        minTag: await tagSchema().label('minTag').validate(minTag),
+        minTag: await tagSchema({ allowAgnosticTee: true })
+          .label('minTag')
+          .validate(minTag),
       }),
       ...(maxTag !== undefined && {
-        maxTag: await tagSchema().label('maxTag').validate(maxTag),
+        maxTag: await tagSchema({ allowAgnosticTee: true })
+          .label('maxTag')
+          .validate(maxTag),
       }),
       ...(maxTrust !== undefined && {
         maxTrust: await positiveIntSchema()

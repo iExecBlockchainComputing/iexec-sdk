@@ -386,6 +386,11 @@ export const paramsSchema = () =>
       },
     );
 
+/**
+ * tag validation schema
+ * @param {*} options
+ * @param {boolean} options.allowAgnosticTee - allow 'tee' tag without tee framework tag (use for datasetorders and requestorders that don't need to specify tee framework)
+ */
 export const tagSchema = ({ allowAgnosticTee = false } = {}) =>
   mixed()
     .transform((value) => {
@@ -540,7 +545,7 @@ export const signedDatasetorderBulkSchema = () =>
           (value) => parseInt(value) >= DATASET_INFINITE_VOLUME - 1, // (DATASET_INFINITE_VOLUME - 1) is accepted for compatibility with already created orders
         )
         .required(),
-      tag: tagSchema().required(),
+      tag: tagSchema({ allowAgnosticTee: true }).required(),
       apprestrict: addressSchema().required(),
       workerpoolrestrict: addressSchema().required(),
       requesterrestrict: addressSchema().required(),
@@ -589,7 +594,7 @@ export const requestorderSchema = (opt) =>
       workerpoolmaxprice: nRlcAmountSchema().required(),
       requester: addressSchema(opt).required(),
       volume: uint256Schema().required(),
-      tag: tagSchema().required(),
+      tag: tagSchema({ allowAgnosticTee: true }).required(),
       category: catidSchema().required(),
       trust: uint256Schema().required(),
       beneficiary: addressSchema(opt).required(),
