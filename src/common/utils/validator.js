@@ -386,6 +386,11 @@ export const paramsSchema = () =>
       },
     );
 
+/**
+ * tag validation schema
+ * @param {*} options
+ * @param {boolean} options.allowAgnosticTee - allow 'tee' tag without tee framework tag (use for datasetorders and requestorders that don't need to specify tee framework)
+ */
 export const tagSchema = ({ allowAgnosticTee = false } = {}) =>
   mixed()
     .transform((value) => {
