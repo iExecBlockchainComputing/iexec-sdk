@@ -16,6 +16,7 @@ import {
   runIExecCliRaw,
   setRandomWallet,
   iexecPath,
+  waitForEnsTransactions,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
@@ -68,9 +69,14 @@ describe('iexec workerpool', () => {
 
   describe('set-api-url', () => {
     test('iexec workerpool set-api-url', async () => {
-      await execAsync(
-        `${iexecPath} ens register ${userFirstDeployedWorkerpoolAddress.toLowerCase()} --for ${userFirstDeployedWorkerpoolAddress}`,
-      );
+      // Register ENS and wait for all transactions to be confirmed
+      const ensRes = await execAsync(
+        `${iexecPath} ens register ${userFirstDeployedWorkerpoolAddress.toLowerCase()} --for ${userFirstDeployedWorkerpoolAddress} --raw`,
+      ).then(JSON.parse);
+
+      // Wait for all ENS transactions to be confirmed to prevent nonce issues
+      await waitForEnsTransactions(ensRes, testChain);
+
       const raw = await execAsync(
         `${iexecPath} workerpool set-api-url https://my-workerpool.com ${userFirstDeployedWorkerpoolAddress} --raw`,
       );

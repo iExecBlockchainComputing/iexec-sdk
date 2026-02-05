@@ -1,13 +1,13 @@
 services:
   custom-token-chain:
     restart: unless-stopped
-    image: 'iexechub/poco-chaintest:5.3.2-token-openethereum'
+    image: 'iexechub/poco-chaintest:1.2.2-poco-v6.2.0-contracts-nethermind'
     expose:
       - 8545
     ports:
       - 18545:8545
     healthcheck:
-      test: nc -z 0.0.0.0 8545
+      test: sh -c 'timeout 1 bash -c "</dev/tcp/0.0.0.0/8545" || exit 1'
       interval: 10s
       timeout: 5s
       retries: 3
@@ -306,3 +306,6 @@ services:
         condition: service_healthy
       voucher-subgraph-deployer:
         condition: service_completed_successfully
+
+x-common-platform: &common-platform
+  platform: linux/amd64

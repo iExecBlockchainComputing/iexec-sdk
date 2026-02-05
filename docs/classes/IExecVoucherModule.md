@@ -1,60 +1,73 @@
-[**iexec**](../README.md)
-
-***
-
-[iexec](../globals.md) / IExecVoucherModule
+[iexec](../README.md) / [Exports](../modules.md) / IExecVoucherModule
 
 # Class: IExecVoucherModule
 
 module exposing voucher methods
 
-## Extends
+## Hierarchy
 
 - [`IExecModule`](IExecModule.md)
 
+  ↳ **`IExecVoucherModule`**
+
+## Table of contents
+
+### Constructors
+
+- [constructor](IExecVoucherModule.md#constructor)
+
+### Properties
+
+- [config](IExecVoucherModule.md#config)
+
+### Methods
+
+- [authorizeRequester](IExecVoucherModule.md#authorizerequester)
+- [getVoucherAddress](IExecVoucherModule.md#getvoucheraddress)
+- [revokeRequesterAuthorization](IExecVoucherModule.md#revokerequesterauthorization)
+- [showUserVoucher](IExecVoucherModule.md#showuservoucher)
+- [fromConfig](IExecVoucherModule.md#fromconfig)
+
 ## Constructors
 
-### Constructor
+### constructor
 
-> **new IExecVoucherModule**(`configOrArgs`, `options?`): `IExecVoucherModule`
+• **new IExecVoucherModule**(`configOrArgs`, `options?`): [`IExecVoucherModule`](IExecVoucherModule.md)
 
 Create an IExecModule instance
 
 #### Parameters
 
-##### configOrArgs
-
-[`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) | [`IExecConfig`](IExecConfig.md)
-
-##### options?
-
-[`IExecConfigOptions`](../interfaces/IExecConfigOptions.md)
+| Name | Type |
+| :------ | :------ |
+| `configOrArgs` | [`IExecConfig`](IExecConfig.md) \| [`IExecConfigArgs`](../interfaces/IExecConfigArgs.md) |
+| `options?` | [`IExecConfigOptions`](../interfaces/IExecConfigOptions.md) |
 
 #### Returns
 
-`IExecVoucherModule`
+[`IExecVoucherModule`](IExecVoucherModule.md)
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`constructor`](IExecModule.md#constructor)
+[IExecModule](IExecModule.md).[constructor](IExecModule.md#constructor)
 
 ## Properties
 
 ### config
 
-> **config**: [`IExecConfig`](IExecConfig.md)
+• **config**: [`IExecConfig`](IExecConfig.md)
 
 current IExecConfig
 
 #### Inherited from
 
-[`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
+[IExecModule](IExecModule.md).[config](IExecModule.md#config)
 
 ## Methods
 
-### authorizeRequester()
+### authorizeRequester
 
-> **authorizeRequester**(`requester`): `Promise`\<`string`\>
+▸ **authorizeRequester**(`requester`): `Promise`<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -68,19 +81,19 @@ console.log('tx:', txHash);
 
 #### Parameters
 
-##### requester
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `requester` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### getVoucherAddress()
+### getVoucherAddress
 
-> **getVoucherAddress**(`owner`): `Promise`\<`string` \| `null`\>
+▸ **getVoucherAddress**(`owner`): `Promise`<``null`` \| `string`\>
 
 returns the address of the voucher contract for the specified address if the address owns a voucher
 
@@ -92,35 +105,35 @@ console.log('voucher contract address:', voucherAddress);
 
 #### Parameters
 
-##### owner
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `owner` | `string` |
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`<``null`` \| `string`\>
 
-***
+___
 
-### revokeRequesterAuthorization()
+### revokeRequesterAuthorization
 
-> **revokeRequesterAuthorization**(`requester`): `Promise`\<`string`\>
+▸ **revokeRequesterAuthorization**(`requester`): `Promise`<`string`\>
 
 #### Parameters
 
-##### requester
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `requester` | `string` |
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`<`string`\>
 
-***
+___
 
-### showUserVoucher()
+### showUserVoucher
 
-> **showUserVoucher**(`owner`): `Promise`\<[`VoucherInfo`](../-internal-/interfaces/VoucherInfo.md)\>
+▸ **showUserVoucher**(`owner`): `Promise`<[`VoucherInfo`](../interfaces/internal_.VoucherInfo.md)\>
 
 returns the user voucher information
 
@@ -139,32 +152,32 @@ console.log('authorized accounts:', userVoucher.authorizedAccounts);
 
 #### Parameters
 
-##### owner
-
-`string`
+| Name | Type |
+| :------ | :------ |
+| `owner` | `string` |
 
 #### Returns
 
-`Promise`\<[`VoucherInfo`](../-internal-/interfaces/VoucherInfo.md)\>
+`Promise`<[`VoucherInfo`](../interfaces/internal_.VoucherInfo.md)\>
 
-***
+___
 
-### fromConfig()
+### fromConfig
 
-> `static` **fromConfig**(`config`): `IExecVoucherModule`
+▸ **fromConfig**(`config`): [`IExecVoucherModule`](IExecVoucherModule.md)
 
 Create an IExecVoucherModule instance using an IExecConfig instance
 
 #### Parameters
 
-##### config
-
-[`IExecConfig`](IExecConfig.md)
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IExecConfig`](IExecConfig.md) |
 
 #### Returns
 
-`IExecVoucherModule`
+[`IExecVoucherModule`](IExecVoucherModule.md)
 
 #### Overrides
 
-[`IExecModule`](IExecModule.md).[`fromConfig`](IExecModule.md#fromconfig)
+[IExecModule](IExecModule.md).[fromConfig](IExecModule.md#fromconfig)

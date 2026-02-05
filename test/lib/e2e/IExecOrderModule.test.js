@@ -1,7 +1,24 @@
 // @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { describe, test, expect, beforeAll } from '@jest/globals';
+
+import { beforeAll, describe, expect, test } from '@jest/globals';
 import { BN } from 'bn.js';
+import { errors } from '../../../src/lib/index.js';
+import { DATASET_INFINITE_VOLUME } from '../../../src/lib/utils.js';
+import '../../jest-setup.js';
+import {
+  NULL_ADDRESS,
+  SERVICE_HTTP_500_URL,
+  SERVICE_UNREACHABLE_URL,
+  TEE_FRAMEWORKS,
+  TEST_CHAINS,
+  addVoucherEligibleAsset,
+  createVoucher,
+  createVoucherType,
+  getRandomAddress,
+  setBalance,
+  setNRlcBalance,
+  sleep,
+} from '../../test-utils.js';
 import {
   ONE_ETH,
   ONE_RLC,
@@ -15,22 +32,6 @@ import {
   getMatchableRequestorder,
   getTestConfig,
 } from '../lib-test-utils.js';
-import {
-  TEST_CHAINS,
-  TEE_FRAMEWORKS,
-  getRandomAddress,
-  setNRlcBalance,
-  NULL_ADDRESS,
-  createVoucher,
-  createVoucherType,
-  addVoucherEligibleAsset,
-  SERVICE_UNREACHABLE_URL,
-  SERVICE_HTTP_500_URL,
-  setBalance,
-} from '../../test-utils.js';
-import '../../jest-setup.js';
-import { errors } from '../../../src/lib/index.js';
-import { DATASET_INFINITE_VOLUME } from '../../../src/lib/utils.js';
 
 const { MarketCallError, ConfigurationError } = errors;
 
@@ -2964,6 +2965,205 @@ describe('estimateMatchOrders()', () => {
             ),
           ).rejects.toThrow(Error('User is not authorized to use the voucher'));
         });
+      });
+    });
+    describe('allowDeposit option', () => {
+      let iexecProvider;
+      let apporderTemplate;
+      let datasetorderTemplate;
+      let workerpoolorderTemplate;
+      let iexecRequester;
+      let requesterWallet;
+      const testChain = TEST_CHAINS['custom-token-chain'];
+
+      beforeAll(async () => {
+        const providerConfig = getTestConfig(testChain)({});
+        iexecProvider = providerConfig.iexec;
+        await setBalance(testChain)(providerConfig.wallet.address, ONE_ETH);
+        const requesterConfig = getTestConfig(testChain)();
+        await setBalance(testChain)(requesterConfig.wallet.address, ONE_ETH);
+        iexecRequester = requesterConfig.iexec;
+        requesterWallet = requesterConfig.wallet;
+
+        apporderTemplate = await deployAndGetApporder(iexecProvider, {
+          volume: 20,
+          appprice: 5,
+        });
+        await sleep(1000);
+        datasetorderTemplate = await deployAndGetDatasetorder(iexecProvider, {
+          volume: 20,
+          datasetprice: 1,
+        });
+        await sleep(1000);
+        workerpoolorderTemplate = await deployAndGetWorkerpoolorder(
+          iexecProvider,
+          { volume: 20, workerpoolprice: 1 },
+        );
+      });
+
+      test('should match orders with allowDeposit when account balance is insufficient but wallet has enough RLC', async () => {
+        // set wallet balance to 1000 RLC (but not deposit to the account)
+        await setNRlcBalance(testChain)(
+          requesterWallet.address,
+          1000n * ONE_RLC,
+        );
+
+        // deposit some nRLC to the account (insufficient amount to cover the total cost)
+        await iexecRequester.account.deposit(1);
+
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder: apporderTemplate,
+          datasetorder: datasetorderTemplate,
+          workerpoolorder: workerpoolorderTemplate,
+        });
+
+        const { total: totalCost } =
+          await iexecRequester.order.estimateMatchOrders({
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder,
+          });
+
+        // check the account balance
+        const { stake } = await iexecRequester.account.checkBalance(
+          requesterWallet.address,
+        );
+        const expectedMissingAmount = totalCost.sub(stake);
+
+        const walletBefore = await iexecRequester.wallet.checkBalances(
+          requesterWallet.address,
+        );
+        const res = await iexecRequester.order.matchOrders(
+          {
+            apporder: apporderTemplate,
+            datasetorder: datasetorderTemplate,
+            workerpoolorder: workerpoolorderTemplate,
+            requestorder,
+          },
+          { allowDeposit: true, preflightCheck: false },
+        );
+
+        const walletAfter = await iexecRequester.wallet.checkBalances(
+          requesterWallet.address,
+        );
+
+        const walletAmountUsed = walletBefore.nRLC.sub(walletAfter.nRLC);
+
+        expect(walletAmountUsed.eq(expectedMissingAmount)).toBe(true);
+        expect(res.txHash).toBeTxHash();
+        expect(res.volume).toBeInstanceOf(BN);
+        expect(res.dealid).toBeTxHash();
+      });
+
+      test('should fail when account balance is insufficient and allowDeposit is true but wallet has not enough RLC', async () => {
+        // Wait a bit to ensure previous test transactions are confirmed
+        await sleep(2000);
+
+        // Create new orders to ensure volume is available
+        const apporder = await deployAndGetApporder(iexecProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(iexecProvider, {
+          volume: 10,
+          datasetprice: 1,
+        });
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecProvider,
+          { volume: 10, workerpoolprice: 1 },
+        );
+
+        // Wait a bit for orders to be properly registered
+        await sleep(1000);
+
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        const { total } = await iexecRequester.order.estimateMatchOrders({
+          apporder,
+          datasetorder,
+          workerpoolorder,
+          requestorder,
+        });
+
+        const insufficientBalance = total.sub(new BN(1));
+        await setNRlcBalance(testChain)(
+          requesterWallet.address,
+          BigInt(insufficientBalance.toString()),
+        );
+
+        await expect(
+          iexecRequester.order.matchOrders(
+            {
+              apporder,
+              datasetorder,
+              workerpoolorder,
+              requestorder,
+            },
+            { allowDeposit: true, preflightCheck: false },
+          ),
+        ).rejects.toThrow();
+      });
+
+      test('should fail when allowDeposit is false and account balance is insufficient', async () => {
+        await setNRlcBalance(testChain)(
+          requesterWallet.address,
+          1000n * ONE_RLC,
+        );
+
+        // Wait a bit to ensure previous test transactions are confirmed
+        await sleep(2000);
+
+        // Create new orders to ensure volume is available
+        const apporder = await deployAndGetApporder(iexecProvider, {
+          volume: 10,
+          appprice: 5,
+        });
+        const datasetorder = await deployAndGetDatasetorder(iexecProvider, {
+          volume: 10,
+          datasetprice: 1,
+        });
+        const workerpoolorder = await deployAndGetWorkerpoolorder(
+          iexecProvider,
+          { volume: 10, workerpoolprice: 1 },
+        );
+
+        // Wait a bit for orders to be properly registered
+        await sleep(1000);
+
+        const requestorder = await getMatchableRequestorder(iexecRequester, {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+        });
+
+        const costPerTask =
+          Number(apporder.appprice) +
+          Number(datasetorder.datasetprice) +
+          Number(workerpoolorder.workerpoolprice);
+        const { stake } = await iexecRequester.account.checkBalance(
+          requesterWallet.address,
+        );
+
+        await expect(
+          iexecRequester.order.matchOrders(
+            {
+              apporder,
+              datasetorder,
+              workerpoolorder,
+              requestorder,
+            },
+            { allowDeposit: false, preflightCheck: false },
+          ),
+        ).rejects.toThrow(
+          new Error(
+            `Cost per task (${costPerTask}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
+          ),
+        );
       });
     });
   });

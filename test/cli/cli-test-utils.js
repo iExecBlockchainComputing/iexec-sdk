@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { pathExists, remove } from 'fs-extra';
 import { join } from 'path';
 import { Wallet } from 'ethers';
-import { execAsync, getId } from '../test-utils.js';
+import { execAsync, getId, sleep } from '../test-utils.js';
 
 const IEXEC_JSON = 'iexec.json';
 const CHAIN_JSON = 'chain.json';
@@ -167,3 +167,23 @@ export const editDatasetorder = async ({ tag }) =>
 
 export const setDeployedJson = (deployed) =>
   saveJSONToFile(deployed, 'deployed.json');
+
+/**
+ * Wait for all ENS registration transactions to be confirmed
+ * This helps prevent "nonce too low" errors with Nethermind
+ */
+export const waitForEnsTransactions = async (ensResult, chain) => {
+  const transactions = [
+    ensResult.registerTxHash,
+    ensResult.setResolverTxHash,
+    ensResult.setAddrTxHash,
+    ensResult.setNameTxHash,
+  ].filter(Boolean);
+
+  await Promise.all(
+    transactions.map((txHash) => chain.provider.waitForTransaction(txHash)),
+  );
+
+  // Wait a bit more for nonce synchronization with Nethermind
+  await sleep(1000);
+};

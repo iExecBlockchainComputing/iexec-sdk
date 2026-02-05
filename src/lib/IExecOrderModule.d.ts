@@ -1044,6 +1044,14 @@ export default class IExecOrderModule extends IExecModule {
        * the user must be authorized by the voucher's owner to use it
        */
       voucherAddress?: Addressish;
+      /**
+       * allow automatic deposit from wallet when account balance is insufficient
+       *
+       * when `true`, automatically deposits nRLC from wallet to account and executes matchOrders in a single transaction using `approveAndCall`
+       *
+       * _NB_: the requester's wallet must have sufficient nRLC balance before matching orders
+       */
+      allowDeposit?: boolean;
     },
   ): Promise<{ dealid: Dealid; volume: BN; txHash: TxHash }>;
   /**

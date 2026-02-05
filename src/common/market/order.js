@@ -1,7 +1,8 @@
-import Debug from 'debug';
 import BN from 'bn.js';
-import { getAddress } from '../wallet/address.js';
+import Debug from 'debug';
+import { checkAllowance } from '../account/allowance.js';
 import { checkBalance } from '../account/balance.js';
+import { createObjParams } from '../execution/order-helper.js';
 import {
   checkDeployedApp,
   checkDeployedDataset,
@@ -10,63 +11,63 @@ import {
   getDatasetOwner,
   getWorkerpoolOwner,
 } from '../protocol/registries.js';
-import { createObjParams } from '../execution/order-helper.js';
-import {
-  checkEventFromLogs,
-  bigIntToBn,
-  getSalt,
-  sumTags,
-  findMissingBitsInTag,
-  checkActiveBitInTag,
-  tagBitToHuman,
-  checkSigner,
-  TAG_MAP,
-  parseTransactionLogs,
-} from '../utils/utils.js';
-import { hashEIP712 } from '../utils/sig-utils.js';
-import {
-  NULL_BYTES,
-  NULL_BYTES32,
-  NULL_ADDRESS,
-  APP_ORDER,
-  DATASET_ORDER,
-  WORKERPOOL_ORDER,
-  REQUEST_ORDER,
-  NULL_DATASETORDER,
-} from '../utils/constant.js';
-import {
-  addressSchema,
-  apporderSchema,
-  datasetorderSchema,
-  workerpoolorderSchema,
-  requestorderSchema,
-  saltedApporderSchema,
-  saltedDatasetorderSchema,
-  saltedWorkerpoolorderSchema,
-  saltedRequestorderSchema,
-  signedApporderSchema,
-  signedDatasetorderSchema,
-  signedWorkerpoolorderSchema,
-  signedRequestorderSchema,
-  tagSchema,
-  uint256Schema,
-  nRlcAmountSchema,
-  throwIfMissing,
-  booleanSchema,
-} from '../utils/validator.js';
-import {
-  wrapCall,
-  wrapSend,
-  wrapWait,
-  wrapSignTypedData,
-} from '../utils/errorWrappers.js';
-import { getVoucherHubContract } from '../utils/voucher-utils.js';
-import { checkAllowance } from '../account/allowance.js';
-import { fetchVoucherContract } from '../voucher/voucher.js';
 import {
   CHAIN_SPECIFIC_FEATURES,
   checkImplementedOnChain,
 } from '../utils/config.js';
+import {
+  APP_ORDER,
+  DATASET_ORDER,
+  NULL_ADDRESS,
+  NULL_BYTES,
+  NULL_BYTES32,
+  NULL_DATASETORDER,
+  REQUEST_ORDER,
+  WORKERPOOL_ORDER,
+} from '../utils/constant.js';
+import {
+  wrapCall,
+  wrapSend,
+  wrapSignTypedData,
+  wrapWait,
+} from '../utils/errorWrappers.js';
+import { hashEIP712 } from '../utils/sig-utils.js';
+import {
+  bigIntToBn,
+  checkActiveBitInTag,
+  checkEventFromLogs,
+  checkSigner,
+  encodeMatchOrders,
+  findMissingBitsInTag,
+  getSalt,
+  parseTransactionLogs,
+  sumTags,
+  TAG_MAP,
+  tagBitToHuman,
+} from '../utils/utils.js';
+import {
+  addressSchema,
+  apporderSchema,
+  booleanSchema,
+  datasetorderSchema,
+  nRlcAmountSchema,
+  requestorderSchema,
+  saltedApporderSchema,
+  saltedDatasetorderSchema,
+  saltedRequestorderSchema,
+  saltedWorkerpoolorderSchema,
+  signedApporderSchema,
+  signedDatasetorderSchema,
+  signedRequestorderSchema,
+  signedWorkerpoolorderSchema,
+  tagSchema,
+  throwIfMissing,
+  uint256Schema,
+  workerpoolorderSchema,
+} from '../utils/validator.js';
+import { getVoucherHubContract } from '../utils/voucher-utils.js';
+import { fetchVoucherContract } from '../voucher/voucher.js';
+import { getAddress } from '../wallet/address.js';
 
 const debug = Debug('iexec:market:order');
 
@@ -916,6 +917,7 @@ export const matchOrders = async ({
   requestorder,
   useVoucher = false,
   voucherAddress,
+  allowDeposit = false,
 }) => {
   try {
     checkSigner(contracts);
@@ -1022,19 +1024,28 @@ export const matchOrders = async ({
         }
       } else {
         if (stake.lt(costPerTask)) {
+          if (allowDeposit) {
+            // Will handle deposit via approveAndCall
+            return { insufficient: true, totalCost };
+          }
           throw new Error(
             `Cost per task (${costPerTask}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account`,
           );
         }
         if (stake.lt(totalCost)) {
+          if (allowDeposit) {
+            // Will handle deposit via approveAndCall
+            return { insufficient: true, totalCost };
+          }
           throw new Error(
             `Total cost for ${matchableVolume} tasks (${totalCost}) is greater than requester account stake (${stake}). Orders can't be matched. If you are the requester, you should deposit to top up your account or reduce your requestorder volume`,
           );
         }
       }
+      return { insufficient: false };
     };
 
-    await checkRequesterSolvabilityAsync();
+    const solvabilityCheck = await checkRequesterSolvabilityAsync();
 
     const appOrderStruct = signedOrderToStruct(APP_ORDER, vAppOrder);
     const datasetOrderStruct = signedOrderToStruct(
@@ -1064,15 +1075,52 @@ export const matchOrders = async ({
           ),
       );
     } else {
-      tx = await wrapSend(
-        iexecContract.matchOrders(
+      if (solvabilityCheck.insufficient && allowDeposit) {
+        // Balance is insufficient, use approveAndCall with encoded orders
+        // This will automatically deposit RLC from wallet to account and execute matchOrders
+        if (contracts.isNative) {
+          throw new Error(
+            'allowDeposit is not supported on native chains. Please deposit manually before matching orders.',
+          );
+        }
+        const { stake } = await checkBalance(
+          contracts,
+          vRequestOrder.requester,
+        );
+
+        // pass the missing amount to the approveAndCall
+        const missingAmount = solvabilityCheck.totalCost.sub(stake);
+        const encodedMatchOrders = await encodeMatchOrders(
+          contracts,
           appOrderStruct,
           datasetOrderStruct,
           workerpoolOrderStruct,
           requestOrderStruct,
-          contracts.txOptions,
-        ),
-      );
+        );
+
+        const rlcContract = await wrapCall(contracts.fetchTokenContract());
+        const rlcContractWithSigner = rlcContract.connect(contracts.signer);
+
+        tx = await wrapSend(
+          rlcContractWithSigner.approveAndCall(
+            contracts.hubAddress,
+            missingAmount.toString(),
+            encodedMatchOrders,
+            contracts.txOptions,
+          ),
+        );
+      } else {
+        // Balance is sufficient or allowDeposit is false, proceed normally
+        tx = await wrapSend(
+          iexecContract.matchOrders(
+            appOrderStruct,
+            datasetOrderStruct,
+            workerpoolOrderStruct,
+            requestOrderStruct,
+            contracts.txOptions,
+          ),
+        );
+      }
     }
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     const events = parseTransactionLogs(
