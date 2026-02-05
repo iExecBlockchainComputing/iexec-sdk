@@ -84,6 +84,7 @@ import {
   apporderSchema,
   datasetorderSchema,
 } from '../../common/utils/validator.js';
+import { stripTeeFrameworkFromTag } from '../../common/utils/utils.js';
 
 const debug = Debug('iexec:iexec-order');
 const objName = 'order';
@@ -520,11 +521,13 @@ fill
           (await apporderSchema().label('apporder').validate(apporder)).tag,
           ...(useDataset
             ? [
-                (
-                  await datasetorderSchema()
-                    .label('datasetorder')
-                    .validate(datasetorder)
-                ).tag,
+                stripTeeFrameworkFromTag(
+                  (
+                    await datasetorderSchema()
+                      .label('datasetorder')
+                      .validate(datasetorder)
+                  ).tag,
+                ),
               ]
             : []),
         ]);

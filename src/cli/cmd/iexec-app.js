@@ -70,6 +70,7 @@ import {
   stringifyNestedBn,
   formatRLC,
   TAG_MAP,
+  stripTeeFrameworkFromTag,
 } from '../../common/utils/utils.js';
 import {
   NULL_ADDRESS,
@@ -847,7 +848,11 @@ run
             ? `Using workerpool ${workerpool}`
             : 'Using any workerpool',
         );
-        const minTag = sumTags([apporder.tag, datasetorder.tag, tag]);
+        const minTag = sumTags([
+          apporder.tag,
+          stripTeeFrameworkFromTag(datasetorder.tag),
+          tag,
+        ]);
         debug('minTag', minTag);
         if (runOnWorkerpool) {
           if (!(await checkDeployedWorkerpool(chain.contracts, workerpool)))

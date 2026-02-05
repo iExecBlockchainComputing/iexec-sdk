@@ -22,6 +22,7 @@ import {
   checkSigner,
   TAG_MAP,
   parseTransactionLogs,
+  stripTeeFrameworkFromTag,
 } from '../utils/utils.js';
 import { hashEIP712 } from '../utils/sig-utils.js';
 import {
@@ -656,7 +657,11 @@ const getMatchableVolume = async (
     // workerpool tag check
     const workerpoolMissingTagBits = findMissingBitsInTag(
       vWorkerpoolOrder.tag,
-      sumTags([vRequestOrder.tag, vAppOrder.tag, vDatasetOrder.tag]),
+      sumTags([
+        vRequestOrder.tag,
+        vAppOrder.tag,
+        stripTeeFrameworkFromTag(vDatasetOrder.tag),
+      ]),
     );
     if (workerpoolMissingTagBits.length > 0) {
       throw new Error(
@@ -667,7 +672,7 @@ const getMatchableVolume = async (
     }
     // app tag check
     const teeAppRequired = checkActiveBitInTag(
-      sumTags([vRequestOrder.tag, vDatasetOrder.tag]),
+      sumTags([vRequestOrder.tag, stripTeeFrameworkFromTag(vDatasetOrder.tag)]),
       1,
     );
     if (teeAppRequired && !checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
@@ -954,7 +959,13 @@ export const matchOrders = async ({
 
     // check resulting tag
     await tagSchema()
-      .validate(sumTags([vAppOrder.tag, vDatasetOrder.tag, vRequestOrder.tag]))
+      .validate(
+        sumTags([
+          vAppOrder.tag,
+          stripTeeFrameworkFromTag(vDatasetOrder.tag),
+          vRequestOrder.tag,
+        ]),
+      )
       .catch((e) => {
         throw new Error(
           `Matching order would produce an invalid deal tag. ${e.message}`,
