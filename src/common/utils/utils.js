@@ -257,45 +257,33 @@ export const decodeTag = (tag) => {
 };
 
 export const sumTags = (tagArray) => {
-  const binStringArray = tagArray.map((hexTag) => {
+  const bigIntTagArray = tagArray.map((hexTag) => {
     if (typeof hexTag !== 'string' || !bytes32Regex.test(hexTag))
       throw new ValidationError('tag must be bytes32 hex string');
-    return BigInt(hexTag).toString(2);
+    return BigInt(hexTag);
   });
-  let summedTagsBinString = '';
-  for (let i = 0; i < 255; i += 1) {
-    let currentBit = '0';
-    binStringArray.forEach((binString) => {
-      if (binString.charAt(binString.length - i - 1) === '1') {
-        currentBit = '1';
-      }
-    });
-    summedTagsBinString = currentBit + summedTagsBinString;
+  let summedBigIntTag = 0n;
+  for (const bigIntTag of bigIntTagArray) {
+    summedBigIntTag |= bigIntTag;
   }
-  return (
-    '0x' + BigInt(`0b${summedTagsBinString}`).toString(16).padStart(64, '0')
-  );
+  return '0x' + summedBigIntTag.toString(16).padStart(64, '0');
 };
 
 export const stripTeeFrameworkFromTag = (tag) => {
   if (typeof tag !== 'string' || !bytes32Regex.test(tag))
     throw new ValidationError('tag must be bytes32 hex string');
-  const binString = BigInt(tag).toString(2);
-  let strippedBinString = '';
-  for (let i = 0; i < binString.length; i += 1) {
-    if (
-      // bits 1,2,3 represent TEE frameworks
-      i === 1 ||
-      i === 2 ||
-      i === 3
-    ) {
-      strippedBinString = '0' + strippedBinString;
-    } else {
-      strippedBinString =
-        binString.charAt(binString.length - i - 1) + strippedBinString;
-    }
-  }
-  return '0x' + BigInt(`0b${strippedBinString}`).toString(16).padStart(64, '0');
+  return (
+    '0x' +
+    (
+      BigInt(tag) &
+      // apply 256 bit mask with bits 1,2,3 (representing TEE frameworks) set to 0
+      BigInt(
+        '0b1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110001',
+      )
+    )
+      .toString(16)
+      .padStart(64, '0')
+  );
 };
 
 export const findMissingBitsInTag = (tag, requiredTag) => {

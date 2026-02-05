@@ -11,14 +11,25 @@ describe('utils', () => {
         ).toString(16);
 
       // bits 1,2,3 represent TEE frameworks disabled
-      const expectedStrippedTag =
+      const maxTagExcludingTeeFramework =
         `0x` +
         BigInt(
           '0b1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110001',
         ).toString(16);
 
-      const strippedTag = stripTeeFrameworkFromTag(maxTag);
-      expect(strippedTag).toBe(expectedStrippedTag);
+      const teeTag =
+        '0x0000000000000000000000000000000000000000000000000000000000000001';
+      const teeSconeTag =
+        '0x0000000000000000000000000000000000000000000000000000000000000003';
+      const teeGramineTag =
+        '0x0000000000000000000000000000000000000000000000000000000000000005';
+
+      expect(stripTeeFrameworkFromTag(maxTag)).toBe(
+        maxTagExcludingTeeFramework,
+      );
+      expect(stripTeeFrameworkFromTag(teeTag)).toBe(teeTag);
+      expect(stripTeeFrameworkFromTag(teeSconeTag)).toBe(teeTag);
+      expect(stripTeeFrameworkFromTag(teeGramineTag)).toBe(teeTag);
     });
   });
 });
