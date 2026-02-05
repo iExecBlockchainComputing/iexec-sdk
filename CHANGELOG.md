@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.22.6](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.5...v8.22.6) (2026-02-05)
+
+
+### Changed
+
+* ignore datasetorder burned TEE frameworks tags from deal tag computation ([#533](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/533)) ([177e2b4](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/177e2b490c4e4450477711794170f6dfbfac8f9a))
+
 ## [8.22.5](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.4...v8.22.5) (2026-02-04)
 
 
