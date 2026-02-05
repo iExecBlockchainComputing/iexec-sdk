@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { join } from 'path';
 import { BN } from 'bn.js';
@@ -11,7 +9,6 @@ import {
 } from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
-  TEE_FRAMEWORKS,
   execAsync,
   getId,
   getRandomAddress,
@@ -366,7 +363,7 @@ describe('dataset', () => {
       );
     });
 
-    test('checks a dataset secret exist on default TEE framework SMS', async () => {
+    test('checks a dataset secret exist in the SMS', async () => {
       const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
         readOnly: true,
       });
@@ -379,38 +376,6 @@ describe('dataset', () => {
       await expect(
         readOnlyIExec.dataset.checkDatasetSecretExists(address),
       ).resolves.toBe(true);
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
-      ).resolves.toBe(true);
-    });
-
-    test('allows teeFramework override', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
-        readOnly: true,
-      });
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomDataset(iexec);
-      await iexec.dataset.pushDatasetSecret(address, 'foo', {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
-      ).resolves.toBe(false);
-      // validate teeFramework
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(getRandomAddress(), {
-          teeFramework: 'foo',
-        }),
-      ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });
 
@@ -472,23 +437,18 @@ describe('dataset', () => {
       );
     });
 
-    test('use the default TEE framework SMS', async () => {
+    test('pushes secret to SMS', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
-      const { address: datasetAddress } = await deployRandomDataset(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
+      const { address: datasetAddress } = await deployRandomDataset(iexec);
+      await expect(
+        iexec.dataset.checkDatasetSecretExists(datasetAddress),
+      ).resolves.toBe(false);
       await expect(
         iexec.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).resolves.toBe(true);
       await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
-      ).rejects.toThrow(
-        new Error(
-          `Secret already exists for ${datasetAddress} and can't be updated`,
-        ),
-      );
+        iexec.dataset.checkDatasetSecretExists(datasetAddress),
+      ).resolves.toBe(true);
     });
 
     test('cannot update existing secret', async () => {
@@ -507,36 +467,6 @@ describe('dataset', () => {
           `Secret already exists for ${datasetAddress} and can't be updated`,
         ),
       );
-    });
-
-    test('allow teeFramework override', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address: datasetAddress } = await deployRandomDataset(iexec);
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo'),
-      ).resolves.toBe(true);
-      await expect(
-        iexec.dataset.checkDatasetSecretExists(datasetAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(false);
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-      await expect(
-        iexec.dataset.checkDatasetSecretExists(datasetAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-
-      // validate teeFramework
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
-          teeFramework: 'foo',
-        }),
-      ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });
 });

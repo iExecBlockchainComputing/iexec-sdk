@@ -7,23 +7,19 @@ export const getTestConfigOptions =
     bridgeAddress: options.bridgeAddress ?? chain.bridgeAddress,
     bridgedNetworkConf: options.bridgedNetworkConf ?? chain.bridgedNetworkConf,
     confirms: options.confirms ?? chain.confirms,
-    defaultTeeFramework:
-      options.defaultTeeFramework ?? chain.defaultTeeFramework,
     ensPublicResolverAddress:
       options.ensPublicResolverAddress ?? chain.ensPublicResolverAddress,
     ensRegistryAddress: options.ensRegistryAddress ?? chain.ensRegistryAddress,
     hubAddress: options.hubAddress ?? chain.hubAddress,
-    voucherHubAddress: options.voucherHubAddress ?? chain.voucherHubAddress,
     iexecGatewayURL: options.iexecGatewayURL ?? chain.iexecGatewayURL,
     ipfsNodeURL: options.ipfsNodeURL ?? chain.ipfsNodeURL,
     ipfsGatewayURL: options.ipfsGatewayURL ?? chain.ipfsGatewayURL,
     pocoSubgraphURL: options.pocoSubgraphURL ?? chain.pocoSubgraphURL,
-    voucherSubgraphURL: options.voucherSubgraphURL ?? chain.voucherSubgraphURL,
     isNative: options.isNative ?? chain.isNative,
     providerOptions: options.providerOptions ?? chain.providerOptions,
     resultProxyURL: options.resultProxyURL ?? chain.resultProxyURL,
     compassURL: options.compassURL ?? chain.compassURL,
-    smsURL: options.smsURL ?? chain.smsMap,
+    smsURL: options.smsURL ?? chain.smsURL,
     useGas: options.useGas ?? chain.useGas,
   });
 

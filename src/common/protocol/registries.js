@@ -7,7 +7,6 @@ import {
   datasetSchema,
   workerpoolSchema,
   uint256Schema,
-  objMrenclaveSchema,
   throwIfMissing,
 } from '../utils/validator.js';
 import {
@@ -517,21 +516,3 @@ export const transferWorkerpool = async (
       .required()
       .validate(to),
   );
-
-export const resolveTeeFrameworkFromApp = async (
-  app,
-  { strict = true } = {},
-) => {
-  if (app.appMREnclave) {
-    try {
-      const mrenclave = await objMrenclaveSchema().validate(app.appMREnclave);
-      return mrenclave.framework;
-    } catch (err) {
-      debug('resolveTeeFrameworkFromApp()', err);
-      if (strict) {
-        throw new Error('Failed to resolve TEE framework from app');
-      }
-    }
-  }
-  return undefined;
-};
