@@ -380,7 +380,7 @@ describe('order', () => {
         iexec.order.signApporder({ ...order, tag: ['tee'] }),
       ).rejects.toThrow(
         new Error(
-          "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+          "'tee' tag must be used with a tee framework ('scone'|'gramine'|'tdx')",
         ),
       );
       await expect(
@@ -395,7 +395,7 @@ describe('order', () => {
           tag: ['tee', 'scone', 'gramine'],
         }),
       ).rejects.toThrow(
-        new Error("tee framework tags are exclusive ('scone'|'gramine')"),
+        new Error("tee framework tags are exclusive ('scone'|'gramine'|'tdx')"),
       );
     });
   });
@@ -476,7 +476,7 @@ describe('signDatasetorder()', () => {
         tag: ['tee', 'scone', 'gramine'],
       }),
     ).rejects.toThrow(
-      new Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      new Error("tee framework tags are exclusive ('scone'|'gramine'|'tdx')"),
     );
   });
 });
@@ -538,7 +538,7 @@ describe('signRequestorder()', () => {
         tag: ['tee', 'scone', 'gramine'],
       }),
     ).rejects.toThrow(
-      new Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      new Error("tee framework tags are exclusive ('scone'|'gramine'|'tdx')"),
     );
   });
 
@@ -2584,6 +2584,42 @@ describe('matchOrders()', () => {
         requestorder,
       }),
     ).rejects.toThrow('execution reverted: revert: iExecV5-matchOrders-0x06');
+  });
+
+  test('TDX tag with app without mrenclave passes checkAppRequirements (preflight)', async () => {
+    const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+    const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
+
+    // Deploy a regular app (no mrenclave) - treated as TDX-compatible for matching
+    const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+      teeFramework: undefined,
+      tag: ['tee', 'tdx'],
+    });
+    const datasetorder = await deployAndGetDatasetorder(
+      iexecResourcesProvider,
+      {},
+    );
+    const workerpoolorder = await deployAndGetWorkerpoolorder(
+      iexecResourcesProvider,
+      { tag: ['tee', 'tdx'] },
+    );
+    const requestorder = await getMatchableRequestorder(iexecRequester, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
+    const result = await iexecRequester.order.matchOrders(
+      {
+        apporder,
+        datasetorder,
+        workerpoolorder,
+        requestorder,
+      },
+      { preflightCheck: true },
+    );
+    expect(result).toBeDefined();
+    expect(result.dealid).toBeDefined();
+    expect(result.txHash).toBeDefined();
   });
 
   describe('useVoucher option', () => {

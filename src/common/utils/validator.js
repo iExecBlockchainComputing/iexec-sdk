@@ -629,8 +629,16 @@ export const objMrenclaveSchema = () =>
   object({
     // common keys
     framework: teeFrameworkSchema().required(),
-    version: string().required(),
-    fingerprint: string().required(),
+    version: mixed().when('framework', ([framework], versionSchema) =>
+      framework && framework.toLowerCase() === TEE_FRAMEWORKS.TDX
+        ? string().notRequired()
+        : versionSchema.required(),
+    ),
+    fingerprint: mixed().when('framework', ([framework], fingerprintSchema) =>
+      framework && framework.toLowerCase() === TEE_FRAMEWORKS.TDX
+        ? string().notRequired()
+        : fingerprintSchema.required(),
+    ),
     // framework specific keys
     entrypoint: mixed().when('framework', ([framework], entrypointSchema) =>
       framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE

@@ -217,6 +217,7 @@ export const TAG_MAP = {
   tee: 0,
   [TEE_FRAMEWORKS.SCONE]: 1,
   [TEE_FRAMEWORKS.GRAMINE]: 2,
+  [TEE_FRAMEWORKS.TDX]: 3,
   gpu: 8,
 };
 Object.assign(
