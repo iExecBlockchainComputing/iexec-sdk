@@ -39,6 +39,16 @@ export const sconeTeeApp = {
   },
 };
 
+/** TDX app template (no mrenclave on-chain, same as non-TEE app). To use your own image replace multiaddr and checksum. See docs/TDX_DOCKER_AND_E2E.md. */
+export const tdxTeeApp = {
+  owner: '0x0000000000000000000000000000000000000000',
+  name: 'hello-world-tdx',
+  type: 'DOCKER',
+  multiaddr: 'iexechub/hello-world-tdx:0.0.1',
+  checksum:
+    '0x15de77fd7ac448028884256b3ab376e7d4560e9ef6acf0594ea0b3c031d5d395',
+};
+
 export const gramineTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'hello-world-gramine',

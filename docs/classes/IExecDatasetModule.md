@@ -133,7 +133,7 @@ const checksum = await computeEncryptedFileChecksum(
 
 ##### encryptedFile
 
-`Buffer` | `Uint8Array` | `ArrayBuffer`
+`ArrayBuffer` | `Uint8Array`\<`ArrayBufferLike`\> | `Buffer`\<`ArrayBufferLike`\>
 
 #### Returns
 
@@ -198,7 +198,7 @@ console.log('deployed at', address);
 
 ### encrypt()
 
-> **encrypt**(`datasetFile`, `encyptionKey`): `Promise`\<`Buffer`\>
+> **encrypt**(`datasetFile`, `encyptionKey`): `Promise`\<`Buffer`\<`ArrayBufferLike`\>\>
 
 encrypt the dataset file with the specified key using AES-256-CBC
 
@@ -225,7 +225,7 @@ const binary = new Blob([encryptedDataset]);
 
 ##### datasetFile
 
-`Buffer` | `Uint8Array` | `ArrayBuffer`
+`ArrayBuffer` | `Uint8Array`\<`ArrayBufferLike`\> | `Buffer`\<`ArrayBufferLike`\>
 
 ##### encyptionKey
 
@@ -233,7 +233,7 @@ const binary = new Blob([encryptedDataset]);
 
 #### Returns
 
-`Promise`\<`Buffer`\>
+`Promise`\<`Buffer`\<`ArrayBufferLike`\>\>
 
 ***
 

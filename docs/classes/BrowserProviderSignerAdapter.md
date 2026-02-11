@@ -83,7 +83,7 @@ Resolves to the Signer address.
 
 ##### message
 
-`string` | `Uint8Array`
+`string` | `Uint8Array`\<`ArrayBufferLike`\>
 
 #### Returns
 

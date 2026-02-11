@@ -835,7 +835,7 @@ describe('[tagSchema]', () => {
   test('invalid tee tag', async () => {
     await expect(tagSchema().validate('tee')).rejects.toThrow(
       new ValidationError(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+        "'tee' tag must be used with a tee framework ('scone'|'gramine'|'tdx')",
       ),
     );
     await expect(
@@ -844,7 +844,7 @@ describe('[tagSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+        "'tee' tag must be used with a tee framework ('scone'|'gramine'|'tdx')",
       ),
     );
     await expect(tagSchema().validate('scone')).rejects.toThrow(
@@ -867,6 +867,16 @@ describe('[tagSchema]', () => {
     ).rejects.toThrow(
       new ValidationError("'gramine' tag must be used with 'tee' tag"),
     );
+    await expect(tagSchema().validate('tdx')).rejects.toThrow(
+      new ValidationError("'tdx' tag must be used with 'tee' tag"),
+    );
+    await expect(
+      tagSchema().validate(
+        '0x0000000000000000000000000000000000000000000000000000000000000008',
+      ),
+    ).rejects.toThrow(
+      new ValidationError("'tdx' tag must be used with 'tee' tag"),
+    );
     const agnosticTeeTag = await tagSchema({ allowAgnosticTee: true }).validate(
       ['tee'],
     );
@@ -875,7 +885,7 @@ describe('[tagSchema]', () => {
     );
     await expect(tagSchema().validate('tee,gramine,scone')).rejects.toThrow(
       new ValidationError(
-        "tee framework tags are exclusive ('scone'|'gramine')",
+        "tee framework tags are exclusive ('scone'|'gramine'|'tdx')",
       ),
     );
     await expect(
@@ -884,8 +894,12 @@ describe('[tagSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        "tee framework tags are exclusive ('scone'|'gramine')",
+        "tee framework tags are exclusive ('scone'|'gramine'|'tdx')",
       ),
+    );
+    const teeTdxTag = await tagSchema().validate(['tee', 'tdx']);
+    expect(teeTdxTag).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000009',
     );
   });
 });

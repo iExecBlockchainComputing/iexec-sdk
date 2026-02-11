@@ -91,6 +91,18 @@ describe('iexec app', () => {
       expect(res.app.mrenclave).toBeDefined();
       expect(res.app.mrenclave.framework).toBe('SCONE');
     });
+
+    test('--tee-framework tdx', async () => {
+      const raw = await execAsync(
+        `${iexecPath} app init --tee-framework tdx --raw`,
+      );
+      const res = JSON.parse(raw);
+      expect(res.ok).toBe(true);
+      expect(res.app).toBeDefined();
+      expect(res.app.name).toContain('tdx');
+      expect(res.app.multiaddr).toContain('tdx');
+      expect(res.app.mrenclave).toBeUndefined();
+    });
   });
 
   describe('deploy', () => {

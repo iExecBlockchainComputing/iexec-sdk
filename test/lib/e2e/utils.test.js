@@ -206,12 +206,20 @@ describe('utils', () => {
       ).toStrictEqual(['tee', 'scone']);
     });
 
+    test("decodeTag('0x0000000000000000000000000000000000000000000000000000000000000009')", () => {
+      expect(
+        utils.decodeTag(
+          '0x0000000000000000000000000000000000000000000000000000000000000009',
+        ),
+      ).toStrictEqual(['tee', 'tdx']);
+    });
+
     test('decodeTag unknown bit tag', () => {
       expect(() =>
         utils.decodeTag(
-          '0x000000000000000000000000000000000000000000000000000000000000000a',
+          '0x0000000000000000000000000000000000000000000000000000000000000010',
         ),
-      ).toThrow(Error('Unknown bit 3 in tag'));
+      ).toThrow(Error('Unknown bit 4 in tag'));
     });
   });
 

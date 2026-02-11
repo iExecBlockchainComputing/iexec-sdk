@@ -109,6 +109,7 @@ export const TEST_CHAINS = {
     chainId: '134',
     sconeSmsURL: 'http://localhost:13300',
     gramineSmsURL: 'http://localhost:13309',
+    tdxSmsURL: 'http://localhost:13300',
     iexecGatewayURL: 'http://localhost:3000',
     resultProxyURL: 'http://localhost:13200',
     ipfsNodeURL: 'http://localhost:5001',
@@ -153,6 +154,7 @@ Object.keys(TEST_CHAINS).forEach((chain) => {
     TEST_CHAINS[chain].smsMap = {
       gramine: TEST_CHAINS[chain].gramineSmsURL,
       scone: TEST_CHAINS[chain].sconeSmsURL,
+      tdx: TEST_CHAINS[chain].tdxSmsURL,
     };
   }
 });

@@ -43,9 +43,13 @@ export const resolveTeeFrameworkFromTag = async (tag) => {
   if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.SCONE])) {
     return TEE_FRAMEWORKS.SCONE;
   }
+  if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.TDX])) {
+    return TEE_FRAMEWORKS.TDX;
+  }
   if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.GRAMINE])) {
     return TEE_FRAMEWORKS.GRAMINE;
   }
+
   return undefined;
 };
 
@@ -209,7 +213,10 @@ export const checkAppRequirements = async (
   const appTeeFramework = await showApp(contracts, app).then((res) =>
     resolveTeeFrameworkFromApp(res.app, { strict: false }),
   );
-  if (appTeeFramework !== tagTeeFramework) {
+  const tagMatchesApp =
+    appTeeFramework === tagTeeFramework ||
+    (tagTeeFramework === TEE_FRAMEWORKS.TDX && appTeeFramework === undefined);
+  if (!tagMatchesApp) {
     throw new Error('Tag mismatch the TEE framework specified by app');
   }
 };
