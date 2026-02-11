@@ -440,6 +440,13 @@ describe('signDatasetorder()', () => {
         `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
       ),
     );
+    await expect(
+      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'tdx'] }),
+    ).rejects.toThrow(
+      new Error(
+        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
+      ),
+    );
     await iexec.dataset.pushDatasetSecret(
       address,
       iexec.dataset.generateEncryptionKey(),
@@ -447,6 +454,10 @@ describe('signDatasetorder()', () => {
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
     ).resolves.toBeDefined();
+    await expect(
+      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'tdx'] }),
+    ).resolves.toBeDefined();
+
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
     ).resolves.toBeDefined();
@@ -2590,7 +2601,6 @@ describe('matchOrders()', () => {
     const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
     const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
 
-    // Deploy a regular app (no mrenclave) - treated as TDX-compatible for matching
     const apporder = await deployAndGetApporder(iexecResourcesProvider, {
       teeFramework: undefined,
       tag: ['tee', 'tdx'],
@@ -2598,6 +2608,10 @@ describe('matchOrders()', () => {
     const datasetorder = await deployAndGetDatasetorder(
       iexecResourcesProvider,
       {},
+    );
+    await iexecResourcesProvider.dataset.pushDatasetSecret(
+      datasetorder.dataset,
+      'foo',
     );
     const workerpoolorder = await deployAndGetWorkerpoolorder(
       iexecResourcesProvider,
@@ -2608,18 +2622,22 @@ describe('matchOrders()', () => {
       datasetorder,
       workerpoolorder,
     });
-    const result = await iexecRequester.order.matchOrders(
-      {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
-      },
-      { preflightCheck: true },
-    );
-    expect(result).toBeDefined();
-    expect(result.dealid).toBeDefined();
-    expect(result.txHash).toBeDefined();
+    await iexecRequester.order
+      .matchOrders(
+        {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+          requestorder,
+        },
+        { preflightCheck: true },
+      )
+      .then((res) => {
+        expect(res.txHash).toBeTxHash();
+        expect(res.volume).toBeInstanceOf(BN);
+        expect(res.volume.eq(new BN(1))).toBe(true);
+        expect(res.dealid).toBeTxHash();
+      });
   });
 
   describe('useVoucher option', () => {
