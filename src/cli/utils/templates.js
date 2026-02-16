@@ -39,7 +39,7 @@ export const sconeTeeApp = {
   },
 };
 
-/** TDX app template (no mrenclave on-chain, same as non-TEE app). To use your own image replace multiaddr and checksum. See docs/TDX_DOCKER_AND_E2E.md. */
+// TODO: push hello-world-tdx docker image to iexechub registry and update the multiaddr and checksum
 export const tdxTeeApp = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'hello-world-tdx',

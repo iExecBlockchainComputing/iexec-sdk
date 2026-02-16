@@ -629,16 +629,8 @@ export const objMrenclaveSchema = () =>
   object({
     // common keys
     framework: teeFrameworkSchema().required(),
-    version: mixed().when('framework', ([framework], versionSchema) =>
-      framework && framework.toLowerCase() === TEE_FRAMEWORKS.TDX
-        ? string().notRequired()
-        : versionSchema.required(),
-    ),
-    fingerprint: mixed().when('framework', ([framework], fingerprintSchema) =>
-      framework && framework.toLowerCase() === TEE_FRAMEWORKS.TDX
-        ? string().notRequired()
-        : fingerprintSchema.required(),
-    ),
+    version: string().required(),
+    fingerprint: string().required(),
     // framework specific keys
     entrypoint: mixed().when('framework', ([framework], entrypointSchema) =>
       framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
@@ -723,7 +715,7 @@ export const appSchema = (opt) =>
     type: appTypeSchema().required(),
     multiaddr: multiaddressSchema().required(),
     checksum: bytes32Schema().required(),
-    mrenclave: mrenclaveSchema().required(),
+    mrenclave: mrenclaveSchema().notRequired(),
   });
 
 export const datasetSchema = (opt) =>
