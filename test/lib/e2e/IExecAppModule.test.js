@@ -302,7 +302,7 @@ describe('app', () => {
       );
     });
 
-    test('checks an app secret exist on SMS inferred from app TEE framework', async () => {
+    test('checks an app secret exist on SMS inferred from gramine app TEE framework', async () => {
       const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
         readOnly: true,
       });
@@ -322,6 +322,30 @@ describe('app', () => {
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address, {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
+        }),
+      ).resolves.toBe(true);
+    });
+
+    test('checks an app secret exist on SMS inferred from tdx app TEE framework', async () => {
+      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+        readOnly: true,
+      });
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const { address } = await deployRandomApp(iexec, {
+        teeFramework: TEE_FRAMEWORKS.TDX,
+      });
+      await expect(
+        readOnlyIExec.app.checkAppSecretExists(address),
+      ).resolves.toBe(false);
+      await iexec.app.pushAppSecret(address, 'foo');
+      // infer teeFramework to use
+      await expect(
+        readOnlyIExec.app.checkAppSecretExists(address),
+      ).resolves.toBe(true);
+      // check inferred teeFramework with teeFramework option
+      await expect(
+        readOnlyIExec.app.checkAppSecretExists(address, {
+          teeFramework: TEE_FRAMEWORKS.TDX,
         }),
       ).resolves.toBe(true);
     });
@@ -408,7 +432,7 @@ describe('app', () => {
       );
     });
 
-    test('infers the SMS from app TEE framework', async () => {
+    test('infers the SMS from gramine app TEE framework', async () => {
       const { iexec } = getTestConfig(iexecTestChain)();
       const { address: appAddress } = await deployRandomApp(iexec, {
         teeFramework: TEE_FRAMEWORKS.GRAMINE,
@@ -421,6 +445,27 @@ describe('app', () => {
       await expect(
         iexec.app.pushAppSecret(appAddress, 'foo', {
           teeFramework: TEE_FRAMEWORKS.GRAMINE,
+        }),
+      ).rejects.toThrow(
+        new Error(
+          `Secret already exists for ${appAddress} and can't be updated`,
+        ),
+      );
+    });
+
+    test('infers the SMS from tdx app TEE framework', async () => {
+      const { iexec } = getTestConfig(iexecTestChain)();
+      const { address: appAddress } = await deployRandomApp(iexec, {
+        teeFramework: TEE_FRAMEWORKS.TDX,
+      });
+      // infer teeFramework to use
+      await expect(iexec.app.pushAppSecret(appAddress, 'foo')).resolves.toBe(
+        true,
+      );
+      // check inferred teeFramework with teeFramework option
+      await expect(
+        iexec.app.pushAppSecret(appAddress, 'foo', {
+          teeFramework: TEE_FRAMEWORKS.TDX,
         }),
       ).rejects.toThrow(
         new Error(

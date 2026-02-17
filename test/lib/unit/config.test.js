@@ -40,6 +40,7 @@ describe('getChainDefaults', () => {
         gramine: 'https://sms.gramine.v8-bellecour.iex.ec',
         scone: 'https://sms.iex.ec',
       },
+      compass: undefined,
       voucherHub: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda',
       voucherSubgraph:
         'https://thegraph.iex.ec/subgraphs/name/bellecour/iexec-voucher',

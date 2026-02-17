@@ -18,15 +18,18 @@ export const deployRandomApp = async (iexec, { owner, teeFramework } = {}) =>
     multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
     checksum:
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-    mrenclave: teeFramework && {
-      framework: teeFramework,
-      version: 'v1',
-      fingerprint: 'fingerprint',
-      ...(teeFramework.toLowerCase() === TEE_FRAMEWORKS.SCONE && {
-        entrypoint: 'entrypoint.sh',
-        heapSize: 4096,
-      }),
-    },
+    mrenclave:
+      teeFramework && teeFramework !== TEE_FRAMEWORKS.TDX
+        ? {
+            framework: teeFramework,
+            version: 'v1',
+            fingerprint: 'fingerprint',
+            ...(teeFramework.toLowerCase() === TEE_FRAMEWORKS.SCONE && {
+              entrypoint: 'entrypoint.sh',
+              heapSize: 4096,
+            }),
+          }
+        : undefined,
   });
 
 export const deployRandomDataset = async (iexec, { owner } = {}) =>

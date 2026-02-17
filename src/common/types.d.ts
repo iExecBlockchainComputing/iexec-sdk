@@ -144,7 +144,7 @@ export type Multiaddress = string | Buffer;
 /**
  * Trusted Execution Environment name
  */
-export type TeeFramework = 'scone' | 'gramine';
+export type TeeFramework = 'scone' | 'gramine' | 'tdx';
 
 export type AnyRecord = Record<string, any>;
 

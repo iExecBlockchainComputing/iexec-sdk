@@ -380,7 +380,7 @@ describe('order', () => {
         iexec.order.signApporder({ ...order, tag: ['tee'] }),
       ).rejects.toThrow(
         new Error(
-          "'tee' tag must be used with a tee framework ('scone'|'gramine')",
+          "'tee' tag must be used with a tee framework ('scone'|'gramine'|'tdx')",
         ),
       );
       await expect(
@@ -395,7 +395,7 @@ describe('order', () => {
           tag: ['tee', 'scone', 'gramine'],
         }),
       ).rejects.toThrow(
-        new Error("tee framework tags are exclusive ('scone'|'gramine')"),
+        new Error("tee framework tags are exclusive ('scone'|'gramine'|'tdx')"),
       );
     });
   });
@@ -440,12 +440,27 @@ describe('signDatasetorder()', () => {
         `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
       ),
     );
+    await expect(
+      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'tdx'] }),
+    ).rejects.toThrow(
+      new Error(
+        `Dataset encryption key is not set for dataset ${address} in the SMS. Dataset decryption will fail.`,
+      ),
+    );
     await iexec.dataset.pushDatasetSecret(
       address,
       iexec.dataset.generateEncryptionKey(),
     );
+    await iexec.dataset.pushDatasetSecret(
+      address,
+      iexec.dataset.generateEncryptionKey(),
+      { teeFramework: TEE_FRAMEWORKS.TDX },
+    );
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
+    ).resolves.toBeDefined();
+    await expect(
+      iexec.order.signDatasetorder({ ...order, tag: ['tee', 'tdx'] }),
     ).resolves.toBeDefined();
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
@@ -476,7 +491,7 @@ describe('signDatasetorder()', () => {
         tag: ['tee', 'scone', 'gramine'],
       }),
     ).rejects.toThrow(
-      new Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      new Error("tee framework tags are exclusive ('scone'|'gramine'|'tdx')"),
     );
   });
 });
@@ -538,7 +553,7 @@ describe('signRequestorder()', () => {
         tag: ['tee', 'scone', 'gramine'],
       }),
     ).rejects.toThrow(
-      new Error("tee framework tags are exclusive ('scone'|'gramine')"),
+      new Error("tee framework tags are exclusive ('scone'|'gramine'|'tdx')"),
     );
   });
 
@@ -2584,6 +2599,50 @@ describe('matchOrders()', () => {
         requestorder,
       }),
     ).rejects.toThrow('execution reverted: revert: iExecV5-matchOrders-0x06');
+  });
+
+  test('TDX tag with app without mrenclave passes checkAppRequirements (preflight)', async () => {
+    const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+    const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
+
+    const apporder = await deployAndGetApporder(iexecResourcesProvider, {
+      teeFramework: undefined,
+      tag: ['tee', 'tdx'],
+    });
+    const datasetorder = await deployAndGetDatasetorder(
+      iexecResourcesProvider,
+      {},
+    );
+    await iexecResourcesProvider.dataset.pushDatasetSecret(
+      datasetorder.dataset,
+      'foo',
+      { teeFramework: TEE_FRAMEWORKS.TDX },
+    );
+    const workerpoolorder = await deployAndGetWorkerpoolorder(
+      iexecResourcesProvider,
+      { tag: ['tee', 'tdx'] },
+    );
+    const requestorder = await getMatchableRequestorder(iexecRequester, {
+      apporder,
+      datasetorder,
+      workerpoolorder,
+    });
+    await iexecRequester.order
+      .matchOrders(
+        {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+          requestorder,
+        },
+        { preflightCheck: true },
+      )
+      .then((res) => {
+        expect(res.txHash).toBeTxHash();
+        expect(res.volume).toBeInstanceOf(BN);
+        expect(res.volume.eq(new BN(1))).toBe(true);
+        expect(res.dealid).toBeTxHash();
+      });
   });
 
   describe('useVoucher option', () => {
