@@ -228,7 +228,7 @@
     "@iexec/poco": "^6.1.0",
     "@iexec/voucher-contracts": "^1.0.1",
     "eslint": "^9.23.0",
-    "eslint-config-prettier": "^10.1.1",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-sonarjs": "^3.0.5",
     "globals": "^16.0.0",
