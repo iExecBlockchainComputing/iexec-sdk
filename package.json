@@ -220,7 +220,7 @@
     "rlc-faucet-contract": "^1.0.10",
     "semver": "^7.7.3",
     "update-check": "^1.5.4",
-    "yup": "^1.6.1"
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@ensdomains/ens-contracts": "^1.2.5",
