@@ -16,9 +16,9 @@ export const app = {
   owner: '0x0000000000000000000000000000000000000000',
   name: 'hello-world',
   type: 'DOCKER',
-  multiaddr: 'iexechub/python-hello-world:7.0.5',
+  multiaddr: 'iexechub/python-hello-world:8.0.4',
   checksum:
-    '0xaea3f77f09567fa0da20b86d9b7dac3ef958b7d4751a37cfa7cd7851f57ac191',
+    '0xb0b664b7a6d249f81c067a9262b1763144eeb3ca63e553567f71673442ce9e84',
 };
 
 export const sconeTeeApp = {
@@ -37,16 +37,6 @@ export const sconeTeeApp = {
     fingerprint:
       '2d4b9efd066d0bb058b8da79bf8551be7d244779bc41d03a12201a4004779609',
   },
-};
-
-// TODO: push hello-world-tdx docker image to iexechub registry and update the multiaddr and checksum
-export const tdxTeeApp = {
-  owner: '0x0000000000000000000000000000000000000000',
-  name: 'hello-world-tdx',
-  type: 'DOCKER',
-  multiaddr: 'iexechub/hello-world-tdx:0.0.1',
-  checksum:
-    '0x15de77fd7ac448028884256b3ab376e7d4560e9ef6acf0594ea0b3c031d5d395',
 };
 
 export const gramineTeeApp = {

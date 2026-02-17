@@ -715,7 +715,7 @@ export const appSchema = (opt) =>
     type: appTypeSchema().required(),
     multiaddr: multiaddressSchema().required(),
     checksum: bytes32Schema().required(),
-    mrenclave: mrenclaveSchema().notRequired(),
+    mrenclave: mrenclaveSchema().required(),
   });
 
 export const datasetSchema = (opt) =>

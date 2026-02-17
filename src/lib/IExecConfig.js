@@ -261,9 +261,7 @@ export default class IExecConfig {
     this.resolveBridgedContractsClient = async () => bridgedContractsPromise;
 
     this.resolveSmsURL = async ({
-      teeFramework = vDefaultTeeFramework ||
-        TEE_FRAMEWORKS.SCONE ||
-        TEE_FRAMEWORKS.TDX,
+      teeFramework = vDefaultTeeFramework || TEE_FRAMEWORKS.SCONE,
     } = {}) => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;

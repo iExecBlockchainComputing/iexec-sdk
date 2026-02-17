@@ -99,8 +99,6 @@ describe('iexec app', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.app).toBeDefined();
-      expect(res.app.name).toContain('tdx');
-      expect(res.app.multiaddr).toContain('tdx');
       expect(res.app.mrenclave).toBeUndefined();
     });
   });
