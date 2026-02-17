@@ -451,13 +451,17 @@ describe('signDatasetorder()', () => {
       address,
       iexec.dataset.generateEncryptionKey(),
     );
+    await iexec.dataset.pushDatasetSecret(
+      address,
+      iexec.dataset.generateEncryptionKey(),
+      { teeFramework: TEE_FRAMEWORKS.TDX },
+    );
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee'] }),
     ).resolves.toBeDefined();
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'tdx'] }),
     ).resolves.toBeDefined();
-
     await expect(
       iexec.order.signDatasetorder({ ...order, tag: ['tee', 'scone'] }),
     ).resolves.toBeDefined();
@@ -2612,6 +2616,7 @@ describe('matchOrders()', () => {
     await iexecResourcesProvider.dataset.pushDatasetSecret(
       datasetorder.dataset,
       'foo',
+      { teeFramework: TEE_FRAMEWORKS.TDX },
     );
     const workerpoolorder = await deployAndGetWorkerpoolorder(
       iexecResourcesProvider,

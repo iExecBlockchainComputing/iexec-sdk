@@ -22,7 +22,6 @@ const networkConfigs = [
     ensPublicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
     sms: {
       [TEE_FRAMEWORKS.SCONE]: 'https://sms.iex.ec',
-      [TEE_FRAMEWORKS.TDX]: 'https://sms.iex.ec',
       [TEE_FRAMEWORKS.GRAMINE]: 'https://sms.gramine.v8-bellecour.iex.ec',
     },
     resultProxy: 'https://result.v8-bellecour.iex.ec',
@@ -82,7 +81,7 @@ const networkConfigs = [
     ensPublicResolver: undefined, // not supported
     sms: {
       [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
-      [TEE_FRAMEWORKS.TDX]: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
+      [TEE_FRAMEWORKS.TDX]: 'https://sms.labs.iex.ec',
     },
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
@@ -113,7 +112,6 @@ const networkConfigs = [
     ensPublicResolver: undefined, // not supported
     sms: {
       [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-mainnet.iex.ec',
-      [TEE_FRAMEWORKS.TDX]: 'https://sms.arbitrum-mainnet.iex.ec',
     },
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',

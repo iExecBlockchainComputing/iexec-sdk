@@ -215,7 +215,7 @@ export const checkAppRequirements = async (
   );
   const tagMatchesApp =
     appTeeFramework === tagTeeFramework ||
-    (tagTeeFramework === TEE_FRAMEWORKS.TDX && appTeeFramework === undefined);
+    (tagTeeFramework === undefined && appTeeFramework === TEE_FRAMEWORKS.TDX);
   if (!tagMatchesApp) {
     throw new Error('Tag mismatch the TEE framework specified by app');
   }

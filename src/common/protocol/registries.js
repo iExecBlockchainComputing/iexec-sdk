@@ -20,7 +20,7 @@ import {
   hexToBuffer,
   BN,
 } from '../utils/utils.js';
-import { APP, DATASET, WORKERPOOL } from '../utils/constant.js';
+import { APP, DATASET, TEE_FRAMEWORKS, WORKERPOOL } from '../utils/constant.js';
 import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
 import { ObjectNotFoundError } from '../utils/errors.js';
 
@@ -532,6 +532,8 @@ export const resolveTeeFrameworkFromApp = async (
         throw new Error('Failed to resolve TEE framework from app');
       }
     }
+  } else {
+    return TEE_FRAMEWORKS.TDX;
   }
   return undefined;
 };
