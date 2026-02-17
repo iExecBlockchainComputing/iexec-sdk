@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.23.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.5...v8.23.0) (2026-02-17)
+
+
+### Added
+
+* add TDX TEE framework support ([#542](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/542)) ([0bb7986](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/0bb7986653fd886811e20815d47fad7d78f95abc))
+
+
+### Changed
+
+* ignore datasetorder burned TEE frameworks tags from deal tag computation ([#533](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/533)) ([177e2b4](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/177e2b490c4e4450477711794170f6dfbfac8f9a))
+
 ## [8.22.5](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.4...v8.22.5) (2026-02-04)
 
 
