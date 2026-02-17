@@ -78,10 +78,6 @@ console.log('IPFS storage initialized:', isIpfsStorageInitialized);
 
 `string`
 
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
-
 #### Returns
 
 `Promise`\<`boolean`\>
@@ -149,10 +145,6 @@ console.log('dropbox storage initialized:', isPushed);
 ###### provider?
 
 `string`
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 

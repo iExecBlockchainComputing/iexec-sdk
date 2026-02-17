@@ -208,44 +208,10 @@ resolve the current result proxy URL
 
 ### resolveSmsURL()
 
-> **resolveSmsURL**(`options?`): `Promise`\<`string`\>
+> **resolveSmsURL**(): `Promise`\<`string`\>
 
 resolve the current SMS URL
-
-#### Parameters
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 
 `Promise`\<`string`\>
-
-***
-
-### resolveVoucherHubAddress()
-
-> **resolveVoucherHubAddress**(): `Promise`\<`string` \| `null`\>
-
-resolve the current VoucherHub contract address
-returns `null` if not available
-
-#### Returns
-
-`Promise`\<`string` \| `null`\>
-
-***
-
-### resolveVoucherSubgraphURL()
-
-> **resolveVoucherSubgraphURL**(): `Promise`\<`string` \| `null`\>
-
-resolve the current voucher subgraph URL
-returns `null` if not available
-
-#### Returns
-
-`Promise`\<`string` \| `null`\>

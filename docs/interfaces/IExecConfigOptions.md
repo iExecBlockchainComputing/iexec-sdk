@@ -76,14 +76,6 @@ number of block to wait for transactions confirmation (default 1)
 
 ***
 
-### defaultTeeFramework?
-
-> `optional` **defaultTeeFramework**: [`TeeFramework`](../type-aliases/TeeFramework.md)
-
-override the TEE framework to use when as default
-
-***
-
 ### ensPublicResolverAddress?
 
 > `optional` **ensPublicResolverAddress**: `string`
@@ -158,7 +150,7 @@ override the result proxy URL to target a custom instance
 
 ### smsURL?
 
-> `optional` **smsURL**: `string` \| `Record`\<[`TeeFramework`](../type-aliases/TeeFramework.md), `string`\>
+> `optional` **smsURL**: `string`
 
 override the SMS URL to target a custom instance
 
@@ -169,19 +161,3 @@ override the SMS URL to target a custom instance
 > `optional` **useGas**: `boolean`
 
 if false set the gasPrice to 0 (default true)
-
-***
-
-### voucherHubAddress?
-
-> `optional` **voucherHubAddress**: `string`
-
-override the VoucherHub contract address to target a custom instance
-
-***
-
-### voucherSubgraphURL?
-
-> `optional` **voucherSubgraphURL**: `string`
-
-override the voucher subgraph URL to target a custom instance

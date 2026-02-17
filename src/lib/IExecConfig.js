@@ -3,13 +3,9 @@ import { BrowserProvider, AbstractProvider, AbstractSigner } from 'ethers';
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
 import { ConfigurationError } from '../common/utils/errors.js';
 import { getChainDefaults } from '../common/utils/config.js';
-import { TEE_FRAMEWORKS } from '../common/utils/constant.js';
 import { getReadOnlyProvider } from '../common/utils/providers.js';
 import { BrowserProviderSignerAdapter } from '../common/utils/signers.js';
-import {
-  smsUrlOrMapSchema,
-  teeFrameworkSchema,
-} from '../common/utils/validator.js';
+import { basicUrlSchema } from '../common/utils/validator.js';
 
 const debug = Debug('iexec:IExecConfig');
 
@@ -19,7 +15,6 @@ export default class IExecConfig {
     {
       hubAddress,
       ensPublicResolverAddress,
-      voucherHubAddress,
       isNative,
       useGas = true,
       confirms,
@@ -32,8 +27,6 @@ export default class IExecConfig {
       iexecGatewayURL,
       compassURL,
       pocoSubgraphURL,
-      voucherSubgraphURL,
-      defaultTeeFramework,
       providerOptions,
       allowExperimentalNetworks = false,
     } = {},
@@ -101,21 +94,53 @@ export default class IExecConfig {
     } catch (err) {
       throw new ConfigurationError(`Invalid ethProvider: ${err.message}`);
     }
-    let vSmsUrlOrMap;
+    let vSmsUrl;
     try {
-      vSmsUrlOrMap = smsUrlOrMapSchema().validateSync(smsURL);
+      vSmsUrl = basicUrlSchema().validateSync(smsURL);
     } catch (err) {
       throw new ConfigurationError(`Invalid smsURL: ${err.message}`);
     }
 
-    let vDefaultTeeFramework;
+    let vIexecGatewayURL;
     try {
-      vDefaultTeeFramework =
-        teeFrameworkSchema().validateSync(defaultTeeFramework);
+      vIexecGatewayURL = basicUrlSchema().validateSync(iexecGatewayURL);
     } catch (err) {
-      throw new ConfigurationError(
-        `Invalid defaultTeeFramework: ${err.message}`,
-      );
+      throw new ConfigurationError(`Invalid iexecGatewayURL: ${err.message}`);
+    }
+
+    let vIpfsGatewayURL;
+    try {
+      vIpfsGatewayURL = basicUrlSchema().validateSync(ipfsGatewayURL);
+    } catch (err) {
+      throw new ConfigurationError(`Invalid ipfsGatewayURL: ${err.message}`);
+    }
+
+    let vIpfsNodeURL;
+    try {
+      vIpfsNodeURL = basicUrlSchema().validateSync(ipfsNodeURL);
+    } catch (err) {
+      throw new ConfigurationError(`Invalid ipfsNodeURL: ${err.message}`);
+    }
+
+    let vPocoSubgraphURL;
+    try {
+      vPocoSubgraphURL = basicUrlSchema().validateSync(pocoSubgraphURL);
+    } catch (err) {
+      throw new ConfigurationError(`Invalid pocoSubgraphURL: ${err.message}`);
+    }
+
+    let vResultProxyURL;
+    try {
+      vResultProxyURL = basicUrlSchema().validateSync(resultProxyURL);
+    } catch (err) {
+      throw new ConfigurationError(`Invalid resultProxyURL: ${err.message}`);
+    }
+
+    let vCompassURL;
+    try {
+      vCompassURL = basicUrlSchema().validateSync(compassURL);
+    } catch (err) {
+      throw new ConfigurationError(`Invalid compassURL: ${err.message}`);
     }
 
     const networkPromise = (async () => {
@@ -260,18 +285,10 @@ export default class IExecConfig {
 
     this.resolveBridgedContractsClient = async () => bridgedContractsPromise;
 
-    this.resolveSmsURL = async ({
-      teeFramework = vDefaultTeeFramework || TEE_FRAMEWORKS.SCONE,
-    } = {}) => {
+    this.resolveSmsURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
-      const vTeeFramework = await teeFrameworkSchema()
-        .label('teeFramework')
-        .validate(teeFramework);
-      const value =
-        (typeof vSmsUrlOrMap === 'string' && vSmsUrlOrMap) ||
-        (typeof vSmsUrlOrMap === 'object' && vSmsUrlOrMap[vTeeFramework]) ||
-        (chainConfDefaults.sms && chainConfDefaults.sms[vTeeFramework]);
+      const value = vSmsUrl || chainConfDefaults.sms;
       if (value !== undefined) {
         return value;
       }
@@ -283,7 +300,7 @@ export default class IExecConfig {
     this.resolveResultProxyURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = resultProxyURL || chainConfDefaults.resultProxy;
+      const value = vResultProxyURL || chainConfDefaults.resultProxy;
       if (value !== undefined) {
         return value;
       }
@@ -295,7 +312,7 @@ export default class IExecConfig {
     this.resolveIexecGatewayURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = iexecGatewayURL || chainConfDefaults.iexecGateway;
+      const value = vIexecGatewayURL || chainConfDefaults.iexecGateway;
       if (value !== undefined) {
         return value;
       }
@@ -306,13 +323,13 @@ export default class IExecConfig {
 
     this.resolveCompassURL = async () => {
       const chainConfDefaults = await chainConfDefaultsPromise;
-      return compassURL || chainConfDefaults.compass;
+      return vCompassURL || chainConfDefaults.compass;
     };
 
     this.resolveIpfsGatewayURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = ipfsGatewayURL || chainConfDefaults.ipfsGateway;
+      const value = vIpfsGatewayURL || chainConfDefaults.ipfsGateway;
       if (value !== undefined) {
         return value;
       }
@@ -324,7 +341,7 @@ export default class IExecConfig {
     this.resolveIpfsNodeURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = ipfsNodeURL || chainConfDefaults.ipfsNode;
+      const value = vIpfsNodeURL || chainConfDefaults.ipfsNode;
       if (value !== undefined) {
         return value;
       }
@@ -336,22 +353,13 @@ export default class IExecConfig {
     this.resolvePocoSubgraphURL = async () => {
       const { chainId } = await networkPromise;
       const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = pocoSubgraphURL || chainConfDefaults.pocoSubgraph;
+      const value = vPocoSubgraphURL || chainConfDefaults.pocoSubgraph;
       if (value !== undefined) {
         return value;
       }
       throw new ConfigurationError(
         `pocoSubgraphURL option not set and no default value for your chain ${chainId}`,
       );
-    };
-
-    this.resolveVoucherSubgraphURL = async () => {
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = voucherSubgraphURL || chainConfDefaults.voucherSubgraph;
-      if (value !== undefined) {
-        return value;
-      }
-      return null;
     };
 
     this.resolveBridgeAddress = async () => {
@@ -384,15 +392,6 @@ export default class IExecConfig {
       throw new ConfigurationError(
         `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`,
       );
-    };
-
-    this.resolveVoucherHubAddress = async () => {
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = voucherHubAddress || chainConfDefaults.voucherHub;
-      if (value !== undefined) {
-        return value;
-      }
-      return null;
     };
   }
 }

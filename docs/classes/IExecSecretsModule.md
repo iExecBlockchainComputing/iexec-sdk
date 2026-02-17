@@ -54,7 +54,7 @@ current IExecConfig
 
 ### checkRequesterSecretExists()
 
-> **checkRequesterSecretExists**(`requesterAddress`, `secretName`, `options?`): `Promise`\<`boolean`\>
+> **checkRequesterSecretExists**(`requesterAddress`, `secretName`): `Promise`\<`boolean`\>
 
 check if a named secret exists for the requester in the Secret Management Service
 
@@ -74,12 +74,6 @@ console.log('secret "my-password" set:', isSecretSet);
 
 `String`
 
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
-
 #### Returns
 
 `Promise`\<`boolean`\>
@@ -88,7 +82,7 @@ console.log('secret "my-password" set:', isSecretSet);
 
 ### pushRequesterSecret()
 
-> **pushRequesterSecret**(`secretName`, `secretValue`, `options?`): `Promise`\<\{ `isPushed`: `boolean`; \}\>
+> **pushRequesterSecret**(`secretName`, `secretValue`): `Promise`\<\{ `isPushed`: `boolean`; \}\>
 
 **SIGNER REQUIRED, ONLY REQUESTER**
 
@@ -113,12 +107,6 @@ console.log('pushed secret "my-password":', isPushed);
 ##### secretValue
 
 `String`
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 

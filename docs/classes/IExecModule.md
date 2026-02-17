@@ -24,7 +24,6 @@ module base
 - [`IExecSecretsModule`](IExecSecretsModule.md)
 - [`IExecStorageModule`](IExecStorageModule.md)
 - [`IExecTaskModule`](IExecTaskModule.md)
-- [`IExecVoucherModule`](IExecVoucherModule.md)
 - [`IExecWalletModule`](IExecWalletModule.md)
 - [`IExecWorkerpoolModule`](IExecWorkerpoolModule.md)
 

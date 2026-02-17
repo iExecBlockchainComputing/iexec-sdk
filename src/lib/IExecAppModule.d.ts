@@ -10,7 +10,6 @@ import {
   BNish,
   Bytes32,
   Multiaddress,
-  TeeFramework,
   TxHash,
 } from '../common/types.js';
 
@@ -27,21 +26,6 @@ export interface SconeMREnclave {
    * dedicated memory in bytes
    */
   heapSize: number;
-  /**
-   * framework's protocol version
-   */
-  version: string;
-  /**
-   * app tee fingerprint
-   */
-  fingerprint: string;
-}
-
-export interface GramineMREnclave {
-  /**
-   * TEE framework name 'GRAMINE'
-   */
-  framework: string;
   /**
    * framework's protocol version
    */
@@ -76,7 +60,7 @@ export interface AppDeploymentArgs {
   /**
    * optional for TEE apps only, specify the TEE protocol to use
    */
-  mrenclave?: SconeMREnclave | GramineMREnclave;
+  mrenclave?: SconeMREnclave;
 }
 /**
  * IExec app
@@ -207,10 +191,7 @@ export default class IExecAppModule extends IExecModule {
    * - each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
    *
    */
-  checkAppSecretExists(
-    appAddress: Addressish,
-    options?: { teeFramework?: TeeFramework },
-  ): Promise<boolean>;
+  checkAppSecretExists(appAddress: Addressish): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY APP OWNER**
    *
@@ -227,11 +208,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('pushed App secret:', isPushed);
    * ```
    */
-  pushAppSecret(
-    appAddress: Addressish,
-    secretValue: String,
-    options?: { teeFramework?: TeeFramework },
-  ): Promise<boolean>;
+  pushAppSecret(appAddress: Addressish, secretValue: String): Promise<boolean>;
   /**
    * **ONLY APP OWNER**
    *

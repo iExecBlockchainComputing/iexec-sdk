@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { jest, expect } from '@jest/globals';
 import { getAddress } from 'ethers';
 
@@ -40,7 +38,7 @@ expect.extend({
     try {
       getAddress(received);
       pass = true;
-    } catch (e) {
+    } catch {
       /* noop */
     }
     return {

@@ -14,5 +14,4 @@ example:
 ```js
 const gpuTag = ['gpu'];
 const sconeTeeTag = ['tee', 'scone'];
-const gramineTeeTag = ['tee', 'gramine'];
 ```

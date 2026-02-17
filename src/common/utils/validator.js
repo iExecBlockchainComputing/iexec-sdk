@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer';
 import Debug from 'debug';
-import { string, number, object, mixed, boolean, array, lazy } from 'yup';
+import { string, number, object, mixed, boolean, array } from 'yup';
 import { getAddress, isAddress, namehash } from 'ethers';
 // import-js/eslint-plugin-import/issues/2703
 // eslint-disable-next-line import/no-unresolved
@@ -627,27 +627,11 @@ export const multiaddressSchema = () =>
 
 export const objMrenclaveSchema = () =>
   object({
-    // common keys
     framework: teeFrameworkSchema().required(),
     version: string().required(),
     fingerprint: string().required(),
-    // framework specific keys
-    entrypoint: mixed().when('framework', ([framework], entrypointSchema) =>
-      framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
-        ? string().required()
-        : entrypointSchema.is(
-            [undefined],
-            'Unknown key "${path}" in mrenclave',
-          ),
-    ),
-    heapSize: mixed().when('framework', ([framework], entrypointSchema) =>
-      framework && framework.toLowerCase() === TEE_FRAMEWORKS.SCONE
-        ? positiveIntSchema().required()
-        : entrypointSchema.is(
-            [undefined],
-            'Unknown key "${path}" in mrenclave',
-          ),
-    ),
+    entrypoint: string().required(),
+    heapSize: positiveIntSchema().required(),
   })
     .json()
     .noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
@@ -872,22 +856,6 @@ export const workerpoolApiUrlSchema = () =>
   string()
     .matches(/^(https?:\/\/.*)?$/, '${path} "${value}" is not a valid URL') // accept empty string to reset workerpool URL
     .default('');
-
-export const smsUrlOrMapSchema = () =>
-  lazy((stringOrMap) => {
-    if (typeof stringOrMap === 'object' && stringOrMap !== null) {
-      return object(
-        teeFrameworksList.reduce(
-          (acc, curr) => ({ ...acc, [curr]: basicUrlSchema() }),
-          {},
-        ),
-      )
-        .noUnknown(true)
-        .nonNullable()
-        .strict(true);
-    }
-    return basicUrlSchema();
-  });
 
 export const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');

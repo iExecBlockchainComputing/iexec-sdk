@@ -156,14 +156,6 @@ task module
 
 ***
 
-### voucher
-
-> **voucher**: [`IExecVoucherModule`](IExecVoucherModule.md)
-
-voucher module
-
-***
-
 ### wallet
 
 > **wallet**: [`IExecWalletModule`](IExecWalletModule.md)
