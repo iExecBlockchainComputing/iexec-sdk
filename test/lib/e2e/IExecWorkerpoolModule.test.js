@@ -16,10 +16,10 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('workerpool', () => {
   describe('showWorkerpool()', () => {
     test('shows a deployed workerpool', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const workerpool = {
         owner: await iexec.wallet.getAddress(),
         description: `workerpool${getId()}`,
@@ -36,7 +36,7 @@ describe('workerpool', () => {
     });
 
     test('fails if the workerpool is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
@@ -54,10 +54,10 @@ describe('workerpool', () => {
 
   describe('showUserWorkerpool()', () => {
     test('shows the user workerpool', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
       const workerpool = {
         owner: wallet.address,
         description: `workerpool${getId()}`,
@@ -76,7 +76,7 @@ describe('workerpool', () => {
     });
 
     test('fails if the workerpool is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
@@ -88,10 +88,10 @@ describe('workerpool', () => {
 
   describe('countUserWorkerpools()', () => {
     test('counts user workerpools', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
       const resBeforeDeploy =
         await readOnlyIExec.workerpool.countUserWorkerpools(wallet.address);
       await deployRandomWorkerpool(iexec);
@@ -106,7 +106,7 @@ describe('workerpool', () => {
 
   describe('deployWorkerpool()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
       const workerpool = {
@@ -123,7 +123,7 @@ describe('workerpool', () => {
     });
 
     test('deploys a workerpool', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const workerpool = {
         owner: await iexec.wallet.getAddress(),
         description: `workerpool${getId()}`,
@@ -134,7 +134,7 @@ describe('workerpool', () => {
     });
 
     test('cannot deploy twice with the same params', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const workerpool = {
         owner: await iexec.wallet.getAddress(),
         description: `workerpool${getId()}`,
@@ -150,10 +150,10 @@ describe('workerpool', () => {
 
   describe('predictWorkerpoolAddress()', () => {
     test('predicts the deployment address', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const workerpool = {
         owner: getRandomAddress(),
         description: `workerpool${getId()}`,
@@ -172,10 +172,10 @@ describe('workerpool', () => {
 
   describe('checkDeployedWorkerpool()', () => {
     test('checks a workerpool is deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const workerpool = {
         owner: getRandomAddress(),
         description: `workerpool${getId()}`,
@@ -194,7 +194,7 @@ describe('workerpool', () => {
 
   describe('transferWorkerpool()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(
         iexec.workerpool.transferWorkerpool(
           getRandomAddress(),
@@ -209,8 +209,9 @@ describe('workerpool', () => {
 
     test('transfers the ownership', async () => {
       const receiverAddress = getRandomAddress();
-      const { iexec: iexecWorkerpoolOwner } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecRandom } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecWorkerpoolOwner } =
+        await getTestConfig(iexecTestChain)();
+      const { iexec: iexecRandom } = await getTestConfig(iexecTestChain)();
       const { address } = await deployRandomWorkerpool(iexecWorkerpoolOwner);
       await expect(
         iexecRandom.workerpool.transferWorkerpool(
@@ -239,10 +240,10 @@ describe('workerpool', () => {
   describe('getWorkerpoolApiUrl()', () => {
     describe('on networks with ENS', () => {
       test('resolves the url against ENS', async () => {
-        const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+        const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
           readOnly: true,
         });
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const { address } = await deployRandomWorkerpool(iexec);
         const resNoApiUrl =
           await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
@@ -261,10 +262,10 @@ describe('workerpool', () => {
     });
 
     describe('on networks relying on compass', () => {
-      const noEnsTestChain = TEST_CHAINS['custom-token-chain-no-ens'];
+      const noEnsTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
       test('resolves the url against Compass', async () => {
-        const { iexec: readOnlyIExec } = getTestConfig(noEnsTestChain)();
+        const { iexec: readOnlyIExec } = await getTestConfig(noEnsTestChain)();
         const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
           '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
         );
@@ -273,7 +274,7 @@ describe('workerpool', () => {
       });
 
       test('throw if the workerpool does not exist in Compass', async () => {
-        const { iexec: readOnlyIExec } = getTestConfig(noEnsTestChain)();
+        const { iexec: readOnlyIExec } = await getTestConfig(noEnsTestChain)();
         const address = getRandomAddress();
         await expect(
           readOnlyIExec.workerpool.getWorkerpoolApiUrl(address),
@@ -285,7 +286,9 @@ describe('workerpool', () => {
       });
 
       test('fails with CompassCallError if Compass is not available', async () => {
-        const { iexec: iexecCompassNotFound } = getTestConfig(noEnsTestChain)({
+        const { iexec: iexecCompassNotFound } = await getTestConfig(
+          noEnsTestChain,
+        )({
           options: {
             compassURL: SERVICE_UNREACHABLE_URL,
           },
@@ -300,7 +303,7 @@ describe('workerpool', () => {
           ),
         );
 
-        const { iexec: iexecCompassInternalError } = getTestConfig(
+        const { iexec: iexecCompassInternalError } = await getTestConfig(
           noEnsTestChain,
         )({
           options: {
@@ -323,7 +326,7 @@ describe('workerpool', () => {
 
   describe('setWorkerpoolApiUrl()', () => {
     test('require a configured ens name for the workerpool', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const { address } = await deployRandomWorkerpool(iexec);
       await expect(
         iexec.workerpool.setWorkerpoolApiUrl(
@@ -336,7 +339,7 @@ describe('workerpool', () => {
     });
 
     test('sets the workerpool api url', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const { address } = await deployRandomWorkerpool(iexec);
       const label = address.toLowerCase();
       const domain = 'pools.iexec.eth';

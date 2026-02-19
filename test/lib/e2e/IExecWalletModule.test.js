@@ -13,17 +13,17 @@ import '../../jest-setup.js';
 import { IExec } from '../../../src/lib/index.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
-const tokenTestChain = TEST_CHAINS['custom-token-chain'];
+const tokenTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('wallet', () => {
   describe('getAddress()', () => {
     test('expose connected wallet', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
       const res = await iexec.wallet.getAddress();
       expect(res).toBe(wallet.address);
     });
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
       await expect(iexec.wallet.getAddress()).rejects.toThrow(
@@ -35,7 +35,9 @@ describe('wallet', () => {
   describe('checkBalances()', () => {
     describe('native chain', () => {
       test('expose nRLC (as 10⁹ wei)', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+        const { iexec } = await getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
         const address = getRandomAddress();
         await setNRlcBalance(iexecTestChain)(address, 1000);
         const balance = await iexec.wallet.checkBalances(address);
@@ -48,7 +50,9 @@ describe('wallet', () => {
 
     describe('token chain', () => {
       test('expose wei and nRLC', async () => {
-        const { iexec } = getTestConfig(tokenTestChain)({ readOnly: true });
+        const { iexec } = await getTestConfig(tokenTestChain)({
+          readOnly: true,
+        });
         const address = getRandomAddress();
         await setBalance(tokenTestChain)(address, 1000);
         const balance = await iexec.wallet.checkBalances(address);
@@ -95,7 +99,7 @@ describe('wallet', () => {
 
   describe('sendETH()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(tokenTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(tokenTestChain)({ readOnly: true });
       await expect(
         iexec.wallet.sendETH(10, getRandomAddress()),
       ).rejects.toThrow(
@@ -108,7 +112,7 @@ describe('wallet', () => {
     describe('token chain', () => {
       test('sends wei', async () => {
         const receiverAddress = getRandomAddress();
-        const { iexec, wallet } = getTestConfig(tokenTestChain)();
+        const { iexec, wallet } = await getTestConfig(tokenTestChain)();
         await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
         const initialBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverInitialBalance =
@@ -134,7 +138,7 @@ describe('wallet', () => {
 
       test('sends specified unit', async () => {
         const receiverAddress = getRandomAddress();
-        const { iexec, wallet } = getTestConfig(tokenTestChain)();
+        const { iexec, wallet } = await getTestConfig(tokenTestChain)();
         await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
         const initialBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverInitialBalance =
@@ -162,7 +166,7 @@ describe('wallet', () => {
     describe('native chain', () => {
       test('throw on native chain', async () => {
         const receiverAddress = getRandomAddress();
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         await expect(iexec.wallet.sendETH(10, receiverAddress)).rejects.toThrow(
           new Error('sendETH() is disabled on sidechain, use sendRLC()'),
         );
@@ -172,7 +176,7 @@ describe('wallet', () => {
 
   describe('sendRLC()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(
         iexec.wallet.sendRLC(10, getRandomAddress()),
       ).rejects.toThrow(
@@ -185,7 +189,7 @@ describe('wallet', () => {
     describe('native chain', () => {
       test('sends nRLC', async () => {
         const receiverAddress = getRandomAddress();
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         await setNRlcBalance(iexecTestChain)(wallet.address, ONE_RLC);
         const initialBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverInitialBalance =
@@ -217,7 +221,7 @@ describe('wallet', () => {
 
       test('sends specified unit', async () => {
         const receiverAddress = getRandomAddress();
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         await setNRlcBalance(iexecTestChain)(wallet.address, ONE_RLC);
         const initialBalance = await iexec.wallet.checkBalances(wallet.address);
         const receiverInitialBalance =
@@ -254,7 +258,7 @@ describe('wallet', () => {
     describe('token chain', () => {
       test('sends nRLC', async () => {
         const receiverAddress = getRandomAddress();
-        const { iexec, wallet } = getTestConfig(tokenTestChain)();
+        const { iexec, wallet } = await getTestConfig(tokenTestChain)();
         await setNRlcBalance(tokenTestChain)(wallet.address, 100);
         await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
         const initialBalance = await iexec.wallet.checkBalances(wallet.address);
@@ -281,7 +285,7 @@ describe('wallet', () => {
 
       test('sends specified unit', async () => {
         const receiverAddress = getRandomAddress();
-        const { iexec, wallet } = getTestConfig(tokenTestChain)();
+        const { iexec, wallet } = await getTestConfig(tokenTestChain)();
         await setNRlcBalance(tokenTestChain)(wallet.address, ONE_RLC);
         await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
         const initialBalance = await iexec.wallet.checkBalances(wallet.address);
@@ -312,7 +316,7 @@ describe('wallet', () => {
       test('sweeps native nRLC', async () => {
         const receiverWallet = getRandomWallet();
         const { iexec, wallet: sweeperWallet } =
-          getTestConfig(iexecTestChain)();
+          await getTestConfig(iexecTestChain)();
         await setBalance(iexecTestChain)(sweeperWallet.address, ONE_ETH);
         await setNRlcBalance(iexecTestChain)(sweeperWallet.address, ONE_RLC);
         const initialBalance = await iexec.wallet.checkBalances(
@@ -351,7 +355,7 @@ describe('wallet', () => {
       test('sweeps wei and nRLC', async () => {
         const receiverWallet = getRandomWallet();
         const { iexec, wallet: sweeperWallet } =
-          getTestConfig(tokenTestChain)();
+          await getTestConfig(tokenTestChain)();
         await setBalance(tokenTestChain)(sweeperWallet.address, ONE_ETH);
         await setNRlcBalance(tokenTestChain)(sweeperWallet.address, ONE_RLC);
 
@@ -387,7 +391,7 @@ describe('wallet', () => {
       test('stop when ERC20 transfer fails', async () => {
         const receiverWallet = getRandomWallet();
         const { iexec, wallet: sweeperWallet } =
-          getTestConfig(tokenTestChain)();
+          await getTestConfig(tokenTestChain)();
         await setNRlcBalance(tokenTestChain)(sweeperWallet.address, ONE_RLC);
         await setBalance(tokenTestChain)(sweeperWallet.address, 1);
         const initialBalance = await iexec.wallet.checkBalances(
@@ -422,10 +426,10 @@ describe('wallet', () => {
       test('report sendNativeTxHash and error when remaining wei cannot be sent', async () => {
         const receiverWallet = getRandomWallet();
         const { iexec, wallet: sweeperWallet } =
-          getTestConfig(tokenTestChain)();
+          await getTestConfig(tokenTestChain)();
         await setBalance(tokenTestChain)(
           sweeperWallet.address,
-          55000000000000n,
+          60000000000000n,
         ); // enough for erc20 transfer only
         await setNRlcBalance(tokenTestChain)(sweeperWallet.address, ONE_RLC);
         const initialBalance = await iexec.wallet.checkBalances(

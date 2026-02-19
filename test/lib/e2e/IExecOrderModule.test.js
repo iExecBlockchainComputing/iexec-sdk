@@ -35,11 +35,12 @@ const signRegex = /^(0x)([0-9a-f]{2}){65}$/;
 
 describe('order', () => {
   describe('prepareDatasetBulk()', () => {
-    const testChain = TEST_CHAINS['custom-token-chain']; // no bulk processing on bellecour;
-    const { iexec: iexecRequester } = getTestConfig(testChain)();
+    const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
+    let iexecRequester;
     let datasetorders = [];
 
     beforeAll(async () => {
+      iexecRequester = (await getTestConfig(testChain)()).iexec;
       const requesterAddress = await iexecRequester.wallet.getAddress();
       await setBalance(testChain)(requesterAddress, ONE_ETH);
       const { address: appAddress } = await deployRandomApp(iexecRequester);
@@ -47,7 +48,8 @@ describe('order', () => {
         Array(10)
           .fill()
           .map(async () => {
-            const { iexec: iexecDataOwner } = getTestConfig(iexecTestChain)();
+            const { iexec: iexecDataOwner } =
+              await getTestConfig(iexecTestChain)();
             const { address } = await deployRandomDataset(iexecDataOwner);
             const datasetBulkOrder = await iexecDataOwner.order
               .createDatasetorder({
@@ -78,7 +80,7 @@ describe('order', () => {
   describe('create...order()', () => {
     describe('createApporder()', () => {
       test('creates a default apporder template', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const app = getRandomAddress();
         const order = await iexec.order.createApporder({
           app,
@@ -95,7 +97,7 @@ describe('order', () => {
       });
 
       test('override defaults', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const app = getRandomAddress();
         const datasetrestrict = getRandomAddress();
         const workerpoolrestrict = getRandomAddress();
@@ -123,7 +125,7 @@ describe('order', () => {
 
     describe('createDatasetorder()', () => {
       test('creates a default datasetorder template', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const dataset = getRandomAddress();
         const order = await iexec.order.createDatasetorder({
           dataset,
@@ -140,7 +142,7 @@ describe('order', () => {
       });
 
       test('override defaults', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const dataset = getRandomAddress();
         const apprestrict = getRandomAddress();
         const workerpoolrestrict = getRandomAddress();
@@ -168,7 +170,7 @@ describe('order', () => {
 
     describe('createWorkerpoolorder()', () => {
       test('creates a default workerpoolorder template', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const workerpool = getRandomAddress();
         const order = await iexec.order.createWorkerpoolorder({
           workerpool,
@@ -188,7 +190,7 @@ describe('order', () => {
       });
 
       test('override defaults', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const workerpool = getRandomAddress();
         const apprestrict = getRandomAddress();
         const datasetrestrict = getRandomAddress();
@@ -220,7 +222,7 @@ describe('order', () => {
 
     describe('createRequestorder()', () => {
       test('creates a default requestorder template', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const app = getRandomAddress();
         const order = await iexec.order.createRequestorder({
           app,
@@ -247,7 +249,7 @@ describe('order', () => {
       });
 
       test('override defaults', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const app = getRandomAddress();
         const dataset = getRandomAddress();
         const workerpool = getRandomAddress();
@@ -297,7 +299,7 @@ describe('order', () => {
   describe('sign...order()', () => {
     describe('signApporder()', () => {
       test('signs the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const { address } = await deployRandomApp(iexec);
         const order = await iexec.order.createApporder({
           app: address,
@@ -313,7 +315,7 @@ describe('order', () => {
       });
 
       test('preflightCheck TEE framework', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const { address: sconeAppAddress } = await deployRandomApp(iexec, {
           teeFramework: TEE_FRAMEWORKS.SCONE,
         });
@@ -345,7 +347,7 @@ describe('order', () => {
       });
 
       test('preflightCheck fails with invalid tag', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await iexec.order.createApporder({
           app: getRandomAddress(),
         });
@@ -375,7 +377,7 @@ describe('order', () => {
 
     describe('signDatasetorder()', () => {
       test('signs the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const { address } = await deployRandomDataset(iexec);
         const order = await iexec.order.createDatasetorder({
           dataset: address,
@@ -393,7 +395,7 @@ describe('order', () => {
       });
 
       test('preflightCheck dataset secret', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const { address } = await deployRandomDataset(iexec);
         const order = await iexec.order.createDatasetorder({
           dataset: address,
@@ -415,7 +417,7 @@ describe('order', () => {
       });
 
       test('preflightCheck fails with invalid tag', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await iexec.order.createDatasetorder({
           dataset: getRandomAddress(),
         });
@@ -427,7 +429,7 @@ describe('order', () => {
 
     describe('signWorkerpoolorder()', () => {
       test('signs the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const { address } = await deployRandomWorkerpool(iexec);
         const order = await iexec.order.createWorkerpoolorder({
           workerpool: address,
@@ -446,7 +448,7 @@ describe('order', () => {
 
     describe('signRequestorder()', () => {
       test('signs the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await iexec.order.createRequestorder({
           app: getRandomAddress(),
           category: 5,
@@ -465,7 +467,7 @@ describe('order', () => {
       });
 
       test('preflightCheck fails with invalid tag', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await iexec.order.createRequestorder({
           app: getRandomAddress(),
           category: 5,
@@ -490,7 +492,7 @@ describe('order', () => {
       });
 
       test('preflightCheck dropbox storage token exists', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await iexec.order.createRequestorder({
           app: getRandomAddress(),
           category: 5,
@@ -518,7 +520,7 @@ describe('order', () => {
       });
 
       test('preflightCheck result encryption exists', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await iexec.order.createRequestorder({
           app: getRandomAddress(),
           category: 5,
@@ -544,8 +546,10 @@ describe('order', () => {
       });
 
       test('preflightCheck checks dataset encryption key exists for tee datasets', async () => {
-        const { iexec: iexecDatasetProvider } = getTestConfig(iexecTestChain)();
-        const { iexec: iexecDatasetConsumer } = getTestConfig(iexecTestChain)();
+        const { iexec: iexecDatasetProvider } =
+          await getTestConfig(iexecTestChain)();
+        const { iexec: iexecDatasetConsumer } =
+          await getTestConfig(iexecTestChain)();
 
         await iexecDatasetConsumer.storage
           .defaultStorageLogin()
@@ -613,7 +617,7 @@ describe('order', () => {
       });
 
       test('preflightCheck requester secrets exist', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         await iexec.storage
           .defaultStorageLogin()
           .then(iexec.storage.pushStorageToken);
@@ -674,7 +678,9 @@ describe('order', () => {
   describe('hash...order()', () => {
     describe('hashApporder()', () => {
       test('gives the order hash', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+        const { iexec } = await getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
         const order = {
           app: '0x76fE91568d50C5fF9411223df5A0c50Ec5fa326A',
           appprice: 0,
@@ -695,7 +701,9 @@ describe('order', () => {
 
     describe('hashDatasetorder()', () => {
       test('gives the order hash', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+        const { iexec } = await getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
         const order = {
           dataset: '0x2Ad5773db1a705DB568fAd403cd247fee4808Fb8',
           datasetprice: 0,
@@ -716,7 +724,9 @@ describe('order', () => {
 
     describe('hashWorkerpoolorder()', () => {
       test('gives the order hash', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+        const { iexec } = await getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
         const order = {
           workerpool: '0x9DEB16F7861123CE34AE755F48D30697eD066793',
           workerpoolprice: 0,
@@ -739,7 +749,9 @@ describe('order', () => {
 
     describe('hashRequestorder()', () => {
       test('gives the order hash', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+        const { iexec } = await getTestConfig(iexecTestChain)({
+          readOnly: true,
+        });
         const order = {
           app: '0x33c791fE02eDDBfF3D3d37176737Eb3F488E150F',
           dataset: '0x69d4a400CFf9838985cD2950aafF28289afc6ad3',
@@ -771,7 +783,7 @@ describe('order', () => {
   describe('cancel...order()', () => {
     describe('cancelApporder()', () => {
       test('revokes the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await deployAndGetApporder(iexec);
         const res = await iexec.order.cancelApporder(order);
         expect(res.order).toEqual(order);
@@ -784,7 +796,7 @@ describe('order', () => {
 
     describe('cancelDatasetorder()', () => {
       test('revokes the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await deployAndGetDatasetorder(iexec);
         const res = await iexec.order.cancelDatasetorder(order);
         expect(res.order).toEqual(order);
@@ -797,7 +809,7 @@ describe('order', () => {
 
     describe('cancelWorkerpoolorder()', () => {
       test('revokes the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await deployAndGetWorkerpoolorder(iexec);
         const res = await iexec.order.cancelWorkerpoolorder(order);
         expect(res.order).toEqual(order);
@@ -810,7 +822,7 @@ describe('order', () => {
 
     describe('cancelRequestorder()', () => {
       test('revokes the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const order = await iexec.order
           .createRequestorder({
             app: getRandomAddress(),
@@ -835,7 +847,7 @@ describe('order', () => {
 
   describe('publish...order()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
         },
@@ -853,7 +865,7 @@ describe('order', () => {
     });
 
     test('throw a MarketCallError when the Market API encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
         },
@@ -872,7 +884,7 @@ describe('order', () => {
 
     describe('publishApporder()', () => {
       test('publishes the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         const orderHash = await iexec.order.publishApporder(apporder);
         expect(orderHash).toBeTxHash();
@@ -881,14 +893,14 @@ describe('order', () => {
 
     describe('publishDatasetorder()', () => {
       test('publishes the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const orderHash = await iexec.order.publishDatasetorder(datasetorder);
         expect(orderHash).toBeTxHash();
       });
 
       test('preflightChecks dataset secret exists for tee tag', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const datasetorder = await deployAndGetDatasetorder(iexec, {
           tag: ['tee'],
         });
@@ -922,7 +934,7 @@ describe('order', () => {
 
     describe('publishWorkerpoolorder()', () => {
       test('publishes the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
         const orderHash =
           await iexec.order.publishWorkerpoolorder(workerpoolorder);
@@ -932,7 +944,7 @@ describe('order', () => {
 
     describe('publishRequestorder()', () => {
       test('publishes the order (skip preflightCheck)', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         await iexec.order.publishApporder(apporder);
         const requestorder = await iexec.order
@@ -958,8 +970,8 @@ describe('order', () => {
       });
 
       test('preflightCheck result encryption key', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
-        const { iexec: iexecAppDev } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
+        const { iexec: iexecAppDev } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexecAppDev, {
           teeFramework: TEE_FRAMEWORKS.SCONE,
           tag: ['tee', 'scone'],
@@ -1003,8 +1015,8 @@ describe('order', () => {
       });
 
       test('preflightCheck dropbox token', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
-        const { iexec: iexecAppDev } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
+        const { iexec: iexecAppDev } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexecAppDev, {
           teeFramework: TEE_FRAMEWORKS.SCONE,
           tag: ['tee', 'scone'],
@@ -1037,7 +1049,7 @@ describe('order', () => {
 
   describe('unpublish...order()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
         },
@@ -1049,7 +1061,7 @@ describe('order', () => {
     });
 
     test('throw a MarketCallError when the Market API encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
         },
@@ -1062,7 +1074,7 @@ describe('order', () => {
 
     describe('unpublishApporder()', () => {
       test('unpublish the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         const orderHash = await iexec.order.publishApporder(apporder);
         const unpublishRes = await iexec.order.unpublishApporder(orderHash);
@@ -1077,7 +1089,7 @@ describe('order', () => {
 
     describe('unpublishDatasetorder()', () => {
       test('unpublish the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
           preflightCheck: false,
@@ -1096,7 +1108,7 @@ describe('order', () => {
 
     describe('unpublishWorkerpoolorder()', () => {
       test('unpublish the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
         const orderHash =
           await iexec.order.publishWorkerpoolorder(workerpoolorder);
@@ -1115,7 +1127,7 @@ describe('order', () => {
 
     describe('unpublishRequestorder()', () => {
       test('unpublish the order', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         await iexec.order.publishApporder(apporder);
         const requestorder = await iexec.order
@@ -1151,7 +1163,7 @@ describe('order', () => {
 
     describe('unpublishLastApporder()', () => {
       test('unpublish the order', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         const orderHash = await iexec.order.publishApporder(apporder);
         const lastApporder = await iexec.order.signApporder(apporder);
@@ -1176,7 +1188,7 @@ describe('order', () => {
 
     describe('unpublishLastDatasetorder()', () => {
       test('unpublish the order', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
           preflightCheck: false,
@@ -1211,7 +1223,7 @@ describe('order', () => {
 
     describe('unpublishLastWorkerpoolorder()', () => {
       test('unpublish the order', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
         const orderHash =
           await iexec.order.publishWorkerpoolorder(workerpoolorder);
@@ -1240,7 +1252,7 @@ describe('order', () => {
 
     describe('unpublishLastRequestorder()', () => {
       test('unpublish the order', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         await iexec.order.publishApporder(apporder);
         const requestorder = await iexec.order
@@ -1292,7 +1304,7 @@ describe('order', () => {
 
     describe('unpublishAllApporders()', () => {
       test('unpublish all orders', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         const orderHash = await iexec.order.publishApporder(apporder);
         const lastApporder = await iexec.order.signApporder(apporder);
@@ -1316,7 +1328,7 @@ describe('order', () => {
 
     describe('unpublishAllDatasetorders()', () => {
       test('unpublish all orders', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const orderHash = await iexec.order.publishDatasetorder(datasetorder, {
           preflightCheck: false,
@@ -1350,7 +1362,7 @@ describe('order', () => {
 
     describe('unpublishAllWorkerpoolorders()', () => {
       test('unpublish all orders', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
         const orderHash =
           await iexec.order.publishWorkerpoolorder(workerpoolorder);
@@ -1377,7 +1389,7 @@ describe('order', () => {
 
     describe('unpublishAllRequestorders()', () => {
       test('unpublish all orders', async () => {
-        const { iexec, wallet } = getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         await iexec.order.publishApporder(apporder);
         const requestorder = await iexec.order
@@ -1429,9 +1441,9 @@ describe('order', () => {
 
   describe('estimateMatchOrders()', () => {
     test('estimates the total cost and volume', async () => {
-      const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecRequester } = await getTestConfig(iexecTestChain)();
       const { iexec: iexecResourcesProvider, wallet: providerWallet } =
-        getTestConfig(iexecTestChain)();
+        await getTestConfig(iexecTestChain)();
 
       await setBalance(iexecTestChain)(providerWallet.address, ONE_ETH);
 
@@ -1471,13 +1483,14 @@ describe('order', () => {
 
   describe('matchOrders()', () => {
     test('order.matchOrders() all tests (split TODO)', async () => {
-      const { iexec: iexecBroker } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecBroker } = await getTestConfig(iexecTestChain)();
       const { iexec: iexecPoolManager, wallet: poolManagerWallet } =
-        getTestConfig(iexecTestChain)();
+        await getTestConfig(iexecTestChain)();
       const { iexec: iexecRequester, wallet: requesterWallet } =
-        getTestConfig(iexecTestChain)();
-      const { iexec: iexecAppProvider } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecDatasetProvider } = getTestConfig(iexecTestChain)();
+        await getTestConfig(iexecTestChain)();
+      const { iexec: iexecAppProvider } = await getTestConfig(iexecTestChain)();
+      const { iexec: iexecDatasetProvider } =
+        await getTestConfig(iexecTestChain)();
 
       await setNRlcBalance(iexecTestChain)(
         requesterWallet.address,
@@ -2077,8 +2090,9 @@ describe('order', () => {
     });
 
     test('preflightChecks', async () => {
-      const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecRequester } = await getTestConfig(iexecTestChain)();
+      const { iexec: iexecResourcesProvider } =
+        await getTestConfig(iexecTestChain)();
 
       const apporder = await deployAndGetApporder(iexecResourcesProvider);
       const datasetorder = await deployAndGetDatasetorder(
@@ -2155,8 +2169,9 @@ describe('order', () => {
     });
 
     test('datasetorder tee framework burned tags are ignored', async () => {
-      const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecRequester } = await getTestConfig(iexecTestChain)();
+      const { iexec: iexecResourcesProvider } =
+        await getTestConfig(iexecTestChain)();
 
       const apporder = await deployAndGetApporder(iexecResourcesProvider, {
         teeFramework: TEE_FRAMEWORKS.SCONE,
@@ -2195,8 +2210,9 @@ describe('order', () => {
     });
 
     test('TDX tag with app without mrenclave passes checkAppRequirements (preflight)', async () => {
-      const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecResourcesProvider } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecRequester } = await getTestConfig(iexecTestChain)();
+      const { iexec: iexecResourcesProvider } =
+        await getTestConfig(iexecTestChain)();
 
       const apporder = await deployAndGetApporder(iexecResourcesProvider, {
         teeFramework: undefined,

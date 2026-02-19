@@ -27,7 +27,7 @@ import IExecContractsClient from '../../../src/common/utils/IExecContractsClient
 import { getChainDefaults } from '../../../src/common/utils/config.js';
 
 const iexecTestChain = TEST_CHAINS['bellecour-fork'];
-const unknownTestChain = TEST_CHAINS['custom-token-chain'];
+const unknownTestChain = TEST_CHAINS['unknown-chain'];
 
 describe('[IExecConfig]', () => {
   describe('constructor', () => {
@@ -584,7 +584,6 @@ describe('[IExecConfig]', () => {
           },
           {
             hubAddress: unknownTestChain.hubAddress,
-            ensRegistryAddress: unknownTestChain.ensRegistryAddress,
           },
         );
         const { provider, signer, chainId } =

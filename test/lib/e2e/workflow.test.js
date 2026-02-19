@@ -34,7 +34,7 @@ describe('[workflow]', () => {
   });
 
   test('deploy and sell app', async () => {
-    const { iexec } = getTestConfig(iexecTestChain)();
+    const { iexec } = await getTestConfig(iexecTestChain)();
     const owner = await iexec.wallet.getAddress();
     const appName = `My app${getId()}`;
     const appDeployRes = await iexec.app.deployApp({
@@ -74,7 +74,7 @@ describe('[workflow]', () => {
   });
 
   test('deploy and sell dataset', async () => {
-    const { iexec } = getTestConfig(iexecTestChain)();
+    const { iexec } = await getTestConfig(iexecTestChain)();
     const owner = await iexec.wallet.getAddress();
     const datasetName = `My dataset${getId()}`;
     const datasetDeployRes = await iexec.dataset.deployDataset({
@@ -113,7 +113,7 @@ describe('[workflow]', () => {
   });
 
   test('deploy and sell computing power', async () => {
-    const { iexec, wallet } = getTestConfig(iexecTestChain)();
+    const { iexec, wallet } = await getTestConfig(iexecTestChain)();
     const workerpoolPrice = '1000000000';
     await setNRlcBalance(iexecTestChain)(wallet.address, workerpoolPrice);
     const owner = await iexec.wallet.getAddress();
@@ -161,7 +161,7 @@ describe('[workflow]', () => {
   });
 
   test('buy computation', async () => {
-    const { iexec, wallet } = getTestConfig(iexecTestChain)();
+    const { iexec, wallet } = await getTestConfig(iexecTestChain)();
     const order = await iexec.order.createRequestorder({
       app: apporder.app,
       appmaxprice: apporder.appprice,
@@ -207,7 +207,7 @@ describe('[workflow]', () => {
   });
 
   test('show & claim task, show & claim deal (initialized & uninitialized tasks)', async () => {
-    const { iexec, wallet } = getTestConfig(iexecTestChain)();
+    const { iexec, wallet } = await getTestConfig(iexecTestChain)();
     const order = await iexec.order.createRequestorder({
       app: apporder.app,
       appmaxprice: apporder.appprice,

@@ -8,7 +8,7 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('result', () => {
   describe('pushResultEncryptionKey()', () => {
     test('pushes the result encryption key', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
       const pushRes = await iexec.result.pushResultEncryptionKey('oops');
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
@@ -22,7 +22,7 @@ describe('result', () => {
     });
 
     test('forceUpdate allows updating the key', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
         forceUpdate: true,
       });
@@ -38,8 +38,8 @@ describe('result', () => {
 
   describe('checkResultEncryptionKeyExists()', () => {
     test('anyone can check the key exists', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
       const withoutSecretRes =
