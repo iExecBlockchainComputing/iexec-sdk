@@ -3,13 +3,15 @@ import { exec } from 'child_process';
 import {
   Wallet,
   JsonRpcProvider,
-  ethers,
   Contract,
   hexlify,
   randomBytes,
+  keccak256,
+  AbiCoder,
+  toBeHex,
 } from 'ethers';
 import { IExec } from '../src/lib/index.js';
-import { getSignerFromPrivateKey } from '../src/lib/utils.js';
+import { getSignerFromPrivateKey, NULL_ADDRESS } from '../src/lib/utils.js';
 
 export {
   TEE_FRAMEWORKS,
@@ -55,52 +57,6 @@ export const SERVICE_HTTP_500_URL = 'http://localhost:5500';
 export const SERVICE_UNREACHABLE_URL = 'http://unreachable:80';
 
 export const TEST_CHAINS = {
-  // autoseal chain with iExec token
-  'custom-token-chain': {
-    rpcURL: 'http://localhost:18545',
-    chainId: '65535',
-    hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-    ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
-    ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
-    ipfsNodeURL: 'http://localhost:5001',
-    ipfsGatewayURL: 'http://localhost:8080',
-    pocoAdminWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    // TODO use another wallet
-    faucetWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    provider: new JsonRpcProvider('http://localhost:18545', undefined, {
-      pollingInterval: 100,
-    }),
-    defaults: {
-      isNative: false,
-      useGas: true,
-    },
-    isAnvil: false,
-  },
-  'custom-token-chain-no-ens': {
-    rpcURL: 'http://localhost:18545',
-    chainId: '65535',
-    hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-    pocoAdminWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    compassURL: 'http://localhost:8069',
-    // TODO use another wallet
-    faucetWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    provider: new JsonRpcProvider('http://localhost:18545', undefined, {
-      pollingInterval: 100,
-    }),
-    defaults: {
-      isNative: false,
-      useGas: true,
-    },
-    isAnvil: false,
-  },
   'bellecour-fork': {
     rpcURL: 'http://localhost:8545',
     chainId: '134',
@@ -126,6 +82,47 @@ export const TEST_CHAINS = {
       useGas: false,
       name: 'bellecour',
     },
+    defaultInitBalance: 0n,
+    isAnvil: true,
+  },
+  'arbitrum-sepolia-fork': {
+    rpcURL: 'http://localhost:8555',
+    chainId: '421614',
+    smsURL: 'http://localhost:13350',
+    iexecGatewayURL: 'http://localhost:3050',
+    resultProxyURL: 'http://localhost:13250',
+    ipfsNodeURL: 'http://localhost:5001',
+    ipfsGatewayURL: 'http://localhost:8080',
+    pocoAdminWallet: new Wallet(
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+    ),
+    // faucetWallet: new Wallet(
+    //   '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
+    // ),
+    provider: new JsonRpcProvider('http://localhost:8555', undefined, {
+      pollingInterval: 100,
+    }),
+    defaults: {
+      hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
+      isNative: false,
+      useGas: true,
+      name: 'arbitrum-sepolia-testnet',
+    },
+    defaultInitBalance: 1n ** 18n, // 1 ETH for gas
+    isAnvil: true,
+  },
+  'unknown-chain': {
+    rpcURL: 'http://localhost:8565',
+    chainId: '421615',
+    hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
+    isNative: false,
+    useGas: true,
+    name: 'arbitrum-sepolia-testnet',
+    provider: new JsonRpcProvider('http://localhost:8565', undefined, {
+      pollingInterval: 100,
+    }),
+    defaultInitBalance: 1n ** 18n, // 1 ETH for gas
+    ensRegistryAddress: NULL_ADDRESS,
     isAnvil: true,
   },
 };
@@ -234,7 +231,7 @@ export const setBalance = (chain) => async (address, targetWeiBalance) => {
       method: 'POST',
       body: JSON.stringify({
         method: 'anvil_setBalance',
-        params: [address, ethers.toBeHex(targetWeiBalance)],
+        params: [address, toBeHex(targetWeiBalance)],
         id: 1,
         jsonrpc: '2.0',
       }),
@@ -247,6 +244,50 @@ export const setBalance = (chain) => async (address, targetWeiBalance) => {
   }
 };
 
+export const anvilSetNRlcTokenBalance =
+  (chain) => async (address, targetNRlcBalance) => {
+    const rlcAddress = await new Contract(
+      chain.hubAddress ?? chain.defaults.hubAddress,
+      [
+        {
+          inputs: [],
+          name: 'token',
+          outputs: [{ internalType: 'address', name: '', type: 'address' }],
+          stateMutability: 'view',
+          type: 'function',
+        },
+      ],
+      chain.provider,
+    ).token();
+
+    const contractStorageLocation =
+      '0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00';
+
+    const balanceSlot = keccak256(
+      AbiCoder.defaultAbiCoder().encode(
+        ['address', 'uint256'],
+        [address, contractStorageLocation],
+      ),
+    );
+
+    await fetch(chain.rpcURL, {
+      method: 'POST',
+      body: JSON.stringify({
+        method: 'anvil_setStorageAt',
+        params: [
+          rlcAddress,
+          balanceSlot,
+          toBeHex(BigInt(targetNRlcBalance), 32),
+        ],
+        id: 1,
+        jsonrpc: '2.0',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  };
+
 const faucetSendNRlcToReachTargetBalance =
   (chain) =>
   async (address, nRlcTargetBalance, tryCount = 1) => {
@@ -257,7 +298,7 @@ const faucetSendNRlcToReachTargetBalance =
           chain.faucetWallet.privateKey,
         ),
       },
-      { hubAddress: chain.hubAddress },
+      { hubAddress: chain.hubAddress ?? chain.defaults.hubAddress },
     );
     const { nRLC } = await iexec.wallet.checkBalances(address);
     const delta = BigInt(`${nRlcTargetBalance}`) - BigInt(`${nRLC}`);
@@ -293,7 +334,11 @@ export const setNRlcBalance = (chain) => async (address, nRlcTargetBalance) => {
     await setBalance(chain)(address, weiAmount);
     return;
   }
-  await faucetSendNRlcToReachTargetBalance(chain)(address, nRlcTargetBalance);
+  if (chain.isAnvil) {
+    await anvilSetNRlcTokenBalance(chain)(address, nRlcTargetBalance);
+  } else {
+    await faucetSendNRlcToReachTargetBalance(chain)(address, nRlcTargetBalance);
+  }
 };
 
 export const setStakedNRlcBalance =
@@ -303,7 +348,7 @@ export const setStakedNRlcBalance =
       {
         ethProvider: sponsorWallet,
       },
-      { hubAddress: chain.hubAddress },
+      { hubAddress: chain.hubAddress ?? chain.defaults.hubAddress },
     );
     await setNRlcBalance(chain)(
       sponsorWallet.address,
@@ -320,7 +365,7 @@ export const setStakedNRlcBalance =
 
 export const initializeTask = (chain) => async (dealid, idx) => {
   const iexecContract = new Contract(
-    chain.hubAddress || chain.defaults.hubAddress,
+    chain.hubAddress ?? chain.defaults.hubAddress,
     [
       {
         constant: false,
@@ -362,7 +407,7 @@ export const adminCreateCategory =
           chain.pocoAdminWallet.privateKey,
         ),
       },
-      { hubAddress: chain.hubAddress },
+      { hubAddress: chain.hubAddress ?? chain.defaults.hubAddress },
     );
     let res;
     try {

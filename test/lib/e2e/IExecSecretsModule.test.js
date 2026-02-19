@@ -16,7 +16,7 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('secrets', () => {
   describe('pushRequesterSecret()', () => {
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
         },
@@ -31,7 +31,7 @@ describe('secrets', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         options: {
           smsURL: SERVICE_HTTP_500_URL,
         },
@@ -46,7 +46,7 @@ describe('secrets', () => {
     });
 
     test('pushes the secret', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
       const pushRes = await iexec.secrets.pushRequesterSecret('foo', 'oops');
       expect(pushRes.isPushed).toBe(true);
       await expect(
@@ -59,7 +59,7 @@ describe('secrets', () => {
 
   describe('checkRequesterSecretExists()', () => {
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
         },
@@ -77,7 +77,7 @@ describe('secrets', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         options: {
           smsURL: SERVICE_HTTP_500_URL,
         },
@@ -95,8 +95,8 @@ describe('secrets', () => {
     });
 
     test('anyone can check a secret exists', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
       await expect(

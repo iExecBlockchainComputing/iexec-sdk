@@ -22,10 +22,10 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('app', () => {
   describe('showApp()', () => {
     test('shows a deployed app', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const app = {
         owner: await iexec.wallet.getAddress(),
         name: `app${getId()}`,
@@ -55,7 +55,7 @@ describe('app', () => {
     });
 
     test('fails if the app is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
@@ -67,10 +67,10 @@ describe('app', () => {
 
   describe('showUserApp()', () => {
     test('shows the user app', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
       const app = {
         owner: wallet.address,
         name: `app${getId()}`,
@@ -100,7 +100,7 @@ describe('app', () => {
     });
 
     test('fails if the app is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
@@ -112,10 +112,10 @@ describe('app', () => {
 
   describe('countUserApps()', () => {
     test('counts user app', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
       const resBeforeDeploy = await readOnlyIExec.app.countUserApps(
         wallet.address,
       );
@@ -129,7 +129,7 @@ describe('app', () => {
 
   describe('deployApp()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -146,7 +146,7 @@ describe('app', () => {
     });
 
     test('deploys an app', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -161,7 +161,7 @@ describe('app', () => {
     });
 
     test('cannot deploy twice with the same params', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -179,10 +179,10 @@ describe('app', () => {
 
   describe('predictAppAddress()', () => {
     test('predicts the deployment address', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -204,10 +204,10 @@ describe('app', () => {
 
   describe('checkDeployedApp()', () => {
     test('checks an app is deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -229,7 +229,7 @@ describe('app', () => {
 
   describe('transferApp()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
       await expect(
         iexec.app.transferApp(getRandomAddress(), getRandomAddress()),
       ).rejects.toThrow(
@@ -241,8 +241,8 @@ describe('app', () => {
 
     test('transfers the ownership', async () => {
       const receiverAddress = getRandomAddress();
-      const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecRandom } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecAppOwner } = await getTestConfig(iexecTestChain)();
+      const { iexec: iexecRandom } = await getTestConfig(iexecTestChain)();
       const { address } = await deployRandomApp(iexecAppOwner);
       await expect(
         iexecRandom.app.transferApp(getRandomAddress(), receiverAddress),
@@ -262,13 +262,13 @@ describe('app', () => {
   describe('checkAppSecretExists()', () => {
     let randomAppAddress;
     beforeAll(async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const { address } = await deployRandomApp(iexec);
       randomAppAddress = address;
     });
 
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
@@ -284,7 +284,7 @@ describe('app', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
           smsURL: SERVICE_HTTP_500_URL,
@@ -300,10 +300,10 @@ describe('app', () => {
     });
 
     test('checks an app secret exist on SMS', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const { address } = await deployRandomApp(iexec);
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address),
@@ -319,14 +319,14 @@ describe('app', () => {
     let randomAppAddress;
     let randomAppOwnerWallet;
     beforeAll(async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
       const { address } = await deployRandomApp(iexec);
       randomAppAddress = address;
       randomAppOwnerWallet = wallet;
     });
 
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         privateKey: randomAppOwnerWallet.privateKey,
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
@@ -342,7 +342,7 @@ describe('app', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(iexecTestChain)({
         privateKey: randomAppOwnerWallet.privateKey,
         options: {
           smsURL: SERVICE_HTTP_500_URL,
@@ -358,9 +358,9 @@ describe('app', () => {
     });
 
     test('only owner can push secret', async () => {
-      const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecAppOwner } = await getTestConfig(iexecTestChain)();
       const { iexec: iexecRandom, wallet: randomWallet } =
-        getTestConfig(iexecTestChain)();
+        await getTestConfig(iexecTestChain)();
       const { address: appAddress } = await deployRandomApp(iexecAppOwner);
       // only owner can push secret
       await expect(
@@ -373,7 +373,7 @@ describe('app', () => {
     });
 
     test('cannot update existing secret', async () => {
-      const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecAppOwner } = await getTestConfig(iexecTestChain)();
       const { address: appAddress } = await deployRandomApp(iexecAppOwner);
 
       await expect(

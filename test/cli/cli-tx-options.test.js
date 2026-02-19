@@ -14,7 +14,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['custom-token-chain'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('tx options', () => {
   let userWallet;
