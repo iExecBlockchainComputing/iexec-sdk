@@ -358,7 +358,7 @@ describe('utils', () => {
 
   describe('getSignerFromPrivateKey()', () => {
     const iexecTestChain = TEST_CHAINS['bellecour-fork'];
-    const tokenTestChain = TEST_CHAINS['custom-token-chain'];
+    const tokenTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
     test('gasPrice option allows to specify gasPrice', async () => {
       const gasPrice = '123456789';

@@ -9,7 +9,7 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('hub', () => {
   describe('showCategory()', () => {
     test('anyone can show category', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const res = await iexec.hub.showCategory(0);
       expect(res).toStrictEqual({
         description: '{}',

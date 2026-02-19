@@ -29,7 +29,7 @@ describe('task', () => {
       '0x71a9ccb619dd7712b1cd6ee88c018ef4da05820d95e3bfd6693f4914cae39181';
 
     test("throw a IpfsGatewayCallError when the IPFS gateway can't be reached", async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
           ipfsGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -45,7 +45,7 @@ describe('task', () => {
     });
 
     test('throw a IpfsGatewayCallError when the IPFS gateway encounters an error', async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
           ipfsGatewayURL: SERVICE_HTTP_500_URL,
@@ -71,7 +71,7 @@ describe('task', () => {
 
   describe.skip('obsTask()', () => {
     test('emits task updates', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const catid = (
         await adminCreateCategory(iexecTestChain)({
           name: 'custom',
@@ -221,7 +221,7 @@ describe('task', () => {
     });
 
     test('exits on task (deal) timeout', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const catid = (
         await adminCreateCategory(iexecTestChain)({
           name: 'custom',
@@ -420,7 +420,7 @@ describe('task', () => {
 
   describe('fetchOffchainInfo()', () => {
     test('throw when workerpool API is not configured', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       await expect(
         iexec.task.fetchOffchainInfo(
           '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
@@ -433,12 +433,14 @@ describe('task', () => {
     });
 
     describe('when workerpool API is configured', () => {
-      const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecWorkerpoolOwner } = getTestConfig(iexecTestChain)();
+      let iexecRequester;
+      let iexecWorkerpoolOwner;
       let taskid;
       let workerpool;
 
       beforeAll(async () => {
+        iexecRequester = (await getTestConfig(iexecTestChain)()).iexec;
+        iexecWorkerpoolOwner = (await getTestConfig(iexecTestChain)()).iexec;
         const workerpoolorder =
           await deployAndGetWorkerpoolorder(iexecWorkerpoolOwner);
         const apporder = await deployAndGetApporder(iexecWorkerpoolOwner);
@@ -499,7 +501,7 @@ describe('task', () => {
 
   describe('fetchLogs()', () => {
     test('throw when workerpool API is not configured', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       await expect(
         iexec.task.fetchLogs(
           '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
@@ -512,12 +514,15 @@ describe('task', () => {
     });
 
     describe('when workerpool API is configured', () => {
-      const { iexec: iexecRequester } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecWorkerpoolOwner } = getTestConfig(iexecTestChain)();
+      let iexecRequester;
+      let iexecWorkerpoolOwner;
       let taskid;
       let workerpool;
 
       beforeAll(async () => {
+        iexecRequester = (await getTestConfig(iexecTestChain)()).iexec;
+        iexecWorkerpoolOwner = (await getTestConfig(iexecTestChain)()).iexec;
+
         const workerpoolorder =
           await deployAndGetWorkerpoolorder(iexecWorkerpoolOwner);
         const apporder = await deployAndGetApporder(iexecWorkerpoolOwner);
@@ -546,7 +551,7 @@ describe('task', () => {
       });
 
       test('throw when user is not the requester', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
           workerpool,
           SERVICE_UNREACHABLE_URL,

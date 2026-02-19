@@ -28,7 +28,7 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('deal', () => {
   describe('fetchRequesterDeals()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -44,7 +44,7 @@ describe('deal', () => {
     });
 
     test('throw a MarketCallError when the Market API encounters an error', async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
@@ -60,7 +60,7 @@ describe('deal', () => {
     });
 
     test('shows past deals', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const requesterAddress = await iexec.wallet.getAddress();
       const apporder = await deployAndGetApporder(iexec);
       const datasetorder = await deployAndGetDatasetorder(iexec);
@@ -123,7 +123,7 @@ describe('deal', () => {
 
   describe('fetchDealsBy...order()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -139,7 +139,7 @@ describe('deal', () => {
     });
 
     test('throw a MarketCallError when the Market API encounters an error', async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
@@ -156,7 +156,7 @@ describe('deal', () => {
 
     describe('fetchDealsByApporder()', () => {
       test('shows past deals', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -187,7 +187,7 @@ describe('deal', () => {
 
     describe('fetchDealsByDatasetorder()', () => {
       test('shows past deals', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -221,7 +221,7 @@ describe('deal', () => {
 
     describe('fetchDealsByWorkerpoolorder()', () => {
       test('shows past deals', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -256,7 +256,7 @@ describe('deal', () => {
 
     describe('fetchDealsByRequestorder()', () => {
       test('shows past deals', async () => {
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(iexecTestChain)();
         const apporder = await deployAndGetApporder(iexec);
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -289,7 +289,7 @@ describe('deal', () => {
 
   describe.skip('obsDeal()', () => {
     test('emits deal updates', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const catid = (
         await adminCreateCategory(iexecTestChain)({
           name: 'custom',
@@ -381,7 +381,7 @@ describe('deal', () => {
     });
 
     test('exits on deal timeout', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(iexecTestChain)();
       const catid = (
         await adminCreateCategory(iexecTestChain)({
           name: 'custom',
