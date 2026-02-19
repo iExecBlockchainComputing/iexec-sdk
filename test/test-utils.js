@@ -68,9 +68,6 @@ export const TEST_CHAINS = {
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
-    faucetWallet: new Wallet(
-      '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
-    ),
     provider: new JsonRpcProvider('http://localhost:8545', undefined, {
       pollingInterval: 100,
     }),
@@ -83,7 +80,6 @@ export const TEST_CHAINS = {
       name: 'bellecour',
     },
     defaultInitBalance: 0n,
-    isAnvil: true,
   },
   'arbitrum-sepolia-fork': {
     rpcURL: 'http://localhost:8555',
@@ -96,9 +92,6 @@ export const TEST_CHAINS = {
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
-    // faucetWallet: new Wallet(
-    //   '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
-    // ),
     provider: new JsonRpcProvider('http://localhost:8555', undefined, {
       pollingInterval: 100,
     }),
@@ -109,7 +102,6 @@ export const TEST_CHAINS = {
       name: 'arbitrum-sepolia-testnet',
     },
     defaultInitBalance: 1n ** 18n, // 1 ETH for gas
-    isAnvil: true,
   },
   'unknown-chain': {
     rpcURL: 'http://localhost:8565',
@@ -123,7 +115,6 @@ export const TEST_CHAINS = {
     }),
     defaultInitBalance: 1n ** 18n, // 1 ETH for gas
     ensRegistryAddress: NULL_ADDRESS,
-    isAnvil: true,
   },
 };
 
@@ -191,60 +182,22 @@ export class InjectedProvider {
   }
 }
 
-const faucetSendWeiToReachTargetBalance =
-  (chain) =>
-  async (address, targetWeiBalance, tryCount = 1) => {
-    const currentBalance = await chain.provider.getBalance(address);
-    const delta = BigInt(`${targetWeiBalance}`) - currentBalance;
-    if (delta < 0n) {
-      console.warn(
-        `Faucet send Eth: aborted - current balance exceed target balance`,
-      );
-      return;
-    }
-    try {
-      const tx = await chain.faucetWallet
-        .connect(chain.provider)
-        .sendTransaction({ to: address, value: delta });
-      await tx.wait();
-    } catch (e) {
-      console.warn(`Faucet send Eth: error (try count ${tryCount}) - ${e}`);
-      // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 5) {
-        await sleep(3000 * tryCount);
-        await faucetSendWeiToReachTargetBalance(chain)(
-          address,
-          targetWeiBalance,
-          tryCount + 1,
-        );
-      } else {
-        throw new Error(
-          `Failed to send Eth from faucet (tried ${tryCount} times)`,
-        );
-      }
-    }
-  };
-
-export const setBalance = (chain) => async (address, targetWeiBalance) => {
-  if (chain.isAnvil) {
-    await fetch(chain.rpcURL, {
-      method: 'POST',
-      body: JSON.stringify({
-        method: 'anvil_setBalance',
-        params: [address, toBeHex(targetWeiBalance)],
-        id: 1,
-        jsonrpc: '2.0',
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  } else {
-    await faucetSendWeiToReachTargetBalance(chain)(address, targetWeiBalance);
-  }
+const anvilSetBalance = (chain) => async (address, targetWeiBalance) => {
+  await fetch(chain.rpcURL, {
+    method: 'POST',
+    body: JSON.stringify({
+      method: 'anvil_setBalance',
+      params: [address, toBeHex(targetWeiBalance)],
+      id: 1,
+      jsonrpc: '2.0',
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
 
-export const anvilSetNRlcTokenBalance =
+const anvilSetNRlcTokenBalance =
   (chain) => async (address, targetNRlcBalance) => {
     const rlcAddress = await new Contract(
       chain.hubAddress ?? chain.defaults.hubAddress,
@@ -288,57 +241,16 @@ export const anvilSetNRlcTokenBalance =
     });
   };
 
-const faucetSendNRlcToReachTargetBalance =
-  (chain) =>
-  async (address, nRlcTargetBalance, tryCount = 1) => {
-    const iexec = new IExec(
-      {
-        ethProvider: getSignerFromPrivateKey(
-          chain.rpcURL,
-          chain.faucetWallet.privateKey,
-        ),
-      },
-      { hubAddress: chain.hubAddress ?? chain.defaults.hubAddress },
-    );
-    const { nRLC } = await iexec.wallet.checkBalances(address);
-    const delta = BigInt(`${nRlcTargetBalance}`) - BigInt(`${nRLC}`);
-    if (delta < 0n) {
-      console.warn(
-        `Faucet send RLC: aborted - current balance exceed target balance`,
-      );
-      return;
-    }
-    try {
-      await iexec.wallet.sendRLC(`${delta}`, address);
-    } catch (e) {
-      console.warn(`Faucet send RLC: error (try count ${tryCount}) - ${e}`);
-      // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 5) {
-        await sleep(3000 * tryCount);
-        await faucetSendNRlcToReachTargetBalance(chain)(
-          address,
-          nRlcTargetBalance,
-          tryCount + 1,
-        );
-      } else {
-        throw new Error(
-          `Failed to send RLC from faucet (tried ${tryCount} times)`,
-        );
-      }
-    }
-  };
+export const setBalance = (chain) => async (address, targetWeiBalance) =>
+  anvilSetBalance(chain)(address, targetWeiBalance);
 
 export const setNRlcBalance = (chain) => async (address, nRlcTargetBalance) => {
   if (chain.isNative || chain.defaults?.isNative) {
     const weiAmount = BigInt(`${nRlcTargetBalance}`) * 10n ** 9n; // 1 nRLC is 10^9 wei
-    await setBalance(chain)(address, weiAmount);
+    await anvilSetBalance(chain)(address, weiAmount);
     return;
   }
-  if (chain.isAnvil) {
-    await anvilSetNRlcTokenBalance(chain)(address, nRlcTargetBalance);
-  } else {
-    await faucetSendNRlcToReachTargetBalance(chain)(address, nRlcTargetBalance);
-  }
+  await anvilSetNRlcTokenBalance(chain)(address, nRlcTargetBalance);
 };
 
 export const setStakedNRlcBalance =
@@ -416,7 +328,7 @@ export const adminCreateCategory =
       console.warn(
         `Admin create category: error (try count ${tryCount}) - ${e}`,
       );
-      // retry as concurrent calls can lead to nonce collisions on the faucet wallet
+      // retry as concurrent calls can lead to nonce collisions on the admin wallet
       if (tryCount < 5) {
         await sleep(3000 * tryCount);
         res = await adminCreateCategory(chain)(category, tryCount + 1);
