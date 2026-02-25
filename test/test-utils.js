@@ -99,9 +99,9 @@ export const TEST_CHAINS = {
       hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
       isNative: false,
       useGas: true,
-      name: 'arbitrum-sepolia-testnet',
+      name: 'arbitrum-sepolia',
     },
-    defaultInitBalance: 1n ** 18n, // 1 ETH for gas
+    defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
   },
   'unknown-chain': {
     rpcURL: 'http://localhost:8565',
@@ -109,11 +109,11 @@ export const TEST_CHAINS = {
     hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
     isNative: false,
     useGas: true,
-    name: 'arbitrum-sepolia-testnet',
+    name: 'unknown-chain',
     provider: new JsonRpcProvider('http://localhost:8565', undefined, {
       pollingInterval: 100,
     }),
-    defaultInitBalance: 1n ** 18n, // 1 ETH for gas
+    defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
     ensRegistryAddress: NULL_ADDRESS,
   },
 };
@@ -276,6 +276,8 @@ export const setStakedNRlcBalance =
   };
 
 export const initializeTask = (chain) => async (dealid, idx) => {
+  const wallet = Wallet.createRandom(chain.provider);
+  await setBalance(chain)(wallet.address, 1n * 10n ** 18n); // fund wallet to pay for initialization
   const iexecContract = new Contract(
     chain.hubAddress ?? chain.defaults.hubAddress,
     [
@@ -303,7 +305,7 @@ export const initializeTask = (chain) => async (dealid, idx) => {
         type: 'function',
       },
     ],
-    Wallet.createRandom(chain.provider), // random to avoid nonce collisions
+    wallet,
   );
   const initTx = await iexecContract.initialize(dealid, idx);
   await initTx.wait();

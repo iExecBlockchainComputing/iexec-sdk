@@ -21,22 +21,23 @@ import { WorkerpoolCallError } from '../../../src/lib/errors.js';
 
 const { ObjectNotFoundError, IpfsGatewayCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
+const ensFeaturedChain = TEST_CHAINS['bellecour-fork'];
 
 describe('task', () => {
   describe('fetchResults()', () => {
-    const BELLECOUR_COMPLETED_TASK_ID =
-      '0x71a9ccb619dd7712b1cd6ee88c018ef4da05820d95e3bfd6693f4914cae39181';
+    const ARBITRUM_SEPOLIA_COMPLETED_TASK_ID =
+      '0xb0a21edc03c536665cc8875a07ebdcd86a5e1e1239805976b31d63fdc21fbed2';
 
     test("throw a IpfsGatewayCallError when the IPFS gateway can't be reached", async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           ipfsGatewayURL: SERVICE_UNREACHABLE_URL,
         },
       });
       await expectAsyncCustomError(
-        iexecReadOnly.task.fetchResults(BELLECOUR_COMPLETED_TASK_ID),
+        iexecReadOnly.task.fetchResults(ARBITRUM_SEPOLIA_COMPLETED_TASK_ID),
         {
           constructor: IpfsGatewayCallError,
           message: `IPFS gateway error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
@@ -45,14 +46,14 @@ describe('task', () => {
     });
 
     test('throw a IpfsGatewayCallError when the IPFS gateway encounters an error', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           ipfsGatewayURL: SERVICE_HTTP_500_URL,
         },
       });
       await expectAsyncCustomError(
-        iexecReadOnly.task.fetchResults(BELLECOUR_COMPLETED_TASK_ID),
+        iexecReadOnly.task.fetchResults(ARBITRUM_SEPOLIA_COMPLETED_TASK_ID),
         {
           constructor: IpfsGatewayCallError,
           message: `IPFS gateway error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
@@ -63,7 +64,7 @@ describe('task', () => {
     test('downloads the result archive from IPFS', async () => {
       const iexecReadOnly = new IExec({ ethProvider: 'bellecour' });
       const res = await iexecReadOnly.task.fetchResults(
-        BELLECOUR_COMPLETED_TASK_ID,
+        ARBITRUM_SEPOLIA_COMPLETED_TASK_ID,
       );
       expect(res).toBeInstanceOf(Response);
     });
@@ -71,9 +72,9 @@ describe('task', () => {
 
   describe.skip('obsTask()', () => {
     test('emits task updates', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const catid = (
-        await adminCreateCategory(iexecTestChain)({
+        await adminCreateCategory(testChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 10,
@@ -175,7 +176,7 @@ describe('task', () => {
               .catch(reject);
           });
         }),
-        sleep(1000).then(() => initializeTask(iexecTestChain)(dealid, 0)),
+        sleep(1000).then(() => initializeTask(testChain)(dealid, 0)),
       ]);
 
       expect(unsubObsTaskWithDealid).toBeInstanceOf(Function);
@@ -221,9 +222,9 @@ describe('task', () => {
     });
 
     test('exits on task (deal) timeout', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const catid = (
-        await adminCreateCategory(iexecTestChain)({
+        await adminCreateCategory(testChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 2,
@@ -351,16 +352,16 @@ describe('task', () => {
         }),
         sleep(2000).then(() => {
           unsubObsTaskBeforeComplete();
-          initializeTask(iexecTestChain)(dealid, 0);
+          initializeTask(testChain)(dealid, 0);
         }),
       ]);
 
       expect(obsTaskWithDealidComplete).toBeUndefined();
       expect(obsTaskWithWrongDealidError).toEqual(
-        new ObjectNotFoundError('deal', NULL_BYTES32, iexecTestChain.chainId),
+        new ObjectNotFoundError('deal', NULL_BYTES32, testChain.chainId),
       );
       expect(obsTaskBeforeInitError).toEqual(
-        new ObjectNotFoundError('task', taskid, iexecTestChain.chainId),
+        new ObjectNotFoundError('task', taskid, testChain.chainId),
       );
       expect(obsTaskAfterInitComplete).toBeUndefined();
 
@@ -420,7 +421,7 @@ describe('task', () => {
 
   describe('fetchOffchainInfo()', () => {
     test('throw when workerpool API is not configured', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(ensFeaturedChain)();
       await expect(
         iexec.task.fetchOffchainInfo(
           '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
@@ -439,8 +440,8 @@ describe('task', () => {
       let workerpool;
 
       beforeAll(async () => {
-        iexecRequester = (await getTestConfig(iexecTestChain)()).iexec;
-        iexecWorkerpoolOwner = (await getTestConfig(iexecTestChain)()).iexec;
+        iexecRequester = (await getTestConfig(ensFeaturedChain)()).iexec;
+        iexecWorkerpoolOwner = (await getTestConfig(ensFeaturedChain)()).iexec;
         const workerpoolorder =
           await deployAndGetWorkerpoolorder(iexecWorkerpoolOwner);
         const apporder = await deployAndGetApporder(iexecWorkerpoolOwner);
@@ -464,7 +465,7 @@ describe('task', () => {
           workerpoolorder,
           requestorder,
         });
-        await initializeTask(iexecTestChain)(dealid, 0);
+        await initializeTask(testChain)(dealid, 0);
         taskid = await iexecRequester.deal.computeTaskId(dealid, 0);
       });
 
@@ -501,7 +502,7 @@ describe('task', () => {
 
   describe('fetchLogs()', () => {
     test('throw when workerpool API is not configured', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(ensFeaturedChain)();
       await expect(
         iexec.task.fetchLogs(
           '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
@@ -520,8 +521,8 @@ describe('task', () => {
       let workerpool;
 
       beforeAll(async () => {
-        iexecRequester = (await getTestConfig(iexecTestChain)()).iexec;
-        iexecWorkerpoolOwner = (await getTestConfig(iexecTestChain)()).iexec;
+        iexecRequester = (await getTestConfig(ensFeaturedChain)()).iexec;
+        iexecWorkerpoolOwner = (await getTestConfig(ensFeaturedChain)()).iexec;
 
         const workerpoolorder =
           await deployAndGetWorkerpoolorder(iexecWorkerpoolOwner);
@@ -546,12 +547,12 @@ describe('task', () => {
           workerpoolorder,
           requestorder,
         });
-        await initializeTask(iexecTestChain)(dealid, 0);
+        await initializeTask(testChain)(dealid, 0);
         taskid = await iexecRequester.deal.computeTaskId(dealid, 0);
       });
 
       test('throw when user is not the requester', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(ensFeaturedChain)();
         await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
           workerpool,
           SERVICE_UNREACHABLE_URL,

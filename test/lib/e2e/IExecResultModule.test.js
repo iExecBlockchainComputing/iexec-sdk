@@ -3,12 +3,12 @@ import { getTestConfig } from '../lib-test-utils.js';
 import { TEST_CHAINS } from '../../test-utils.js';
 import '../../jest-setup.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('result', () => {
   describe('pushResultEncryptionKey()', () => {
     test('pushes the result encryption key', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const pushRes = await iexec.result.pushResultEncryptionKey('oops');
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
@@ -22,7 +22,7 @@ describe('result', () => {
     });
 
     test('forceUpdate allows updating the key', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const pushRes = await iexec.result.pushResultEncryptionKey('Oops', {
         forceUpdate: true,
       });
@@ -38,8 +38,8 @@ describe('result', () => {
 
   describe('checkResultEncryptionKeyExists()', () => {
     test('anyone can check the key exists', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec, wallet } = await getTestConfig(testChain)();
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const withoutSecretRes =
