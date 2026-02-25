@@ -155,7 +155,7 @@
     "build:doc": "npm run build:doc:lib && npm run build:doc:cli",
     "build:doc:lib": "./node_modules/typedoc/bin/typedoc --tsconfig tsconfig.doc.json --disableSources",
     "build:doc:cli": "node generateCliDoc.cjs",
-    "test:prepare": "node test/scripts/prepare-bellecour-fork-for-tests.js"
+    "test:prepare": "node test/scripts/prepare-forks-for-tests.js"
   },
   "files": [
     "src/",
