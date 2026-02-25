@@ -1,10 +1,11 @@
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, beforeEach } from '@jest/globals';
 import {
   TEST_CHAINS,
   execAsync,
   getRandomAddress,
   getRandomWallet,
   setBalance,
+  setNRlcBalance,
 } from '../test-utils.js';
 import {
   checkExists,
@@ -18,7 +19,8 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
+const nativeTestChain = TEST_CHAINS['bellecour-fork'];
 
 describe('iexec wallet', () => {
   let userWallet;
@@ -29,8 +31,7 @@ describe('iexec wallet', () => {
     await globalSetup('cli-iexec-wallet');
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
-    await setChain(testChain)();
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
     importedWallet = getRandomWallet();
     const { fileName } = await runIExecCliRaw(
       `${iexecPath} wallet import ${importedWallet.privateKey} --password test --force`,
@@ -40,7 +41,9 @@ describe('iexec wallet', () => {
 
   beforeEach(async () => {
     // reset user wallet
-    await setWallet(userWallet.privateKey);
+    await setWallet(testChain)(userWallet.privateKey);
+    // reset chain
+    await setChain(testChain)();
   });
 
   afterAll(async () => {
@@ -146,16 +149,18 @@ describe('iexec wallet', () => {
 
   describe('show', () => {
     beforeAll(async () => {
-      await setBalance(testChain)(userWallet.address, 10n * 10n ** 18n);
+      await setBalance(testChain)(userWallet.address, 1n * 10n ** 18n);
+      await setNRlcBalance(testChain)(userWallet.address, 10n * 10n ** 9n);
     });
 
     test('iexec wallet show (user wallet)', async () => {
+      await setNRlcBalance(testChain)(userWallet.address, 10n * 10n ** 9n);
       const res = await runIExecCliRaw(`${iexecPath} wallet show`);
       expect(res.ok).toBe(true);
       expect(res.wallet.address).toBe(userWallet.address);
       expect(res.wallet.publicKey).toBeUndefined();
       expect(res.wallet.privateKey).toBeUndefined();
-      expect(res.balance.ether).toBeUndefined();
+      expect(res.balance.ether).toBe('1.0');
       expect(res.balance.RLC).toBe('10.0');
       expect(res.balance.nRLC).toBe('10000000000');
     });
@@ -168,7 +173,7 @@ describe('iexec wallet', () => {
       expect(res.wallet.address).toBe(userWallet.address);
       // expect(res.wallet.publicKey).toBe(userWallet.publicKey); // unexpected format
       expect(res.wallet.privateKey).toBe(userWallet.privateKey);
-      expect(res.balance.ether).toBeUndefined();
+      expect(res.balance.ether).toBe('1.0');
       expect(res.balance.RLC).toBe('10.0');
       expect(res.balance.nRLC).toBe('10000000000');
     });
@@ -179,8 +184,7 @@ describe('iexec wallet', () => {
       );
       expect(res.ok).toBe(true);
       expect(res.wallet).toBeUndefined();
-      expect(res.balance.ether).toBeUndefined();
-      expect(res.balance.nRLC).toBeDefined();
+      expect(res.balance.ether).toBe('0.0');
       expect(res.balance.RLC).toBe('0.0');
       expect(res.balance.nRLC).toBe('0');
     });
@@ -280,7 +284,8 @@ describe('iexec wallet', () => {
 
   describe('send-ether', () => {
     test('iexec wallet send-ether (error on sidechain)', async () => {
-      await setBalance(testChain)(userWallet.address, 10n * 10n ** 18n);
+      await setChain(nativeTestChain)();
+      await setBalance(nativeTestChain)(userWallet.address, 10n * 10n ** 18n);
       const to = getRandomAddress();
       const res = await runIExecCliRaw(
         `${iexecPath} wallet send-ether 1 gwei --to ${to} --force`,
@@ -293,12 +298,8 @@ describe('iexec wallet', () => {
   });
 
   describe('send-RLC', () => {
-    beforeAll(async () => {
-      await setBalance(testChain)(userWallet.address, 10n * 10n ** 18n);
-    });
-
     test('iexec wallet send-RLC 0.5', async () => {
-      await setBalance(testChain)(userWallet.address, 10n * 10n ** 18n);
+      await setNRlcBalance(testChain)(userWallet.address, 10n ** 9n);
       const to = getRandomAddress();
       const res = await runIExecCliRaw(
         `${iexecPath} wallet send-RLC 0.5 --to ${to} --force`,
@@ -312,13 +313,11 @@ describe('iexec wallet', () => {
         `${iexecPath} wallet show ${to}`,
       );
       expect(balance.RLC).toBe('0.5');
-      await testChain.provider.getTransaction(res.txHash).then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
     });
 
     test('iexec wallet send-RLC 1000000000 nRLC', async () => {
       const to = getRandomAddress();
+      await setNRlcBalance(testChain)(userWallet.address, 10n ** 9n);
       const res = await runIExecCliRaw(
         `${iexecPath} wallet send-RLC 1000000000 nRLC --to ${to} --force`,
       );
@@ -338,9 +337,9 @@ describe('iexec wallet', () => {
     test('iexec wallet sweep', async () => {
       const walletToSweep = getRandomWallet();
       const rlcBalance = 10n;
-      await setBalance(testChain)(
+      await setNRlcBalance(testChain)(
         walletToSweep.address,
-        rlcBalance * 10n ** 18n,
+        rlcBalance * 10n ** 9n,
       );
       const to = getRandomAddress();
       await runIExecCliRaw(
@@ -359,11 +358,6 @@ describe('iexec wallet', () => {
         `${iexecPath} wallet show ${to}`,
       );
       expect(balance.RLC).toBe(`${rlcBalance}.0`);
-      await testChain.provider
-        .getTransaction(res.sendNativeTxHash)
-        .then((tx) => {
-          expect(tx.gasPrice.toString()).toBe('0');
-        });
     });
   });
 });
