@@ -360,28 +360,6 @@ describe('utils', () => {
     const iexecTestChain = TEST_CHAINS['bellecour-fork'];
     const tokenTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
-    test('gasPrice option allows to specify gasPrice', async () => {
-      const gasPrice = '123456789';
-      const wallet = getRandomWallet();
-      const iexec = new IExec(
-        {
-          ethProvider: utils.getSignerFromPrivateKey(
-            tokenTestChain.rpcURL,
-            wallet.privateKey,
-            {
-              gasPrice,
-            },
-          ),
-        },
-        getTestConfigOptions(tokenTestChain)(),
-      );
-      await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
-      const txHash = await iexec.wallet.sendETH(0, wallet.address);
-      const tx = await tokenTestChain.provider.getTransaction(txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe(gasPrice);
-    });
-
     test('getTransactionCount option allows custom nonce management', async () => {
       const wallet = getRandomWallet();
 

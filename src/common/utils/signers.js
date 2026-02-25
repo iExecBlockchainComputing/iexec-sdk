@@ -101,7 +101,7 @@ export const getSignerFromPrivateKey = (
   host,
   privateKey,
   {
-    gasPrice,
+    gasPrice, // TODO remove this option (not applicable on supported chains)
     getTransactionCount,
     providers,
     allowExperimentalNetworks = false,
