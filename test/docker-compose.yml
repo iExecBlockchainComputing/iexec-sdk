@@ -214,6 +214,8 @@ services:
     environment:
       CHAIN: ARBITRUM_SEPOLIA
       START_BLOCK: $ARBITRUM_SEPOLIA_FORK_BLOCK
+      CHAIN_ID: 421614
+      IS_NATIVE: 'false'
       ETH_WS_HOST: ws://arbitrum-sepolia-fork:8545
       ETH_RPC_HOST: http://arbitrum-sepolia-fork:8545
       MONGO_HOST: market-mongo
@@ -262,7 +264,7 @@ services:
     environment:
       CHAINS: ARBITRUM_SEPOLIA_FORK
       ARBITRUM_SEPOLIA_FORK_ETH_RPC_HOST: http://arbitrum-sepolia-fork:8545
-      ARBITRUM_SEPOLIA_FORK_CHAIN_ID: 421613
+      ARBITRUM_SEPOLIA_FORK_CHAIN_ID: 421614
       ARBITRUM_SEPOLIA_FORK_IS_NATIVE: 'false'
       ARBITRUM_SEPOLIA_FORK_IEXEC_ADDRESS: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E'
       MONGO_HOST: market-mongo

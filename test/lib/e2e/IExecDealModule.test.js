@@ -24,11 +24,11 @@ import { errors } from '../../../src/lib/index.js';
 
 const { ObjectNotFoundError, MarketCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 describe('deal', () => {
   describe('fetchRequesterDeals()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -44,7 +44,7 @@ describe('deal', () => {
     });
 
     test('throw a MarketCallError when the Market API encounters an error', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
@@ -60,7 +60,7 @@ describe('deal', () => {
     });
 
     test('shows past deals', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const requesterAddress = await iexec.wallet.getAddress();
       const apporder = await deployAndGetApporder(iexec);
       const datasetorder = await deployAndGetDatasetorder(iexec);
@@ -123,7 +123,7 @@ describe('deal', () => {
 
   describe('fetchDealsBy...order()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -139,7 +139,7 @@ describe('deal', () => {
     });
 
     test('throw a MarketCallError when the Market API encounters an error', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
@@ -156,7 +156,7 @@ describe('deal', () => {
 
     describe('fetchDealsByApporder()', () => {
       test('shows past deals', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(testChain)();
         const apporder = await deployAndGetApporder(iexec);
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -187,7 +187,7 @@ describe('deal', () => {
 
     describe('fetchDealsByDatasetorder()', () => {
       test('shows past deals', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(testChain)();
         const apporder = await deployAndGetApporder(iexec);
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -221,7 +221,7 @@ describe('deal', () => {
 
     describe('fetchDealsByWorkerpoolorder()', () => {
       test('shows past deals', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(testChain)();
         const apporder = await deployAndGetApporder(iexec);
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -256,7 +256,7 @@ describe('deal', () => {
 
     describe('fetchDealsByRequestorder()', () => {
       test('shows past deals', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(testChain)();
         const apporder = await deployAndGetApporder(iexec);
         const datasetorder = await deployAndGetDatasetorder(iexec);
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -289,9 +289,9 @@ describe('deal', () => {
 
   describe.skip('obsDeal()', () => {
     test('emits deal updates', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const catid = (
-        await adminCreateCategory(iexecTestChain)({
+        await adminCreateCategory(testChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 10,
@@ -321,8 +321,8 @@ describe('deal', () => {
       const runnerUnsubBeforeInit = runObservableSubscribe(dealObservable);
       await sleep(6000);
       runnerUnsubBeforeInit.unsubscribe();
-      await initializeTask(iexecTestChain)(dealid, 3);
-      await initializeTask(iexecTestChain)(dealid, 0);
+      await initializeTask(testChain)(dealid, 3);
+      await initializeTask(testChain)(dealid, 0);
       await sleep(6000);
       runnerUnsubAfterInit.unsubscribe();
 
@@ -381,9 +381,9 @@ describe('deal', () => {
     });
 
     test('exits on deal timeout', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const catid = (
-        await adminCreateCategory(iexecTestChain)({
+        await adminCreateCategory(testChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 2,
@@ -421,13 +421,13 @@ describe('deal', () => {
           runnerUnsub.unsubscribe();
           return runnerUnsub.wait();
         }),
-        initializeTask(iexecTestChain)(dealid, 3)
+        initializeTask(testChain)(dealid, 3)
           .then(sleep(5000))
-          .then(() => initializeTask(iexecTestChain)(dealid, 0)),
+          .then(() => initializeTask(testChain)(dealid, 0)),
       ]);
 
       expect(wrongDealidRes.error).toStrictEqual(
-        new ObjectNotFoundError('deal', NULL_BYTES32, iexecTestChain.chainId),
+        new ObjectNotFoundError('deal', NULL_BYTES32, testChain.chainId),
       );
       expect(wrongDealidRes.messages.length).toBe(0);
       expect(wrongDealidRes.completed).toBe(false);

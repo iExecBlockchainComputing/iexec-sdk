@@ -10,7 +10,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec result', () => {
   let userWallet;
@@ -26,7 +26,7 @@ describe('iexec result', () => {
   });
 
   beforeEach(async () => {
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
   });
 
   describe('generate-encryption-keypair', () => {

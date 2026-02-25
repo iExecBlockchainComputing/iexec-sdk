@@ -8,17 +8,17 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
-
 describe('iexec info', () => {
   beforeAll(async () => {
     await globalSetup('cli-iexec-info');
-    await setChain(testChain)();
   });
   afterAll(async () => {
     await globalTeardown();
   });
-  test('iexec info', async () => {
+
+  test('iexec info (bellecour)', async () => {
+    const testChain = TEST_CHAINS['bellecour-fork'];
+    await setChain(testChain)();
     const raw = await execAsync(`${iexecPath} info --raw`);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(true);
@@ -32,6 +32,24 @@ describe('iexec info', () => {
     expect(res.workerpoolRegistryAddress).toBeDefined();
     expect(res.rlcAddress).toBeUndefined();
     expect(res.useNative).toBe(true);
+  });
+
+  test('iexec info (arbitrum-sepolia)', async () => {
+    const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
+    await setChain(testChain)();
+    const raw = await execAsync(`${iexecPath} info --raw`);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.pocoVersion).toBeDefined();
+    expect(res.host).toBe(testChain.rpcURL);
+    expect(res.hubAddress).toBe(
+      testChain.hubAddress || testChain.defaults.hubAddress,
+    );
+    expect(res.appRegistryAddress).toBeDefined();
+    expect(res.datasetRegistryAddress).toBeDefined();
+    expect(res.workerpoolRegistryAddress).toBeDefined();
+    expect(res.rlcAddress).toBeDefined();
+    expect(res.useNative).toBe(false);
   });
 
   test('iexec info --chain mainnet', async () => {

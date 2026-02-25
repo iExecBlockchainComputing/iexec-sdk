@@ -17,12 +17,12 @@ import {
 import '../../jest-setup.js';
 import { IExec } from '../../../src/lib/index.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['bellecour-fork'];
 
 describe('ens', () => {
   describe('ens resolution', () => {
     test('resolve ens on iExec sidechain', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const balance = await iexec.wallet.checkBalances('core.v5.iexec.eth');
       expect(balance.wei).toBeInstanceOf(BN);
       expect(balance.nRLC).toBeInstanceOf(BN);
@@ -43,13 +43,13 @@ describe('ens', () => {
 
   describe('getOwner()', () => {
     test('get owner address', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const res = await iexec.ens.getOwner('core.v5.iexec.eth');
       expect(res).toBe('0x0B3a38b0A47aB0c5E8b208A703de366751Df5916');
     });
 
     test('get address zero for unregistered names', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const res = await iexec.ens.getOwner('unregistered.iexec.eth');
       expect(res).toBe(NULL_ADDRESS);
     });
@@ -57,15 +57,13 @@ describe('ens', () => {
 
   describe('resolveName()', () => {
     test('known names resolves to address', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const res = await iexec.ens.resolveName('core.v5.iexec.eth');
-      expect(res).toBe(
-        iexecTestChain.hubAddress || iexecTestChain.defaults.hubAddress,
-      );
+      expect(res).toBe(testChain.hubAddress || testChain.defaults.hubAddress);
     });
 
     test('unknown name resolves to null', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const res = await iexec.ens.resolveName('unknown.eth');
       expect(res).toBe(null);
     });
@@ -73,10 +71,10 @@ describe('ens', () => {
 
   describe('lookupAddress()', () => {
     test('return the name when reverse resolution is configured', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const label = `ens-${getId()}`;
       const domain = 'users.iexec.eth';
       const name = `${label}.${domain}`;
@@ -87,7 +85,7 @@ describe('ens', () => {
     });
 
     test('return null when no reverse resolution is configured', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const res = await iexec.ens.lookupAddress(getRandomAddress());
       expect(res).toBe(null);
     });
@@ -95,10 +93,10 @@ describe('ens', () => {
 
   describe('getDefaultDomain()', () => {
     test('returns the domain corresponding to the address', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const { address: appAddress } = await deployRandomApp(iexec);
       const { address: datasetAddress } = await deployRandomDataset(iexec);
       const { address: workerpoolAddress } =
@@ -119,7 +117,7 @@ describe('ens', () => {
 
   describe('claimName()', () => {
     test('get an available name', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const label = `wallet-${wallet.address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
       const res = await iexec.ens.claimName(label);
@@ -133,7 +131,7 @@ describe('ens', () => {
     });
 
     test('allow claim on custom domain with FIFS registrar', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const label = `wallet-${wallet.address.toLowerCase()}`;
       const domain = 'apps.iexec.eth';
       const name = `${label}.${domain}`;
@@ -146,7 +144,7 @@ describe('ens', () => {
     });
 
     test('fails if name is not available', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const label = 'users';
       const domain = 'iexec.eth';
       await expect(iexec.ens.claimName(label, domain)).rejects.toThrow(
@@ -157,7 +155,7 @@ describe('ens', () => {
     });
 
     test('fails if custom domain has no registrar', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const label = 'test';
       const domain = 'no-registrar.iexec.eth';
       await expect(iexec.ens.claimName(label, domain)).rejects.toThrow(
@@ -170,7 +168,7 @@ describe('ens', () => {
 
   describe('configureResolution()', () => {
     test('configures for user address by default', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const label = `wallet-${wallet.address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
       await iexec.ens.claimName(label);
@@ -191,7 +189,7 @@ describe('ens', () => {
     });
 
     test('optionally configures for target address', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const app1 = await deployRandomApp(iexec);
 
       const label = `address-${wallet.address.toLowerCase()}`;
@@ -232,7 +230,7 @@ describe('ens', () => {
     });
 
     test('fails if name is not owned', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       await expect(
         iexec.ens.configureResolution('not-owned.eth', wallet.address),
       ).rejects.toThrow(
@@ -243,7 +241,7 @@ describe('ens', () => {
     });
 
     test('fails if target app address not owned', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const app = await deployRandomApp(iexec, { owner: getRandomAddress() });
       const label = `address-${app.address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
@@ -259,7 +257,7 @@ describe('ens', () => {
     });
 
     test('fails if target address is an EAO different from user wallet', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const targetAddress = getRandomAddress();
       const label = `address-${targetAddress.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
@@ -277,7 +275,7 @@ describe('ens', () => {
 
   describe('obsConfigureResolution()', () => {
     test('configures for user address by default', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const label = `wallet-${wallet.address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
       await iexec.ens.claimName(label);
@@ -294,7 +292,7 @@ describe('ens', () => {
     });
 
     test('optionally configures for target address', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const app1 = await deployRandomApp(iexec);
       const app2 = await deployRandomApp(iexec);
 
@@ -325,7 +323,7 @@ describe('ens', () => {
     });
 
     test('ens.obsConfigureResolution(name, address) throw with name not owned', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const configureObs = await iexec.ens.obsConfigureResolution(
         'not-owned.eth',
         wallet.address,
@@ -343,7 +341,7 @@ describe('ens', () => {
     });
 
     test('fails if target app address not owned', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const app = await deployRandomApp(iexec, {
         owner: getRandomAddress(),
       });
@@ -368,7 +366,7 @@ describe('ens', () => {
     });
 
     test('fails if target address is an EAO different from user wallet', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const targetAddress = getRandomAddress();
       const label = `address-${targetAddress.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
@@ -392,7 +390,7 @@ describe('ens', () => {
 
   describe('setTextRecord()', () => {
     test('fails if resolver is not configured', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const name = `${getId()}.users.iexec.eth`;
       await expect(
         iexec.ens.setTextRecord(name, 'key', 'value'),
@@ -400,14 +398,14 @@ describe('ens', () => {
     });
 
     test('fails if the name is not owned', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const label = getId();
       const name = `${label}.users.iexec.eth`;
       await iexec.ens.claimName(label);
       await iexec.ens.configureResolution(name);
 
       const { iexec: iexecNotOwner, wallet: walletNotOwner } =
-        await getTestConfig(iexecTestChain)();
+        await getTestConfig(testChain)();
       await expect(
         iexecNotOwner.ens.setTextRecord(name, 'key', 'value'),
       ).rejects.toThrow(
@@ -418,7 +416,7 @@ describe('ens', () => {
     });
 
     test('sets a text record', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const { address } = await deployRandomWorkerpool(iexec);
       const label = `workerpool-${address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
@@ -432,7 +430,7 @@ describe('ens', () => {
     });
 
     test('can reset a text record', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const { address } = await deployRandomWorkerpool(iexec);
       const label = `workerpool-${address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
@@ -447,7 +445,7 @@ describe('ens', () => {
 
   describe('readTextRecord()', () => {
     test('fails if the resolver not configured', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const address = getRandomAddress();
       const label = `address-${address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;
@@ -457,10 +455,10 @@ describe('ens', () => {
     });
 
     test('returns empty string if the record not set', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const label = getId();
       const name = `${label}.users.iexec.eth`;
       await iexec.ens.claimName(label);
@@ -470,10 +468,10 @@ describe('ens', () => {
     });
 
     test('shows an existing text record', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const { address } = await deployRandomWorkerpool(iexec);
       const label = `workerpool-${address.toLowerCase()}`;
       const name = `${label}.users.iexec.eth`;

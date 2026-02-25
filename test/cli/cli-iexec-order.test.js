@@ -13,7 +13,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec order', () => {
   let userWallet;
@@ -26,7 +26,7 @@ describe('iexec order', () => {
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
     await execAsync(`${iexecPath} app init`);
     await execAsync(`${iexecPath} dataset init`);
     await execAsync(`${iexecPath} workerpool init`);
@@ -157,9 +157,6 @@ describe('iexec order', () => {
     expect(res.volume).toBe('1');
     expect(res.dealid).toBeDefined();
     expect(res.txHash).toBeDefined();
-    await testChain.provider.getTransaction(res.txHash).then((tx) => {
-      expect(tx.gasPrice.toString()).toBe('0');
-    });
   });
 
   test('iexec order sign --app', async () => {
@@ -258,9 +255,6 @@ describe('iexec order', () => {
     expect(res.workerpoolorder).toBeUndefined();
     expect(res.requestorder).toBeUndefined();
     expect(res.fail).toBeUndefined();
-    await testChain.provider.getTransaction(res.apporder.txHash).then((tx) => {
-      expect(tx.gasPrice.toString()).toBe('0');
-    });
   });
 
   test('iexec order cancel --dataset', async () => {
@@ -276,11 +270,6 @@ describe('iexec order', () => {
     expect(res.workerpoolorder).toBeUndefined();
     expect(res.requestorder).toBeUndefined();
     expect(res.fail).toBeUndefined();
-    await testChain.provider
-      .getTransaction(res.datasetorder.txHash)
-      .then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
   });
 
   test('iexec order cancel --workerpool', async () => {
@@ -296,11 +285,6 @@ describe('iexec order', () => {
     expect(res.workerpoolorder.txHash).toBeDefined();
     expect(res.requestorder).toBeUndefined();
     expect(res.fail).toBeUndefined();
-    await testChain.provider
-      .getTransaction(res.workerpoolorder.txHash)
-      .then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
   });
 
   test('iexec order cancel --request', async () => {
@@ -318,10 +302,5 @@ describe('iexec order', () => {
     expect(res.requestorder).toBeDefined();
     expect(res.requestorder.txHash).toBeDefined();
     expect(res.fail).toBeUndefined();
-    await testChain.provider
-      .getTransaction(res.requestorder.txHash)
-      .then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
   });
 });

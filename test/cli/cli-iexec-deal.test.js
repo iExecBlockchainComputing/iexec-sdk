@@ -16,7 +16,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec deal', () => {
   let userWallet;
@@ -37,7 +37,7 @@ describe('iexec deal', () => {
       workClockTimeRef: '0',
     }).then(({ catid }) => catid.toString());
     // restore user wallet
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
     await execAsync(`${iexecPath} app init`);
     await execAsync(`${iexecPath} dataset init`);
     await execAsync(`${iexecPath} workerpool init`);

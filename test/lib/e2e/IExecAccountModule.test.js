@@ -11,15 +11,16 @@ import {
 import '../../jest-setup.js';
 import { IExec } from '../../../src/lib/index.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 const tokenTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];
+const nativeTestChain = TEST_CHAINS['bellecour-fork'];
 
 describe('account', () => {
   describe('checkBalance()', () => {
     test('shows account nRLC stake and locked balances', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-      await setNRlcBalance(iexecTestChain)(wallet.address, 10);
-      const { iexec: readOnlyIExec } = await getTestConfig(iexecTestChain)({
+      const { iexec, wallet } = await getTestConfig(testChain)();
+      await setNRlcBalance(testChain)(wallet.address, 10);
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const initialBalance = await readOnlyIExec.account.checkBalance(
@@ -74,7 +75,7 @@ describe('account', () => {
   describe('approve()', () => {
     test('require a signer', async () => {
       const spenderAddress = getRandomAddress();
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       await expect(iexec.account.approve(10, spenderAddress)).rejects.toThrow(
         new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
@@ -83,7 +84,7 @@ describe('account', () => {
     });
 
     test('rejects invalid address', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const spenderAddress = 'invalid_address';
       const amount = 10;
 
@@ -95,7 +96,7 @@ describe('account', () => {
     });
 
     test('rejects invalid amount', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const spenderAddress = wallet.address;
       const amount = 'invalid_amount';
 
@@ -105,7 +106,7 @@ describe('account', () => {
     });
 
     test('prevents approve negative amount', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const spenderAddress = wallet.address;
       const negativeAmount = -999;
       await expect(
@@ -114,7 +115,7 @@ describe('account', () => {
     });
 
     test('approve succeeds', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const spenderAddress = getRandomAddress();
       const txHash = await iexec.account.approve(10, spenderAddress);
       expect(txHash).toBeDefined();
@@ -123,7 +124,7 @@ describe('account', () => {
 
   describe('checkAllowance()', () => {
     test('rejects invalid ownerAddress', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const ownerAddress = 'invalid_address';
       const spenderAddress = getRandomAddress();
 
@@ -135,7 +136,7 @@ describe('account', () => {
     });
 
     test('rejects invalid spenderAddress', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const ownerAddress = getRandomAddress();
       const spenderAddress = "'invalid_address'";
 
@@ -147,7 +148,7 @@ describe('account', () => {
     });
 
     test('return zero allowance if no approval exists', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const ownerAddress = getRandomAddress();
       const spenderAddress = getRandomAddress();
 
@@ -160,7 +161,7 @@ describe('account', () => {
     });
 
     test('return the allowed amount as a BigNumber', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const ownerAddress = iexec.wallet.getAddress();
       const spenderAddress = getRandomAddress();
       const allowanceValue = '10';
@@ -184,7 +185,7 @@ describe('account', () => {
   describe('revokeApproval()', () => {
     test('require a signer', async () => {
       const spenderAddress = getRandomAddress();
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       await expect(
         iexec.account.revokeApproval(spenderAddress),
       ).rejects.toThrow(
@@ -195,7 +196,7 @@ describe('account', () => {
     });
 
     test('rejects invalid address', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const spenderAddress = 'invalid_address';
 
       await expect(
@@ -206,7 +207,7 @@ describe('account', () => {
     });
 
     test('revokeApproval succeeds', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const spenderAddress = getRandomAddress();
       const approvalTxHash = await iexec.account.approve(10, spenderAddress);
       expect(approvalTxHash).toBeDefined();
@@ -224,7 +225,7 @@ describe('account', () => {
 
   describe('deposit()', () => {
     test('require a signer', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       await expect(iexec.account.deposit(10)).rejects.toThrow(
         new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
@@ -233,7 +234,7 @@ describe('account', () => {
     });
 
     test('prevents deposit 0', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       await expect(iexec.account.deposit(0)).rejects.toThrow(
         new Error('Deposit amount must be greater than 0'),
       );
@@ -241,8 +242,8 @@ describe('account', () => {
 
     describe('native chain', () => {
       test('deposits native asset (1 nRLC = 10⁹ wei)', async () => {
-        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-        await setNRlcBalance(iexecTestChain)(wallet.address, 10);
+        const { iexec, wallet } = await getTestConfig(nativeTestChain)();
+        await setNRlcBalance(nativeTestChain)(wallet.address, 10);
         const accountInitialBalance = await iexec.account.checkBalance(
           wallet.address,
         );
@@ -272,8 +273,8 @@ describe('account', () => {
       });
 
       test('deposits specified unit', async () => {
-        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-        await setNRlcBalance(iexecTestChain)(wallet.address, ONE_RLC);
+        const { iexec, wallet } = await getTestConfig(nativeTestChain)();
+        await setNRlcBalance(nativeTestChain)(wallet.address, ONE_RLC);
         const accountInitialBalance = await iexec.account.checkBalance(
           wallet.address,
         );
@@ -305,7 +306,7 @@ describe('account', () => {
       });
 
       test('fails if amount exceed wallet balance', async () => {
-        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+        const { iexec, wallet } = await getTestConfig(nativeTestChain)();
         const accountInitialBalance = await iexec.account.checkBalance(
           wallet.address,
         );
@@ -400,7 +401,7 @@ describe('account', () => {
 
   describe('withdraw()', () => {
     test('require a signer', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       await expect(iexec.account.withdraw(10)).rejects.toThrow(
         new Error(
           'The current provider is not a signer, impossible to sign messages or transactions',
@@ -409,15 +410,15 @@ describe('account', () => {
     });
 
     test('prevents withdraw 0', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       await expect(iexec.account.withdraw(0)).rejects.toThrow(
         new Error('Withdraw amount must be greater than 0'),
       );
     });
 
     test('withdraws stacked nRLC', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-      await setNRlcBalance(iexecTestChain)(wallet.address, 10);
+      const { iexec, wallet } = await getTestConfig(testChain)();
+      await setNRlcBalance(testChain)(wallet.address, 10);
       await iexec.account.deposit(10);
       const accountInitialBalance = await iexec.account.checkBalance(
         wallet.address,
@@ -448,8 +449,8 @@ describe('account', () => {
     });
 
     test('withdraws specified unit', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-      await setNRlcBalance(iexecTestChain)(wallet.address, 10000);
+      const { iexec, wallet } = await getTestConfig(testChain)();
+      await setNRlcBalance(testChain)(wallet.address, 10000);
       await iexec.account.deposit(10000);
       const accountInitialBalance = await iexec.account.checkBalance(
         wallet.address,
@@ -480,8 +481,8 @@ describe('account', () => {
     });
 
     test('fails if amount exceeds account balance)', async () => {
-      const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-      await setNRlcBalance(iexecTestChain)(wallet.address, 10);
+      const { iexec, wallet } = await getTestConfig(testChain)();
+      await setNRlcBalance(testChain)(wallet.address, 10);
       await iexec.account.deposit(10);
       const accountInitialBalance = await iexec.account.checkBalance(
         wallet.address,

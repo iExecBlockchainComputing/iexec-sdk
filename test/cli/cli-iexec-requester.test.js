@@ -9,7 +9,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec requester', () => {
   let userWallet;
@@ -19,7 +19,7 @@ describe('iexec requester', () => {
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
   });
   afterAll(async () => {
     await globalTeardown();

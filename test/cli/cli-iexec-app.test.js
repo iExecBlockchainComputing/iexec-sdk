@@ -20,7 +20,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec app', () => {
   let userWallet;
@@ -32,7 +32,7 @@ describe('iexec app', () => {
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
 
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
     await execAsync(`${iexecPath} app init`);
     await setAppUniqueName();
     const deployed = await runIExecCliRaw(`${iexecPath} app deploy`);
@@ -84,9 +84,6 @@ describe('iexec app', () => {
       expect(res.ok).toBe(true);
       expect(res.address).toBeDefined();
       expect(res.txHash).toBeDefined();
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe('0');
     });
   });
 
@@ -161,9 +158,6 @@ describe('iexec app', () => {
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
       expect(res.txHash).toBeDefined();
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe('0');
     });
   });
 
@@ -179,7 +173,7 @@ describe('iexec app', () => {
         workClockTimeRef: '0',
       }).then(({ catid }) => catid.toString());
       // restore user wallet
-      await setWallet(userWallet.privateKey);
+      await setWallet(testChain)(userWallet.privateKey);
       await execAsync(`${iexecPath} app init`);
       await setAppUniqueName();
       await execAsync(`${iexecPath} dataset init`);

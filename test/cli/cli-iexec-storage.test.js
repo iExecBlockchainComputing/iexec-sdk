@@ -9,7 +9,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec storage', () => {
   beforeAll(async () => {
@@ -20,7 +20,7 @@ describe('iexec storage', () => {
   });
 
   beforeEach(async () => {
-    await setRandomWallet();
+    await setRandomWallet(testChain)();
   });
 
   afterAll(async () => {

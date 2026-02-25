@@ -18,7 +18,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec dataset', () => {
   let userWallet;
@@ -29,7 +29,7 @@ describe('iexec dataset', () => {
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
     await execAsync(`${iexecPath} dataset init`);
     await setDatasetUniqueName();
     const deployed = await runIExecCliRaw(`${iexecPath} dataset deploy`);
@@ -79,9 +79,6 @@ describe('iexec dataset', () => {
       expect(res.ok).toBe(true);
       expect(res.address).toBeDefined();
       expect(res.txHash).toBeDefined();
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe('0');
     });
   });
 

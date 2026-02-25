@@ -26,7 +26,7 @@ import { utils, IExecConfig, errors } from '../../../src/lib/index.js';
 import IExecContractsClient from '../../../src/common/utils/IExecContractsClient.js';
 import { getChainDefaults } from '../../../src/common/utils/config.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 const unknownTestChain = TEST_CHAINS['unknown-chain'];
 
 describe('[IExecConfig]', () => {
@@ -443,7 +443,7 @@ describe('[IExecConfig]', () => {
         const wallet = getRandomWallet();
         const config = new IExecConfig({
           ethProvider: utils.getSignerFromPrivateKey(
-            iexecTestChain.rpcURL,
+            testChain.rpcURL,
             wallet.privateKey,
           ),
         });
@@ -452,13 +452,10 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe(iexecTestChain.chainId);
+        expect(chainId).toBe(testChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
-        expect(network.name).toBe(iexecTestChain.defaults.name);
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+        expect(network.chainId).toBe(BigInt(testChain.chainId));
+        expect(network.name).toBe(testChain.defaults.name);
       });
 
       test('getSignerFromPrivateKey() with network fallback', async () => {
@@ -490,7 +487,7 @@ describe('[IExecConfig]', () => {
     describe('web3 provider', () => {
       test('InjectedProvider', async () => {
         const injectedProvider = new InjectedProvider(
-          iexecTestChain.rpcURL,
+          testChain.rpcURL,
           getRandomWallet().privateKey,
         );
         const config = new IExecConfig({
@@ -501,13 +498,10 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(BrowserProvider);
-        expect(chainId).toBe(iexecTestChain.chainId);
+        expect(chainId).toBe(testChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
-        expect(network.name).toBe(iexecTestChain.defaults.name);
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+        expect(network.chainId).toBe(BigInt(testChain.chainId));
+        expect(network.name).toBe(testChain.defaults.name);
       });
       // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
@@ -554,7 +548,7 @@ describe('[IExecConfig]', () => {
 
     describe('ethers AbstractProvider', () => {
       test('JsonRpcProvider', async () => {
-        const ethersProvider = new JsonRpcProvider(iexecTestChain.rpcURL);
+        const ethersProvider = new JsonRpcProvider(testChain.rpcURL);
         const config = new IExecConfig({
           ethProvider: ethersProvider,
         });
@@ -563,13 +557,10 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe(iexecTestChain.chainId);
+        expect(chainId).toBe(testChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
-        expect(network.name).toBe(iexecTestChain.defaults.name);
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+        expect(network.chainId).toBe(BigInt(testChain.chainId));
+        expect(network.name).toBe(testChain.defaults.name);
       });
 
       test('JsonRpcProvider with custom network (including ens)', async () => {
@@ -614,7 +605,7 @@ describe('[IExecConfig]', () => {
 
       test('Wallet with provider', async () => {
         const ethersSigner = Wallet.createRandom(
-          new JsonRpcProvider(iexecTestChain.rpcURL),
+          new JsonRpcProvider(testChain.rpcURL),
         );
         const config = new IExecConfig({
           ethProvider: ethersSigner,
@@ -625,13 +616,10 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeInstanceOf(HDNodeWallet);
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe(iexecTestChain.chainId);
+        expect(chainId).toBe(testChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
-        expect(network.name).toBe(iexecTestChain.defaults.name);
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+        expect(network.chainId).toBe(BigInt(testChain.chainId));
+        expect(network.name).toBe(testChain.defaults.name);
       });
     });
 
@@ -708,7 +696,7 @@ describe('[IExecConfig]', () => {
       });
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, bridgedNetworkConf })', async () => {
         const config = new IExecConfig(
-          { ethProvider: iexecTestChain.rpcURL },
+          { ethProvider: testChain.rpcURL },
           {
             bridgedNetworkConf: {
               rpcURL: unknownTestChain.rpcURL,
@@ -735,10 +723,10 @@ describe('[IExecConfig]', () => {
   describe('resolveChainId()', () => {
     test('success', async () => {
       const config = new IExecConfig({
-        ethProvider: iexecTestChain.rpcURL,
+        ethProvider: testChain.rpcURL,
       });
       await expect(config.resolveChainId()).resolves.toBe(
-        parseInt(iexecTestChain.chainId, 10),
+        parseInt(testChain.chainId, 10),
       );
     });
     test('throw on network error', async () => {

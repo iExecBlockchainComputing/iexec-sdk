@@ -10,7 +10,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const ensFeaturedChain = TEST_CHAINS['bellecour-fork'];
 
 describe('iexec ens', () => {
   let userWallet;
@@ -21,8 +21,8 @@ describe('iexec ens', () => {
   beforeAll(async () => {
     await globalSetup('cli-iexec-ens');
     await execAsync(`${iexecPath} init --skip-wallet --force`);
-    await setChain(testChain)();
-    userWallet = await setRandomWallet();
+    await setChain(ensFeaturedChain)();
+    userWallet = await setRandomWallet(ensFeaturedChain)();
     await execAsync(`${iexecPath} app init`);
     await execAsync(`${iexecPath} dataset init`);
     await execAsync(`${iexecPath} workerpool init`);
@@ -54,20 +54,6 @@ describe('iexec ens', () => {
       expect(res.setResolverTxHash).toBeTxHash();
       expect(res.setAddrTxHash).toBeTxHash();
       expect(res.setNameTxHash).toBeTxHash();
-      await testChain.provider.getTransaction(res.registerTxHash).then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
-      await testChain.provider
-        .getTransaction(res.setResolverTxHash)
-        .then((tx) => {
-          expect(tx.gasPrice.toString()).toBe('0');
-        });
-      await testChain.provider.getTransaction(res.setAddrTxHash).then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
-      await testChain.provider.getTransaction(res.setNameTxHash).then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
 
       const showAddressRes = await runIExecCliRaw(`${iexecPath} wallet show`);
       expect(showAddressRes.ens).toBe(expectedEns);
