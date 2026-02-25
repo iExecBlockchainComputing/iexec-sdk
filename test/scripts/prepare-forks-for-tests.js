@@ -8,7 +8,7 @@ import {
 
 const TARGET_POCO_ADMIN_WALLET = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
 
-const provider = (rpcUrl) =>
+const getProvider = (rpcUrl) =>
   new JsonRpcProvider(rpcUrl, undefined, {
     pollingInterval: 100, // fast polling for tests
   });
@@ -26,7 +26,7 @@ const setBalance = (rpcUrl) => async (address, weiAmount) => {
       'Content-Type': 'application/json',
     },
   });
-  const balance = await provider(rpcUrl).getBalance(address);
+  const balance = await getProvider(rpcUrl).getBalance(address);
   console.log(`${address} wallet balance is now ${formatEther(balance)}`);
 };
 
@@ -86,13 +86,13 @@ const getIExecHubOwnership =
           type: 'function',
         },
       ],
-      provider(rpcUrl),
+      getProvider(rpcUrl),
     );
     const iexecOwner = await iexecContract.owner();
     setBalance(rpcUrl)(iexecOwner, 1n * 10n ** 18n); // give some ETH to the owner to be able to send the transaction
     await impersonate(rpcUrl)(iexecOwner);
     await iexecContract
-      .connect(new JsonRpcSigner(provider(rpcUrl), iexecOwner))
+      .connect(new JsonRpcSigner(getProvider(rpcUrl), iexecOwner))
       .transferOwnership(targetOwner, legacyTx ? { gasPrice: 0 } : {})
       .then((tx) => tx.wait());
     await stopImpersonate(rpcUrl)(iexecOwner);
@@ -102,7 +102,6 @@ const getIExecHubOwnership =
   };
 
 const main = async () => {
-  // prepare PoCo
   const bellecourForkRpcUrl = 'http://localhost:8545';
   console.log(`preparing bellecour-fork at ${bellecourForkRpcUrl}`);
   await setBalance(bellecourForkRpcUrl)(
@@ -118,8 +117,6 @@ const main = async () => {
   console.log(
     `preparing arbitrum-sepolia-fork at ${arbitrumSepoliaForkRpcUrl}`,
   );
-
-  // prepare PoCo
   await setBalance(arbitrumSepoliaForkRpcUrl)(
     TARGET_POCO_ADMIN_WALLET,
     1000000n * 10n ** 18n,
