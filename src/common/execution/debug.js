@@ -40,15 +40,19 @@ export const getWorkerpoolApiUrl = async (
         contracts.chainId,
         CHAIN_SPECIFIC_FEATURES.COMPASS,
       );
-      const json = await jsonApi.get({
-        api: compassUrl,
-        endpoint: `/${contracts.chainId}/workerpools/${vAddress}`,
-        ApiCallErrorClass: CompassCallError,
-      });
-      if (!json?.apiUrl) {
-        throw new Error(`No apiUrl found in compass response`);
-      }
-      return json.apiUrl;
+      const json = await jsonApi
+        .get({
+          api: compassUrl,
+          endpoint: `/${contracts.chainId}/workerpools/${vAddress}`,
+          ApiCallErrorClass: CompassCallError,
+        })
+        .catch((e) => {
+          if (e instanceof CompassCallError) {
+            throw e;
+          }
+          return { apiUrl: undefined };
+        });
+      return json?.apiUrl;
     }
 
     // ENS based workerpool API URL resolution
