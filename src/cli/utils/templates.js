@@ -149,6 +149,7 @@ export const chains = {
     mainnet: {},
     bellecour: {},
     'arbitrum-mainnet': {},
+    'arbitrum-sepolia-testnet': {},
   },
 };
 
