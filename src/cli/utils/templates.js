@@ -144,7 +144,7 @@ export const category = {
 };
 
 export const chains = {
-  default: 'bellecour',
+  default: 'arbitrum-sepolia-testnet',
   chains: {
     mainnet: {},
     bellecour: {},
