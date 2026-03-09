@@ -274,16 +274,12 @@ describe('workerpool', () => {
         expect(apiUrl.startsWith('https://')).toBe(true);
       });
 
-      test('throw if the workerpool does not exist in Compass', async () => {
+      test('returns undefined if the workerpool does not exist in Compass', async () => {
         const { iexec: readOnlyIExec } = getTestConfig(noEnsTestChain)();
         const address = getRandomAddress();
         await expect(
           readOnlyIExec.workerpool.getWorkerpoolApiUrl(address),
-        ).rejects.toThrow(
-          new Error(
-            `API error: Workerpool with address '${address}' not found in chain '${noEnsTestChain.chainId}'`,
-          ),
-        );
+        ).resolves.toBe(undefined);
       });
 
       test('fails with CompassCallError if Compass is not available', async () => {
