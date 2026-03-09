@@ -28,7 +28,7 @@ const iexecTestChain = TEST_CHAINS['bellecour-fork'];
 describe('task', () => {
   describe('fetchResults()', () => {
     const BELLECOUR_COMPLETED_TASK_ID =
-      '0x71a9ccb619dd7712b1cd6ee88c018ef4da05820d95e3bfd6693f4914cae39181';
+      '0xb8715386d9b9ab6d2be10aead05c46682af90d9a36a5ed0afb6a085db387f6ee';
 
     test("throw a IpfsGatewayCallError when the IPFS gateway can't be reached", async () => {
       const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
