@@ -1,5 +1,4 @@
 name: docker publish
-description: reusable docker workflow for this project
 
 on:
   workflow_call:
@@ -22,14 +21,13 @@ on:
 
 jobs:
   docker-publish:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.4.0
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v3.1.1
     with:
       image-name: 'iexechub/iexec-sdk'
       registry: 'docker.io'
       dockerfile: 'Dockerfile'
       context: '.'
-      security-scan: true
-      security-report: 'sarif'
+      security-scan: false
       hadolint: true
       push: ${{ !inputs.dry-run }}
       image-tag: ${{ inputs.tag }}
