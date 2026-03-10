@@ -54,7 +54,7 @@ current IExecConfig
 
 ### checkAppSecretExists()
 
-> **checkAppSecretExists**(`appAddress`, `options?`): `Promise`\<`boolean`\>
+> **checkAppSecretExists**(`appAddress`): `Promise`\<`boolean`\>
 
 check if a secret exists for the app in the Secret Management Service
 
@@ -71,12 +71,6 @@ _NB_:
 ##### appAddress
 
 `string`
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 
@@ -196,7 +190,7 @@ console.log('address', address);
 
 ### pushAppSecret()
 
-> **pushAppSecret**(`appAddress`, `secretValue`, `options?`): `Promise`\<`boolean`\>
+> **pushAppSecret**(`appAddress`, `secretValue`): `Promise`\<`boolean`\>
 
 **SIGNER REQUIRED, ONLY APP OWNER**
 
@@ -222,12 +216,6 @@ console.log('pushed App secret:', isPushed);
 ##### secretValue
 
 `String`
-
-##### options?
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 

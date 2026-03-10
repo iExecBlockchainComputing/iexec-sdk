@@ -54,7 +54,7 @@ current IExecConfig
 
 ### checkResultEncryptionKeyExists()
 
-> **checkResultEncryptionKeyExists**(`beneficiaryAddress`, `options`): `Promise`\<`boolean`\>
+> **checkResultEncryptionKeyExists**(`beneficiaryAddress`): `Promise`\<`boolean`\>
 
 check if a beneficiary result encryption key exists in the Secret Management Service
 
@@ -69,12 +69,6 @@ console.log('encryption key available:', isEncryptionKeyAvailable);
 ##### beneficiaryAddress
 
 `string`
-
-##### options
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 
@@ -141,10 +135,6 @@ console.log('encryption key pushed:', isPushed);
 ###### forceUpdate?
 
 `boolean`
-
-###### teeFramework?
-
-[`TeeFramework`](../type-aliases/TeeFramework.md)
 
 #### Returns
 

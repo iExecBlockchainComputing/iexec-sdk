@@ -2,7 +2,7 @@ export type * from '../common/types.js';
 export type * from './IExecConfig.js';
 
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
-import { AnyRecord, ProviderOptions, TeeFramework } from '../common/types.js';
+import { AnyRecord, ProviderOptions } from '../common/types.js';
 import { AbstractProvider, AbstractSigner, BrowserProvider } from 'ethers';
 
 export interface Eip1193Provider {
@@ -54,10 +54,6 @@ export interface IExecConfigOptions {
    */
   ensPublicResolverAddress?: string;
   /**
-   * override the VoucherHub contract address to target a custom instance
-   */
-  voucherHubAddress?: string;
-  /**
    * override the bridge contract address to target a custom instance
    */
   bridgeAddress?: string;
@@ -89,11 +85,7 @@ export interface IExecConfigOptions {
   /**
    * override the SMS URL to target a custom instance
    */
-  smsURL?: Record<TeeFramework, string> | string;
-  /**
-   * override the TEE framework to use when as default
-   */
-  defaultTeeFramework?: TeeFramework;
+  smsURL?: string;
   /**
    * override the IPFS gateway URL to target a custom instance
    */
@@ -116,10 +108,6 @@ export interface IExecConfigOptions {
    * override the PoCo subgraph URL to target a custom instance
    */
   pocoSubgraphURL?: string;
-  /**
-   * override the voucher subgraph URL to target a custom instance
-   */
-  voucherSubgraphURL?: string;
   /**
    * number of block to wait for transactions confirmation (default 1)
    */
@@ -187,7 +175,7 @@ export default class IExecConfig {
   /**
    * resolve the current SMS URL
    */
-  resolveSmsURL(options?: { teeFramework?: TeeFramework }): Promise<string>;
+  resolveSmsURL(): Promise<string>;
   /**
    * resolve the current result proxy URL
    */
@@ -214,11 +202,6 @@ export default class IExecConfig {
    */
   resolvePocoSubgraphURL(): Promise<string>;
   /**
-   * resolve the current voucher subgraph URL
-   * returns `null` if not available
-   */
-  resolveVoucherSubgraphURL(): Promise<string | null>;
-  /**
    * resolve the current bridge contract address
    */
   resolveBridgeAddress(): Promise<string>;
@@ -230,9 +213,4 @@ export default class IExecConfig {
    * resolve the current ENS public resolver contract address
    */
   resolveEnsPublicResolverAddress(): Promise<string>;
-  /**
-   * resolve the current VoucherHub contract address
-   * returns `null` if not available
-   */
-  resolveVoucherHubAddress(): Promise<string | null>;
 }
