@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.23.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.23.0...v8.23.1) (2026-03-10)
+
+
+### Changed
+
+* add arbitrum-sepolia-testnet in chain.json ([#548](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/548)) ([f13c8be](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/f13c8beacbdb57467562b11ec6e4aa52eb852800))
+* prevent getWorkerpoolApiUrl to throw when workerpool is not known in compass ([#545](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/545)) ([9d89560](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/9d895604e8a70be6319862dfa5a7e26a67b9ea36))
+* set arbitrum-sepolia-testnet as new default chain in chain.json ([#550](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/550)) ([75e19d3](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/75e19d3378156940dc47a84e0d019d9dfa090a74))
+
 ## [8.23.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.22.5...v8.23.0) (2026-02-17)
 
 
