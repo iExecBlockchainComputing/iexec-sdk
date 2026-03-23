@@ -201,7 +201,7 @@
   "dependencies": {
     "@multiformats/multiaddr": "^13.0.1",
     "@types/bn.js": "^5.2.0",
-    "bn.js": "^5.2.2",
+    "bn.js": "^5.2.3",
     "buffer": "^6.0.3",
     "commander": "^13.1.0",
     "debug": "^4.4.3",
