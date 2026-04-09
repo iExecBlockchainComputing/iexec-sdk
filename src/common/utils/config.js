@@ -81,7 +81,7 @@ const networkConfigs = [
     ensPublicResolver: undefined, // not supported
     sms: {
       [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
-      [TEE_FRAMEWORKS.TDX]: 'https://sms.labs.iex.ec',
+      [TEE_FRAMEWORKS.TDX]: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
     },
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
@@ -112,6 +112,7 @@ const networkConfigs = [
     ensPublicResolver: undefined, // not supported
     sms: {
       [TEE_FRAMEWORKS.SCONE]: 'https://sms.arbitrum-mainnet.iex.ec',
+      [TEE_FRAMEWORKS.TDX]: 'https://sms.arbitrum-mainnet.iex.ec',
     },
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
