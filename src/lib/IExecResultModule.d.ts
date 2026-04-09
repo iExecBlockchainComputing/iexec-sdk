@@ -3,7 +3,7 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Addressish, TeeFramework } from '../common/types.js';
+import { Addressish } from '../common/types.js';
 
 /**
  * module exposing result methods
@@ -20,7 +20,6 @@ export default class IExecResultModule extends IExecModule {
    */
   checkResultEncryptionKeyExists(
     beneficiaryAddress: Addressish,
-    options: { teeFramework?: TeeFramework },
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY BENEFICIARY**
@@ -71,7 +70,6 @@ export default class IExecResultModule extends IExecModule {
     rsaPublicKey: string | CryptoKey,
     options?: {
       forceUpdate?: boolean;
-      teeFramework?: TeeFramework;
     },
   ): Promise<{ isPushed: boolean; isUpdated: boolean }>;
   /**

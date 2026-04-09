@@ -1,10 +1,7 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { expectAsyncCustomError, getTestConfig } from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
-  TEE_FRAMEWORKS,
   SERVICE_UNREACHABLE_URL,
   SERVICE_HTTP_500_URL,
   getRandomAddress,
@@ -57,12 +54,6 @@ describe('secrets', () => {
       ).rejects.toThrow(
         new Error(`Secret "foo" already exists for ${wallet.address}`),
       );
-      const pushForTeeFrameworkRes = await iexec.secrets.pushRequesterSecret(
-        'foo',
-        'oops',
-        { teeFramework: TEE_FRAMEWORKS.GRAMINE },
-      );
-      expect(pushForTeeFrameworkRes.isPushed).toBe(true);
     });
   });
 
@@ -115,15 +106,6 @@ describe('secrets', () => {
       await expect(
         iexecReadOnly.secrets.checkRequesterSecretExists(wallet.address, 'foo'),
       ).resolves.toBe(true);
-      await expect(
-        iexecReadOnly.secrets.checkRequesterSecretExists(
-          wallet.address,
-          'foo',
-          {
-            teeFramework: TEE_FRAMEWORKS.GRAMINE,
-          },
-        ),
-      ).resolves.toBe(false);
     });
   });
 });

@@ -22,7 +22,7 @@ import {
   handleError,
   option,
   Spinner,
-  getPropertyFormChain,
+  getPropertyFromChain,
   prompt,
 } from '../utils/cli-helper.js';
 import { Keystore } from '../utils/keystore.js';
@@ -179,7 +179,7 @@ register
         setNameTxHash,
       } = await configureResolution(
         chain.contracts,
-        getPropertyFormChain(chain, 'ensPublicResolver'),
+        getPropertyFromChain(chain, 'ensPublicResolver'),
         name,
         targetAddress,
       );

@@ -3,7 +3,7 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Addressish, TeeFramework } from '../common/types.js';
+import { Addressish } from '../common/types.js';
 
 /**
  * module exposing secrets methods
@@ -21,9 +21,6 @@ export default class IExecSecretsModule extends IExecModule {
   checkRequesterSecretExists(
     requesterAddress: Addressish,
     secretName: String,
-    options?: {
-      teeFramework?: TeeFramework;
-    },
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
@@ -43,9 +40,6 @@ export default class IExecSecretsModule extends IExecModule {
   pushRequesterSecret(
     secretName: String,
     secretValue: String,
-    options?: {
-      teeFramework?: TeeFramework;
-    },
   ): Promise<{ isPushed: boolean }>;
   /**
    * Create an IExecSecretsModule instance using an IExecConfig instance
