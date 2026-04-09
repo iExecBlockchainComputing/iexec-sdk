@@ -3,13 +3,15 @@ import { exec } from 'child_process';
 import {
   Wallet,
   JsonRpcProvider,
-  ethers,
   Contract,
   hexlify,
   randomBytes,
+  keccak256,
+  AbiCoder,
+  toBeHex,
 } from 'ethers';
 import { IExec } from '../src/lib/index.js';
-import { getSignerFromPrivateKey } from '../src/lib/utils.js';
+import { getSignerFromPrivateKey, NULL_ADDRESS } from '../src/lib/utils.js';
 
 export {
   TEE_FRAMEWORKS,
@@ -55,52 +57,6 @@ export const SERVICE_HTTP_500_URL = 'http://localhost:5500';
 export const SERVICE_UNREACHABLE_URL = 'http://unreachable:80';
 
 export const TEST_CHAINS = {
-  // autoseal chain with iExec token
-  'custom-token-chain': {
-    rpcURL: 'http://localhost:18545',
-    chainId: '65535',
-    hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-    ensRegistryAddress: '0xaf87b82B01E484f8859c980dE69eC8d09D30F22a',
-    ensPublicResolverAddress: '0x464E9FC01C2970173B183D24B43A0FA07e6A072E',
-    ipfsNodeURL: 'http://localhost:5001',
-    ipfsGatewayURL: 'http://localhost:8080',
-    pocoAdminWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    // TODO use another wallet
-    faucetWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    provider: new JsonRpcProvider('http://localhost:18545', undefined, {
-      pollingInterval: 100,
-    }),
-    defaults: {
-      isNative: false,
-      useGas: true,
-    },
-    isAnvil: false,
-  },
-  'custom-token-chain-no-ens': {
-    rpcURL: 'http://localhost:18545',
-    chainId: '65535',
-    hubAddress: '0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca',
-    pocoAdminWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    compassURL: 'http://localhost:8069',
-    // TODO use another wallet
-    faucetWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    provider: new JsonRpcProvider('http://localhost:18545', undefined, {
-      pollingInterval: 100,
-    }),
-    defaults: {
-      isNative: false,
-      useGas: true,
-    },
-    isAnvil: false,
-  },
   'bellecour-fork': {
     rpcURL: 'http://localhost:8545',
     chainId: '134',
@@ -111,9 +67,6 @@ export const TEST_CHAINS = {
     ipfsGatewayURL: 'http://localhost:8080',
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    faucetWallet: new Wallet(
-      '0xde43b282c2931fc41ca9e1486fedc2c45227a3b9b4115c89d37f6333c8816d89',
     ),
     provider: new JsonRpcProvider('http://localhost:8545', undefined, {
       pollingInterval: 100,
@@ -126,7 +79,42 @@ export const TEST_CHAINS = {
       useGas: false,
       name: 'bellecour',
     },
-    isAnvil: true,
+    defaultInitBalance: 0n,
+  },
+  'arbitrum-sepolia-fork': {
+    rpcURL: 'http://localhost:8555',
+    chainId: '421614',
+    smsURL: 'http://localhost:13350',
+    iexecGatewayURL: 'http://localhost:3050',
+    resultProxyURL: 'http://localhost:13250',
+    ipfsNodeURL: 'http://localhost:5001',
+    ipfsGatewayURL: 'http://localhost:8080',
+    pocoAdminWallet: new Wallet(
+      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
+    ),
+    provider: new JsonRpcProvider('http://localhost:8555', undefined, {
+      pollingInterval: 100,
+    }),
+    defaults: {
+      hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
+      isNative: false,
+      useGas: true,
+      name: 'arbitrum-sepolia',
+    },
+    defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
+  },
+  'unknown-chain': {
+    rpcURL: 'http://localhost:8565',
+    chainId: '421615',
+    hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
+    isNative: false,
+    useGas: true,
+    name: 'unknown-chain',
+    provider: new JsonRpcProvider('http://localhost:8565', undefined, {
+      pollingInterval: 100,
+    }),
+    defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
+    ensRegistryAddress: NULL_ADDRESS,
   },
 };
 
@@ -194,47 +182,56 @@ export class InjectedProvider {
   }
 }
 
-const faucetSendWeiToReachTargetBalance =
-  (chain) =>
-  async (address, targetWeiBalance, tryCount = 1) => {
-    const currentBalance = await chain.provider.getBalance(address);
-    const delta = BigInt(`${targetWeiBalance}`) - currentBalance;
-    if (delta < 0n) {
-      console.warn(
-        `Faucet send Eth: aborted - current balance exceed target balance`,
-      );
-      return;
-    }
-    try {
-      const tx = await chain.faucetWallet
-        .connect(chain.provider)
-        .sendTransaction({ to: address, value: delta });
-      await tx.wait();
-    } catch (e) {
-      console.warn(`Faucet send Eth: error (try count ${tryCount}) - ${e}`);
-      // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 5) {
-        await sleep(3000 * tryCount);
-        await faucetSendWeiToReachTargetBalance(chain)(
-          address,
-          targetWeiBalance,
-          tryCount + 1,
-        );
-      } else {
-        throw new Error(
-          `Failed to send Eth from faucet (tried ${tryCount} times)`,
-        );
-      }
-    }
-  };
+const anvilSetBalance = (chain) => async (address, targetWeiBalance) => {
+  await fetch(chain.rpcURL, {
+    method: 'POST',
+    body: JSON.stringify({
+      method: 'anvil_setBalance',
+      params: [address, toBeHex(targetWeiBalance)],
+      id: 1,
+      jsonrpc: '2.0',
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
 
-export const setBalance = (chain) => async (address, targetWeiBalance) => {
-  if (chain.isAnvil) {
+const anvilSetNRlcTokenBalance =
+  (chain) => async (address, targetNRlcBalance) => {
+    const rlcAddress = await new Contract(
+      chain.hubAddress ?? chain.defaults.hubAddress,
+      [
+        {
+          inputs: [],
+          name: 'token',
+          outputs: [{ internalType: 'address', name: '', type: 'address' }],
+          stateMutability: 'view',
+          type: 'function',
+        },
+      ],
+      chain.provider,
+    ).token();
+
+    const contractStorageLocation =
+      '0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00';
+
+    const balanceSlot = keccak256(
+      AbiCoder.defaultAbiCoder().encode(
+        ['address', 'uint256'],
+        [address, contractStorageLocation],
+      ),
+    );
+
     await fetch(chain.rpcURL, {
       method: 'POST',
       body: JSON.stringify({
-        method: 'anvil_setBalance',
-        params: [address, ethers.toBeHex(targetWeiBalance)],
+        method: 'anvil_setStorageAt',
+        params: [
+          rlcAddress,
+          balanceSlot,
+          toBeHex(BigInt(targetNRlcBalance), 32),
+        ],
         id: 1,
         jsonrpc: '2.0',
       }),
@@ -242,58 +239,18 @@ export const setBalance = (chain) => async (address, targetWeiBalance) => {
         'Content-Type': 'application/json',
       },
     });
-  } else {
-    await faucetSendWeiToReachTargetBalance(chain)(address, targetWeiBalance);
-  }
-};
-
-const faucetSendNRlcToReachTargetBalance =
-  (chain) =>
-  async (address, nRlcTargetBalance, tryCount = 1) => {
-    const iexec = new IExec(
-      {
-        ethProvider: getSignerFromPrivateKey(
-          chain.rpcURL,
-          chain.faucetWallet.privateKey,
-        ),
-      },
-      { hubAddress: chain.hubAddress },
-    );
-    const { nRLC } = await iexec.wallet.checkBalances(address);
-    const delta = BigInt(`${nRlcTargetBalance}`) - BigInt(`${nRLC}`);
-    if (delta < 0n) {
-      console.warn(
-        `Faucet send RLC: aborted - current balance exceed target balance`,
-      );
-      return;
-    }
-    try {
-      await iexec.wallet.sendRLC(`${delta}`, address);
-    } catch (e) {
-      console.warn(`Faucet send RLC: error (try count ${tryCount}) - ${e}`);
-      // retry as concurrent calls can lead to nonce collisions on the faucet wallet
-      if (tryCount < 5) {
-        await sleep(3000 * tryCount);
-        await faucetSendNRlcToReachTargetBalance(chain)(
-          address,
-          nRlcTargetBalance,
-          tryCount + 1,
-        );
-      } else {
-        throw new Error(
-          `Failed to send RLC from faucet (tried ${tryCount} times)`,
-        );
-      }
-    }
   };
+
+export const setBalance = (chain) => async (address, targetWeiBalance) =>
+  anvilSetBalance(chain)(address, targetWeiBalance);
 
 export const setNRlcBalance = (chain) => async (address, nRlcTargetBalance) => {
   if (chain.isNative || chain.defaults?.isNative) {
     const weiAmount = BigInt(`${nRlcTargetBalance}`) * 10n ** 9n; // 1 nRLC is 10^9 wei
-    await setBalance(chain)(address, weiAmount);
+    await anvilSetBalance(chain)(address, weiAmount);
     return;
   }
-  await faucetSendNRlcToReachTargetBalance(chain)(address, nRlcTargetBalance);
+  await anvilSetNRlcTokenBalance(chain)(address, nRlcTargetBalance);
 };
 
 export const setStakedNRlcBalance =
@@ -303,7 +260,7 @@ export const setStakedNRlcBalance =
       {
         ethProvider: sponsorWallet,
       },
-      { hubAddress: chain.hubAddress },
+      { hubAddress: chain.hubAddress ?? chain.defaults.hubAddress },
     );
     await setNRlcBalance(chain)(
       sponsorWallet.address,
@@ -319,8 +276,10 @@ export const setStakedNRlcBalance =
   };
 
 export const initializeTask = (chain) => async (dealid, idx) => {
+  const wallet = Wallet.createRandom(chain.provider);
+  await setBalance(chain)(wallet.address, 1n * 10n ** 18n); // fund wallet to pay for initialization
   const iexecContract = new Contract(
-    chain.hubAddress || chain.defaults.hubAddress,
+    chain.hubAddress ?? chain.defaults.hubAddress,
     [
       {
         constant: false,
@@ -346,7 +305,7 @@ export const initializeTask = (chain) => async (dealid, idx) => {
         type: 'function',
       },
     ],
-    Wallet.createRandom(chain.provider), // random to avoid nonce collisions
+    wallet,
   );
   const initTx = await iexecContract.initialize(dealid, idx);
   await initTx.wait();
@@ -362,7 +321,7 @@ export const adminCreateCategory =
           chain.pocoAdminWallet.privateKey,
         ),
       },
-      { hubAddress: chain.hubAddress },
+      { hubAddress: chain.hubAddress ?? chain.defaults.hubAddress },
     );
     let res;
     try {
@@ -371,7 +330,7 @@ export const adminCreateCategory =
       console.warn(
         `Admin create category: error (try count ${tryCount}) - ${e}`,
       );
-      // retry as concurrent calls can lead to nonce collisions on the faucet wallet
+      // retry as concurrent calls can lead to nonce collisions on the admin wallet
       if (tryCount < 5) {
         await sleep(3000 * tryCount);
         res = await adminCreateCategory(chain)(category, tryCount + 1);

@@ -1,5 +1,6 @@
 import { Wallet, JsonRpcProvider } from 'ethers';
 import { IExec } from '../src/lib/index.js';
+import { setBalance } from './test-utils.js';
 
 export const getTestConfigOptions =
   (chain) =>
@@ -24,8 +25,37 @@ export const getTestConfigOptions =
   });
 
 export const getTestConfig =
-  (chain) =>
-  ({ privateKey, readOnly = false, options = {} } = {}) => {
+  (
+    /**
+     * Target test blockchain configuration.
+     */
+    chain,
+  ) =>
+  async ({
+    /**
+     * The private key to use for the wallet, if not provided a random wallet will be created unless `readOnly` is set to true.
+     * If `readOnly` is true, this parameter is ignored.
+     * @type {string}
+     */
+    privateKey,
+    /**
+     * Whether the IExec instance should be read-only (no transactions will be sent).
+     * Defaults to false.
+     * @type {boolean}
+     */
+    readOnly = false,
+    /**
+     * The balance to set for the wallet.
+     * If not provided, defaults to the chain's default initial balance or 0n.
+     * @type {bigint}
+     */
+    balance = chain.defaultInitBalance || 0n,
+    /**
+     * IExec configuration options.
+     * @type {Object}
+     */
+    options = {},
+  } = {}) => {
     const configOptions = getTestConfigOptions(chain)({ options });
     if (readOnly) {
       return {
@@ -36,6 +66,10 @@ export const getTestConfig =
       pollingInterval: 1000,
     });
     const wallet = privateKey ? new Wallet(privateKey) : Wallet.createRandom();
+    // fund wallet if needed
+    if (balance > 0n) {
+      await setBalance(chain)(await wallet.getAddress(), balance);
+    }
     const ethProvider = new Wallet(wallet.privateKey, provider);
     return {
       iexec: new IExec({ ethProvider }, configOptions),
