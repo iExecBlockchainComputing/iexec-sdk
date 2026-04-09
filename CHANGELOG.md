@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.24.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.23.1...v8.24.0) (2026-04-09)
+
+
+### Added
+
+* enable TDX on arbitrum-mainnet ([#555](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/555)) ([195ccad](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/195ccaddc104ecbcae48a8891679f46ad42d953a))
+
 ## [8.23.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.23.0...v8.23.1) (2026-03-23)
 
 
