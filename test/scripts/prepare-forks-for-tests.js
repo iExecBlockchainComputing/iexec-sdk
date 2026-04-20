@@ -89,7 +89,7 @@ const getIExecHubOwnership =
       getProvider(rpcUrl),
     );
     const iexecOwner = await iexecContract.owner();
-    setBalance(rpcUrl)(iexecOwner, 1n * 10n ** 18n); // give some ETH to the owner to be able to send the transaction
+    await setBalance(rpcUrl)(iexecOwner, 1n * 10n ** 18n); // give some ETH to the owner to be able to send the transaction
     await impersonate(rpcUrl)(iexecOwner);
     await iexecContract
       .connect(new JsonRpcSigner(getProvider(rpcUrl), iexecOwner))
