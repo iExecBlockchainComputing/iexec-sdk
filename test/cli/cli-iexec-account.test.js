@@ -5,7 +5,7 @@ import {
   execAsync,
   getRandomAddress,
   getRandomWallet,
-  setBalance,
+  setNRlcBalance,
 } from '../test-utils.js';
 import {
   globalSetup,
@@ -18,7 +18,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec account', () => {
   let userWallet;
@@ -28,8 +28,8 @@ describe('iexec account', () => {
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
-    userWallet = await setRandomWallet();
-    await setBalance(testChain)(userWallet.address, 50n * 10n ** 18n);
+    userWallet = await setRandomWallet(testChain)();
+    await setNRlcBalance(testChain)(userWallet.address, 50n * 10n ** 9n);
   });
 
   afterAll(async () => {
@@ -54,9 +54,6 @@ describe('iexec account', () => {
       expect(res.ok).toBe(true);
       expect(res.amount).toBe(amount);
       expect(res.txHash).toBeDefined();
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe('0');
 
       const bnAmount = new BN(amount);
       const finalWalletBalance = new BN(
@@ -171,9 +168,7 @@ describe('iexec account', () => {
       expect(res.ok).toBe(true);
       expect(res.amount).toBe(amount);
       expect(res.txHash).toBeDefined();
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe('0');
+
       const bnAmount = new BN(amount);
       const finalWalletBalance = new BN(
         JSON.parse(await execAsync(`${iexecPath} wallet show --raw`)).balance
@@ -240,9 +235,6 @@ describe('iexec account', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.txHash).toBeDefined();
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe('0');
 
       const raw1 = await execAsync(
         `${iexecPath} account allowance ${spender} --raw`,
@@ -262,9 +254,6 @@ describe('iexec account', () => {
       const res = JSON.parse(raw);
       expect(res.ok).toBe(true);
       expect(res.txHash).toBeDefined();
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe('0');
 
       const raw1 = await execAsync(
         `${iexecPath} account allowance ${spender} --raw`,
@@ -312,7 +301,7 @@ describe('iexec account', () => {
       const amount = '500';
       const spender = getRandomAddress();
       const { privateKey, address: owner } = getRandomWallet();
-      await setWallet(privateKey);
+      await setWallet(testChain)(privateKey);
       await execAsync(
         `${iexecPath} account approve ${amount} ${spender} --raw`,
       );

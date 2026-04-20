@@ -89,6 +89,7 @@ export const TEST_CHAINS = {
     resultProxyURL: 'http://localhost:13250',
     ipfsNodeURL: 'http://localhost:5001',
     ipfsGatewayURL: 'http://localhost:8080',
+    compassURL: 'http://localhost:8069',
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
@@ -99,9 +100,9 @@ export const TEST_CHAINS = {
       hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
       isNative: false,
       useGas: true,
-      name: 'arbitrum-sepolia-testnet',
+      name: 'arbitrum-sepolia',
     },
-    defaultInitBalance: 1n ** 18n, // 1 ETH for gas
+    defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
   },
   'unknown-chain': {
     rpcURL: 'http://localhost:8565',
@@ -109,11 +110,11 @@ export const TEST_CHAINS = {
     hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
     isNative: false,
     useGas: true,
-    name: 'arbitrum-sepolia-testnet',
+    name: 'unknown-chain',
     provider: new JsonRpcProvider('http://localhost:8565', undefined, {
       pollingInterval: 100,
     }),
-    defaultInitBalance: 1n ** 18n, // 1 ETH for gas
+    defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
     ensRegistryAddress: NULL_ADDRESS,
   },
 };
@@ -253,29 +254,9 @@ export const setNRlcBalance = (chain) => async (address, nRlcTargetBalance) => {
   await anvilSetNRlcTokenBalance(chain)(address, nRlcTargetBalance);
 };
 
-export const setStakedNRlcBalance =
-  (chain) => async (address, nRlcTargetBalance) => {
-    const sponsorWallet = Wallet.createRandom(chain.provider);
-    const iexec = new IExec(
-      {
-        ethProvider: sponsorWallet,
-      },
-      { hubAddress: chain.hubAddress ?? chain.defaults.hubAddress },
-    );
-    await setNRlcBalance(chain)(
-      sponsorWallet.address,
-      BigInt(nRlcTargetBalance),
-    );
-    const contractClient = await iexec.config.resolveContractsClient();
-    const iexecContract = contractClient.getIExecContract();
-    const tx = await iexecContract.depositFor(address, {
-      value: BigInt(nRlcTargetBalance) * 10n ** 9n,
-      gasPrice: 0, // TODO: wont work on non gasless chain
-    });
-    await tx.wait();
-  };
-
 export const initializeTask = (chain) => async (dealid, idx) => {
+  const wallet = Wallet.createRandom(chain.provider);
+  await setBalance(chain)(wallet.address, 1n * 10n ** 18n); // fund wallet to pay for initialization
   const iexecContract = new Contract(
     chain.hubAddress ?? chain.defaults.hubAddress,
     [
@@ -303,7 +284,7 @@ export const initializeTask = (chain) => async (dealid, idx) => {
         type: 'function',
       },
     ],
-    Wallet.createRandom(chain.provider), // random to avoid nonce collisions
+    wallet,
   );
   const initTx = await iexecContract.initialize(dealid, idx);
   await initTx.wait();

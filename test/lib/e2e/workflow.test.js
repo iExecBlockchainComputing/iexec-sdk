@@ -12,7 +12,7 @@ import {
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('[workflow]', () => {
   let noDurationCatId;
@@ -22,7 +22,7 @@ describe('[workflow]', () => {
   let workerpoolorderToClaim;
 
   test('create category', async () => {
-    const res = await adminCreateCategory(iexecTestChain)({
+    const res = await adminCreateCategory(testChain)({
       name: 'custom',
       description: 'desc',
       workClockTimeRef: '0',
@@ -34,7 +34,7 @@ describe('[workflow]', () => {
   });
 
   test('deploy and sell app', async () => {
-    const { iexec } = await getTestConfig(iexecTestChain)();
+    const { iexec } = await getTestConfig(testChain)();
     const owner = await iexec.wallet.getAddress();
     const appName = `My app${getId()}`;
     const appDeployRes = await iexec.app.deployApp({
@@ -74,7 +74,7 @@ describe('[workflow]', () => {
   });
 
   test('deploy and sell dataset', async () => {
-    const { iexec } = await getTestConfig(iexecTestChain)();
+    const { iexec } = await getTestConfig(testChain)();
     const owner = await iexec.wallet.getAddress();
     const datasetName = `My dataset${getId()}`;
     const datasetDeployRes = await iexec.dataset.deployDataset({
@@ -113,9 +113,9 @@ describe('[workflow]', () => {
   });
 
   test('deploy and sell computing power', async () => {
-    const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+    const { iexec, wallet } = await getTestConfig(testChain)();
     const workerpoolPrice = '1000000000';
-    await setNRlcBalance(iexecTestChain)(wallet.address, workerpoolPrice);
+    await setNRlcBalance(testChain)(wallet.address, workerpoolPrice);
     const owner = await iexec.wallet.getAddress();
     const desc = `workerpool${getId()}`;
     const workerpoolDeployRes = await iexec.workerpool.deployWorkerpool({
@@ -161,7 +161,7 @@ describe('[workflow]', () => {
   });
 
   test('buy computation', async () => {
-    const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+    const { iexec, wallet } = await getTestConfig(testChain)();
     const order = await iexec.order.createRequestorder({
       app: apporder.app,
       appmaxprice: apporder.appprice,
@@ -187,7 +187,7 @@ describe('[workflow]', () => {
     const totalPrice = new BN(order.appmaxprice)
       .add(new BN(order.datasetmaxprice))
       .add(new BN(order.workerpoolmaxprice));
-    await setNRlcBalance(iexecTestChain)(wallet.address, totalPrice);
+    await setNRlcBalance(testChain)(wallet.address, totalPrice);
     await iexec.account.deposit(totalPrice);
     expect(signedorder.sign).toBeDefined();
 
@@ -207,7 +207,7 @@ describe('[workflow]', () => {
   });
 
   test('show & claim task, show & claim deal (initialized & uninitialized tasks)', async () => {
-    const { iexec, wallet } = await getTestConfig(iexecTestChain)();
+    const { iexec, wallet } = await getTestConfig(testChain)();
     const order = await iexec.order.createRequestorder({
       app: apporder.app,
       appmaxprice: apporder.appprice,
@@ -225,7 +225,7 @@ describe('[workflow]', () => {
       .add(new BN(order.datasetmaxprice))
       .add(new BN(order.workerpoolmaxprice))
       .mul(new BN(order.volume));
-    await setNRlcBalance(iexecTestChain)(wallet.address, totalPrice);
+    await setNRlcBalance(testChain)(wallet.address, totalPrice);
     await iexec.account.deposit(totalPrice);
     expect(signedorder.sign).toBeDefined();
     const matchOrdersRes = await iexec.order.matchOrders(
@@ -291,11 +291,11 @@ describe('[workflow]', () => {
       .catch((e) => e);
     expect(showTaskUnsetRes instanceof errors.ObjectNotFoundError).toBe(true);
     expect(showTaskUnsetRes.message).toBe(
-      `No task found for id ${showDealRes.tasks[0]} on chain ${iexecTestChain.chainId}`,
+      `No task found for id ${showDealRes.tasks[0]} on chain ${testChain.chainId}`,
     );
 
     const taskIdxToInit = 1;
-    await initializeTask(iexecTestChain)(matchOrdersRes.dealid, taskIdxToInit);
+    await initializeTask(testChain)(matchOrdersRes.dealid, taskIdxToInit);
     const showTaskActiveRes = await iexec.task.show(
       showDealRes.tasks[taskIdxToInit],
     );
@@ -324,7 +324,7 @@ describe('[workflow]', () => {
     expect(showTaskActiveRes.taskTimedOut).toBe(true);
 
     const taskIdxToClaim = 2;
-    await initializeTask(iexecTestChain)(matchOrdersRes.dealid, taskIdxToClaim);
+    await initializeTask(testChain)(matchOrdersRes.dealid, taskIdxToClaim);
     const claimTaskRes = await iexec.task.claim(
       showDealRes.tasks[taskIdxToClaim],
     );

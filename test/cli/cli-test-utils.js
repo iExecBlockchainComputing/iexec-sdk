@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { pathExists, remove } from 'fs-extra';
 import { join } from 'path';
 import { Wallet } from 'ethers';
-import { execAsync, getId } from '../test-utils.js';
+import { execAsync, getId, setBalance } from '../test-utils.js';
 
 const IEXEC_JSON = 'iexec.json';
 const CHAIN_JSON = 'chain.json';
@@ -41,8 +41,11 @@ export const saveJSONToFile = async (json, fileName) => {
   await writeFile(filePath(fileName), text);
 };
 
-export const setWallet = async (privateKey) => {
+export const setWallet = (chain) => async (privateKey) => {
   const wallet = privateKey ? new Wallet(privateKey) : Wallet.createRandom();
+  if (chain.defaultInitBalance) {
+    await setBalance(chain)(wallet.address, chain.defaultInitBalance);
+  }
   const jsonWallet = {
     privateKey: wallet.privateKey,
     publicKey: wallet.publicKey,
@@ -51,10 +54,10 @@ export const setWallet = async (privateKey) => {
   await saveJSONToFile(jsonWallet, 'wallet.json');
   return jsonWallet;
 };
-export const setRandomWallet = () => setWallet();
+export const setRandomWallet = (chain) => () => setWallet(chain)();
 
 export const setChainsPocoAdminWallet = (chain) => () =>
-  setWallet(chain.pocoAdminWallet.privateKey);
+  setWallet(chain)(chain.pocoAdminWallet.privateKey);
 
 export const removeWallet = () => remove('./wallet.json').catch(() => {});
 

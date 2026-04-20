@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll } from '@jest/globals';
+import { describe, test, expect } from '@jest/globals';
 import {
   deployAndGetApporder,
   deployAndGetWorkerpoolorder,
@@ -21,22 +21,22 @@ import { WorkerpoolCallError } from '../../../src/lib/errors.js';
 
 const { ObjectNotFoundError, IpfsGatewayCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('task', () => {
   describe('fetchResults()', () => {
-    const BELLECOUR_COMPLETED_TASK_ID =
-      '0xb8715386d9b9ab6d2be10aead05c46682af90d9a36a5ed0afb6a085db387f6ee';
+    const ARBITRUM_SEPOLIA_COMPLETED_TASK_ID =
+      '0x07ea14ef6d25eca722575a8d568e64d9fdb44fa1cae1229618988d6222dba7c4';
 
     test("throw a IpfsGatewayCallError when the IPFS gateway can't be reached", async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           ipfsGatewayURL: SERVICE_UNREACHABLE_URL,
         },
       });
       await expectAsyncCustomError(
-        iexecReadOnly.task.fetchResults(BELLECOUR_COMPLETED_TASK_ID),
+        iexecReadOnly.task.fetchResults(ARBITRUM_SEPOLIA_COMPLETED_TASK_ID),
         {
           constructor: IpfsGatewayCallError,
           message: `IPFS gateway error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
@@ -45,14 +45,14 @@ describe('task', () => {
     });
 
     test('throw a IpfsGatewayCallError when the IPFS gateway encounters an error', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           ipfsGatewayURL: SERVICE_HTTP_500_URL,
         },
       });
       await expectAsyncCustomError(
-        iexecReadOnly.task.fetchResults(BELLECOUR_COMPLETED_TASK_ID),
+        iexecReadOnly.task.fetchResults(ARBITRUM_SEPOLIA_COMPLETED_TASK_ID),
         {
           constructor: IpfsGatewayCallError,
           message: `IPFS gateway error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
@@ -61,9 +61,11 @@ describe('task', () => {
     });
 
     test('downloads the result archive from IPFS', async () => {
-      const iexecReadOnly = new IExec({ ethProvider: 'bellecour' });
+      const iexecReadOnly = new IExec({
+        ethProvider: 'arbitrum-sepolia-testnet',
+      });
       const res = await iexecReadOnly.task.fetchResults(
-        BELLECOUR_COMPLETED_TASK_ID,
+        ARBITRUM_SEPOLIA_COMPLETED_TASK_ID,
       );
       expect(res).toBeInstanceOf(Response);
     });
@@ -71,9 +73,9 @@ describe('task', () => {
 
   describe.skip('obsTask()', () => {
     test('emits task updates', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const catid = (
-        await adminCreateCategory(iexecTestChain)({
+        await adminCreateCategory(testChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 10,
@@ -175,7 +177,7 @@ describe('task', () => {
               .catch(reject);
           });
         }),
-        sleep(1000).then(() => initializeTask(iexecTestChain)(dealid, 0)),
+        sleep(1000).then(() => initializeTask(testChain)(dealid, 0)),
       ]);
 
       expect(unsubObsTaskWithDealid).toBeInstanceOf(Function);
@@ -221,9 +223,9 @@ describe('task', () => {
     });
 
     test('exits on task (deal) timeout', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const catid = (
-        await adminCreateCategory(iexecTestChain)({
+        await adminCreateCategory(testChain)({
           name: 'custom',
           description: 'desc',
           workClockTimeRef: 2,
@@ -351,16 +353,16 @@ describe('task', () => {
         }),
         sleep(2000).then(() => {
           unsubObsTaskBeforeComplete();
-          initializeTask(iexecTestChain)(dealid, 0);
+          initializeTask(testChain)(dealid, 0);
         }),
       ]);
 
       expect(obsTaskWithDealidComplete).toBeUndefined();
       expect(obsTaskWithWrongDealidError).toEqual(
-        new ObjectNotFoundError('deal', NULL_BYTES32, iexecTestChain.chainId),
+        new ObjectNotFoundError('deal', NULL_BYTES32, testChain.chainId),
       );
       expect(obsTaskBeforeInitError).toEqual(
-        new ObjectNotFoundError('task', taskid, iexecTestChain.chainId),
+        new ObjectNotFoundError('task', taskid, testChain.chainId),
       );
       expect(obsTaskAfterInitComplete).toBeUndefined();
 
@@ -420,78 +422,41 @@ describe('task', () => {
 
   describe('fetchOffchainInfo()', () => {
     test('throw when workerpool API is not configured', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       await expect(
         iexec.task.fetchOffchainInfo(
-          '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
+          '0x4405e57c6afd6b3ed2399609213b88bbbc4663a02481f097b110ee7dca5a992f',
         ),
       ).rejects.toThrow(
         new Error(
-          'Impossible to resolve API url for workerpool 0x13EE8c43Abd7dFAcfa4C42554Dff72d9fbcF3330',
+          'Impossible to resolve API url for workerpool 0x0556feC57717B8146B03F8ce003eFa3012490d37',
         ),
       );
     });
 
     describe('when workerpool API is configured', () => {
-      let iexecRequester;
-      let iexecWorkerpoolOwner;
-      let taskid;
-      let workerpool;
-
-      beforeAll(async () => {
-        iexecRequester = (await getTestConfig(iexecTestChain)()).iexec;
-        iexecWorkerpoolOwner = (await getTestConfig(iexecTestChain)()).iexec;
-        const workerpoolorder =
-          await deployAndGetWorkerpoolorder(iexecWorkerpoolOwner);
-        const apporder = await deployAndGetApporder(iexecWorkerpoolOwner);
-
-        workerpool = workerpoolorder.workerpool;
-        const { name: workerpoolEns } =
-          await iexecWorkerpoolOwner.ens.claimName(
-            workerpool.toLowerCase(),
-            await iexecWorkerpoolOwner.ens.getDefaultDomain(workerpool),
-          );
-        await iexecWorkerpoolOwner.ens.configureResolution(
-          workerpoolEns,
-          workerpool,
-        );
-        const requestorder = await getMatchableRequestorder(iexecRequester, {
-          workerpoolorder,
-          apporder,
-        });
-        const { dealid } = await iexecRequester.order.matchOrders({
-          apporder,
-          workerpoolorder,
-          requestorder,
-        });
-        await initializeTask(iexecTestChain)(dealid, 0);
-        taskid = await iexecRequester.deal.computeTaskId(dealid, 0);
-      });
-
       test('throw WorkerpoolCallError when the workerpool API is unreachable', async () => {
-        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
-          workerpool,
-          SERVICE_UNREACHABLE_URL,
-        );
+        const { iexec } = await getTestConfig(testChain)();
         await expect(
-          iexecRequester.task.fetchOffchainInfo(taskid),
+          iexec.task.fetchOffchainInfo(
+            '0xc6a7f29715b563b75a1daf71458125ecb2f09858380c545ceda9d5652106a92f',
+          ),
         ).rejects.toThrow(
           new WorkerpoolCallError(
-            `Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+            `Connection to https://unreachable-workerpool.iex.ec failed with a network error`,
           ),
         );
       });
 
       test('throw WorkerpoolCallError when the workerpool API answers with error', async () => {
-        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
-          workerpool,
-          SERVICE_HTTP_500_URL,
-        );
+        const { iexec } = await getTestConfig(testChain)();
         await expect(
-          iexecRequester.task.fetchOffchainInfo(taskid),
+          iexec.task.fetchOffchainInfo(
+            '0x22069de2261dfad53437835ff268018105343583fb64d8cd06803bb3a9c49960',
+          ),
         ).rejects.toThrow(
           new WorkerpoolCallError(
-            `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+            `Server at http://localhost:5500 encountered an internal error`,
             new Error('Server internal error: 500 Internal Server Error'),
           ),
         );
@@ -501,92 +466,16 @@ describe('task', () => {
 
   describe('fetchLogs()', () => {
     test('throw when workerpool API is not configured', async () => {
-      const { iexec } = await getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       await expect(
         iexec.task.fetchLogs(
-          '0xf835e22624dd305c6a1f6c6b5688b92231455778847e7ef3bee1091e627e8786',
+          '0x4405e57c6afd6b3ed2399609213b88bbbc4663a02481f097b110ee7dca5a992f',
         ),
       ).rejects.toThrow(
         new Error(
-          'Impossible to resolve API url for workerpool 0x13EE8c43Abd7dFAcfa4C42554Dff72d9fbcF3330',
+          'Impossible to resolve API url for workerpool 0x0556feC57717B8146B03F8ce003eFa3012490d37',
         ),
       );
-    });
-
-    describe('when workerpool API is configured', () => {
-      let iexecRequester;
-      let iexecWorkerpoolOwner;
-      let taskid;
-      let workerpool;
-
-      beforeAll(async () => {
-        iexecRequester = (await getTestConfig(iexecTestChain)()).iexec;
-        iexecWorkerpoolOwner = (await getTestConfig(iexecTestChain)()).iexec;
-
-        const workerpoolorder =
-          await deployAndGetWorkerpoolorder(iexecWorkerpoolOwner);
-        const apporder = await deployAndGetApporder(iexecWorkerpoolOwner);
-
-        workerpool = workerpoolorder.workerpool;
-        const { name: workerpoolEns } =
-          await iexecWorkerpoolOwner.ens.claimName(
-            workerpool.toLowerCase(),
-            await iexecWorkerpoolOwner.ens.getDefaultDomain(workerpool),
-          );
-        await iexecWorkerpoolOwner.ens.configureResolution(
-          workerpoolEns,
-          workerpool,
-        );
-        const requestorder = await getMatchableRequestorder(iexecRequester, {
-          workerpoolorder,
-          apporder,
-        });
-        const { dealid } = await iexecRequester.order.matchOrders({
-          apporder,
-          workerpoolorder,
-          requestorder,
-        });
-        await initializeTask(iexecTestChain)(dealid, 0);
-        taskid = await iexecRequester.deal.computeTaskId(dealid, 0);
-      });
-
-      test('throw when user is not the requester', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
-          workerpool,
-          SERVICE_UNREACHABLE_URL,
-        );
-        await expect(iexec.task.fetchLogs(taskid)).rejects.toThrow(
-          new Error(
-            `Only task requester ${await iexecRequester.wallet.getAddress()} can access replicates logs`,
-          ),
-        );
-      });
-
-      test('throw WorkerpoolCallError when the workerpool API is unreachable', async () => {
-        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
-          workerpool,
-          SERVICE_UNREACHABLE_URL,
-        );
-        await expect(iexecRequester.task.fetchLogs(taskid)).rejects.toThrow(
-          new WorkerpoolCallError(
-            `Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-          ),
-        );
-      });
-
-      test('throw WorkerpoolCallError when the workerpool API answers with error', async () => {
-        await iexecWorkerpoolOwner.workerpool.setWorkerpoolApiUrl(
-          workerpool,
-          SERVICE_HTTP_500_URL,
-        );
-        await expect(iexecRequester.task.fetchLogs(taskid)).rejects.toThrow(
-          new WorkerpoolCallError(
-            `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-            new Error('Server internal error: 500 Internal Server Error'),
-          ),
-        );
-      });
     });
   });
 });

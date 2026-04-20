@@ -357,14 +357,15 @@ describe('utils', () => {
   });
 
   describe('getSignerFromPrivateKey()', () => {
-    const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+    const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
     const tokenTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
     test('getTransactionCount option allows custom nonce management', async () => {
       const wallet = getRandomWallet();
+      await setBalance(testChain)(wallet.address, ONE_ETH);
 
       const createNonceProvider = (address) => {
-        const initNoncePromise = iexecTestChain.provider.getTransactionCount(
+        const initNoncePromise = testChain.provider.getTransactionCount(
           address,
           'latest',
         );
@@ -383,7 +384,7 @@ describe('utils', () => {
       const nonceProvider = createNonceProvider(wallet.address);
 
       const signer = utils.getSignerFromPrivateKey(
-        iexecTestChain.rpcURL,
+        testChain.rpcURL,
         wallet.privateKey,
         {
           getTransactionCount: nonceProvider.getNonce,
@@ -394,34 +395,63 @@ describe('utils', () => {
         {
           ethProvider: signer,
         },
-        getTestConfigOptions(iexecTestChain)(),
+        getTestConfigOptions(testChain)(),
       );
 
-      const { registerTxHash: tx0 } = await iexec.ens.claimName(
-        `name-${getId()}`,
-      );
+      const { txHash: tx0 } = await iexec.app.deployApp({
+        owner: wallet.address,
+        name: `app-${getId()}`,
+        type: 'DOCKER',
+        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+        checksum:
+          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+      });
       expect(tx0).toBeTxHash();
 
-      await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
-        'nonce too low',
-      );
+      await expect(
+        iexec.app.deployApp({
+          owner: wallet.address,
+          name: `app-${getId()}`,
+          type: 'DOCKER',
+          multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+          checksum:
+            '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+        }),
+      ).rejects.toThrow('nonce too low');
 
       nonceProvider.increaseNonce();
 
-      const { registerTxHash: tx1 } = await iexec.ens.claimName(
-        `name-${getId()}`,
-      );
+      const { txHash: tx1 } = await iexec.app.deployApp({
+        owner: wallet.address,
+        name: `app-${getId()}`,
+        type: 'DOCKER',
+        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+        checksum:
+          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+      });
       expect(tx1).toBeTxHash();
 
-      await expect(iexec.ens.claimName(`name-${getId()}`)).rejects.toThrow(
-        'nonce too low',
-      );
+      await expect(
+        iexec.app.deployApp({
+          owner: wallet.address,
+          name: `app-${getId()}`,
+          type: 'DOCKER',
+          multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+          checksum:
+            '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+        }),
+      ).rejects.toThrow('nonce too low');
 
       nonceProvider.increaseNonce();
 
-      const { registerTxHash: tx2 } = await iexec.ens.claimName(
-        `name-${getId()}`,
-      );
+      const { txHash: tx2 } = await iexec.app.deployApp({
+        owner: wallet.address,
+        name: `app-${getId()}`,
+        type: 'DOCKER',
+        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
+        checksum:
+          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
+      });
       expect(tx2).toBeTxHash();
     });
 

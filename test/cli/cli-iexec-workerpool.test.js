@@ -17,7 +17,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec workerpool', () => {
   let userWallet;
@@ -28,7 +28,7 @@ describe('iexec workerpool', () => {
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
     await execAsync(`${iexecPath} workerpool init`);
     const deployed = await execAsync(
       `${iexecPath} workerpool deploy --raw`,
@@ -58,49 +58,6 @@ describe('iexec workerpool', () => {
       expect(res.ok).toBe(true);
       expect(res.address).toBeDefined();
       expect(res.txHash).toBeDefined();
-      await testChain.provider.getTransaction(res.txHash).then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
-    });
-  });
-
-  describe('set-api-url', () => {
-    test('iexec workerpool set-api-url', async () => {
-      await execAsync(
-        `${iexecPath} ens register ${userFirstDeployedWorkerpoolAddress.toLowerCase()} --for ${userFirstDeployedWorkerpoolAddress}`,
-      );
-      const raw = await execAsync(
-        `${iexecPath} workerpool set-api-url https://my-workerpool.com ${userFirstDeployedWorkerpoolAddress} --raw`,
-      );
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(true);
-      expect(res.address).toBe(userFirstDeployedWorkerpoolAddress);
-      expect(res.url).toBe('https://my-workerpool.com');
-      expect(res.txHash).toBeTxHash();
-      await testChain.provider.getTransaction(res.txHash).then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
-
-      const showRes = await runIExecCliRaw(
-        `${iexecPath} workerpool show ${userFirstDeployedWorkerpoolAddress}`,
-      );
-      expect(showRes.apiUrl).toBe('https://my-workerpool.com');
-    });
-
-    test('iexec workerpool set-api-url (fail no ENS)', async () => {
-      await setWorkerpoolUniqueDescription();
-      const { address } = await runIExecCliRaw(
-        `${iexecPath} workerpool deploy`,
-      );
-      const raw = await execAsync(
-        `${iexecPath} workerpool set-api-url https://my-workerpool.com --raw`,
-      ).catch((e) => e.message);
-      const res = JSON.parse(raw);
-      expect(res.ok).toBe(false);
-      expect(res.error.name).toBe('Error');
-      expect(res.error.message).toBe(
-        `Missing ENS for workerpool ${address}. You probably forgot to run "iexec ens register <name> --for ${address}"`,
-      );
     });
   });
 
@@ -171,9 +128,6 @@ describe('iexec workerpool', () => {
       expect(res.address).toBe(address);
       expect(res.to).toBe(receiverAddress);
       expect(res.txHash).toBeDefined();
-      await testChain.provider.getTransaction(res.txHash).then((tx) => {
-        expect(tx.gasPrice.toString()).toBe('0');
-      });
     });
   });
 

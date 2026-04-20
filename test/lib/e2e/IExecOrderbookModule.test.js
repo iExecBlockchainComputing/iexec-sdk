@@ -21,12 +21,12 @@ import '../../jest-setup.js';
 
 const { MarketCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('orderbook', () => {
   describe('fetch...Order()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -42,7 +42,7 @@ describe('orderbook', () => {
     });
 
     test('throw a MarketCallError when the Market API encounters an error', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
@@ -59,8 +59,8 @@ describe('orderbook', () => {
 
     describe('fetchApporder()', () => {
       test('anyone can get a published order by hash', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const apporder = await deployAndGetApporder(iexec);
@@ -79,8 +79,8 @@ describe('orderbook', () => {
 
     describe('fetchDatasetorder()', () => {
       test('anyone can get a published order by hash', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const datasetorder = await deployAndGetDatasetorder(iexec);
@@ -102,8 +102,8 @@ describe('orderbook', () => {
 
     describe('fetchWorkerpoolorder()', () => {
       test('anyone can get a published order by hash', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -124,8 +124,8 @@ describe('orderbook', () => {
 
     describe('fetchRequestorder()', () => {
       test('anyone can get a published order by hash', async () => {
-        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec, wallet } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const apporder = await deployAndGetApporder(iexec);
@@ -165,7 +165,7 @@ describe('orderbook', () => {
 
   describe('fetch...Orderbook()', () => {
     test("throw a MarketCallError when the Market API can't be reached", async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_UNREACHABLE_URL,
@@ -181,7 +181,7 @@ describe('orderbook', () => {
     });
 
     test('throw a MarketCallError when the Market API encounters an error', async () => {
-      const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           iexecGatewayURL: SERVICE_HTTP_500_URL,
@@ -197,8 +197,8 @@ describe('orderbook', () => {
     });
     describe('fetchAppOrderbook()', () => {
       test('returns orders available fo anyone', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const appAddress = getRandomAddress();
@@ -287,10 +287,9 @@ describe('orderbook', () => {
       });
 
       test('appOwner returns orders from app owner', async () => {
-        const { iexec: iexecUser, wallet } =
-          await getTestConfig(iexecTestChain)();
-        const { iexec: iexecOtherUser } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec: iexecUser, wallet } = await getTestConfig(testChain)();
+        const { iexec: iexecOtherUser } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         // publish orders from two different users
@@ -321,8 +320,8 @@ describe('orderbook', () => {
       });
 
       test('strict option allow filtering only orders for specified dataset, workerpool or requester', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
 
@@ -499,8 +498,8 @@ describe('orderbook', () => {
 
     describe('fetchDatasetOrderbook()', () => {
       test('returns orders available fo anyone', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const datasetAddress = getRandomAddress();
@@ -600,10 +599,9 @@ describe('orderbook', () => {
       });
 
       test('datasetOwner returns orders from dataset owner', async () => {
-        const { iexec: iexecUser, wallet } =
-          await getTestConfig(iexecTestChain)();
-        const { iexec: iexecOtherUser } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec: iexecUser, wallet } = await getTestConfig(testChain)();
+        const { iexec: iexecOtherUser } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         // publish orders from two different users
@@ -634,8 +632,8 @@ describe('orderbook', () => {
       });
 
       test('strict option allow filtering only orders for specified app, workerpool or requester', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         // 1 and 2: orders without any restrictions
@@ -819,8 +817,8 @@ describe('orderbook', () => {
       });
 
       test('bulkOnly option allow filtering only orders allowing dataset bulk processing', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         // 1 and 2: orders without any restrictions
@@ -868,8 +866,8 @@ describe('orderbook', () => {
 
     describe('fetchWorkerpoolOrderbook()', () => {
       test('returns orders available fo anyone', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const workerpoolorder = await deployAndGetWorkerpoolorder(iexec);
@@ -955,8 +953,8 @@ describe('orderbook', () => {
       });
 
       test('strict option allow filtering only orders for specified app, dataset or requester', async () => {
-        const { iexec } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         // 1 and 2: orders without any restrictions
@@ -1132,8 +1130,8 @@ describe('orderbook', () => {
 
     describe('fetchRequestOrderbook()', () => {
       test('returns orders available fo anyone', async () => {
-        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec, wallet } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const apporder = await deployAndGetApporder(iexec);
@@ -1200,8 +1198,8 @@ describe('orderbook', () => {
       });
 
       test('strict option allow filtering only orders for specified workerpool', async () => {
-        const { iexec, wallet } = await getTestConfig(iexecTestChain)();
-        const { iexec: iexecReadOnly } = await getTestConfig(iexecTestChain)({
+        const { iexec, wallet } = await getTestConfig(testChain)();
+        const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
           readOnly: true,
         });
         const requesterAddress = wallet.address;
