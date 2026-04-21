@@ -102,7 +102,6 @@ import {
   Spinner,
   pretty,
   info,
-  isEthAddress,
   renderTasksStatus,
   getPropertyFromChain,
   optionCreator,
@@ -115,13 +114,10 @@ import {
 } from '../utils/fs.js';
 import { Keystore } from '../utils/keystore.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
-import { lookupAddress } from '../../common/ens/resolution.js';
-import {
-  ConfigurationError,
-  ValidationError,
-} from '../../common/utils/errors.js';
+import { ValidationError } from '../../common/utils/errors.js';
 import { pushAppSecret } from '../../common/sms/push.js';
 import { checkAppSecretExists } from '../../common/sms/check.js';
+import { isAddress } from 'ethers';
 
 const debug = Debug('iexec:iexec-app');
 
@@ -232,9 +228,9 @@ show
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
 
-      const isAddress = isEthAddress(addressOrIndex, { strict: false });
+      const isAddr = isAddress(addressOrIndex);
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
-      if (!isAddress && !userAddress)
+      if (!isAddr && !userAddress)
         throw new Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex)
@@ -242,38 +238,18 @@ show
       spinner.start(info.showing(objName));
 
       let res;
-      let ens;
-      if (isAddress) {
-        [res, ens] = await Promise.all([
-          showApp(chain.contracts, addressOrIndex),
-          lookupAddress(chain.contracts, addressOrIndex).catch((e) => {
-            if (e instanceof ConfigurationError) {
-              /** no ENS */
-            } else {
-              throw e;
-            }
-          }),
-        ]);
+      if (isAddr) {
+        res = await showApp(chain.contracts, addressOrIndex);
       } else {
         res = await showUserApp(chain.contracts, addressOrIndex, userAddress);
-        ens = await lookupAddress(chain.contracts, res.objAddress).catch(
-          (e) => {
-            if (e instanceof ConfigurationError) {
-              /** no ENS */
-            } else {
-              throw e;
-            }
-          },
-        );
       }
       const { app, objAddress } = res;
       spinner.succeed(
         `App ${objAddress} details:${pretty({
-          ...(ens && { ENS: ens }),
           ...app,
         })}`,
         {
-          raw: { address: objAddress, ens, app },
+          raw: { address: objAddress, app },
         },
       );
     } catch (error) {
@@ -334,11 +310,7 @@ checkSecret
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
       const sms = getPropertyFromChain(chain, 'sms');
-      const secretIsSet = await checkAppSecretExists(
-        chain.contracts,
-        sms,
-        resourceAddress,
-      );
+      const secretIsSet = await checkAppSecretExists(sms, resourceAddress);
       if (secretIsSet) {
         spinner.succeed(`Secret found for app ${resourceAddress}`, {
           raw: { isSecretSet: true },
@@ -455,7 +427,7 @@ publish
         workerpoolrestrict: opts.workerpoolRestrict,
         requesterrestrict: opts.requesterRestrict,
       };
-      const orderToSign = await createApporder(chain.contracts, overrides);
+      const orderToSign = await createApporder(overrides);
       if (!opts.skipPreflightCheck) {
         await checkAppRequirements({ contracts: chain.contracts }, orderToSign);
       }
@@ -710,13 +682,9 @@ run
       debug('tag', tag);
       const trust = await positiveIntSchema().validate(opts.trust || '0');
       debug('trust', trust);
-      const callback = await addressSchema({
-        ethProvider: chain.contracts.provider,
-      }).validate(opts.callback);
+      const callback = await addressSchema().validate(opts.callback);
       debug('callback', callback);
-      const beneficiary = await addressSchema({
-        ethProvider: chain.contracts.provider,
-      }).validate(opts.beneficiary);
+      const beneficiary = await addressSchema().validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
       const watch = !!opts.watch || !!opts.download;
@@ -733,7 +701,7 @@ run
         if (isAppOwner) {
           spinner.info('Creating apporder');
           await connectKeystore(chain, keystore);
-          return createApporder(chain.contracts, {
+          return createApporder({
             app,
             appprice: 0,
             volume: 1,
@@ -786,7 +754,7 @@ run
         if (isDatasetOwner) {
           spinner.info('Creating datasetorder');
           await connectKeystore(chain, keystore);
-          return createDatasetorder(chain.contracts, {
+          return createDatasetorder({
             dataset,
             datasetprice: 0,
             volume: 1,
@@ -844,7 +812,7 @@ run
           if (isWorkerpoolOwner) {
             spinner.info('Creating workerpoolorder');
             await connectKeystore(chain, keystore);
-            return createWorkerpoolorder(chain.contracts, {
+            return createWorkerpoolorder({
               workerpool,
               workerpoolprice: 0,
               volume: 1,
@@ -982,7 +950,6 @@ run
         });
         await checkDatasetRequirements(
           {
-            contracts: chain.contracts,
             smsURL: getPropertyFromChain(chain, 'sms'),
           },
           datasetorder,
@@ -998,7 +965,6 @@ run
         });
         await checkRequestRequirements(
           {
-            contracts: chain.contracts,
             smsURL: getPropertyFromChain(chain, 'sms'),
           },
           requestorderToSign,
@@ -1262,13 +1228,9 @@ requestRun
       debug('tag', tag);
       const trust = await positiveIntSchema().validate(opts.trust || 0);
       debug('trust', trust);
-      const callback = await addressSchema({
-        ethProvider: chain.contracts.provider,
-      }).validate(opts.callback);
+      const callback = await addressSchema().validate(opts.callback);
       debug('callback', callback);
-      const beneficiary = await addressSchema({
-        ethProvider: chain.contracts.provider,
-      }).validate(opts.beneficiary);
+      const beneficiary = await addressSchema().validate(opts.beneficiary);
       debug('beneficiary', beneficiary);
 
       spinner.info('Creating requestorder');
@@ -1297,7 +1259,6 @@ requestRun
       if (!opts.skipPreflightCheck) {
         await checkRequestRequirements(
           {
-            contracts: chain.contracts,
             smsURL: getPropertyFromChain(chain, 'sms'),
           },
           requestorderToSign,

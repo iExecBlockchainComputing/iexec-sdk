@@ -3,7 +3,7 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Addressish } from '../common/types.js';
+import { Address } from '../common/types.js';
 
 /**
  * module exposing secrets methods
@@ -19,8 +19,8 @@ export default class IExecSecretsModule extends IExecModule {
    * ```
    */
   checkRequesterSecretExists(
-    requesterAddress: Addressish,
-    secretName: String,
+    requesterAddress: Address,
+    secretName: string,
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**

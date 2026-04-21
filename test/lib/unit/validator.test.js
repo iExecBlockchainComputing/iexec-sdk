@@ -23,10 +23,6 @@ import {
   objParamsSchema,
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
-  ensDomainSchema,
-  ensLabelSchema,
-  textRecordKeySchema,
-  textRecordValueSchema,
   teeFrameworkSchema,
   addressOrAnySchema,
   signedDatasetorderBulkSchema,
@@ -890,11 +886,7 @@ describe('[tagSchema]', () => {
 
 describe('[addressSchema]', () => {
   test('undefined', async () => {
-    await expect(
-      addressSchema({
-        ethProvider: mainnetDefaultProvider,
-      }).validate(undefined),
-    ).resolves.toBe(undefined);
+    await expect(addressSchema().validate(undefined)).resolves.toBe(undefined);
   });
   test('address', async () => {
     await expect(
@@ -906,13 +898,6 @@ describe('[addressSchema]', () => {
       addressSchema().validate('607F4C5BB672230e8672085532f7e901544a7375'),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
-  test('address (with ethProvider)', async () => {
-    await expect(
-      addressSchema({ ethProvider: mainnetDefaultProvider }).validate(
-        '0x607F4C5BB672230e8672085532f7e901544a7375',
-      ),
-    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
-  });
   test('invalid address', async () => {
     await expect(
       addressSchema().validate('0x07F4C5BB672230e8672085532f7e901544a7375'),
@@ -922,36 +907,13 @@ describe('[addressSchema]', () => {
       ),
     );
   });
-  test('ens (resolve ENS with ethProvider)', async () => {
-    await expect(
-      addressSchema({ ethProvider: mainnetDefaultProvider }).validate(
-        'rlc.iexec.eth',
-      ),
-    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
-  }, 10000);
-  test('invalid ens (throw when ens is missing)', async () => {
-    await expect(
-      addressSchema({ ethProvider: mainnetDefaultProvider }).validate(
-        'pierre.iexec.eth',
-      ),
-    ).rejects.toThrow(
-      new ValidationError('Unable to resolve ENS pierre.iexec.eth'),
-    );
-  });
-  test('ens (throw when ethProvider is missing)', async () => {
-    await expect(addressSchema().validate('rlc.iexec.eth')).rejects.toThrow(
-      new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
-    );
-  });
 });
 
 describe('[addressOrAnySchema]', () => {
   test('undefined', async () => {
-    await expect(
-      addressOrAnySchema({
-        ethProvider: mainnetDefaultProvider,
-      }).validate(undefined),
-    ).resolves.toBe(undefined);
+    await expect(addressOrAnySchema().validate(undefined)).resolves.toBe(
+      undefined,
+    );
   });
   test('any', async () => {
     await expect(addressOrAnySchema().validate('any')).resolves.toBe('any');
@@ -970,9 +932,9 @@ describe('[addressOrAnySchema]', () => {
   });
   test('address (with ethProvider)', async () => {
     await expect(
-      addressOrAnySchema({
-        ethProvider: mainnetDefaultProvider,
-      }).validate('0x607F4C5BB672230e8672085532f7e901544a7375'),
+      addressOrAnySchema().validate(
+        '0x607F4C5BB672230e8672085532f7e901544a7375',
+      ),
     ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
   });
   test('invalid address', async () => {
@@ -984,29 +946,6 @@ describe('[addressOrAnySchema]', () => {
       new ValidationError(
         '0x07F4C5BB672230e8672085532f7e901544a7375 is not a valid ethereum address',
       ),
-    );
-  });
-  test('ens (resolve ENS with ethProvider)', async () => {
-    await expect(
-      addressOrAnySchema({
-        ethProvider: mainnetDefaultProvider,
-      }).validate('rlc.iexec.eth'),
-    ).resolves.toBe('0x607F4C5BB672230e8672085532f7e901544a7375');
-  }, 10000);
-  test('invalid ens (throw when ens is missing)', async () => {
-    await expect(
-      addressOrAnySchema({
-        ethProvider: mainnetDefaultProvider,
-      }).validate('pierre.iexec.eth'),
-    ).rejects.toThrow(
-      new ValidationError('Unable to resolve ENS pierre.iexec.eth'),
-    );
-  });
-  test('ens (throw when ethProvider is missing)', async () => {
-    await expect(
-      addressOrAnySchema().validate('rlc.iexec.eth'),
-    ).rejects.toThrow(
-      new ValidationError('Unable to resolve ENS rlc.iexec.eth'),
     );
   });
 });
@@ -1234,103 +1173,6 @@ describe('[mrenclaveSchema]', () => {
     };
     await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
       new ValidationError('framework is not a valid TEE framework'),
-    );
-  });
-});
-
-describe('[ensLabelSchema]', () => {
-  test('valid', async () => {
-    await expect(ensLabelSchema().validate('a')).resolves.toBe('a');
-    await expect(ensLabelSchema().validate('🦄')).resolves.toBe('🦄');
-    await expect(ensLabelSchema().validate('a-b')).resolves.toBe('a-b');
-  });
-  test('throw with uppercase', async () => {
-    await expect(ensLabelSchema().validate('A')).rejects.toThrow(
-      'A is not a valid ENS label (label cannot contain uppercase characters)',
-    );
-  });
-  test('throw with unsupported characters', async () => {
-    await expect(ensLabelSchema().validate('&')).rejects.toThrow(
-      '& is not a valid ENS label (label cannot contain unsupported characters)',
-    );
-    await expect(ensLabelSchema().validate('@')).rejects.toThrow(
-      '@ is not a valid ENS label (label cannot contain unsupported characters)',
-    );
-  });
-  test('throw with dot', async () => {
-    await expect(ensLabelSchema().validate('foo.bar')).rejects.toThrow(
-      'foo.bar is not a valid ENS label (label cannot have `.`)',
-    );
-  });
-});
-
-describe('[ensDomainSchema]', () => {
-  test('valid', async () => {
-    await expect(ensDomainSchema().validate('foo.a-b.bar.eth')).resolves.toBe(
-      'foo.a-b.bar.eth',
-    );
-    await expect(
-      ensDomainSchema().validate('foo.🦄🦄🦄.bar.eth'),
-    ).resolves.toBe('foo.🦄🦄🦄.bar.eth');
-  });
-  test('throw with uppercase', async () => {
-    await expect(ensDomainSchema().validate('foo.Abc.bar.eth')).rejects.toThrow(
-      'foo.Abc.bar.eth is not a valid ENS domain (domain cannot contain uppercase characters)',
-    );
-  });
-  test('throw with unsupported characters', async () => {
-    await expect(ensDomainSchema().validate('foo.a&b.bar.eth')).rejects.toThrow(
-      'foo.a&b.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
-    );
-    await expect(ensDomainSchema().validate('foo.a@a.bar.eth')).rejects.toThrow(
-      'foo.a@a.bar.eth is not a valid ENS domain (domain cannot contain unsupported characters)',
-    );
-  });
-  test('throw with empty labels', async () => {
-    await expect(ensDomainSchema().validate('foo..bar.eth')).rejects.toThrow(
-      'foo..bar.eth is not a valid ENS domain (domain cannot have empty labels)',
-    );
-  });
-});
-
-describe('[textRecordKeySchema]', () => {
-  test('" "', async () => {
-    const res = await textRecordKeySchema().validate(' ');
-    expect(res).toBe(' ');
-  });
-  test('throw with empty string', async () => {
-    await expect(textRecordKeySchema().validate('')).rejects.toThrow(
-      'this is a required field',
-    );
-  });
-  test('throw with string coercible value', async () => {
-    await expect(textRecordKeySchema().validate(1)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `1`.',
-    );
-  });
-});
-
-describe('[textRecordValueSchema]', () => {
-  test('" "', async () => {
-    const res = await textRecordValueSchema().validate(' ');
-    expect(res).toBe(' ');
-  });
-  test('allow undefined', async () => {
-    const res = await textRecordValueSchema().validate();
-    expect(res).toBe(undefined);
-  });
-  test('allow empty string', async () => {
-    const res = await textRecordValueSchema().validate('');
-    expect(res).toBe('');
-  });
-  test('throw with null', async () => {
-    await expect(textRecordValueSchema().validate(null)).rejects.toThrow(
-      'this cannot be null',
-    );
-  });
-  test('throw with string coercible value', async () => {
-    await expect(textRecordValueSchema().validate(1)).rejects.toThrow(
-      'this must be a `string` type, but the final value was: `1`.',
     );
   });
 });

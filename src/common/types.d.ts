@@ -20,19 +20,6 @@ export type BNish = BN | bigint | string | number;
  */
 export type Address = string;
 /**
- * ENS
- *
- * example:
- * ```js
- * const ensName = 'iexec.eth';
- * ```
- */
-export type ENS = string;
-/**
- * ethereum address or ENS
- */
-export type Addressish = Address | ENS;
-/**
  * bytes hex string
  *
  * example:

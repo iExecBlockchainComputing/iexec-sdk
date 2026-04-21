@@ -282,10 +282,8 @@ checkSecret
         [keyAddress] = await keystore.accounts();
         spinner.info(`Checking encryption key exists for wallet ${keyAddress}`);
       }
-      const { contracts } = chain;
       const sms = getPropertyFromChain(chain, 'sms');
       const secretExists = await checkWeb2SecretExists(
-        contracts,
         sms,
         keyAddress,
         getResultEncryptionKeyName(),

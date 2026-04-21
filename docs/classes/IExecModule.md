@@ -15,7 +15,6 @@ module base
 - [`IExecAppModule`](IExecAppModule.md)
 - [`IExecDatasetModule`](IExecDatasetModule.md)
 - [`IExecDealModule`](IExecDealModule.md)
-- [`IExecENSModule`](IExecENSModule.md)
 - [`IExecHubModule`](IExecHubModule.md)
 - [`IExecNetworkModule`](IExecNetworkModule.md)
 - [`IExecOrderModule`](IExecOrderModule.md)

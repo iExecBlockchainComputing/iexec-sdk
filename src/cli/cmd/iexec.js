@@ -105,8 +105,6 @@ cli.command('storage', 'manage remote storage');
 
 cli.command('result', 'manage results encryption');
 
-cli.command('ens', 'manage ENS names');
-
 cli.command('category', 'manage iExec categories');
 
 const infoCmd = cli.command('info');

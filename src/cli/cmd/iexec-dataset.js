@@ -56,12 +56,10 @@ import {
   pretty,
   info,
   prompt,
-  isEthAddress,
   getPropertyFromChain,
 } from '../utils/cli-helper.js';
-import { lookupAddress } from '../../common/ens/resolution.js';
-import { ConfigurationError } from '../../common/utils/errors.js';
 import { checkDatasetRequirements } from '../../common/execution/order-helper.js';
+import { isAddress } from 'ethers';
 
 const { ensureDir, pathExists, readFile, lstat, readdir } = fsExtra;
 
@@ -182,9 +180,9 @@ show
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
 
-      const isAddress = isEthAddress(addressOrIndex, { strict: false });
+      const isAddr = isAddress(addressOrIndex);
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
-      if (!isAddress && !userAddress)
+      if (!isAddr && !userAddress)
         throw new Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex)
@@ -193,42 +191,22 @@ show
       spinner.start(info.showing(objName));
 
       let res;
-      let ens;
-      if (isAddress) {
-        [res, ens] = await Promise.all([
-          showDataset(chain.contracts, addressOrIndex),
-          lookupAddress(chain.contracts, addressOrIndex).catch((e) => {
-            if (e instanceof ConfigurationError) {
-              /** no ENS */
-            } else {
-              throw e;
-            }
-          }),
-        ]);
+      if (isAddr) {
+        res = await showDataset(chain.contracts, addressOrIndex);
       } else {
         res = await showUserDataset(
           chain.contracts,
           addressOrIndex,
           userAddress,
         );
-        ens = await lookupAddress(chain.contracts, res.objAddress).catch(
-          (e) => {
-            if (e instanceof ConfigurationError) {
-              /** no ENS */
-            } else {
-              throw e;
-            }
-          },
-        );
       }
       const { dataset, objAddress } = res;
       spinner.succeed(
         `Dataset ${objAddress} details:${pretty({
-          ...(ens && { ENS: ens }),
           ...dataset,
         })}`,
         {
-          raw: { address: objAddress, ens, dataset },
+          raw: { address: objAddress, dataset },
         },
       );
     } catch (error) {
@@ -480,11 +458,7 @@ checkSecret
       }
       spinner.info(`Checking secret for address ${resourceAddress}`);
       const sms = getPropertyFromChain(chain, 'sms');
-      const secretIsSet = await checkWeb3SecretExists(
-        chain.contracts,
-        sms,
-        resourceAddress,
-      );
+      const secretIsSet = await checkWeb3SecretExists(sms, resourceAddress);
       if (secretIsSet) {
         spinner.succeed(`Secret found for dataset ${resourceAddress}`, {
           raw: { isSecretSet: true },
@@ -539,7 +513,7 @@ publish
       if (!(await checkDeployedDataset(chain.contracts, address))) {
         throw new Error(`No ${objName} deployed at address ${address}`);
       }
-      const overrides = {
+      const orderToSign = await createDatasetorder({
         dataset: address,
         datasetprice: opts.price,
         volume: opts.volume || '1000000',
@@ -547,14 +521,10 @@ publish
         apprestrict: opts.appRestrict,
         workerpoolrestrict: opts.workerpoolRestrict,
         requesterrestrict: opts.requesterRestrict,
-      };
-      const orderToSign = await createDatasetorder(chain.contracts, overrides);
+      });
       if (!opts.skipPreflightCheck) {
         const sms = getPropertyFromChain(chain, 'sms');
-        await checkDatasetRequirements(
-          { contracts: chain.contracts, smsURL: sms },
-          orderToSign,
-        );
+        await checkDatasetRequirements({ smsURL: sms }, orderToSign);
       }
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));

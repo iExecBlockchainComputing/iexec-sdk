@@ -29,7 +29,6 @@ export default class IExecAppModule extends IExecModule {
       countUserApps(await this.config.resolveContractsClient(), address);
     this.checkAppSecretExists = async (appAddress) => {
       return checkAppSecretExists(
-        await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         appAddress,
       );

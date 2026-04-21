@@ -3,13 +3,13 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Address, Addressish, BN, BNish, TxHash } from '../common/types.js';
+import { Address, BN, BNish, TxHash } from '../common/types.js';
 
 export interface WorkerpoolDeploymentArgs {
   /**
    * the workerpool owner
    */
-  owner: Addressish;
+  owner: Address;
   /**
    * a description for the workerpool
    */
@@ -81,7 +81,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * console.log('workerpool deployed', isDeployed);
    * ```
    */
-  checkDeployedWorkerpool(workerpoolAddress: Addressish): Promise<Boolean>;
+  checkDeployedWorkerpool(workerpoolAddress: Address): Promise<Boolean>;
   /**
    * show a deployed workerpool details
    *
@@ -92,7 +92,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * ```
    */
   showWorkerpool(
-    workerpoolAddress: Addressish,
+    workerpoolAddress: Address,
   ): Promise<{ objAddress: Address; workerpool: Workerpool }>;
   /**
    * count the workerpools owned by an address.
@@ -103,7 +103,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * console.log('workerpool count:', count);
    * ```
    */
-  countUserWorkerpools(userAddress: Addressish): Promise<BN>;
+  countUserWorkerpools(userAddress: Address): Promise<BN>;
   /**
    * show deployed workerpool details by index for specified user user
    *
@@ -115,7 +115,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    */
   showUserWorkerpool(
     index: BNish,
-    address: Addressish,
+    address: Address,
   ): Promise<{ objAddress: Address; workerpool: Workerpool }>;
   /**
    * read the workerpool API url on the blockchain
@@ -124,13 +124,11 @@ export default class IExecWorkerpoolModule extends IExecModule {
    *
    * example:
    * ```js
-   * const url = await getWorkerpoolApiUrl('my-workerpool.eth');
+   * const url = await getWorkerpoolApiUrl(address);
    * console.log('workerpool API url:', url);
    * ```
    */
-  getWorkerpoolApiUrl(
-    workerpoolAddress: Addressish,
-  ): Promise<string | undefined>;
+  getWorkerpoolApiUrl(workerpoolAddress: Address): Promise<string | undefined>;
   /**
    * **ONLY WORKERPOOL OWNER**
    *
@@ -145,8 +143,8 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * ```
    */
   transferWorkerpool(
-    workerpoolAddress: Addressish,
-    to: Addressish,
+    workerpoolAddress: Address,
+    to: Address,
   ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
   /**
    * Create an IExecWorkerpoolModule instance using an IExecConfig instance

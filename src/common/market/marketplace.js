@@ -252,11 +252,7 @@ export const unpublishAllApporders = async (
     await chainIdSchema().validate(contracts.chainId),
     {
       target: UNPUBLISH_TARGET_ALL_ORDERS,
-      address: await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(appAddress),
+      address: await addressSchema().required().validate(appAddress),
     },
   );
 
@@ -272,11 +268,7 @@ export const unpublishAllDatasetorders = async (
     await chainIdSchema().validate(contracts.chainId),
     {
       target: UNPUBLISH_TARGET_ALL_ORDERS,
-      address: await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(datasetAddress),
+      address: await addressSchema().required().validate(datasetAddress),
     },
   );
 
@@ -292,11 +284,7 @@ export const unpublishAllWorkerpoolorders = async (
     await chainIdSchema().validate(contracts.chainId),
     {
       target: UNPUBLISH_TARGET_ALL_ORDERS,
-      address: await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(workerpoolAddress),
+      address: await addressSchema().required().validate(workerpoolAddress),
     },
   );
 
@@ -327,11 +315,7 @@ export const unpublishLastApporder = async (
     await chainIdSchema().validate(contracts.chainId),
     {
       target: UNPUBLISH_TARGET_LAST_ORDER,
-      address: await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(appAddress),
+      address: await addressSchema().required().validate(appAddress),
     },
   );
   return unpublished[0];
@@ -349,11 +333,7 @@ export const unpublishLastDatasetorder = async (
     await chainIdSchema().validate(contracts.chainId),
     {
       target: UNPUBLISH_TARGET_LAST_ORDER,
-      address: await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(datasetAddress),
+      address: await addressSchema().required().validate(datasetAddress),
     },
   );
   return unpublished[0];
@@ -371,11 +351,7 @@ export const unpublishLastWorkerpoolorder = async (
     await chainIdSchema().validate(contracts.chainId),
     {
       target: UNPUBLISH_TARGET_LAST_ORDER,
-      address: await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(workerpoolAddress),
+      address: await addressSchema().required().validate(workerpoolAddress),
     },
   );
   return unpublished[0];

@@ -5,7 +5,6 @@ import {
   AlchemyProvider,
   InfuraProvider,
   EtherscanProvider,
-  CloudflareProvider,
   BrowserProvider,
   Wallet,
   HDNodeWallet,
@@ -16,7 +15,6 @@ import {
   INFURA_PROJECT_ID,
   InjectedProvider,
   TEST_CHAINS,
-  getRandomAddress,
   getRandomWallet,
   DEFAULT_PROVIDER_OPTIONS,
 } from '../../test-utils.js';
@@ -84,9 +82,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
       });
       test('IExecConfig({ ethProvider: "bellecour" })', async () => {
         const config = new IExecConfig({ ethProvider: 'bellecour' });
@@ -99,9 +94,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: "kovan" })', () => {
         const createConfig = () => new IExecConfig({ ethProvider: 'kovan' });
@@ -155,9 +147,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
       });
       test('IExecConfig({ ethProvider: "134" })', async () => {
         const config = new IExecConfig({ ethProvider: '134' });
@@ -170,9 +159,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
       test('IExecConfig({ ethProvider: 1 })', async () => {
         const config = new IExecConfig(
@@ -190,9 +176,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
       });
       test('IExecConfig({ ethProvider: 134 })', async () => {
         const config = new IExecConfig({ ethProvider: 134 });
@@ -205,9 +188,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
       test('throw with unsupported chains - IExecConfig({ ethProvider: 42 })', () => {
         const createConfig = () => new IExecConfig({ ethProvider: 42 });
@@ -271,9 +251,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { infura }})', async () => {
         const config = new IExecConfig(
@@ -293,9 +270,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { alchemy }})', async () => {
         const config = new IExecConfig(
@@ -315,9 +289,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { etherscan }})', async () => {
         const config = new IExecConfig(
@@ -337,9 +308,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBeDefined();
       });
       test('IExecConfig({ ethProvider: "mainnet" }, { providerOptions : { cloudflare, infura, etherscan, alchemy }})', async () => {
         const config = new IExecConfig(
@@ -363,9 +331,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBeDefined();
       });
     });
 
@@ -384,7 +349,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(BigInt(unknownTestChain.chainId));
         expect(network.name).toBe('unknown');
-        expect(network.getPlugin('org.ethers.plugins.network.Ens')).toBe(null);
       });
       test('IExecConfig({ ethProvider: "https://bellecour.iex.ec" }) - autodetect known network', async () => {
         const config = new IExecConfig({
@@ -399,9 +363,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(134n);
         expect(network.name).toBe('bellecour');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
       // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
@@ -478,9 +439,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(1n);
         expect(network.name).toBe('mainnet');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
       });
     });
 
@@ -561,34 +519,6 @@ describe('[IExecConfig]', () => {
         const network = await provider.getNetwork();
         expect(network.chainId).toBe(BigInt(testChain.chainId));
         expect(network.name).toBe(testChain.defaults.name);
-      });
-
-      test('JsonRpcProvider with custom network (including ens)', async () => {
-        const ethersProvider = new JsonRpcProvider(unknownTestChain.rpcURL, {
-          chainId: parseInt(unknownTestChain.chainId, 10),
-          name: 'test',
-          ensAddress: unknownTestChain.ensRegistryAddress,
-        });
-        const config = new IExecConfig(
-          {
-            ethProvider: ethersProvider,
-          },
-          {
-            hubAddress: unknownTestChain.hubAddress,
-          },
-        );
-        const { provider, signer, chainId } =
-          await config.resolveContractsClient();
-        expect(signer).toBeUndefined();
-        expect(provider).toBeDefined();
-        expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe(unknownTestChain.chainId);
-        const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(unknownTestChain.chainId));
-        expect(network.name).toBe('test');
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(unknownTestChain.ensRegistryAddress);
       });
     });
 
@@ -949,64 +879,6 @@ describe('[IExecConfig]', () => {
         ethProvider: 'http://localhost:8888',
       });
       const promise = config.resolvePocoSubgraphURL();
-      await expect(promise).rejects.toThrow('Failed to detect network:');
-      await expect(promise).rejects.toThrow(Error);
-    });
-  });
-
-  describe('resolveEnsPublicResolverAddress()', () => {
-    test('success', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'bellecour',
-      });
-      const promise = config.resolveEnsPublicResolverAddress();
-      const address = await promise;
-      expect(typeof address).toBe('string');
-      expect(address.length).toBe(42);
-    });
-    test('success ensPublicResolverAddress override', async () => {
-      const ensPublicResolverAddressOverride = getRandomAddress();
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        {
-          ensPublicResolverAddress: ensPublicResolverAddressOverride,
-        },
-      );
-      const promise = config.resolveEnsPublicResolverAddress();
-      await expect(promise).resolves.toBe(ensPublicResolverAddressOverride);
-    });
-    test('success with ensPublicResolverAddress on custom chain', async () => {
-      const ensPublicResolverAddressOverride = getRandomAddress();
-      const config = new IExecConfig(
-        {
-          ethProvider: unknownTestChain.rpcURL,
-        },
-        {
-          ensPublicResolverAddress: ensPublicResolverAddressOverride,
-        },
-      );
-      const promise = config.resolveEnsPublicResolverAddress();
-      await expect(promise).resolves.toBe(ensPublicResolverAddressOverride);
-    });
-    test('throw on unknown chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: unknownTestChain.rpcURL,
-      });
-      const promise = config.resolveEnsPublicResolverAddress();
-      await expect(promise).rejects.toThrow(
-        new Error(
-          `ensPublicResolverAddress option not set and no default value for your chain ${unknownTestChain.chainId}`,
-        ),
-      );
-      await expect(promise).rejects.toThrow(errors.ConfigurationError);
-    });
-    test('throw on network error', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'http://localhost:8888',
-      });
-      const promise = config.resolveEnsPublicResolverAddress();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
     });

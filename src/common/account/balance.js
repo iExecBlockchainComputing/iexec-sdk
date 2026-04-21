@@ -7,11 +7,7 @@ const debug = Debug('iexec:account:balance');
 
 export const checkBalance = async (contracts = throwIfMissing(), address) => {
   try {
-    const vAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
-      .required()
-      .validate(address);
+    const vAddress = await addressSchema().required().validate(address);
     const iexecContract = contracts.getIExecContract();
     const { stake, locked } = await wrapCall(
       iexecContract.viewAccount(vAddress),

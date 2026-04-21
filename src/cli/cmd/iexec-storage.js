@@ -47,7 +47,6 @@ initStorage
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
       const tokenExists = await checkWeb2SecretExists(
-        contracts,
         smsURL,
         address,
         tokenKeyName,
@@ -111,7 +110,6 @@ checkStorage
         loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
-      const { contracts } = chain;
       const smsURL = getPropertyFromChain(chain, 'sms');
       const providerName = provider || 'default';
       const tokenKeyName = getStorageTokenKeyName(providerName);
@@ -120,7 +118,6 @@ checkStorage
         `Checking ${providerName} storage token for user ${userAddress}`,
       );
       const tokenExists = await checkWeb2SecretExists(
-        contracts,
         smsURL,
         userAddress,
         tokenKeyName,

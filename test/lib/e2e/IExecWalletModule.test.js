@@ -2,7 +2,6 @@ import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils.js';
 import {
-  DEFAULT_PROVIDER_OPTIONS,
   TEST_CHAINS,
   getRandomAddress,
   getRandomWallet,
@@ -10,7 +9,6 @@ import {
   setNRlcBalance,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
-import { IExec } from '../../../src/lib/index.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 const tokenTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];

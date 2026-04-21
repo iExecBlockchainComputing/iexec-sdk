@@ -15,7 +15,6 @@ export default class IExecStorageModule extends IExecModule {
       );
     this.checkStorageTokenExists = async (address, { provider } = {}) =>
       checkWeb2SecretExists(
-        await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         address,
         getStorageTokenKeyName(provider),

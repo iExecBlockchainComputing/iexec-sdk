@@ -75,7 +75,6 @@ export const setChain =
             sms: chain.smsURL,
             iexecGateway: chain.iexecGatewayURL,
             resultProxy: chain.resultProxyURL,
-            ensPublicResolver: chain.ensPublicResolverAddress,
             useGas: chain.useGas,
             native: chain.isNative,
             ...chainOptions,

@@ -11,7 +11,7 @@ import {
   toBeHex,
 } from 'ethers';
 import { IExec } from '../src/lib/index.js';
-import { getSignerFromPrivateKey, NULL_ADDRESS } from '../src/lib/utils.js';
+import { getSignerFromPrivateKey } from '../src/lib/utils.js';
 
 export {
   TEE_FRAMEWORKS,
@@ -73,8 +73,6 @@ export const TEST_CHAINS = {
     }),
     defaults: {
       hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
-      ensRegistryAddress: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
-      ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
       isNative: true,
       useGas: false,
       name: 'bellecour',
@@ -115,7 +113,6 @@ export const TEST_CHAINS = {
       pollingInterval: 100,
     }),
     defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
-    ensRegistryAddress: NULL_ADDRESS,
   },
 };
 

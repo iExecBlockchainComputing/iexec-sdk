@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import Debug from 'debug';
 import { string, number, object, mixed, boolean, array } from 'yup';
-import { getAddress, isAddress, namehash } from 'ethers';
+import { getAddress, isAddress } from 'ethers';
 // import-js/eslint-plugin-import/issues/2703
 // eslint-disable-next-line import/no-unresolved
 import { CID } from 'multiformats/cid';
@@ -16,7 +16,6 @@ import {
   TAG_MAP,
 } from './utils.js';
 import { ValidationError } from './errors.js';
-import { wrapCall } from './errorWrappers.js';
 import {
   TEE_FRAMEWORKS,
   IEXEC_REQUEST_PARAMS,
@@ -142,96 +141,30 @@ export const weiAmountSchema = ({ defaultUnit = 'wei' } = {}) =>
 export const chainIdSchema = () =>
   stringNumberSchema({ message: '${originalValue} is not a valid chainId' });
 
-const transformAddressOrEns = (ethProvider) => (value) => {
-  try {
-    if (typeof value === 'string') {
-      if (value.match(/^.*\.eth$/)) {
-        if (
-          ethProvider &&
-          ethProvider.resolveName &&
-          typeof ethProvider.resolveName === 'function'
-        ) {
-          debug('resolving ENS', value);
-          return wrapCall(ethProvider.resolveName(value))
-            .then((resolved) => {
-              debug('resolved ENS', resolved);
-              return resolved;
-            })
-            .catch((error) => {
-              debug('ENS resolution error', error);
-              return null;
-            });
-        }
-        debug("no ethProvider ENS can't be resolved");
-      }
-      return getAddress(value.toLowerCase());
-    }
-  } catch (e) {
-    debug('Error', e);
+const toChecksummedAddress = (value) => {
+  if (typeof value === 'string' && isAddress(value.toLowerCase())) {
+    return getAddress(value.toLowerCase());
   }
   return value;
 };
 
-const testResolveEnsPromise = async (value) => {
-  if (value === undefined) {
-    return true;
-  }
-  if (typeof value === 'string') {
-    return !value.match(/^.*\.eth$/);
-  }
-  try {
-    const address = await value;
-    if (!address) return false;
-    getAddress(address);
-    return true;
-  } catch (e) {
-    debug('resolve-ens', e);
-    return false;
-  }
-};
-
-const testAddressOrAddressPromise = async (value) => {
-  if (value === undefined) {
-    return true;
-  }
-  const resolvedValue = typeof value === 'string' ? value : await value;
-  return isAddress(resolvedValue);
-};
-
-export const addressSchema = ({ ethProvider } = {}) =>
-  mixed()
-    .transform((value) => transformAddressOrEns(ethProvider)(value))
-    .test('resolve-ens', 'Unable to resolve ENS ${originalValue}', (value) =>
-      testResolveEnsPromise(value),
-    )
+export const addressSchema = () =>
+  string()
+    .transform((value) => toChecksummedAddress(value))
     .test(
       'is-address',
       '${originalValue} is not a valid ethereum address',
-      (value) => testAddressOrAddressPromise(value),
+      (value) => isAddress(value) || value === undefined,
     );
 
-export const addressOrAnySchema = ({ ethProvider } = {}) =>
-  mixed()
-    .transform((value) => {
-      if (value === ANY) {
-        return value;
-      }
-      return transformAddressOrEns(ethProvider)(value);
-    })
-    .test('resolve-ens', 'Unable to resolve ENS ${originalValue}', (value) => {
-      if (value === ANY) {
-        return true;
-      }
-      return testResolveEnsPromise(value);
-    })
+export const addressOrAnySchema = () =>
+  string()
+    .transform((value) => toChecksummedAddress(value))
     .test(
       'is-address',
       '${originalValue} is not a valid ethereum address',
       (value) => {
-        if (value === ANY) {
-          return true;
-        }
-        return testAddressOrAddressPromise(value);
+        return isAddress(value) || value === undefined || value === ANY;
       },
     );
 
@@ -476,54 +409,54 @@ export const tagSchema = ({ allowAgnosticTee = false } = {}) =>
       },
     );
 
-export const apporderSchema = (opt) =>
+export const apporderSchema = () =>
   object(
     {
-      app: addressSchema(opt).required(),
+      app: addressSchema().required(),
       appprice: nRlcAmountSchema().required(),
       volume: uint256Schema().required(),
       tag: tagSchema().required(),
-      datasetrestrict: addressSchema(opt).required(),
-      workerpoolrestrict: addressSchema(opt).required(),
-      requesterrestrict: addressSchema(opt).required(),
+      datasetrestrict: addressSchema().required(),
+      workerpoolrestrict: addressSchema().required(),
+      requesterrestrict: addressSchema().required(),
     },
     '${originalValue} is not a valid apporder',
   );
 
-export const saltedApporderSchema = (opt) =>
-  apporderSchema(opt).shape(
+export const saltedApporderSchema = () =>
+  apporderSchema().shape(
     salted(),
     '${originalValue} is not a valid salted apporder',
   );
 
-export const signedApporderSchema = (opt) =>
-  saltedApporderSchema(opt).shape(
+export const signedApporderSchema = () =>
+  saltedApporderSchema().shape(
     signed(),
     '${originalValue} is not a valid signed apporder',
   );
 
-export const datasetorderSchema = (opt) =>
+export const datasetorderSchema = () =>
   object(
     {
-      dataset: addressSchema(opt).required(),
+      dataset: addressSchema().required(),
       datasetprice: nRlcAmountSchema().required(),
       volume: uint256Schema().required(),
       tag: tagSchema({ allowAgnosticTee: true }).required(),
-      apprestrict: addressSchema(opt).required(),
-      workerpoolrestrict: addressSchema(opt).required(),
-      requesterrestrict: addressSchema(opt).required(),
+      apprestrict: addressSchema().required(),
+      workerpoolrestrict: addressSchema().required(),
+      requesterrestrict: addressSchema().required(),
     },
     '${originalValue} is not a valid datasetorder',
   );
 
-export const saltedDatasetorderSchema = (opt) =>
-  datasetorderSchema(opt).shape(
+export const saltedDatasetorderSchema = () =>
+  datasetorderSchema().shape(
     salted(),
     '${originalValue} is not a valid salted datasetorder',
   );
 
-export const signedDatasetorderSchema = (opt) =>
-  saltedDatasetorderSchema(opt).shape(
+export const signedDatasetorderSchema = () =>
+  saltedDatasetorderSchema().shape(
     signed(),
     '${originalValue} is not a valid signed datasetorder',
   );
@@ -555,63 +488,63 @@ export const signedDatasetorderBulkSchema = () =>
     '${originalValue} is not a valid bulk datasetorder',
   );
 
-export const workerpoolorderSchema = (opt) =>
+export const workerpoolorderSchema = () =>
   object(
     {
-      workerpool: addressSchema(opt).required(),
+      workerpool: addressSchema().required(),
       workerpoolprice: nRlcAmountSchema().required(),
       volume: uint256Schema().required(),
       tag: tagSchema().required(),
       category: catidSchema().required(),
       trust: uint256Schema().required(),
-      apprestrict: addressSchema(opt).required(),
-      datasetrestrict: addressSchema(opt).required(),
-      requesterrestrict: addressSchema(opt).required(),
+      apprestrict: addressSchema().required(),
+      datasetrestrict: addressSchema().required(),
+      requesterrestrict: addressSchema().required(),
     },
     '${originalValue} is not a valid workerpoolorder',
   );
 
-export const saltedWorkerpoolorderSchema = (opt) =>
-  workerpoolorderSchema(opt).shape(
+export const saltedWorkerpoolorderSchema = () =>
+  workerpoolorderSchema().shape(
     salted(),
     '${originalValue} is not a valid salted workerpoolorder',
   );
 
-export const signedWorkerpoolorderSchema = (opt) =>
-  saltedWorkerpoolorderSchema(opt).shape(
+export const signedWorkerpoolorderSchema = () =>
+  saltedWorkerpoolorderSchema().shape(
     signed(),
     '${originalValue} is not a valid signed workerpoolorder',
   );
 
-export const requestorderSchema = (opt) =>
+export const requestorderSchema = () =>
   object(
     {
-      app: addressSchema(opt).required(),
+      app: addressSchema().required(),
       appmaxprice: nRlcAmountSchema().required(),
-      dataset: addressSchema(opt).required(),
+      dataset: addressSchema().required(),
       datasetmaxprice: nRlcAmountSchema().required(),
-      workerpool: addressSchema(opt).required(),
+      workerpool: addressSchema().required(),
       workerpoolmaxprice: nRlcAmountSchema().required(),
-      requester: addressSchema(opt).required(),
+      requester: addressSchema().required(),
       volume: uint256Schema().required(),
       tag: tagSchema({ allowAgnosticTee: true }).required(),
       category: catidSchema().required(),
       trust: uint256Schema().required(),
-      beneficiary: addressSchema(opt).required(),
-      callback: addressSchema(opt).required(),
+      beneficiary: addressSchema().required(),
+      callback: addressSchema().required(),
       params: paramsSchema(),
     },
     '${originalValue} is not a valid requestorder',
   );
 
-export const saltedRequestorderSchema = (opt) =>
-  requestorderSchema(opt).shape(
+export const saltedRequestorderSchema = () =>
+  requestorderSchema().shape(
     salted(),
     '${originalValue} is not a valid salted requestorder',
   );
 
-export const signedRequestorderSchema = (opt) =>
-  saltedRequestorderSchema(opt).shape(
+export const signedRequestorderSchema = () =>
+  saltedRequestorderSchema().shape(
     signed(),
     '${originalValue} is not a valid signed requestorder',
   );
@@ -692,9 +625,9 @@ export const mrenclaveSchema = () =>
 export const appTypeSchema = () =>
   string().oneOf(['DOCKER'], '${originalValue} is not a valid type');
 
-export const appSchema = (opt) =>
+export const appSchema = () =>
   object({
-    owner: addressSchema(opt).required(),
+    owner: addressSchema().required(),
     name: string().required(),
     type: appTypeSchema().required(),
     multiaddr: multiaddressSchema().required(),
@@ -702,17 +635,17 @@ export const appSchema = (opt) =>
     mrenclave: mrenclaveSchema().required(),
   });
 
-export const datasetSchema = (opt) =>
+export const datasetSchema = () =>
   object({
-    owner: addressSchema(opt).required(),
+    owner: addressSchema().required(),
     name: string().required(),
     multiaddr: multiaddressSchema().required(),
     checksum: bytes32Schema().required(),
   });
 
-export const workerpoolSchema = (opt) =>
+export const workerpoolSchema = () =>
   object({
-    owner: addressSchema(opt).required(),
+    owner: addressSchema().required(),
     description: string().required(),
   });
 
@@ -754,103 +687,6 @@ export const base64Encoded256bitsKeySchema = () =>
       }
     },
   );
-
-export const ensDomainSchema = () =>
-  string()
-    .test(
-      'no-empty-label',
-      '${originalValue} is not a valid ENS domain (domain cannot have empty labels)',
-      (value) => {
-        try {
-          const nameArray = value.split('.');
-          const hasEmptyLabels =
-            nameArray.filter((e) => e.length < 1).length > 0;
-          if (hasEmptyLabels)
-            throw new Error('Domain cannot have empty labels');
-          return true;
-        } catch (e) {
-          debug('ensDomainSchema no-empty-label', e);
-          return false;
-        }
-      },
-    )
-    .test(
-      'valid-namehash',
-      '${originalValue} is not a valid ENS domain (domain cannot contain unsupported characters)',
-      (value) => {
-        try {
-          namehash(value);
-          return true;
-        } catch (e) {
-          debug('ensDomainSchema valid-namehash', e);
-          return false;
-        }
-      },
-    )
-    .test(
-      'no-uppercase',
-      '${originalValue} is not a valid ENS domain (domain cannot contain uppercase characters)',
-      (value) => {
-        try {
-          if (value !== value.toLowerCase()) {
-            throw new Error('Domain cannot have uppercase characters');
-          }
-          return true;
-        } catch (e) {
-          debug('ensDomainSchema no-uppercase', e);
-          return false;
-        }
-      },
-    );
-
-export const ensLabelSchema = () =>
-  string()
-    .test(
-      'no-dot',
-      '${originalValue} is not a valid ENS label (label cannot have `.`)',
-      async (value) => {
-        try {
-          const hasDot = value.indexOf('.') !== -1;
-          if (hasDot) throw new Error('Label cannot have `.`');
-          return true;
-        } catch (e) {
-          debug('ensLabelSchema no-dot', e);
-          return false;
-        }
-      },
-    )
-    .test(
-      'valid-namehash',
-      '${originalValue} is not a valid ENS label (label cannot contain unsupported characters)',
-      (value) => {
-        try {
-          namehash(value);
-          return true;
-        } catch (e) {
-          debug('ensLabelSchema valid-namehash', e);
-          return false;
-        }
-      },
-    )
-    .test(
-      'no-uppercase',
-      '${originalValue} is not a valid ENS label (label cannot contain uppercase characters)',
-      (value) => {
-        try {
-          if (value !== value.toLowerCase()) {
-            throw new Error('Label cannot have uppercase characters');
-          }
-          return true;
-        } catch (e) {
-          debug('ensLabelSchema no-uppercase', e);
-          return false;
-        }
-      },
-    );
-
-export const textRecordKeySchema = () => string().required().strict(true);
-
-export const textRecordValueSchema = () => string().default('').strict(true);
 
 export const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');

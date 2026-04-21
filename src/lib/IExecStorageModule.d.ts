@@ -3,7 +3,7 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Addressish } from '../common/types.js';
+import { Address } from '../common/types.js';
 
 /**
  * module exposing storage methods
@@ -21,7 +21,7 @@ export default class IExecStorageModule extends IExecModule {
    * ```
    */
   checkStorageTokenExists(
-    beneficiaryAddress: Addressish,
+    beneficiaryAddress: Address,
     options?: {
       provider?: string;
     },

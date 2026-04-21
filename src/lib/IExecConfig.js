@@ -14,7 +14,6 @@ export default class IExecConfig {
     { ethProvider } = {},
     {
       hubAddress,
-      ensPublicResolverAddress,
       isNative,
       useGas = true,
       confirms,
@@ -146,9 +145,7 @@ export default class IExecConfig {
         throw new Error(`Failed to detect network: ${err.message}`);
       });
       const { chainId, name } = network;
-      const ensPlugin = network.getPlugin('org.ethers.plugins.network.Ens');
-      const ensAddress = ensPlugin ? ensPlugin.address : undefined;
-      return { chainId: Number(chainId), name, ensAddress };
+      return { chainId: Number(chainId), name };
     })();
 
     networkPromise.catch((err) => {
@@ -274,19 +271,6 @@ export default class IExecConfig {
       }
       throw new ConfigurationError(
         `pocoSubgraphURL option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    this.resolveEnsPublicResolverAddress = async () => {
-      const { chainId } = await networkPromise;
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value =
-        ensPublicResolverAddress || chainConfDefaults.ensPublicResolver;
-      if (value !== undefined) {
-        return value;
-      }
-      throw new ConfigurationError(
-        `ensPublicResolverAddress option not set and no default value for your chain ${chainId}`,
       );
     };
   }
