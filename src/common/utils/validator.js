@@ -852,11 +852,6 @@ export const textRecordKeySchema = () => string().required().strict(true);
 
 export const textRecordValueSchema = () => string().default('').strict(true);
 
-export const workerpoolApiUrlSchema = () =>
-  string()
-    .matches(/^(https?:\/\/.*)?$/, '${path} "${value}" is not a valid URL') // accept empty string to reset workerpool URL
-    .default('');
-
 export const throwIfMissing = () => {
   throw new ValidationError('Missing parameter');
 };

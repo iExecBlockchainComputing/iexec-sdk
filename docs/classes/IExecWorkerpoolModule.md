@@ -182,38 +182,6 @@ console.log('address', address);
 
 ***
 
-### setWorkerpoolApiUrl()
-
-> **setWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`\<`string`\>
-
-**ONLY WORKERPOOL ENS NAME OWNER**
-
-declare the workerpool API url on the blockchain
-
-_NB_: declaring the workerpool API url require an ENS name with a configured reverse resolution on the workerpool address (see: IExecENSModule obsConfigureResolution/configureResolution)
-
-example:
-```js
-const txHash = await setWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
-console.log('txHash:', txHash);
-```
-
-#### Parameters
-
-##### workerpoolAddress
-
-`string`
-
-##### url
-
-`string`
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
 ### showUserWorkerpool()
 
 > **showUserWorkerpool**(`index`, `address`): `Promise`\<\{ `objAddress`: `string`; `workerpool`: [`Workerpool`](../-internal-/interfaces/Workerpool.md); \}\>

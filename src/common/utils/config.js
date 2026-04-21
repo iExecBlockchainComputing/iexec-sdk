@@ -3,7 +3,6 @@ import { ConfigurationError } from './errors.js';
 
 export const CHAIN_SPECIFIC_FEATURES = {
   ENS: 'ENS',
-  WORKERPOOL_API_URL_REGISTRATION: 'Workerpool API Registration',
   COMPASS: 'iExec Compass',
   BULK_PROCESSING: 'Bulk processing',
 };
@@ -69,10 +68,7 @@ const networkConfigs = [
     shouldRegisterNetwork: false,
     isExperimental: false,
     uploadBulkForThegraph: true,
-    notImplemented: [
-      CHAIN_SPECIFIC_FEATURES.ENS,
-      CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
-    ],
+    notImplemented: [CHAIN_SPECIFIC_FEATURES.ENS],
   },
   {
     id: 42161,
@@ -91,10 +87,7 @@ const networkConfigs = [
       'https://thegraph.arbitrum.iex.ec/api/subgraphs/id/B1comLe9SANBLrjdnoNTJSubbeC7cY7EoNu6zD82HeKy',
     shouldRegisterNetwork: false,
     uploadBulkForThegraph: true,
-    notImplemented: [
-      CHAIN_SPECIFIC_FEATURES.ENS,
-      CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
-    ],
+    notImplemented: [CHAIN_SPECIFIC_FEATURES.ENS],
   },
 ];
 
