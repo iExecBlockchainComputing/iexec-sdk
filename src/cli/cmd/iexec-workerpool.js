@@ -47,7 +47,6 @@ import {
 } from '../utils/fs.js';
 import { Keystore } from '../utils/keystore.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
-import { setWorkerpoolApiUrl } from '../../common/execution/workerpool.js';
 import { getWorkerpoolApiUrl } from '../../common/execution/debug.js';
 import { lookupAddress } from '../../common/ens/resolution.js';
 import { ConfigurationError } from '../../common/utils/errors.js';
@@ -119,49 +118,6 @@ deploy
         raw: { address, txHash },
       });
       await saveDeployedObj(objName, chain.id, address);
-    } catch (error) {
-      handleError(error, cli, opts);
-    }
-  });
-
-const setApiUrl = cli.command('set-api-url <apiUrl> [workerpoolAddress]');
-addGlobalOptions(setApiUrl);
-addWalletLoadOptions(setApiUrl);
-setApiUrl
-  .option(...option.chain())
-  .option(...option.txGasPrice())
-  .option(...option.txConfirms())
-  .description('declare the workerpool API URL on the blockchain')
-  .action(async (url, workerpoolAddress, opts) => {
-    await checkUpdate(opts);
-    const spinner = Spinner(opts);
-    try {
-      const walletOptions = computeWalletLoadOptions(opts);
-      const txOptions = await computeTxOptions(opts);
-      const keystore = Keystore(walletOptions);
-      const chain = await loadChain(opts.chain, { txOptions, spinner });
-      const address =
-        workerpoolAddress ||
-        (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
-        ));
-      if (!address) {
-        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
-      }
-      const ens = await lookupAddress(chain.contracts, address);
-      if (!ens) {
-        throw new Error(info.missingEnsForObjectAtAddress(objName, address));
-      }
-
-      await connectKeystore(chain, keystore, { txOptions });
-      spinner.start(`Setting API URL for workerpool ${address}`);
-      const txHash = await setWorkerpoolApiUrl(chain.contracts, address, url);
-      spinner.succeed(
-        `API URL "${url}" is set for ${objName} at address ${address}`,
-        {
-          raw: { address, url, txHash },
-        },
-      );
     } catch (error) {
       handleError(error, cli, opts);
     }
