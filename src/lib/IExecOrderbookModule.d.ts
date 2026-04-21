@@ -5,7 +5,6 @@ import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
 import {
   Address,
-  Addressish,
   BNish,
   Bytes,
   Bytes32,
@@ -152,29 +151,29 @@ export default class IExecOrderbookModule extends IExecModule {
    */
   fetchAppOrderbook(
     appAddressOrOptions:
-      | Addressish
+      | Address
       | 'any'
       | {
           /**
            * filter by app
            */
-          app?: Addressish | 'any';
+          app?: Address | 'any';
           /**
            * filter by app owner
            */
-          appOwner?: Addressish;
+          appOwner?: Address;
           /**
            * include orders restricted to specified dataset (use `'any'` to include any dataset)
            */
-          dataset?: Addressish | 'any';
+          dataset?: Address | 'any';
           /**
            * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
            */
-          workerpool?: Addressish | 'any';
+          workerpool?: Address | 'any';
           /**
            * include orders restricted to specified requester (use `'any'` to include any requester)
            */
-          requester?: Addressish | 'any';
+          requester?: Address | 'any';
           /**
            * filter by minimum volume remaining
            */
@@ -219,15 +218,15 @@ export default class IExecOrderbookModule extends IExecModule {
       /**
        * include orders restricted to specified dataset (use `'any'` to include any dataset)
        */
-      dataset?: Addressish | 'any';
+      dataset?: Address | 'any';
       /**
        * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
        */
-      workerpool?: Addressish | 'any';
+      workerpool?: Address | 'any';
       /**
        * include orders restricted to specified requester (use `'any'` to include any requester)
        */
-      requester?: Addressish | 'any';
+      requester?: Address | 'any';
       /**
        * filter by minimum volume remaining
        */
@@ -276,29 +275,29 @@ export default class IExecOrderbookModule extends IExecModule {
    */
   fetchDatasetOrderbook(
     datasetAddressOrOptions:
-      | Addressish
+      | Address
       | 'any'
       | {
           /**
            * filter by dataset
            */
-          dataset?: Addressish | 'any';
+          dataset?: Address | 'any';
           /**
            * filter by dataset owner
            */
-          datasetOwner?: Addressish;
+          datasetOwner?: Address;
           /**
            * include orders restricted to specified app (use `'any'` to include any app)
            */
-          app?: Addressish | 'any';
+          app?: Address | 'any';
           /**
            * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
            */
-          workerpool?: Addressish | 'any';
+          workerpool?: Address | 'any';
           /**
            * include orders restricted to specified requester (use `'any'` to include any requester)
            */
-          requester?: Addressish | 'any';
+          requester?: Address | 'any';
           /**
            * filter by minimum volume remaining
            */
@@ -347,15 +346,15 @@ export default class IExecOrderbookModule extends IExecModule {
       /**
        * include orders restricted to specified app (use `'any'` to include any app)
        */
-      app?: Addressish | 'any';
+      app?: Address | 'any';
       /**
        * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
        */
-      workerpool?: Addressish | 'any';
+      workerpool?: Address | 'any';
       /**
        * include orders restricted to specified requester (use `'any'` to include any requester)
        */
-      requester?: Addressish | 'any';
+      requester?: Address | 'any';
       /**
        * filter by minimum volume remaining
        */
@@ -410,11 +409,11 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * filter by workerpool
      */
-    workerpool?: Addressish;
+    workerpool?: Address;
     /**
      * filter by workerpool owner
      */
-    workerpoolOwner?: Addressish;
+    workerpoolOwner?: Address;
     /**
      * filter by category
      */
@@ -422,15 +421,15 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * include orders restricted to specified app (use `'any'` to include any app)
      */
-    app?: Addressish | 'any';
+    app?: Address | 'any';
     /**
      * include orders restricted to specified dataset (use `'any'` to include any dataset)
      */
-    dataset?: Addressish | 'any';
+    dataset?: Address | 'any';
     /**
      * include orders restricted to specified requester (use `'any'` to include any requester)
      */
-    requester?: Addressish | 'any';
+    requester?: Address | 'any';
     /**
      * filter by minimum volume remaining
      */
@@ -484,7 +483,7 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * filter by requester
      */
-    requester?: Addressish;
+    requester?: Address;
     /**
      * filter by category
      */
@@ -492,15 +491,15 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * filter by specified app
      */
-    app?: Addressish;
+    app?: Address;
     /**
      * filter by specified dataset
      */
-    dataset?: Addressish;
+    dataset?: Address;
     /**
      * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
      */
-    workerpool?: Addressish | 'any';
+    workerpool?: Address | 'any';
     /**
      * filter by minimum volume remaining
      */

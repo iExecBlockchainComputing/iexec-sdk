@@ -10,7 +10,6 @@ import {
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
-import { ConfigurationError } from '../../../src/lib/errors.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 

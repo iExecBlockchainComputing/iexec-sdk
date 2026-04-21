@@ -22,8 +22,6 @@ describe('getId()', () => {
 describe('getChainDefaults', () => {
   test('id 134 returns bellecour config', () => {
     expect(getChainDefaults(134)).toEqual({
-      ensPublicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
-      ensRegistry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
       host: 'https://bellecour.iex.ec',
       hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
       iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
@@ -61,26 +59,6 @@ describe('Networks', () => {
 });
 
 describe('checkImplementedOnChain', () => {
-  describe(`feature ${CHAIN_SPECIFIC_FEATURES.ENS}`, () => {
-    const feature = CHAIN_SPECIFIC_FEATURES.ENS;
-    test('is implemented on bellecour', () => {
-      expect(() => checkImplementedOnChain(134, feature)).not.toThrow();
-    });
-    test('is implemented on mainnet', () => {
-      expect(() => checkImplementedOnChain(1, feature)).not.toThrow();
-    });
-    test('is not implemented on arbitrum-mainnet', () => {
-      expect(() => checkImplementedOnChain(42161, feature)).toThrow(
-        `${feature} is not available on network arbitrum-mainnet`,
-      );
-    });
-    test('is not implemented on arbitrum-sepolia-testnet', () => {
-      expect(() => checkImplementedOnChain(421614, feature)).toThrow(
-        `${feature} is not available on network arbitrum-sepolia-testnet`,
-      );
-    });
-  });
-
   describe(`feature ${CHAIN_SPECIFIC_FEATURES.COMPASS}`, () => {
     const feature = CHAIN_SPECIFIC_FEATURES.COMPASS;
     test('is not implemented on bellecour', () => {

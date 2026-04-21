@@ -94,10 +94,8 @@ checkSecret
           `Checking secret "${secretName}" exists for wallet ${address}`,
         );
       }
-      const { contracts } = chain;
       const sms = getPropertyFromChain(chain, 'sms');
       const secretExists = await checkRequesterSecretExists(
-        contracts,
         sms,
         address,
         secretName,

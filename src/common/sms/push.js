@@ -121,7 +121,6 @@ export const pushWeb2Secret = async (
     await stringSchema().validate(secretName, { strict: true });
     await stringSchema().validate(secretValue, { strict: true });
     const secretExists = await checkWeb2SecretExists(
-      contracts,
       smsURL,
       ownerAddress,
       secretName,
@@ -181,7 +180,6 @@ export const pushRequesterSecret = async (
     await stringSchema().validate(secretName, { strict: true });
     await stringSchema().validate(secretValue, { strict: true });
     const secretExists = await checkRequesterSecretExists(
-      contracts,
       smsURL,
       requesterAddress,
       secretName,

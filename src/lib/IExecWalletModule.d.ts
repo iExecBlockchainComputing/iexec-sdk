@@ -3,15 +3,7 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import {
-  Address,
-  Addressish,
-  NRLCAmount,
-  TxHash,
-  WeiAmount,
-  BN,
-} from '../common/types.js';
-import { Observable } from '../common/utils/reactive.js';
+import { Address, NRLCAmount, TxHash, WeiAmount, BN } from '../common/types.js';
 
 /**
  * module exposing wallet methods
@@ -39,7 +31,7 @@ export default class IExecWalletModule extends IExecModule {
    * console.log('ethereum wei:', wei.toString());
    * ```
    */
-  checkBalances(address: Addressish): Promise<{
+  checkBalances(address: Address): Promise<{
     wei: BN;
     nRLC: BN;
   }>;
@@ -54,7 +46,7 @@ export default class IExecWalletModule extends IExecModule {
    * console.log('transaction hash:', txHash);
    * ```
    */
-  sendETH(WeiAmount: WeiAmount, to: Addressish): Promise<TxHash>;
+  sendETH(WeiAmount: WeiAmount, to: Address): Promise<TxHash>;
   /**
    * **SIGNER REQUIRED**
    *
@@ -66,7 +58,7 @@ export default class IExecWalletModule extends IExecModule {
    * console.log('transaction hash:', txHash);
    * ```
    */
-  sendRLC(nRLCAmount: NRLCAmount, to: Addressish): Promise<TxHash>;
+  sendRLC(nRLCAmount: NRLCAmount, to: Address): Promise<TxHash>;
   /**
    * **SIGNER REQUIRED**
    *
@@ -80,7 +72,7 @@ export default class IExecWalletModule extends IExecModule {
    * ```
    */
   sweep(
-    to: Addressish,
+    to: Address,
   ): Promise<{ sendERC20TxHash: TxHash; sendNativeTxHash: TxHash }>;
   /**
    * Create an IExecWalletModule instance using an IExecConfig instance

@@ -36,14 +36,6 @@ number of block to wait for transactions confirmation (default 1)
 
 ***
 
-### ensPublicResolverAddress?
-
-> `optional` **ensPublicResolverAddress**: `string`
-
-override the ENS public resolver contract address to target a custom instance
-
-***
-
 ### hubAddress?
 
 > `optional` **hubAddress**: `string`

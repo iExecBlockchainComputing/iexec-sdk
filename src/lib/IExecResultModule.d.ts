@@ -3,7 +3,7 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Addressish } from '../common/types.js';
+import { Address } from '../common/types.js';
 
 /**
  * module exposing result methods
@@ -18,9 +18,7 @@ export default class IExecResultModule extends IExecModule {
    * console.log('encryption key available:', isEncryptionKeyAvailable);
    * ```
    */
-  checkResultEncryptionKeyExists(
-    beneficiaryAddress: Addressish,
-  ): Promise<boolean>;
+  checkResultEncryptionKeyExists(beneficiaryAddress: Address): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY BENEFICIARY**
    *

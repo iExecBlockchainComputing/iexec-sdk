@@ -51,12 +51,6 @@
       "browser": "./dist/esm/lib/IExecDealModule.js",
       "default": "./dist/esm/lib/IExecDealModule.js"
     },
-    "./IExecENSModule": {
-      "types": "./dist/esm/lib/IExecENSModule.d.ts",
-      "import": "./dist/esm/lib/IExecENSModule.js",
-      "browser": "./dist/esm/lib/IExecENSModule.js",
-      "default": "./dist/esm/lib/IExecENSModule.js"
-    },
     "./IExecHubModule": {
       "types": "./dist/esm/lib/IExecHubModule.d.ts",
       "import": "./dist/esm/lib/IExecHubModule.js",
@@ -166,7 +160,6 @@
     "IExecDatasetModule",
     "IExecConfig",
     "IExecDealModule",
-    "IExecENSModule",
     "IExecHubModule",
     "IExecModule",
     "IExecNetworkModule",
@@ -216,7 +209,6 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "@ensdomains/ens-contracts": "^1.2.5",
     "@eslint/js": "^9.23.0",
     "@iexec/poco": "^6.1.0",
     "eslint": "^9.23.0",

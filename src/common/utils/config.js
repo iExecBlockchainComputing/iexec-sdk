@@ -1,8 +1,7 @@
-import { EnsPlugin, Network } from 'ethers';
+import { Network } from 'ethers';
 import { ConfigurationError } from './errors.js';
 
 export const CHAIN_SPECIFIC_FEATURES = {
-  ENS: 'ENS',
   COMPASS: 'iExec Compass',
   BULK_PROCESSING: 'Bulk processing',
 };
@@ -13,14 +12,12 @@ const networkConfigs = [
     name: 'bellecour',
     hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
     host: 'https://bellecour.iex.ec',
-    ensRegistry: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
-    ensPublicResolver: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
     sms: 'https://sms.iex.ec',
     resultProxy: 'https://result.v8-bellecour.iex.ec',
     ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
     ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
     iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
-    compass: undefined, // no compass using ENS
+    compass: undefined, // no compass
     pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
     shouldRegisterNetwork: true,
     isExperimental: false,
@@ -34,8 +31,6 @@ const networkConfigs = [
     name: 'mainnet',
     hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
     host: 'mainnet',
-    ensRegistry: undefined, // use ethers default
-    ensPublicResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
     sms: undefined, // no protocol running
     resultProxy: undefined, // no protocol running
     ipfsGateway: undefined, // no protocol running
@@ -55,8 +50,6 @@ const networkConfigs = [
     name: 'arbitrum-sepolia-testnet',
     hub: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
     host: 'https://sepolia-rollup.arbitrum.io/rpc',
-    ensRegistry: undefined, // not supported
-    ensPublicResolver: undefined, // not supported
     sms: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
@@ -68,15 +61,13 @@ const networkConfigs = [
     shouldRegisterNetwork: false,
     isExperimental: false,
     uploadBulkForThegraph: true,
-    notImplemented: [CHAIN_SPECIFIC_FEATURES.ENS],
+    notImplemented: [],
   },
   {
     id: 42161,
     name: 'arbitrum-mainnet',
     hub: '0x098bFCb1E50ebcA0BaA92C12eA0c3F045A1aD9f0',
     host: 'https://arb1.arbitrum.io/rpc',
-    ensRegistry: undefined, // not supported
-    ensPublicResolver: undefined, // not supported
     sms: 'https://sms.arbitrum-mainnet.iex.ec',
     resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
@@ -87,7 +78,7 @@ const networkConfigs = [
       'https://thegraph.arbitrum.iex.ec/api/subgraphs/id/B1comLe9SANBLrjdnoNTJSubbeC7cY7EoNu6zD82HeKy',
     shouldRegisterNetwork: false,
     uploadBulkForThegraph: true,
-    notImplemented: [CHAIN_SPECIFIC_FEATURES.ENS],
+    notImplemented: [],
   },
 ];
 
@@ -110,8 +101,6 @@ export const getChainDefaults = (
   const {
     name,
     host,
-    ensRegistry,
-    ensPublicResolver,
     hub,
     sms,
     resultProxy,
@@ -130,8 +119,6 @@ export const getChainDefaults = (
   return {
     name,
     host,
-    ensRegistry,
-    ensPublicResolver,
     hub,
     sms,
     resultProxy,
@@ -158,17 +145,13 @@ export const checkImplementedOnChain = (chainId, featureName) => {
   }
 };
 
-// Register unknown networks and their ENS settings for the ethers library
+// Register unknown networks for the ethers library
 networkConfigs.forEach((networkConfig) => {
   if (
     networkConfig.shouldRegisterNetwork &&
-    Network.from(networkConfig.id).name === 'unknown' &&
-    networkConfig.ensRegistry
+    Network.from(networkConfig.id).name === 'unknown'
   ) {
-    const network = new Network(
-      networkConfig.name,
-      networkConfig.id,
-    ).attachPlugin(new EnsPlugin(networkConfig.ensRegistry, networkConfig.id));
+    const network = new Network(networkConfig.name, networkConfig.id);
     Network.register(network.chainId, () => network);
     Network.register(network.name, () => network);
   }

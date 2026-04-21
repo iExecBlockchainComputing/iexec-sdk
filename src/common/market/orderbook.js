@@ -81,33 +81,21 @@ export const fetchAppOrderbook = async (
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
       ...(app && {
-        app: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('app')
-          .validate(app),
+        app: await addressOrAnySchema().label('app').validate(app),
       }),
       ...(appOwner && {
-        appOwner: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        appOwner: await addressOrAnySchema()
           .label('appOwner')
           .validate(appOwner),
       }),
       ...(dataset && {
-        dataset: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('dataset')
-          .validate(dataset),
+        dataset: await addressOrAnySchema().label('dataset').validate(dataset),
       }),
       isDatasetStrict: await booleanSchema()
         .label('isDatasetStrict')
         .validate(isDatasetStrict),
       ...(workerpool && {
-        workerpool: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        workerpool: await addressOrAnySchema()
           .label('workerpool')
           .validate(workerpool),
       }),
@@ -115,9 +103,7 @@ export const fetchAppOrderbook = async (
         .label('isWorkerpoolStrict')
         .validate(isWorkerpoolStrict),
       ...(requester && {
-        requester: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        requester: await addressOrAnySchema()
           .label('requester')
           .validate(requester),
       }),
@@ -232,33 +218,21 @@ export const fetchDatasetOrderbook = async (
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
       ...(dataset && {
-        dataset: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('dataset')
-          .validate(dataset),
+        dataset: await addressOrAnySchema().label('dataset').validate(dataset),
       }),
       ...(datasetOwner && {
-        datasetOwner: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        datasetOwner: await addressOrAnySchema()
           .label('datasetOwner')
           .validate(datasetOwner),
       }),
       ...(app && {
-        app: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('app')
-          .validate(app),
+        app: await addressOrAnySchema().label('app').validate(app),
       }),
       isAppStrict: await booleanSchema()
         .label('isAppStrict')
         .validate(isAppStrict),
       ...(workerpool && {
-        workerpool: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        workerpool: await addressOrAnySchema()
           .label('workerpool')
           .validate(workerpool),
       }),
@@ -266,9 +240,7 @@ export const fetchDatasetOrderbook = async (
         .label('isWorkerpoolStrict')
         .validate(isWorkerpoolStrict),
       ...(requester && {
-        requester: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        requester: await addressOrAnySchema()
           .label('requester')
           .validate(requester),
       }),
@@ -345,36 +317,24 @@ export const fetchWorkerpoolOrderbook = async (
         .validate(contracts.chainId),
       category: await uint256Schema().label('category').validate(category),
       ...(workerpool && {
-        workerpool: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        workerpool: await addressOrAnySchema()
           .label('workerpool')
           .validate(workerpool),
       }),
       ...(app && {
-        app: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('app')
-          .validate(app),
+        app: await addressOrAnySchema().label('app').validate(app),
       }),
       isAppStrict: await booleanSchema()
         .label('isAppStrict')
         .validate(isAppStrict),
       ...(dataset && {
-        dataset: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('dataset')
-          .validate(dataset),
+        dataset: await addressOrAnySchema().label('dataset').validate(dataset),
       }),
       isDatasetStrict: await booleanSchema()
         .label('isDatasetStrict')
         .validate(isDatasetStrict),
       ...(requester && {
-        requester: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        requester: await addressOrAnySchema()
           .label('requester')
           .validate(requester),
       }),
@@ -392,9 +352,7 @@ export const fetchWorkerpoolOrderbook = async (
           .validate(maxTag),
       }),
       ...(workerpoolOwner && {
-        workerpoolOwner: await addressSchema({
-          ethProvider: contracts.provider,
-        })
+        workerpoolOwner: await addressSchema()
           .label('workerpoolOwner')
           .validate(workerpoolOwner),
       }),
@@ -460,37 +418,23 @@ export const fetchRequestOrderbook = async (
         .validate(contracts.chainId),
       category: await uint256Schema().label('category').validate(category),
       ...(requester && {
-        requester: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        requester: await addressOrAnySchema()
           .label('requester')
           .validate(requester),
       }),
       ...(beneficiary && {
-        beneficiary: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        beneficiary: await addressOrAnySchema()
           .label('beneficiary')
           .validate(beneficiary),
       }),
       ...(app && {
-        app: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('app')
-          .validate(app),
+        app: await addressOrAnySchema().label('app').validate(app),
       }),
       ...(dataset && {
-        dataset: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('dataset')
-          .validate(dataset),
+        dataset: await addressOrAnySchema().label('dataset').validate(dataset),
       }),
       ...(workerpool && {
-        workerpool: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        workerpool: await addressOrAnySchema()
           .label('workerpool')
           .validate(workerpool),
       }),

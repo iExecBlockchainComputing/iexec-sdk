@@ -50,10 +50,6 @@ export interface IExecConfigOptions {
    */
   hubAddress?: string;
   /**
-   * override the ENS public resolver contract address to target a custom instance
-   */
-  ensPublicResolverAddress?: string;
-  /**
    * override the result proxy URL to target a custom instance
    */
   resultProxyURL?: string;
@@ -172,8 +168,4 @@ export default class IExecConfig {
    * resolve the current PoCo subgraph URL
    */
   resolvePocoSubgraphURL(): Promise<string>;
-  /**
-   * resolve the current ENS public resolver contract address
-   */
-  resolveEnsPublicResolverAddress(): Promise<string>;
 }

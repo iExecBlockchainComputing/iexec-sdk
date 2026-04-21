@@ -38,11 +38,7 @@ export default class IExecDatasetModule extends IExecModule {
     this.countUserDatasets = async (address) =>
       countUserDatasets(await this.config.resolveContractsClient(), address);
     this.checkDatasetSecretExists = async (datasetAddress) =>
-      checkWeb3SecretExists(
-        await this.config.resolveContractsClient(),
-        await this.config.resolveSmsURL(),
-        datasetAddress,
-      );
+      checkWeb3SecretExists(await this.config.resolveSmsURL(), datasetAddress);
     this.pushDatasetSecret = async (datasetAddress, datasetSecret) =>
       pushWeb3Secret(
         await this.config.resolveContractsClient(),

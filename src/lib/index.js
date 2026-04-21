@@ -8,7 +8,6 @@ export { default as IExecAccountModule } from './IExecAccountModule.js';
 export { default as IExecAppModule } from './IExecAppModule.js';
 export { default as IExecDatasetModule } from './IExecDatasetModule.js';
 export { default as IExecDealModule } from './IExecDealModule.js';
-export { default as IExecENSModule } from './IExecENSModule.js';
 export { default as IExecHubModule } from './IExecHubModule.js';
 export { default as IExecNetworkModule } from './IExecNetworkModule.js';
 export { default as IExecOrderModule } from './IExecOrderModule.js';

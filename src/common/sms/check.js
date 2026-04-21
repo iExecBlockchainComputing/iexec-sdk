@@ -22,14 +22,11 @@ const cacheSecretExists = ({ smsURL, kindOfSecret, secretId }) => {
 
 // used for dataset key
 export const checkWeb3SecretExists = async (
-  contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   resourceAddress,
 ) => {
   try {
-    const vResourceAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
+    const vResourceAddress = await addressSchema()
       .required()
       .validate(resourceAddress);
     const kindOfSecret = 'web3';
@@ -64,15 +61,12 @@ export const checkWeb3SecretExists = async (
 
 // used for beneficiary key
 export const checkWeb2SecretExists = async (
-  contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   ownerAddress,
   secretName,
 ) => {
   try {
-    const vOwnerAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
+    const vOwnerAddress = await addressSchema()
       .required()
       .validate(ownerAddress);
     const kindOfSecret = 'web2';
@@ -107,15 +101,12 @@ export const checkWeb2SecretExists = async (
 };
 
 export const checkRequesterSecretExists = async (
-  contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   requesterAddress = throwIfMissing(),
   secretName = throwIfMissing(),
 ) => {
   try {
-    const vRequesterAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(requesterAddress);
+    const vRequesterAddress = await addressSchema().validate(requesterAddress);
     const kindOfSecret = 'requester';
     const secretId = `${vRequesterAddress}|${secretName}`;
     const cached = checkCache({ smsURL, kindOfSecret, secretId });
@@ -144,16 +135,11 @@ export const checkRequesterSecretExists = async (
 };
 
 export const checkAppSecretExists = async (
-  contracts = throwIfMissing(),
   smsURL = throwIfMissing(),
   appAddress,
 ) => {
   try {
-    const vAppAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
-      .required()
-      .validate(appAddress);
+    const vAppAddress = await addressSchema().required().validate(appAddress);
     const kindOfSecret = 'app';
     const secretId = vAppAddress;
     const cached = checkCache({ smsURL, kindOfSecret, secretId });

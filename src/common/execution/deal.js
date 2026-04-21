@@ -40,21 +40,14 @@ export const fetchRequesterDeals = async (
   } = {},
 ) => {
   try {
-    const vRequesterAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
+    const vRequesterAddress = await addressSchema()
       .required()
       .validate(requesterAddress);
     const vChainId = await chainIdSchema().validate(contracts.chainId);
-    const vAppAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(appAddress);
-    const vDatasetAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(datasetAddress);
-    const vWorkerpoolAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(workerpoolAddress);
+    const vAppAddress = await addressSchema().validate(appAddress);
+    const vDatasetAddress = await addressSchema().validate(datasetAddress);
+    const vWorkerpoolAddress =
+      await addressSchema().validate(workerpoolAddress);
     const query = {
       chainId: vChainId,
       requester: vRequesterAddress,

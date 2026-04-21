@@ -27,11 +27,7 @@ const sendNativeToken = async (
 ) => {
   try {
     checkSigner(contracts);
-    const vAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
-      .required()
-      .validate(to);
+    const vAddress = await addressSchema().required().validate(to);
     const vValue = await uint256Schema().required().validate(value);
     const tx = await wrapSend(
       contracts.signer.sendTransaction({
@@ -52,11 +48,7 @@ const sendNativeToken = async (
 
 const sendERC20 = async (contracts = throwIfMissing(), nRlcAmount, to) => {
   checkSigner(contracts);
-  const vAddress = await addressSchema({
-    ethProvider: contracts.provider,
-  })
-    .required()
-    .validate(to);
+  const vAddress = await addressSchema().required().validate(to);
   const vAmount = await nRlcAmountSchema().required().validate(nRlcAmount);
   try {
     const rlcContract = await wrapCall(contracts.fetchTokenContract());
@@ -74,11 +66,7 @@ const sendERC20 = async (contracts = throwIfMissing(), nRlcAmount, to) => {
 export const sendETH = async (contracts = throwIfMissing(), amount, to) => {
   try {
     checkSigner(contracts);
-    const vAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
-      .required()
-      .validate(to);
+    const vAddress = await addressSchema().required().validate(to);
     const vAmount = await weiAmountSchema().required().validate(amount);
     if (contracts.isNative)
       throw new Error('sendETH() is disabled on sidechain, use sendRLC()');
@@ -96,11 +84,7 @@ export const sendETH = async (contracts = throwIfMissing(), amount, to) => {
 export const sendRLC = async (contracts = throwIfMissing(), nRlcAmount, to) => {
   try {
     checkSigner(contracts);
-    const vAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
-      .required()
-      .validate(to);
+    const vAddress = await addressSchema().required().validate(to);
     const vAmount = await nRlcAmountSchema().required().validate(nRlcAmount);
     const balance = await getRlcBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
@@ -122,11 +106,7 @@ export const sendRLC = async (contracts = throwIfMissing(), nRlcAmount, to) => {
 export const sweep = async (contracts = throwIfMissing(), to) => {
   try {
     checkSigner(contracts);
-    const vAddressTo = await addressSchema({
-      ethProvider: contracts.provider,
-    })
-      .required()
-      .validate(to);
+    const vAddressTo = await addressSchema().required().validate(to);
     const userAddress = await getAddress(contracts);
     const code = await contracts.provider.getCode(vAddressTo);
     if (code !== '0x') {

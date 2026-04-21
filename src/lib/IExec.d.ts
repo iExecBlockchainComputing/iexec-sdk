@@ -7,7 +7,6 @@ import IExecAccountModule from './IExecAccountModule.js';
 import IExecAppModule from './IExecAppModule.js';
 import IExecDatasetModule from './IExecDatasetModule.js';
 import IExecDealModule from './IExecDealModule.js';
-import IExecENSModule from './IExecENSModule.js';
 import IExecHubModule from './IExecHubModule.js';
 import IExecNetworkModule from './IExecNetworkModule.js';
 import IExecOrderModule from './IExecOrderModule.js';
@@ -39,10 +38,6 @@ export default class IExec extends IExecModule {
    * deal module
    */
   deal: IExecDealModule;
-  /**
-   * ens module
-   */
-  ens: IExecENSModule;
   /**
    * hub module
    */

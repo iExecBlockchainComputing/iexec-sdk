@@ -75,7 +75,6 @@ Additionally the [IExec](./classes/IExec.md) module exposes all the following li
 - [IExecAppModule](./classes/IExecAppModule.md) exposes **app** methods
 - [IExecDatasetModule](./classes/IExecDatasetModule.md) exposes **dataset** methods
 - [IExecDealModule](./classes/IExecDealModule.md) exposes **deal** methods
-- [IExecENSModule](./classes/IExecENSModule.md) exposes **ENS** methods
 - [IExecHubModule](./classes/IExecHubModule.md) exposes **hub** methods
 - [IExecNetworkModule](./classes/IExecNetworkModule.md) exposes **network** methods
 - [IExecOrderModule](./classes/IExecOrderModule.md) exposes **order** methods
