@@ -20,64 +20,26 @@ const ERROR_GETTING_ORDERBOOK = 'An error occurred while getting orderbook';
 export const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  appOrOptions = throwIfMissing(),
-  options,
+  {
+    app,
+    appOwner,
+    dataset,
+    workerpool,
+    requester,
+    minTag,
+    maxTag,
+    minVolume,
+    page = 0,
+    pageSize = 20,
+    isDatasetStrict = false,
+    isWorkerpoolStrict = false,
+    isRequesterStrict = false,
+  } = {},
 ) => {
   try {
-    let app;
-    let appOwner;
-    let dataset;
-    let workerpool;
-    let requester;
-    let minTag;
-    let maxTag;
-    let minVolume;
-    let page;
-    let pageSize;
-    let isDatasetStrict;
-    let isWorkerpoolStrict;
-    let isRequesterStrict;
-    if (typeof appOrOptions === 'object' && appOrOptions !== null) {
-      ({
-        app,
-        appOwner,
-        dataset,
-        workerpool,
-        requester,
-        minTag,
-        maxTag,
-        minVolume,
-        page = 0,
-        pageSize = 20,
-        isDatasetStrict = false,
-        isWorkerpoolStrict = false,
-        isRequesterStrict = false,
-      } = appOrOptions);
-    } else {
-      // deprecated
-      // eslint-disable-next-line no-console
-      console.warn(
-        'passing app as first argument is deprecated, please pass the options object containing app or appOwner instead',
-      );
-      app = appOrOptions;
-      ({
-        dataset,
-        workerpool,
-        requester,
-        minTag,
-        maxTag,
-        minVolume,
-        page = 0,
-        pageSize = 20,
-        isDatasetStrict = false,
-        isWorkerpoolStrict = false,
-        isRequesterStrict = false,
-      } = options || {});
-    }
     if (!app && !appOwner) {
       throw Error('app or appOwner is required');
     }
-
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
       ...(app && {
@@ -154,67 +116,27 @@ export const fetchAppOrderbook = async (
 export const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  datasetOrOptions = throwIfMissing(),
-  options,
+  {
+    dataset,
+    datasetOwner,
+    app,
+    workerpool,
+    requester,
+    minTag,
+    maxTag,
+    minVolume,
+    page = 0,
+    pageSize = 20,
+    isAppStrict = false,
+    isWorkerpoolStrict = false,
+    isRequesterStrict = false,
+    bulkOnly = false,
+  } = {},
 ) => {
   try {
-    let dataset;
-    let datasetOwner;
-    let app;
-    let workerpool;
-    let requester;
-    let minTag;
-    let maxTag;
-    let minVolume;
-    let page;
-    let pageSize;
-    let isAppStrict;
-    let isWorkerpoolStrict;
-    let isRequesterStrict;
-    let bulkOnly;
-    if (typeof datasetOrOptions === 'object' && datasetOrOptions !== null) {
-      ({
-        dataset,
-        datasetOwner,
-        app,
-        workerpool,
-        requester,
-        minTag,
-        maxTag,
-        minVolume,
-        page = 0,
-        pageSize = 20,
-        isAppStrict = false,
-        isWorkerpoolStrict = false,
-        isRequesterStrict = false,
-        bulkOnly = false,
-      } = datasetOrOptions);
-    } else {
-      // deprecated
-      // eslint-disable-next-line no-console
-      console.warn(
-        'passing dataset as first argument is deprecated, please pass the options object containing dataset or datasetOwner instead',
-      );
-      dataset = datasetOrOptions;
-      ({
-        app,
-        workerpool,
-        requester,
-        minTag,
-        maxTag,
-        minVolume,
-        page = 0,
-        pageSize = 20,
-        isAppStrict = false,
-        isWorkerpoolStrict = false,
-        isRequesterStrict = false,
-        bulkOnly = false,
-      } = options || {});
-    }
     if (!dataset && !datasetOwner) {
       throw Error('dataset or datasetOwner is required');
     }
-
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
       ...(dataset && {
