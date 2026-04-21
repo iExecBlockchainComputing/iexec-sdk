@@ -8,10 +8,6 @@ import {
   sweep as walletSweep,
 } from '../../common/wallet/send.js';
 import {
-  bridgeToSidechain as walletBridgeToSidechain,
-  bridgeToMainchain as walletBridgeToMainchain,
-} from '../../common/wallet/bridge.js';
-import {
   Keystore,
   createAndSave,
   importPrivateKeyAndSave,
@@ -38,7 +34,6 @@ import {
   prompt,
   pretty,
   info,
-  getPropertyFromChain,
 } from '../utils/cli-helper.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
 import { lookupAddress } from '../../common/ens/resolution.js';
@@ -349,180 +344,6 @@ sweep
             sendNativeTxHash,
             sendERC20TxHash,
             errors,
-          },
-        },
-      );
-    } catch (error) {
-      handleError(error, cli, opts);
-    }
-  });
-
-const bridgeToSidechain = cli.command('bridge-to-sidechain <amount> [unit]');
-addGlobalOptions(bridgeToSidechain);
-addWalletLoadOptions(bridgeToSidechain);
-bridgeToSidechain
-  .option(...option.chain())
-  .option(...option.txGasPrice())
-  .option(...option.txConfirms())
-  .option(...option.force())
-  .description(desc.bridgeToSidechain())
-  .action(async (amount, unit, opts) => {
-    await checkUpdate(opts);
-    const spinner = Spinner(opts);
-    try {
-      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = computeWalletLoadOptions(opts);
-      const txOptions = await computeTxOptions(opts);
-      const keystore = Keystore(walletOptions);
-      const [[address], chain] = await Promise.all([
-        keystore.accounts(),
-        loadChain(opts.chain, { txOptions, spinner }),
-      ]);
-      await connectKeystore(chain, keystore, { txOptions });
-      if (chain.contracts.isNative)
-        throw new Error('Cannot bridge sidechain to sidechain');
-      const bridgeConf = getPropertyFromChain(chain, 'bridge');
-      const bridgeAddress = bridgeConf && bridgeConf.contract;
-      const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
-      if (!bridgeAddress) {
-        throw new Error(
-          `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
-        );
-      }
-      if (!bridgedChainId) {
-        throw new Error(
-          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
-        );
-      }
-      if (!opts.force) {
-        await prompt.transferRLC(
-          formatRLC(nRlcAmount),
-          chain.name,
-          `bridge contract ${bridgeAddress} (please double check the address)`,
-          chain.id,
-        );
-      }
-      const bridgedChainConfigured = !!(
-        chain.bridgedNetwork &&
-        chain.bridgedNetwork.contracts &&
-        chain.bridgedNetwork.bridge &&
-        chain.bridgedNetwork.bridge.contract
-      );
-      const message = `${formatRLC(nRlcAmount)} ${
-        chain.name
-      } RLC to ${bridgeAddress}`;
-      spinner.start(`Sending ${message}...`);
-      const { sendTxHash, receiveTxHash } = await walletBridgeToSidechain(
-        chain.contracts,
-        bridgeAddress,
-        nRlcAmount,
-        {
-          sidechainBridgeAddress:
-            bridgedChainConfigured && chain.bridgedNetwork.bridge.contract,
-          bridgedContracts:
-            bridgedChainConfigured && chain.bridgedNetwork.contracts,
-        },
-      );
-      spinner.succeed(
-        `Sent ${message} (tx: ${sendTxHash})\n${
-          bridgedChainConfigured
-            ? `Wallet credited on chain ${bridgedChainId} (tx: ${receiveTxHash})`
-            : `Please wait for the agent to credit your wallet on chain ${bridgedChainId}`
-        }`,
-        {
-          raw: {
-            amount: nRlcAmount,
-            from: address,
-            to: bridgeAddress,
-            sendTxHash,
-            receiveTxHash,
-          },
-        },
-      );
-    } catch (error) {
-      handleError(error, cli, opts);
-    }
-  });
-
-const bridgeToMainchain = cli.command('bridge-to-mainchain <amount> [unit]');
-addGlobalOptions(bridgeToMainchain);
-addWalletLoadOptions(bridgeToMainchain);
-bridgeToMainchain
-  .option(...option.chain())
-  .option(...option.txGasPrice())
-  .option(...option.txConfirms())
-  .option(...option.force())
-  .description(desc.bridgeToMainchain())
-  .action(async (amount, unit, opts) => {
-    await checkUpdate(opts);
-    const spinner = Spinner(opts);
-    try {
-      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = computeWalletLoadOptions(opts);
-      const txOptions = await computeTxOptions(opts);
-      const keystore = Keystore(walletOptions);
-      const [[address], chain] = await Promise.all([
-        keystore.accounts(),
-        loadChain(opts.chain, { txOptions, spinner }),
-      ]);
-      await connectKeystore(chain, keystore, { txOptions });
-      if (!chain.contracts.isNative)
-        throw new Error('Cannot bridge mainchain to mainchain');
-      const bridgeConf = getPropertyFromChain(chain, 'bridge');
-      const bridgeAddress = bridgeConf && bridgeConf.contract;
-      const bridgedChainId = bridgeConf && bridgeConf.bridgedChainId;
-      if (!bridgeAddress) {
-        throw new Error(
-          `Missing bridge contract address in "chain.json" for chain ${chain.name}`,
-        );
-      }
-      if (!bridgedChainId) {
-        throw new Error(
-          `Missing bridge bridgedChainId in "chain.json" for chain ${chain.name}`,
-        );
-      }
-      if (!opts.force) {
-        await prompt.transferRLC(
-          formatRLC(nRlcAmount),
-          chain.name,
-          `bridge contract ${bridgeAddress} (please double check the address)`,
-          chain.id,
-        );
-      }
-      const bridgedChainConfigured = !!(
-        chain.bridgedNetwork &&
-        chain.bridgedNetwork.contracts &&
-        chain.bridgedNetwork.bridge &&
-        chain.bridgedNetwork.bridge.contract
-      );
-      const message = `${formatRLC(nRlcAmount)} ${
-        chain.name
-      } RLC to ${bridgeAddress}`;
-      spinner.start(`Sending ${message}...`);
-      const { sendTxHash, receiveTxHash } = await walletBridgeToMainchain(
-        chain.contracts,
-        bridgeAddress,
-        nRlcAmount,
-        {
-          mainchainBridgeAddress:
-            bridgedChainConfigured && chain.bridgedNetwork.bridge.contract,
-          bridgedContracts:
-            bridgedChainConfigured && chain.bridgedNetwork.contracts,
-        },
-      );
-      spinner.succeed(
-        `Sent ${message} (tx: ${sendTxHash})\n${
-          bridgedChainConfigured
-            ? `Wallet credited on chain ${bridgedChainId} (tx: ${receiveTxHash})`
-            : `Please wait for the agent to credit your wallet on chain ${bridgedChainId}`
-        }`,
-        {
-          raw: {
-            amount: nRlcAmount,
-            from: address,
-            to: bridgeAddress,
-            sendTxHash,
-            receiveTxHash,
           },
         },
       );

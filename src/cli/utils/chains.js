@@ -11,12 +11,7 @@ const debug = Debug('iexec:chains');
 const createChainFromConf = (
   chainName,
   chainConf,
-  {
-    bridgeConf,
-    providerOptions,
-    txOptions = {},
-    allowExperimentalNetworks = false,
-  } = {},
+  { providerOptions, txOptions = {}, allowExperimentalNetworks = false } = {},
 ) => {
   try {
     const chain = { ...chainConf };
@@ -35,21 +30,6 @@ const createChainFromConf = (
       confirms: txOptions.confirms,
     });
     chain.contracts = contracts;
-    if (bridgeConf) {
-      chain.bridgedNetwork = { ...bridgeConf };
-      const bridgeProvider = getReadOnlyProvider(bridgeConf.host, {
-        providers: providerOptions,
-        allowExperimentalNetworks,
-      });
-      chain.bridgedNetwork.contracts = new IExecContractsClient({
-        provider: bridgeProvider,
-        chainId: bridgeConf.id,
-        hubAddress: bridgeConf.hub,
-        useGas: bridgeConf.useGas,
-        isNative: bridgeConf.native,
-        confirms: txOptions.confirms,
-      });
-    }
     return chain;
   } catch (error) {
     debug('createChainFromConf()', error);
@@ -122,54 +102,7 @@ export const loadChain = async (
         `Missing RPC host, no "host" key in "chain.json" and no default value for chain ${conf.id}`,
       );
     }
-
-    let bridgeConf;
-    const bridgedChainNameOrId = conf.bridge && conf.bridge.bridgedChainName;
-    if (bridgedChainNameOrId) {
-      let bridgeLoadedConf;
-      if (chainsConf.chains[bridgedChainNameOrId]) {
-        bridgeLoadedConf = chainsConf.chains[bridgedChainNameOrId];
-      } else {
-        const { name: alias } = getChainDefaults(
-          getId(bridgedChainNameOrId, {
-            allowExperimentalNetworks,
-          }),
-          {
-            allowExperimentalNetworks,
-          },
-        );
-        if (alias && chainsConf.chains[alias]) {
-          bridgeLoadedConf = chainsConf.chains[alias];
-        }
-        if (!bridgeLoadedConf)
-          throw new Error(`Missing "${name}" chain in "chain.json"`);
-      }
-      const bridgeIdConf = {
-        id:
-          bridgeLoadedConf.id ||
-          getId(bridgedChainNameOrId, {
-            allowExperimentalNetworks,
-          }),
-      };
-      const bridgeDefaultConf = getChainDefaults(bridgeIdConf.id, {
-        allowExperimentalNetworks,
-      });
-      debug('bridgeLoadedConf', bridgeLoadedConf);
-      debug('bridgeDefaultConf', defaultConf);
-      bridgeConf = {
-        ...bridgeIdConf,
-        ...bridgeDefaultConf,
-        ...bridgeLoadedConf,
-      };
-      if (!bridgeConf.host) {
-        throw new Error(
-          `Missing RPC host for bridged chain, no "host" key in "chain.json" and no default value for bridged chain ${bridgeConf.id}`,
-        );
-      }
-    }
-    debug('bridged chain', bridgeConf);
     const chain = createChainFromConf(name, conf, {
-      bridgeConf,
       providerOptions,
       txOptions,
       allowExperimentalNetworks,

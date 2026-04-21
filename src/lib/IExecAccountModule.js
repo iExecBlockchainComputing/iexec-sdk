@@ -8,8 +8,6 @@ export default class IExecAccountModule extends IExecModule {
     super(...args);
     this.checkBalance = async (address) =>
       checkBalance(await this.config.resolveContractsClient(), address);
-    this.checkBridgedBalance = async (address) =>
-      checkBalance(await this.config.resolveBridgedContractsClient(), address);
     this.deposit = async (nRlcAmount) =>
       deposit(await this.config.resolveContractsClient(), nRlcAmount);
     this.withdraw = async (nRlcAmount) =>

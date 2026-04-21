@@ -65,39 +65,6 @@ describe('wallet', () => {
     });
   });
 
-  describe('checkBridgedBalances()', () => {
-    describe('native chain', () => {
-      test('expose bridged balances (mainnet) on bellecour', async () => {
-        const iexec = new IExec(
-          { ethProvider: 'bellecour' },
-          {
-            providerOptions: DEFAULT_PROVIDER_OPTIONS,
-          },
-        );
-        const address = getRandomAddress();
-        const balance = await iexec.wallet.checkBridgedBalances(address);
-        expect(balance.nRLC).toBeInstanceOf(BN);
-        expect(balance.wei).toBeInstanceOf(BN);
-        expect(balance.nRLC).toStrictEqual(new BN(0));
-        expect(balance.wei).toStrictEqual(new BN(0));
-      });
-    });
-    describe('token chain', () => {
-      test('expose bridged balances (bellecour) on mainnet', async () => {
-        const iexec = new IExec(
-          { ethProvider: 'mainnet' },
-          {
-            providerOptions: DEFAULT_PROVIDER_OPTIONS,
-          },
-        );
-        const address = getRandomAddress();
-        const balance = await iexec.wallet.checkBridgedBalances(address);
-        expect(balance.nRLC).toStrictEqual(new BN(0));
-        expect(balance.wei).toStrictEqual(new BN(0));
-      });
-    });
-  });
-
   describe('sendETH()', () => {
     test('require a signer', async () => {
       const { iexec } = await getTestConfig(tokenTestChain)({ readOnly: true });

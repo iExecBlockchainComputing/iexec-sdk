@@ -67,21 +67,6 @@ export class ObjectNotFoundError extends Error {
   }
 }
 
-export class BridgeError extends Error {
-  constructor(originalError, sendTxHash) {
-    super(
-      `Failed to get bridged chain confirmation for transaction ${sendTxHash}`,
-      { cause: originalError },
-    );
-    this.name = this.constructor.name;
-    this.sendTxHash = sendTxHash;
-    this.originalError = originalError; // deprecated
-    if (originalError && typeof originalError === 'object') {
-      Object.assign(this, getPropsToCopy(originalError));
-    }
-  }
-}
-
 export class ApiCallError extends Error {
   constructor(message, originalError) {
     super(message, { cause: originalError });

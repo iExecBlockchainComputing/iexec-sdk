@@ -135,30 +135,6 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 ***
 
-### checkBridgedBalance()
-
-> **checkBridgedBalance**(`address`): `Promise`\<\{ `locked`: [`BN`](../interfaces/BN.md); `stake`: [`BN`](../interfaces/BN.md); \}\>
-
-check the account balance on bridged chain of specified address ie: when connected to mainnet, check the account ballance on bellecour
-example:
-```js
-const balance = await checkBridgedBalance(ethAddress);
-console.log('Nano RLC staked:', balance.stake.toString());
-console.log('Nano RLC locked:', balance.locked.toString());
-```
-
-#### Parameters
-
-##### address
-
-`string`
-
-#### Returns
-
-`Promise`\<\{ `locked`: [`BN`](../interfaces/BN.md); `stake`: [`BN`](../interfaces/BN.md); \}\>
-
-***
-
 ### deposit()
 
 > **deposit**(`amount`): `Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>

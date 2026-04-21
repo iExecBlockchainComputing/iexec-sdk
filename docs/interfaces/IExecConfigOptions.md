@@ -18,46 +18,6 @@ if true allows using a provider connected to an experimental networks (default f
 
 ***
 
-### bridgeAddress?
-
-> `optional` **bridgeAddress**: `string`
-
-override the bridge contract address to target a custom instance
-
-***
-
-### bridgedNetworkConf?
-
-> `optional` **bridgedNetworkConf**: `object`
-
-override the bridged network configuration
-
-#### bridgeAddress?
-
-> `optional` **bridgeAddress**: `string`
-
-bridge contract address on bridged network
-
-#### chainId?
-
-> `optional` **chainId**: `string` \| `number`
-
-bridged network chainId
-
-#### hubAddress?
-
-> `optional` **hubAddress**: `string`
-
-IExec contract address on bridged network
-
-#### rpcURL?
-
-> `optional` **rpcURL**: `string`
-
-bridged network node url
-
-***
-
 ### compassURL?
 
 > `optional` **compassURL**: `string`

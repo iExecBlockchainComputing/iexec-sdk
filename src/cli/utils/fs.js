@@ -35,12 +35,6 @@ const chainConfSchema = () =>
     pocoSubgraph: string(),
     native: boolean(),
     useGas: boolean().default(true),
-    bridge: object({
-      bridgedChainName: string().required(),
-      contract: addressSchema().required(),
-    })
-      .notRequired()
-      .strict(),
   })
     .noUnknown(true, 'Unknown key "${unknown}"')
     .strict();

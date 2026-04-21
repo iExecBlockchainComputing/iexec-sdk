@@ -401,7 +401,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `iexecGateway` set the url of the iexec marketplace gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `pocoSubgraph` set the url of the PoCo subgraph used by the SDK cli on each chain (overwrite default value).
-  - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
   - optional key `native` specify whether or not the chain native token is RLC (overwrite default value: chain value or `false`).
   - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction (overwrite default value: chain value or `true`).
 - optional key `providers` set the backends for public chains
@@ -422,11 +421,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       },
       "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
-      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
-      "bridge": {
-        "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedChainName": "dev-sidechain"
-      }
+      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca"
     },
     "dev-sidechain": {
       "host": "http://localhost:18545",
@@ -438,11 +433,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "ipfsGateway": "http://localhost:18080",
       "native": true,
       "useGas": false,
-      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
-      "bridge": {
-        "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedChainName": "development"
-      }
+      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca"
     },
     "mainnet": {},
     "bellecour": {}
