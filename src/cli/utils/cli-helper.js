@@ -159,10 +159,6 @@ export const desc = {
   generateKeys: () =>
     'generate a beneficiary key pair to encrypt and decrypt the results',
   decryptResults: () => 'decrypt encrypted results with beneficiary key',
-  bridgeToSidechain: () =>
-    'send RLC from the mainchain to the sidechain (default unit nRLC)',
-  bridgeToMainchain: () =>
-    'send RLC from the sidechain to the mainchain (default unit nRLC)',
   appRun: () =>
     'run an iExec application at market price (default run last deployed app)',
   requestRun: () => 'request an iExec application execution at limit price',

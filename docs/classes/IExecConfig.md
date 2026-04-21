@@ -60,42 +60,6 @@ const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet',
 
 ## Methods
 
-### resolveBridgeAddress()
-
-> **resolveBridgeAddress**(): `Promise`\<`string`\>
-
-resolve the current bridge contract address
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
-### resolveBridgeBackAddress()
-
-> **resolveBridgeBackAddress**(): `Promise`\<`string`\>
-
-resolve the bridge contract address on bridged chain
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
-### resolveBridgedContractsClient()
-
-> **resolveBridgedContractsClient**(): `Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
-
-resolve the current bridged IExecContractsClient
-
-#### Returns
-
-`Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
-
-***
-
 ### resolveChainId()
 
 > **resolveChainId**(): `Promise`\<`number`\>

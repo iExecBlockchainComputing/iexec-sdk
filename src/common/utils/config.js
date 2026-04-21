@@ -5,7 +5,6 @@ export const CHAIN_SPECIFIC_FEATURES = {
   ENS: 'ENS',
   WORKERPOOL_API_URL_REGISTRATION: 'Workerpool API Registration',
   COMPASS: 'iExec Compass',
-  XRLC_BRIDGE: 'iExec xRLC Bridge',
   BULK_PROCESSING: 'Bulk processing',
 };
 
@@ -24,10 +23,6 @@ const networkConfigs = [
     iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
     compass: undefined, // no compass using ENS
     pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
-    bridge: {
-      contract: '0x188A4376a1D818bF2434972Eb34eFd57102a19b7',
-      bridgedChainId: '1',
-    },
     shouldRegisterNetwork: true,
     isExperimental: false,
     notImplemented: [
@@ -49,10 +44,6 @@ const networkConfigs = [
     iexecGateway: undefined, // no protocol running
     compass: undefined, // no protocol running
     pocoSubgraph: undefined, // no protocol running
-    bridge: {
-      contract: '0x4e55c9B8953AB1957ad0A59D413631A66798c6a2',
-      bridgedChainId: '134',
-    },
     shouldRegisterNetwork: false,
     isExperimental: false,
     notImplemented: [
@@ -75,14 +66,12 @@ const networkConfigs = [
     compass: 'https://compass.arbitrum-sepolia-testnet.iex.ec',
     pocoSubgraph:
       'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/2GCj8gzLCihsiEDq8cYvC5nUgK6VfwZ6hm3Wj8A3kcxz',
-    bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     isExperimental: false,
     uploadBulkForThegraph: true,
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.ENS,
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
-      CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
     ],
   },
   {
@@ -100,13 +89,11 @@ const networkConfigs = [
     compass: 'https://compass.arbitrum-mainnet.iex.ec',
     pocoSubgraph:
       'https://thegraph.arbitrum.iex.ec/api/subgraphs/id/B1comLe9SANBLrjdnoNTJSubbeC7cY7EoNu6zD82HeKy',
-    bridge: {}, // no bridge
     shouldRegisterNetwork: false,
     uploadBulkForThegraph: true,
     notImplemented: [
       CHAIN_SPECIFIC_FEATURES.ENS,
       CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION,
-      CHAIN_SPECIFIC_FEATURES.XRLC_BRIDGE,
     ],
   },
 ];
@@ -140,7 +127,6 @@ export const getChainDefaults = (
     ipfsNode,
     compass,
     pocoSubgraph,
-    bridge,
   } =
     networkConfigs
       .filter(
@@ -161,7 +147,6 @@ export const getChainDefaults = (
     ipfsNode,
     compass,
     pocoSubgraph,
-    bridge,
   };
 };
 

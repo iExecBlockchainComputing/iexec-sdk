@@ -8,7 +8,6 @@
 
 ## Classes
 
-- [BridgeObservable](classes/BridgeObservable.md)
 - [DealObservable](classes/DealObservable.md)
 - [ENSConfigurationObservable](classes/ENSConfigurationObservable.md)
 - [IExecContractsClient](classes/IExecContractsClient.md)
