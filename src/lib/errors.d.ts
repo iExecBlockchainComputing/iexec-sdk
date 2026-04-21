@@ -16,19 +16,17 @@ export class Web3ProviderError extends Error {
      * A descriptive error message detailing the nature of the error.
      */
     message: string,
-    /**
-     * The original Error object that caused this web3 provider error.
-     */
-    originalError: Error,
+    options?: {
+      /**
+       * The original error that caused this web3 provider error.
+       */
+      cause?: unknown;
+    },
   );
   /**
-   * @deprecated use Error cause instead.
+   * The original error that caused this web3 provider error.
    */
-  originalError: Error;
-  /**
-   * The original Error object that caused this web3 provider error.
-   */
-  cause: Error;
+  cause?: unknown;
   /**
    * Wether the error was caused by a user rejection
    */
@@ -87,19 +85,17 @@ export class ApiCallError extends Error {
      * A descriptive error message detailing the nature of the error.
      */
     message: string,
-    /**
-     * The original Error object that caused this API call error.
-     */
-    originalError: Error,
+    options?: {
+      /**
+       * The original error that caused this API call error.
+       */
+      cause?: unknown;
+    },
   );
   /**
-   * @deprecated use Error cause instead.
+   * The original error that caused this API call error.
    */
-  originalError: Error;
-  /**
-   * The original Error object that caused this API call error.
-   */
-  cause: Error;
+  cause?: unknown;
 }
 
 /**

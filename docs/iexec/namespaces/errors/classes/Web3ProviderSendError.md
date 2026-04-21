@@ -16,7 +16,7 @@ Web3ProviderSendError encapsulates an error thrown by the web3 provider during a
 
 ### Constructor
 
-> **new Web3ProviderSendError**(`message`, `originalError`): `Web3ProviderSendError`
+> **new Web3ProviderSendError**(`message`, `options?`): `Web3ProviderSendError`
 
 #### Parameters
 
@@ -26,11 +26,13 @@ Web3ProviderSendError encapsulates an error thrown by the web3 provider during a
 
 A descriptive error message detailing the nature of the error.
 
-##### originalError
+##### options?
 
-`Error`
+###### cause?
 
-The original Error object that caused this web3 provider error.
+`unknown`
+
+The original error that caused this web3 provider error.
 
 #### Returns
 
@@ -42,11 +44,11 @@ The original Error object that caused this web3 provider error.
 
 ## Properties
 
-### cause
+### cause?
 
-> **cause**: `Error`
+> `optional` **cause**: `unknown`
 
-The original Error object that caused this web3 provider error.
+The original error that caused this web3 provider error.
 
 #### Inherited from
 
@@ -63,17 +65,3 @@ Wether the error was caused by a user rejection
 #### Inherited from
 
 [`Web3ProviderError`](Web3ProviderError.md).[`isUserRejection`](Web3ProviderError.md#isuserrejection)
-
-***
-
-### ~~originalError~~
-
-> **originalError**: `Error`
-
-#### Deprecated
-
-use Error cause instead.
-
-#### Inherited from
-
-[`Web3ProviderError`](Web3ProviderError.md).[`originalError`](Web3ProviderError.md#originalerror)

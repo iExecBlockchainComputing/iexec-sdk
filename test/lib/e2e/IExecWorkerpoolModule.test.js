@@ -282,7 +282,11 @@ describe('workerpool', () => {
       ).rejects.toThrow(
         new errors.CompassCallError(
           `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-          new Error('Server internal error: 500 Internal Server Error'),
+          {
+            cause: new Error(
+              'Server internal error: 500 Internal Server Error',
+            ),
+          },
         ),
       );
     });
