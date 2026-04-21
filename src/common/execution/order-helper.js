@@ -89,10 +89,7 @@ export const createObjParams = async ({
 };
 
 export const checkRequestRequirements = async (
-  {
-    contracts = throwIfMissing(),
-    smsURL = throwIfMissing(),
-  } = throwIfMissing(),
+  { smsURL = throwIfMissing() } = throwIfMissing(),
   requestorder = throwIfMissing(),
 ) => {
   const vRequestorder = await requestorderSchema().validate(requestorder);
@@ -109,7 +106,6 @@ export const checkRequestRequirements = async (
   // check encryption key
   if (paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_ENCRYPTION] === true) {
     const isEncryptionKeySet = await checkWeb2SecretExists(
-      contracts,
       smsURL,
       beneficiary,
       reservedSecretKeyName.IEXEC_RESULT_ENCRYPTION_PUBLIC_KEY,
@@ -127,7 +123,6 @@ export const checkRequestRequirements = async (
     STORAGE_PROVIDERS.DROPBOX
   ) {
     const isStorageTokenSet = await checkWeb2SecretExists(
-      contracts,
       smsURL,
       requester,
       getStorageTokenKeyName(
@@ -145,11 +140,7 @@ export const checkRequestRequirements = async (
 
   // check tee dataset encryption key
   if (dataset && dataset !== NULL_ADDRESS && isTee) {
-    const isDatasetSecretSet = await checkWeb3SecretExists(
-      contracts,
-      smsURL,
-      dataset,
-    );
+    const isDatasetSecretSet = await checkWeb3SecretExists(smsURL, dataset);
     if (!isDatasetSecretSet) {
       throw new Error(
         `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
@@ -162,7 +153,6 @@ export const checkRequestRequirements = async (
       Object.values(paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_SECRETS]).map(
         async (secretName) => {
           const isSecretSet = await checkRequesterSecretExists(
-            contracts,
             smsURL,
             requester,
             secretName,
@@ -179,10 +169,7 @@ export const checkRequestRequirements = async (
 };
 
 export const checkDatasetRequirements = async (
-  {
-    contracts = throwIfMissing(),
-    smsURL = throwIfMissing(),
-  } = throwIfMissing(),
+  { smsURL = throwIfMissing() } = throwIfMissing(),
   datasetorder = throwIfMissing(),
   { tagOverride } = {},
 ) => {
@@ -196,11 +183,7 @@ export const checkDatasetRequirements = async (
   );
   // check tee dataset encryption key
   if (dataset && dataset !== NULL_ADDRESS && isTee) {
-    const isDatasetSecretSet = await checkWeb3SecretExists(
-      contracts,
-      smsURL,
-      dataset,
-    );
+    const isDatasetSecretSet = await checkWeb3SecretExists(smsURL, dataset);
     if (!isDatasetSecretSet) {
       throw new Error(
         `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,

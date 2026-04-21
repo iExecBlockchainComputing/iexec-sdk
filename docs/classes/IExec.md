@@ -84,14 +84,6 @@ deal module
 
 ***
 
-### ens
-
-> **ens**: [`IExecENSModule`](IExecENSModule.md)
-
-ens module
-
-***
-
 ### hub
 
 > **hub**: [`IExecHubModule`](IExecHubModule.md)

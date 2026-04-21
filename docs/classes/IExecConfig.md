@@ -98,18 +98,6 @@ resolve the current IExecContractsClient
 
 ***
 
-### resolveEnsPublicResolverAddress()
-
-> **resolveEnsPublicResolverAddress**(): `Promise`\<`string`\>
-
-resolve the current ENS public resolver contract address
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
 ### resolveIexecGatewayURL()
 
 > **resolveIexecGatewayURL**(): `Promise`\<`string`\>

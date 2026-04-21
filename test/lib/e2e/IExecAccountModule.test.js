@@ -129,7 +129,7 @@ describe('account', () => {
 
     test('return the allowed amount as a BigNumber', async () => {
       const { iexec } = await getTestConfig(testChain)();
-      const ownerAddress = iexec.wallet.getAddress();
+      const ownerAddress = await iexec.wallet.getAddress();
       const spenderAddress = getRandomAddress();
       const allowanceValue = '10';
 

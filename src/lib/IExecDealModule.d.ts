@@ -6,7 +6,6 @@ import { Observable } from '../common/utils/reactive.js';
 import IExecModule from './IExecModule.js';
 import {
   Address,
-  Addressish,
   BN,
   BNish,
   Bytes,
@@ -245,20 +244,20 @@ export default class IExecDealModule extends IExecModule {
    * ```
    */
   fetchRequesterDeals(
-    requesterAddress: Addressish,
+    requesterAddress: Address,
     options?: {
       /**
        * filter by app
        */
-      appAddress?: Addressish;
+      appAddress?: Address;
       /**
        * filter by dataset
        */
-      datasetAddress?: Addressish;
+      datasetAddress?: Address;
       /**
        * filter by workerpool
        */
-      workerpoolAddress?: Addressish;
+      workerpoolAddress?: Address;
       /**
        * index of the page to fetch
        */

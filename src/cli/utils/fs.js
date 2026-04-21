@@ -25,8 +25,6 @@ const chainConfSchema = () =>
     id: chainIdSchema(),
     host: string(),
     hub: string(), // todo address
-    ensRegistry: string(), // TODO: DEPRECATED not used anymore
-    ensPublicResolver: string(), // todo address
     sms: basicUrlSchema(),
     resultProxy: string(),
     ipfsGateway: string(),

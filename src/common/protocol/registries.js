@@ -47,9 +47,7 @@ export const checkDeployedObj =
 export const checkDeployedApp = async (contracts = throwIfMissing(), address) =>
   checkDeployedObj(APP)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
+    await addressSchema().required().validate(address),
   );
 
 export const checkDeployedDataset = async (
@@ -58,9 +56,7 @@ export const checkDeployedDataset = async (
 ) =>
   checkDeployedObj(DATASET)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
+    await addressSchema().required().validate(address),
   );
 
 export const checkDeployedWorkerpool = async (
@@ -69,9 +65,7 @@ export const checkDeployedWorkerpool = async (
 ) =>
   checkDeployedObj(WORKERPOOL)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
+    await addressSchema().required().validate(address),
   );
 
 const toUpperFirst = (str) => ''.concat(str[0].toUpperCase(), str.substr(1));
@@ -138,39 +132,26 @@ const deployObj =
   };
 
 export const predictAppAddress = async (contracts, app) =>
-  predictObjAddress(APP)(
-    contracts,
-    await appSchema({ ethProvider: contracts.provider }).validate(app),
-  );
+  predictObjAddress(APP)(contracts, await appSchema().validate(app));
 export const predictDatasetAddress = async (contracts, dataset) =>
   predictObjAddress(DATASET)(
     contracts,
-    await datasetSchema({ ethProvider: contracts.provider }).validate(dataset),
+    await datasetSchema().validate(dataset),
   );
 export const predictWorkerpoolAddress = async (contracts, workerpool) =>
   predictObjAddress(WORKERPOOL)(
     contracts,
-    await workerpoolSchema({ ethProvider: contracts.provider }).validate(
-      workerpool,
-    ),
+    await workerpoolSchema().validate(workerpool),
   );
 
 export const deployApp = async (contracts, app) =>
-  deployObj(APP)(
-    contracts,
-    await appSchema({ ethProvider: contracts.provider }).validate(app),
-  );
+  deployObj(APP)(contracts, await appSchema().validate(app));
 export const deployDataset = async (contracts, dataset) =>
-  deployObj(DATASET)(
-    contracts,
-    await datasetSchema({ ethProvider: contracts.provider }).validate(dataset),
-  );
+  deployObj(DATASET)(contracts, await datasetSchema().validate(dataset));
 export const deployWorkerpool = async (contracts, workerpool) =>
   deployObj(WORKERPOOL)(
     contracts,
-    await workerpoolSchema({ ethProvider: contracts.provider }).validate(
-      workerpool,
-    ),
+    await workerpoolSchema().validate(workerpool),
   );
 
 const getObjOwner =
@@ -188,17 +169,13 @@ const getObjOwner =
 export const getAppOwner = async (contracts = throwIfMissing(), address) =>
   getObjOwner(APP)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
+    await addressSchema().required().validate(address),
   );
 
 export const getDatasetOwner = async (contracts = throwIfMissing(), address) =>
   getObjOwner(DATASET)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
+    await addressSchema().required().validate(address),
   );
 
 export const getWorkerpoolOwner = async (
@@ -207,20 +184,14 @@ export const getWorkerpoolOwner = async (
 ) =>
   getObjOwner(WORKERPOOL)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
+    await addressSchema().required().validate(address),
   );
 
 const showObjByAddress =
   (objName = throwIfMissing()) =>
   async (contracts = throwIfMissing(), objAddress = throwIfMissing()) => {
     try {
-      const vAddress = await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(objAddress);
+      const vAddress = await addressSchema().required().validate(objAddress);
       const isDeployed = await checkDeployedObj(objName)(contracts, objAddress);
       if (!isDeployed)
         throw new ObjectNotFoundError(objName, objAddress, contracts.chainId);
@@ -247,11 +218,7 @@ const countUserObj =
   (objName = throwIfMissing()) =>
   async (contracts = throwIfMissing(), userAddress = throwIfMissing()) => {
     try {
-      const vAddress = await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(userAddress);
+      const vAddress = await addressSchema().required().validate(userAddress);
       const registryContract = await wrapCall(
         contracts.fetchRegistryContract(objName),
       );
@@ -269,9 +236,7 @@ export const countUserApps = async (
 ) =>
   countUserObj(APP)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(userAddress),
+    await addressSchema().required().validate(userAddress),
   );
 export const countUserDatasets = async (
   contracts = throwIfMissing(),
@@ -279,9 +244,7 @@ export const countUserDatasets = async (
 ) =>
   countUserObj(DATASET)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(userAddress),
+    await addressSchema().required().validate(userAddress),
   );
 export const countUserWorkerpools = async (
   contracts = throwIfMissing(),
@@ -289,9 +252,7 @@ export const countUserWorkerpools = async (
 ) =>
   countUserObj(WORKERPOOL)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(userAddress),
+    await addressSchema().required().validate(userAddress),
   );
 
 const showUserObjByIndex =
@@ -299,11 +260,7 @@ const showUserObjByIndex =
   async (contracts = throwIfMissing(), objIndex, userAddress) => {
     try {
       const vIndex = await uint256Schema().required().validate(objIndex);
-      const vAddress = await addressSchema({
-        ethProvider: contracts.provider,
-      })
-        .required()
-        .validate(userAddress);
+      const vAddress = await addressSchema().required().validate(userAddress);
       const totalObj = await countUserObj(objName)(contracts, userAddress);
       if (new BN(vIndex).gte(totalObj))
         throw new Error(`${objName} not deployed`);
@@ -344,9 +301,7 @@ const cleanApp = (obj) =>
 export const showApp = async (contracts = throwIfMissing(), appAddress) => {
   const { obj, objAddress } = await showObjByAddress(APP)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(appAddress),
+    await addressSchema().required().validate(appAddress),
   );
   return { objAddress, app: cleanApp(obj) };
 };
@@ -359,9 +314,7 @@ export const showUserApp = async (
   const { obj, objAddress } = await showUserObjByIndex(APP)(
     contracts,
     await uint256Schema().required().validate(index),
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(userAddress),
+    await addressSchema().required().validate(userAddress),
   );
   return { objAddress, app: cleanApp(obj) };
 };
@@ -372,9 +325,7 @@ export const showDataset = async (
 ) => {
   const { obj, objAddress } = await showObjByAddress(DATASET)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(datasetAddress),
+    await addressSchema().required().validate(datasetAddress),
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -393,9 +344,7 @@ export const showUserDataset = async (
   const { obj, objAddress } = await showUserObjByIndex(DATASET)(
     contracts,
     await uint256Schema().required().validate(index),
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(userAddress),
+    await addressSchema().required().validate(userAddress),
   );
   const clean = Object.assign(
     cleanObj(obj),
@@ -412,9 +361,7 @@ export const showWorkerpool = async (
 ) => {
   const { obj, objAddress } = await showObjByAddress(WORKERPOOL)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(workerpoolAddress),
+    await addressSchema().required().validate(workerpoolAddress),
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
@@ -428,9 +375,7 @@ export const showUserWorkerpool = async (
   const { obj, objAddress } = await showUserObjByIndex(WORKERPOOL)(
     contracts,
     await uint256Schema().required().validate(index),
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(userAddress),
+    await addressSchema().required().validate(userAddress),
   );
   const clean = cleanObj(obj);
   return { objAddress, workerpool: clean };
@@ -479,12 +424,8 @@ const transferObj =
 export const transferApp = async (contracts = throwIfMissing(), address, to) =>
   transferObj(APP)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(to),
+    await addressSchema().required().validate(address),
+    await addressSchema().required().validate(to),
   );
 
 export const transferDataset = async (
@@ -494,12 +435,8 @@ export const transferDataset = async (
 ) =>
   transferObj(DATASET)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(to),
+    await addressSchema().required().validate(address),
+    await addressSchema().required().validate(to),
   );
 
 export const transferWorkerpool = async (
@@ -509,10 +446,6 @@ export const transferWorkerpool = async (
 ) =>
   transferObj(WORKERPOOL)(
     contracts,
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(address),
-    await addressSchema({ ethProvider: contracts.provider })
-      .required()
-      .validate(to),
+    await addressSchema().required().validate(address),
+    await addressSchema().required().validate(to),
   );

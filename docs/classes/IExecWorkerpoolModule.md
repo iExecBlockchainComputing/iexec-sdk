@@ -139,7 +139,7 @@ _NB_: resolve to `undefined` if the workerpool API url was not declared.
 
 example:
 ```js
-const url = await getWorkerpoolApiUrl('my-workerpool.eth');
+const url = await getWorkerpoolApiUrl(address);
 console.log('workerpool API url:', url);
 ```
 

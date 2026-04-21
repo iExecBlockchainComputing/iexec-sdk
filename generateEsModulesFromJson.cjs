@@ -63,22 +63,6 @@ const sources = [
     '@iexec/poco/artifacts/contracts/registries/datasets/Dataset.sol/Dataset.json',
     { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
-  [
-    '@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.abi },
-  ],
-  [
-    '@ensdomains/ens-contracts/artifacts/contracts/registry/FIFSRegistrar.sol/FIFSRegistrar.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.abi },
-  ],
-  [
-    '@ensdomains/ens-contracts/artifacts/contracts/reverseRegistrar/ReverseRegistrar.sol/ReverseRegistrar.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.abi },
-  ],
-  [
-    '@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json',
-    { dir: '@ensdomains/resolvers', minifier: minifiers.abi },
-  ],
 ];
 
 const createEsModule = (jsonObj) => {

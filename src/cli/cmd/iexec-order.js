@@ -211,7 +211,7 @@ sign
           if (!loadedOrder) {
             throw new Error(info.missingOrder(APP_ORDER, 'app'));
           }
-          const orderObj = await createApporder(chain.contracts, loadedOrder);
+          const orderObj = await createApporder(loadedOrder);
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
             throw new Error(`No app deployed at address ${orderObj.app}`);
           if (!opts.skipPreflightCheck) {
@@ -252,10 +252,7 @@ sign
           if (!loadedOrder) {
             throw new Error(info.missingOrder(DATASET_ORDER, 'dataset'));
           }
-          const orderObj = await createDatasetorder(
-            chain.contracts,
-            loadedOrder,
-          );
+          const orderObj = await createDatasetorder(loadedOrder);
           if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
             throw new Error(
               `No dataset deployed at address ${orderObj.dataset}`,
@@ -263,7 +260,6 @@ sign
           if (!opts.skipPreflightCheck) {
             await checkDatasetRequirements(
               {
-                contracts: chain.contracts,
                 smsURL: getPropertyFromChain(chain, 'sms'),
               },
               orderObj,
@@ -301,10 +297,7 @@ sign
           if (!loadedOrder) {
             throw new Error(info.missingOrder(WORKERPOOL_ORDER, 'workerpool'));
           }
-          const orderObj = await createWorkerpoolorder(
-            chain.contracts,
-            loadedOrder,
-          );
+          const orderObj = await createWorkerpoolorder(loadedOrder);
           if (
             !(await checkDeployedWorkerpool(
               chain.contracts,
@@ -350,7 +343,6 @@ sign
           if (!opts.skipPreflightCheck) {
             await checkRequestRequirements(
               {
-                contracts: chain.contracts,
                 smsURL: getPropertyFromChain(chain, 'sms'),
               },
               orderObj,
@@ -541,7 +533,6 @@ fill
         if (useDataset) {
           await checkDatasetRequirements(
             {
-              contracts: chain.contracts,
               smsURL: getPropertyFromChain(chain, 'sms'),
             },
             datasetorder,
@@ -558,7 +549,6 @@ fill
         }
         await checkRequestRequirements(
           {
-            contracts: chain.contracts,
             smsURL: getPropertyFromChain(chain, 'sms'),
           },
           requestorder,
@@ -665,7 +655,6 @@ publish
               if (!opts.skipPreflightCheck) {
                 await checkDatasetRequirements(
                   {
-                    contracts: chain.contracts,
                     smsURL: getPropertyFromChain(chain, 'sms'),
                   },
                   orderToPublish,
@@ -696,7 +685,6 @@ publish
               if (!opts.skipPreflightCheck) {
                 await checkRequestRequirements(
                   {
-                    contracts: chain.contracts,
                     smsURL: getPropertyFromChain(chain, 'sms'),
                   },
                   orderToPublish,

@@ -56,15 +56,11 @@ export default class IExecOrderModule extends IExecModule {
   constructor(...args) {
     super(...args);
 
-    this.createApporder = async (overwrite) =>
-      createApporder(await this.config.resolveContractsClient(), overwrite);
+    this.createApporder = async (overwrite) => createApporder(overwrite);
     this.createDatasetorder = async (overwrite) =>
-      createDatasetorder(await this.config.resolveContractsClient(), overwrite);
+      createDatasetorder(overwrite);
     this.createWorkerpoolorder = async (overwrite) =>
-      createWorkerpoolorder(
-        await this.config.resolveContractsClient(),
-        overwrite,
-      );
+      createWorkerpoolorder(overwrite);
     this.createRequestorder = async (overwrite) =>
       createRequestorder(
         {
@@ -110,7 +106,6 @@ export default class IExecOrderModule extends IExecModule {
         preflightCheck === true
           ? await checkDatasetRequirements(
               {
-                contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL(),
               },
               datasetorder,
@@ -131,7 +126,6 @@ export default class IExecOrderModule extends IExecModule {
         preflightCheck === true
           ? await checkRequestRequirements(
               {
-                contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL(),
               },
               requestorder,
@@ -184,7 +178,6 @@ export default class IExecOrderModule extends IExecModule {
         preflightCheck === true
           ? await checkDatasetRequirements(
               {
-                contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL(),
               },
               signedDatasetorder,
@@ -207,7 +200,6 @@ export default class IExecOrderModule extends IExecModule {
         preflightCheck === true
           ? await checkRequestRequirements(
               {
-                contracts: await this.config.resolveContractsClient(),
                 smsURL: await this.config.resolveSmsURL(),
               },
               signedRequestorder,
@@ -321,7 +313,6 @@ export default class IExecOrderModule extends IExecModule {
           ).then(() => apporder),
           datasetorder: await checkDatasetRequirements(
             {
-              contracts,
               smsURL: await this.config.resolveSmsURL(),
             },
             datasetorder,
@@ -330,7 +321,6 @@ export default class IExecOrderModule extends IExecModule {
           workerpoolorder,
           requestorder: await checkRequestRequirements(
             {
-              contracts,
               smsURL: await this.config.resolveSmsURL(),
             },
             requestorder,

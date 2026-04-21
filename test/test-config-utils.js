@@ -6,9 +6,6 @@ export const getTestConfigOptions =
   (chain) =>
   ({ options = {} } = {}) => ({
     confirms: options.confirms ?? chain.confirms,
-    ensPublicResolverAddress:
-      options.ensPublicResolverAddress ?? chain.ensPublicResolverAddress,
-    ensRegistryAddress: options.ensRegistryAddress ?? chain.ensRegistryAddress,
     hubAddress: options.hubAddress ?? chain.hubAddress,
     iexecGatewayURL: options.iexecGatewayURL ?? chain.iexecGatewayURL,
     ipfsNodeURL: options.ipfsNodeURL ?? chain.ipfsNodeURL,

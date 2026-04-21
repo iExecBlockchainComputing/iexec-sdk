@@ -72,7 +72,7 @@ console.log('secret "my-password" set:', isSecretSet);
 
 ##### secretName
 
-`String`
+`string`
 
 #### Returns
 

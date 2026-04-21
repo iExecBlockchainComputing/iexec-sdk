@@ -23,7 +23,6 @@
 - [IExecConfig](classes/IExecConfig.md)
 - [IExecDatasetModule](classes/IExecDatasetModule.md)
 - [IExecDealModule](classes/IExecDealModule.md)
-- [IExecENSModule](classes/IExecENSModule.md)
 - [IExecHubModule](classes/IExecHubModule.md)
 - [IExecModule](classes/IExecModule.md)
 - [IExecNetworkModule](classes/IExecNetworkModule.md)
@@ -48,13 +47,11 @@
 ## Type Aliases
 
 - [Address](type-aliases/Address.md)
-- [Addressish](type-aliases/Addressish.md)
 - [AnyRecord](type-aliases/AnyRecord.md)
 - [BNish](type-aliases/BNish.md)
 - [Bytes](type-aliases/Bytes.md)
 - [Bytes32](type-aliases/Bytes32.md)
 - [Dealid](type-aliases/Dealid.md)
-- [ENS](type-aliases/ENS.md)
 - [HumanSingleTag](type-aliases/HumanSingleTag.md)
 - [Multiaddress](type-aliases/Multiaddress.md)
 - [NRLCAmount](type-aliases/NRLCAmount.md)

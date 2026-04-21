@@ -23,9 +23,7 @@ export const getWorkerpoolApiUrl = async (
   workerpoolAddress,
 ) => {
   try {
-    const vAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
+    const vAddress = await addressSchema()
       .required()
       .label('workerpool address')
       .validate(workerpoolAddress);

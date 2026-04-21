@@ -36,8 +36,6 @@ import {
   info,
 } from '../utils/cli-helper.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
-import { lookupAddress } from '../../common/ens/resolution.js';
-import { ConfigurationError } from '../../common/utils/errors.js';
 
 const objName = 'wallet';
 
@@ -154,19 +152,7 @@ show
       // show address balance
       const addressToShow = address || userWalletAddress;
       spinner.start(info.checkBalance(''));
-      const [balances, ens] = await Promise.all([
-        checkBalances(chain.contracts, addressToShow),
-        lookupAddress(chain.contracts, addressToShow).catch((e) => {
-          if (e instanceof ConfigurationError) {
-            /** no ENS */
-          } else {
-            throw e;
-          }
-        }),
-      ]);
-      if (ens) {
-        spinner.info(`ENS: ${ens}`);
-      }
+      const balances = await checkBalances(chain.contracts, addressToShow);
       const displayBalances = {
         ether: chain.contracts.isNative ? undefined : formatEth(balances.wei),
         RLC: formatRLC(balances.nRLC),
@@ -183,7 +169,6 @@ show
                 : balances.wei.toString(),
             },
             ...(!address && displayedWallet && { wallet: displayedWallet }),
-            ens,
           },
         },
       );

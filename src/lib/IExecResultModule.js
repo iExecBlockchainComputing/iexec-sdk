@@ -10,7 +10,6 @@ export default class IExecResultModule extends IExecModule {
 
     this.checkResultEncryptionKeyExists = async (address) =>
       checkWeb2SecretExists(
-        await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         address,
         getResultEncryptionKeyName(),

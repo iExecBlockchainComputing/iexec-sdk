@@ -97,8 +97,6 @@ export const info = {
   downloaded: (filePath) => `Downloaded task result to file ${filePath}`,
   missingAddressOrDeployed: (objName, chainId) =>
     `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chainId}`,
-  missingEnsForObjectAtAddress: (objName, address) =>
-    `Missing ENS for ${objName} ${address}. You probably forgot to run "iexec ens register <name> --for ${address}"`,
   checking: (obj) => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) =>
     `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
@@ -915,19 +913,6 @@ export const prettyRPC = (rpcObj) => {
     return acc;
   }, {});
   return pretty(prettyObj);
-};
-
-export const isEthAddress = (address, { strict = false } = {}) => {
-  const isHexString =
-    typeof address === 'string' && address.substr(0, 2) === '0x';
-  const isEns =
-    typeof address === 'string' &&
-    address.substring(address.length - 4) === '.eth';
-  const isAddress = isEns || (isHexString && address.length === 42);
-  if (!isAddress && strict) {
-    throw new Error(`Address ${address} is not a valid Ethereum address`);
-  }
-  return isAddress;
 };
 
 export const isBytes32 = (str, { strict = false } = {}) => {
