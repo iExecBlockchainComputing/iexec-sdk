@@ -214,13 +214,22 @@ const anvilSetNRlcTokenBalance =
       chain.provider,
     ).token();
 
-    const contractStorageLocation =
+    /** [rlc-multichain](https://github.com/iExecBlockchainComputing/rlc-multichain/tree/v0.1.0) is an openzeppelin ERC20Upgradeable contract
+     *
+     * ERC20Upgradeable contract use a specific storage slot, which is:
+     * ```
+     * // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.ERC20")) - 1)) & ~bytes32(uint256(0xff))
+     * bytes32 private constant ERC20StorageLocation = 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00;
+     * ```
+     * sources: https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/v5.3.0/contracts/token/ERC20/ERC20Upgradeable.sol#L43-L44
+     */
+    const erc20StorageLocation =
       '0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00';
 
     const balanceSlot = keccak256(
       AbiCoder.defaultAbiCoder().encode(
         ['address', 'uint256'],
-        [address, contractStorageLocation],
+        [address, erc20StorageLocation],
       ),
     );
 
