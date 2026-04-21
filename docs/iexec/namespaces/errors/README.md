@@ -9,7 +9,6 @@
 ## Classes
 
 - [ApiCallError](classes/ApiCallError.md)
-- [BridgeError](classes/BridgeError.md)
 - [CompassCallError](classes/CompassCallError.md)
 - [ConfigurationError](classes/ConfigurationError.md)
 - [IpfsGatewayCallError](classes/IpfsGatewayCallError.md)

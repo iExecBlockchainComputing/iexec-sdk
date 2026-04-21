@@ -84,16 +84,6 @@ export default class IExecAccountModule extends IExecModule {
    */
   checkBalance(address: Addressish): Promise<{ stake: BN; locked: BN }>;
   /**
-   * check the account balance on bridged chain of specified address ie: when connected to mainnet, check the account ballance on bellecour
-   * example:
-   * ```js
-   * const balance = await checkBridgedBalance(ethAddress);
-   * console.log('Nano RLC staked:', balance.stake.toString());
-   * console.log('Nano RLC locked:', balance.locked.toString());
-   * ```
-   */
-  checkBridgedBalance(address: Addressish): Promise<{ stake: BN; locked: BN }>;
-  /**
    * Create an IExecAccountModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecAccountModule;

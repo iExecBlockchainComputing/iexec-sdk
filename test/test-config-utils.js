@@ -5,8 +5,6 @@ import { setBalance } from './test-utils.js';
 export const getTestConfigOptions =
   (chain) =>
   ({ options = {} } = {}) => ({
-    bridgeAddress: options.bridgeAddress ?? chain.bridgeAddress,
-    bridgedNetworkConf: options.bridgedNetworkConf ?? chain.bridgedNetworkConf,
     confirms: options.confirms ?? chain.confirms,
     ensPublicResolverAddress:
       options.ensPublicResolverAddress ?? chain.ensPublicResolverAddress,

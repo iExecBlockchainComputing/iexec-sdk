@@ -54,31 +54,6 @@ export interface IExecConfigOptions {
    */
   ensPublicResolverAddress?: string;
   /**
-   * override the bridge contract address to target a custom instance
-   */
-  bridgeAddress?: string;
-  /**
-   * override the bridged network configuration
-   */
-  bridgedNetworkConf?: {
-    /**
-     * bridged network chainId
-     */
-    chainId?: number | string;
-    /**
-     * bridged network node url
-     */
-    rpcURL?: string;
-    /**
-     * IExec contract address on bridged network
-     */
-    hubAddress?: string;
-    /**
-     * bridge contract address on bridged network
-     */
-    bridgeAddress?: string;
-  };
-  /**
    * override the result proxy URL to target a custom instance
    */
   resultProxyURL?: string;
@@ -169,10 +144,6 @@ export default class IExecConfig {
    */
   resolveContractsClient(): Promise<IExecContractsClient>;
   /**
-   * resolve the current bridged IExecContractsClient
-   */
-  resolveBridgedContractsClient(): Promise<IExecContractsClient>;
-  /**
    * resolve the current SMS URL
    */
   resolveSmsURL(): Promise<string>;
@@ -201,14 +172,6 @@ export default class IExecConfig {
    * resolve the current PoCo subgraph URL
    */
   resolvePocoSubgraphURL(): Promise<string>;
-  /**
-   * resolve the current bridge contract address
-   */
-  resolveBridgeAddress(): Promise<string>;
-  /**
-   * resolve the bridge contract address on bridged chain
-   */
-  resolveBridgeBackAddress(): Promise<string>;
   /**
    * resolve the current ENS public resolver contract address
    */

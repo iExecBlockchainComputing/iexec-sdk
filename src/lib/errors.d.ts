@@ -77,33 +77,6 @@ export class ObjectNotFoundError extends Error {
    */
   chainId: string;
 }
-/**
- * BridgeError is thrown when bridging RLC between mainchain and sidechain fail before the value transfer confirmation.
- */
-export class BridgeError extends Error {
-  constructor(
-    /**
-     * The original Error object that caused this API call error.
-     */
-    originalError: Error,
-    /**
-     * Hash of the transaction sending the value to the bridge contract.
-     */
-    sendTxHash: string,
-  );
-  /**
-   * Hash of the transaction sending the value to the bridge contract.
-   */
-  sendTxHash: string;
-  /**
-   * @deprecated use Error cause instead
-   */
-  originalError: Error;
-  /**
-   * The original Error object that caused this API call error.
-   */
-  cause: Error;
-}
 
 /**
  * ApiCallError encapsulates an error occurring during a call to an API such as a network error or a server-side internal error.

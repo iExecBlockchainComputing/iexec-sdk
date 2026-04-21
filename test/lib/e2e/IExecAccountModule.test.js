@@ -2,14 +2,12 @@ import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils.js';
 import {
-  DEFAULT_PROVIDER_OPTIONS,
   TEST_CHAINS,
   getRandomAddress,
   setBalance,
   setNRlcBalance,
 } from '../../test-utils.js';
 import '../../jest-setup.js';
-import { IExec } from '../../../src/lib/index.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 const tokenTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];
@@ -38,37 +36,6 @@ describe('account', () => {
         true,
       );
       expect(finalBalance.locked.eq(initialBalance.locked)).toBe(true);
-    });
-  });
-
-  describe('checkBridgedBalance()', () => {
-    describe('native chain', () => {
-      test('expose bridged balances (mainnet) on bellecour', async () => {
-        const iexec = new IExec(
-          { ethProvider: 'bellecour' },
-          {
-            providerOptions: DEFAULT_PROVIDER_OPTIONS,
-          },
-        );
-        const res = await iexec.account.checkBridgedBalance(getRandomAddress());
-        expect(res.stake).toBeInstanceOf(BN);
-        expect(res.locked).toBeInstanceOf(BN);
-      });
-
-      describe('token chain', () => {
-        test('expose bridged balances (bellecour) on mainnet', async () => {
-          const iexec = new IExec(
-            { ethProvider: 'mainnet' },
-            {
-              providerOptions: DEFAULT_PROVIDER_OPTIONS,
-            },
-          );
-          const res =
-            await iexec.account.checkBridgedBalance(getRandomAddress());
-          expect(res.stake).toBeInstanceOf(BN);
-          expect(res.locked).toBeInstanceOf(BN);
-        });
-      });
     });
   });
 
