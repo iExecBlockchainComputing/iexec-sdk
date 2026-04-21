@@ -16,7 +16,7 @@ CompassCallError encapsulates an error occurring during a call to the Compass AP
 
 ### Constructor
 
-> **new CompassCallError**(`message`, `originalError`): `CompassCallError`
+> **new CompassCallError**(`message`, `options?`): `CompassCallError`
 
 #### Parameters
 
@@ -26,11 +26,13 @@ CompassCallError encapsulates an error occurring during a call to the Compass AP
 
 A descriptive error message detailing the nature of the error.
 
-##### originalError
+##### options?
 
-`Error`
+###### cause?
 
-The original Error object that caused this API call error.
+`unknown`
+
+The original error that caused this API call error.
 
 #### Returns
 
@@ -42,26 +44,12 @@ The original Error object that caused this API call error.
 
 ## Properties
 
-### cause
+### cause?
 
-> **cause**: `Error`
+> `optional` **cause**: `unknown`
 
-The original Error object that caused this API call error.
+The original error that caused this API call error.
 
 #### Inherited from
 
 [`ApiCallError`](ApiCallError.md).[`cause`](ApiCallError.md#cause)
-
-***
-
-### ~~originalError~~
-
-> **originalError**: `Error`
-
-#### Deprecated
-
-use Error cause instead.
-
-#### Inherited from
-
-[`ApiCallError`](ApiCallError.md).[`originalError`](ApiCallError.md#originalerror)

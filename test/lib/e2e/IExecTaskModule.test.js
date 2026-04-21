@@ -457,7 +457,11 @@ describe('task', () => {
         ).rejects.toThrow(
           new WorkerpoolCallError(
             `Server at http://localhost:5500 encountered an internal error`,
-            new Error('Server internal error: 500 Internal Server Error'),
+            {
+              cause: new Error(
+                'Server internal error: 500 Internal Server Error',
+              ),
+            },
           ),
         );
       });
