@@ -80,25 +80,7 @@ describe('checkImplementedOnChain', () => {
       );
     });
   });
-  describe(`feature ${CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION}`, () => {
-    const feature = CHAIN_SPECIFIC_FEATURES.WORKERPOOL_API_URL_REGISTRATION;
-    test('is implemented on bellecour', () => {
-      expect(() => checkImplementedOnChain(134, feature)).not.toThrow();
-    });
-    test('is implemented on mainnet', () => {
-      expect(() => checkImplementedOnChain(1, feature)).not.toThrow();
-    });
-    test('is not implemented on arbitrum-mainnet', () => {
-      expect(() => checkImplementedOnChain(42161, feature)).toThrow(
-        `${feature} is not available on network arbitrum-mainnet`,
-      );
-    });
-    test('is not implemented on arbitrum-sepolia-testnet', () => {
-      expect(() => checkImplementedOnChain(421614, feature)).toThrow(
-        `${feature} is not available on network arbitrum-sepolia-testnet`,
-      );
-    });
-  });
+
   describe(`feature ${CHAIN_SPECIFIC_FEATURES.COMPASS}`, () => {
     const feature = CHAIN_SPECIFIC_FEATURES.COMPASS;
     test('is not implemented on bellecour', () => {

@@ -238,133 +238,54 @@ describe('workerpool', () => {
   });
 
   describe('getWorkerpoolApiUrl()', () => {
-    describe('on networks with ENS', () => {
-      const testChainWithEns = TEST_CHAINS['bellecour-fork'];
-      test('resolves the url against ENS', async () => {
-        const { iexec: readOnlyIExec } = await getTestConfig(testChainWithEns)({
-          readOnly: true,
-        });
-        const { iexec } = await getTestConfig(testChainWithEns)();
-        const { address } = await deployRandomWorkerpool(iexec);
-        const resNoApiUrl =
-          await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
-        expect(resNoApiUrl).toBe(undefined);
-        const label = address.toLowerCase();
-        const domain = 'pools.iexec.eth';
-        const name = `${label}.${domain}`;
-        await iexec.ens.claimName(label, domain);
-        await iexec.ens.configureResolution(name, address);
-        const apiUrl = 'https://my-workerpool.com';
-        await iexec.workerpool.setWorkerpoolApiUrl(address, apiUrl);
-        const resConfigured =
-          await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
-        expect(resConfigured).toBe(apiUrl);
-      });
+    test('resolves the url against Compass', async () => {
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)();
+      const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
+        '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
+      );
+      expect(typeof apiUrl).toBe('string');
+      expect(apiUrl.startsWith('https://')).toBe(true);
     });
 
-    describe('on networks relying on compass', () => {
-      test('resolves the url against Compass', async () => {
-        const { iexec: readOnlyIExec } = await getTestConfig(testChain)();
-        const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
-          '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
-        );
-        expect(typeof apiUrl).toBe('string');
-        expect(apiUrl.startsWith('https://')).toBe(true);
-      });
-
-      test('returns undefined if the workerpool does not exist in Compass', async () => {
-        const { iexec: readOnlyIExec } = await getTestConfig(testChain)();
-        const address = getRandomAddress();
-        await expect(
-          readOnlyIExec.workerpool.getWorkerpoolApiUrl(address),
-        ).resolves.toBe(undefined);
-      });
-
-      test('fails with CompassCallError if Compass is not available', async () => {
-        const { iexec: iexecCompassNotFound } = await getTestConfig(testChain)({
-          options: {
-            compassURL: SERVICE_UNREACHABLE_URL,
-          },
-        });
-        await expect(
-          iexecCompassNotFound.workerpool.getWorkerpoolApiUrl(
-            getRandomAddress(),
-          ),
-        ).rejects.toThrow(
-          new errors.CompassCallError(
-            `Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-          ),
-        );
-
-        const { iexec: iexecCompassInternalError } = await getTestConfig(
-          testChain,
-        )({
-          options: {
-            compassURL: SERVICE_HTTP_500_URL,
-          },
-        });
-        await expect(
-          iexecCompassInternalError.workerpool.getWorkerpoolApiUrl(
-            getRandomAddress(),
-          ),
-        ).rejects.toThrow(
-          new errors.CompassCallError(
-            `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-            new Error('Server internal error: 500 Internal Server Error'),
-          ),
-        );
-      });
-    });
-  });
-
-  describe('setWorkerpoolApiUrl()', () => {
-    describe('on networks with ENS', () => {
-      const testChainWithEns = TEST_CHAINS['bellecour-fork'];
-
-      test('require a configured ens name for the workerpool', async () => {
-        const { iexec } = await getTestConfig(testChainWithEns)();
-        const { address } = await deployRandomWorkerpool(iexec);
-        await expect(
-          iexec.workerpool.setWorkerpoolApiUrl(
-            address,
-            'https://my-workerpool.com',
-          ),
-        ).rejects.toThrow(
-          new Error(`No ENS name reverse resolution configured for ${address}`),
-        );
-      });
-
-      test('sets the workerpool api url', async () => {
-        const { iexec } = await getTestConfig(testChainWithEns)();
-        const { address } = await deployRandomWorkerpool(iexec);
-        const label = address.toLowerCase();
-        const domain = 'pools.iexec.eth';
-        const name = `${label}.${domain}`;
-        await iexec.ens.claimName(label, domain);
-        await iexec.ens.configureResolution(name, address);
-        const res = await iexec.workerpool.setWorkerpoolApiUrl(
-          address,
-          'https://my-workerpool.com',
-        );
-        expect(res).toBeTxHash();
-      });
+    test('returns undefined if the workerpool does not exist in Compass', async () => {
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)();
+      const address = getRandomAddress();
+      await expect(
+        readOnlyIExec.workerpool.getWorkerpoolApiUrl(address),
+      ).resolves.toBe(undefined);
     });
 
-    describe('on networks relying on compass', () => {
-      test('setWorkerpoolApiUrl is not supported', async () => {
-        const { iexec } = await getTestConfig(testChain)();
-        const { address } = await deployRandomWorkerpool(iexec);
-        await expect(
-          iexec.workerpool.setWorkerpoolApiUrl(
-            address,
-            'https://my-workerpool.com',
-          ),
-        ).rejects.toThrow(
-          new ConfigurationError(
-            'Workerpool API Registration is not available on network arbitrum-sepolia-testnet',
-          ),
-        );
+    test('fails with CompassCallError if Compass is not available', async () => {
+      const { iexec: iexecCompassNotFound } = await getTestConfig(testChain)({
+        options: {
+          compassURL: SERVICE_UNREACHABLE_URL,
+        },
       });
+      await expect(
+        iexecCompassNotFound.workerpool.getWorkerpoolApiUrl(getRandomAddress()),
+      ).rejects.toThrow(
+        new errors.CompassCallError(
+          `Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        ),
+      );
+
+      const { iexec: iexecCompassInternalError } = await getTestConfig(
+        testChain,
+      )({
+        options: {
+          compassURL: SERVICE_HTTP_500_URL,
+        },
+      });
+      await expect(
+        iexecCompassInternalError.workerpool.getWorkerpoolApiUrl(
+          getRandomAddress(),
+        ),
+      ).rejects.toThrow(
+        new errors.CompassCallError(
+          `Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+          new Error('Server internal error: 500 Internal Server Error'),
+        ),
+      );
     });
   });
 });

@@ -1282,7 +1282,6 @@ Commands:
 
 - [init](#iexec-workerpool-init)
 - [deploy](#iexec-workerpool-deploy)
-- [set-api-url](#iexec-workerpool-set-api-url)
 - [show](#iexec-workerpool-show)
 - [count](#iexec-workerpool-count)
 - [publish](#iexec-workerpool-publish)
@@ -1318,30 +1317,6 @@ Usage:
 
 ```sh
 iexec workerpool deploy [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-
-#### iexec workerpool set-api-url
-
-declare the workerpool API URL on the blockchain
-
-Usage:
-
-```sh
-iexec workerpool set-api-url <apiUrl> [workerpoolAddress] [options]
 ```
 
 Options:

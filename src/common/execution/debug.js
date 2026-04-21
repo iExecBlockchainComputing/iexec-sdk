@@ -2,14 +2,10 @@ import Debug from 'debug';
 import {
   throwIfMissing,
   addressSchema,
-  workerpoolApiUrlSchema,
   bytes32Schema,
 } from '../utils/validator.js';
-import { lookupAddress } from '../ens/resolution.js';
-import { readTextRecord } from '../ens/text-record.js';
 import { show as dealShow } from './deal.js';
 import { show as taskShow } from './task.js';
-import { WORKERPOOL_URL_TEXT_RECORD_KEY } from '../utils/constant.js';
 import { jsonApi, getAuthorization } from '../utils/api-utils.js';
 import { checkSigner } from '../utils/utils.js';
 import { getAddress } from '../wallet/address.js';
@@ -54,25 +50,6 @@ export const getWorkerpoolApiUrl = async (
         });
       return json?.apiUrl;
     }
-
-    // ENS based workerpool API URL resolution
-    const name = await lookupAddress(contracts, vAddress).catch(() => {
-      /** return undefined */
-    });
-    if (!name) {
-      return undefined;
-    }
-    const url = await readTextRecord(
-      contracts,
-      name,
-      WORKERPOOL_URL_TEXT_RECORD_KEY,
-    );
-    return await workerpoolApiUrlSchema()
-      .required()
-      .validate(url)
-      .catch(() => {
-        /** return undefined */
-      });
   } catch (e) {
     debug('getWorkerpoolApiUrl()', e);
     throw e;
