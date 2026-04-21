@@ -22,7 +22,7 @@ Web3ProviderError encapsulates an error thrown by the web3 provider.
 
 ### Constructor
 
-> **new Web3ProviderError**(`message`, `originalError`): `Web3ProviderError`
+> **new Web3ProviderError**(`message`, `options?`): `Web3ProviderError`
 
 #### Parameters
 
@@ -32,11 +32,13 @@ Web3ProviderError encapsulates an error thrown by the web3 provider.
 
 A descriptive error message detailing the nature of the error.
 
-##### originalError
+##### options?
 
-`Error`
+###### cause?
 
-The original Error object that caused this web3 provider error.
+`unknown`
+
+The original error that caused this web3 provider error.
 
 #### Returns
 
@@ -48,11 +50,11 @@ The original Error object that caused this web3 provider error.
 
 ## Properties
 
-### cause
+### cause?
 
-> **cause**: `Error`
+> `optional` **cause**: `unknown`
 
-The original Error object that caused this web3 provider error.
+The original error that caused this web3 provider error.
 
 ***
 
@@ -61,13 +63,3 @@ The original Error object that caused this web3 provider error.
 > `optional` **isUserRejection**: `boolean`
 
 Wether the error was caused by a user rejection
-
-***
-
-### ~~originalError~~
-
-> **originalError**: `Error`
-
-#### Deprecated
-
-use Error cause instead.
