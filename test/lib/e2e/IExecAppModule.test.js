@@ -1,10 +1,7 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
 import {
   TEST_CHAINS,
-  TEE_FRAMEWORKS,
   getId,
   getRandomAddress,
   SERVICE_UNREACHABLE_URL,
@@ -20,15 +17,15 @@ import { errors } from '../../../src/lib/index.js';
 
 const { SmsCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('app', () => {
   describe('showApp()', () => {
     test('shows a deployed app', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const app = {
         owner: await iexec.wallet.getAddress(),
         name: `app${getId()}`,
@@ -58,22 +55,22 @@ describe('app', () => {
     });
 
     test('fails if the app is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
       await expect(readOnlyIExec.app.showApp(address)).rejects.toThrow(
-        new errors.ObjectNotFoundError('app', address, iexecTestChain.chainId),
+        new errors.ObjectNotFoundError('app', address, testChain.chainId),
       );
     });
   });
 
   describe('showUserApp()', () => {
     test('shows the user app', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const app = {
         owner: wallet.address,
         name: `app${getId()}`,
@@ -103,7 +100,7 @@ describe('app', () => {
     });
 
     test('fails if the app is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
@@ -115,10 +112,10 @@ describe('app', () => {
 
   describe('countUserApps()', () => {
     test('counts user app', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const resBeforeDeploy = await readOnlyIExec.app.countUserApps(
         wallet.address,
       );
@@ -132,7 +129,7 @@ describe('app', () => {
 
   describe('deployApp()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -149,7 +146,7 @@ describe('app', () => {
     });
 
     test('deploys an app', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -164,7 +161,7 @@ describe('app', () => {
     });
 
     test('cannot deploy twice with the same params', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -182,10 +179,10 @@ describe('app', () => {
 
   describe('predictAppAddress()', () => {
     test('predicts the deployment address', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -207,10 +204,10 @@ describe('app', () => {
 
   describe('checkDeployedApp()', () => {
     test('checks an app is deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const app = {
         owner: getRandomAddress(),
         name: `app${getId()}`,
@@ -232,7 +229,7 @@ describe('app', () => {
 
   describe('transferApp()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       await expect(
         iexec.app.transferApp(getRandomAddress(), getRandomAddress()),
       ).rejects.toThrow(
@@ -244,8 +241,8 @@ describe('app', () => {
 
     test('transfers the ownership', async () => {
       const receiverAddress = getRandomAddress();
-      const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecRandom } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecAppOwner } = await getTestConfig(testChain)();
+      const { iexec: iexecRandom } = await getTestConfig(testChain)();
       const { address } = await deployRandomApp(iexecAppOwner);
       await expect(
         iexecRandom.app.transferApp(getRandomAddress(), receiverAddress),
@@ -265,13 +262,13 @@ describe('app', () => {
   describe('checkAppSecretExists()', () => {
     let randomAppAddress;
     beforeAll(async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const { address } = await deployRandomApp(iexec);
       randomAppAddress = address;
     });
 
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
@@ -287,7 +284,7 @@ describe('app', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           smsURL: SERVICE_HTTP_500_URL,
@@ -302,74 +299,19 @@ describe('app', () => {
       );
     });
 
-    test('checks an app secret exist on SMS inferred from gramine app TEE framework', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+    test('checks an app secret exist on SMS', async () => {
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
+      const { iexec } = await getTestConfig(testChain)();
+      const { address } = await deployRandomApp(iexec);
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address),
       ).resolves.toBe(false);
       await iexec.app.pushAppSecret(address, 'foo');
-      // infer teeFramework to use
       await expect(
         readOnlyIExec.app.checkAppSecretExists(address),
       ).resolves.toBe(true);
-      // check inferred teeFramework with teeFramework option
-      await expect(
-        readOnlyIExec.app.checkAppSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-    });
-
-    test('checks an app secret exist on SMS inferred from tdx app TEE framework', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
-        readOnly: true,
-      });
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.TDX,
-      });
-      await expect(
-        readOnlyIExec.app.checkAppSecretExists(address),
-      ).resolves.toBe(false);
-      await iexec.app.pushAppSecret(address, 'foo');
-      // infer teeFramework to use
-      await expect(
-        readOnlyIExec.app.checkAppSecretExists(address),
-      ).resolves.toBe(true);
-      // check inferred teeFramework with teeFramework option
-      await expect(
-        readOnlyIExec.app.checkAppSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.TDX,
-        }),
-      ).resolves.toBe(true);
-    });
-
-    test('allows teeFramework override', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
-        readOnly: true,
-      });
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
-      await iexec.app.pushAppSecret(address, 'foo');
-      await expect(
-        readOnlyIExec.app.checkAppSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
-      ).resolves.toBe(false);
-      // validate teeFramework
-      await expect(
-        readOnlyIExec.app.checkAppSecretExists(getRandomAddress(), {
-          teeFramework: 'foo',
-        }),
-      ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });
 
@@ -377,14 +319,14 @@ describe('app', () => {
     let randomAppAddress;
     let randomAppOwnerWallet;
     beforeAll(async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const { address } = await deployRandomApp(iexec);
       randomAppAddress = address;
       randomAppOwnerWallet = wallet;
     });
 
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         privateKey: randomAppOwnerWallet.privateKey,
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
@@ -400,7 +342,7 @@ describe('app', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         privateKey: randomAppOwnerWallet.privateKey,
         options: {
           smsURL: SERVICE_HTTP_500_URL,
@@ -416,12 +358,10 @@ describe('app', () => {
     });
 
     test('only owner can push secret', async () => {
-      const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecAppOwner } = await getTestConfig(testChain)();
       const { iexec: iexecRandom, wallet: randomWallet } =
-        getTestConfig(iexecTestChain)();
-      const { address: appAddress } = await deployRandomApp(iexecAppOwner, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
+        await getTestConfig(testChain)();
+      const { address: appAddress } = await deployRandomApp(iexecAppOwner);
       // only owner can push secret
       await expect(
         iexecRandom.app.pushAppSecret(appAddress, 'foo'),
@@ -432,53 +372,9 @@ describe('app', () => {
       );
     });
 
-    test('infers the SMS from gramine app TEE framework', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address: appAddress } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
-      // infer teeFramework to use
-      await expect(iexec.app.pushAppSecret(appAddress, 'foo')).resolves.toBe(
-        true,
-      );
-      // check inferred teeFramework with teeFramework option
-      await expect(
-        iexec.app.pushAppSecret(appAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).rejects.toThrow(
-        new Error(
-          `Secret already exists for ${appAddress} and can't be updated`,
-        ),
-      );
-    });
-
-    test('infers the SMS from tdx app TEE framework', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address: appAddress } = await deployRandomApp(iexec, {
-        teeFramework: TEE_FRAMEWORKS.TDX,
-      });
-      // infer teeFramework to use
-      await expect(iexec.app.pushAppSecret(appAddress, 'foo')).resolves.toBe(
-        true,
-      );
-      // check inferred teeFramework with teeFramework option
-      await expect(
-        iexec.app.pushAppSecret(appAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.TDX,
-        }),
-      ).rejects.toThrow(
-        new Error(
-          `Secret already exists for ${appAddress} and can't be updated`,
-        ),
-      );
-    });
-
     test('cannot update existing secret', async () => {
-      const { iexec: iexecAppOwner } = getTestConfig(iexecTestChain)();
-      const { address: appAddress } = await deployRandomApp(iexecAppOwner, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
+      const { iexec: iexecAppOwner } = await getTestConfig(testChain)();
+      const { address: appAddress } = await deployRandomApp(iexecAppOwner);
 
       await expect(
         iexecAppOwner.app.pushAppSecret(appAddress, 'foo'),
@@ -491,37 +387,6 @@ describe('app', () => {
           `Secret already exists for ${appAddress} and can't be updated`,
         ),
       );
-    });
-
-    test('allow teeFramework override', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address: appAddress } = await deployRandomApp(iexec);
-      // infer teeFramework to use
-      await expect(iexec.app.pushAppSecret(appAddress, 'foo')).resolves.toBe(
-        true,
-      );
-      await expect(
-        iexec.app.checkAppSecretExists(appAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(false);
-      await expect(
-        iexec.app.pushAppSecret(appAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-      await expect(
-        iexec.app.checkAppSecretExists(appAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-
-      // validate teeFramework
-      await expect(
-        iexec.app.pushAppSecret(appAddress, 'foo', {
-          teeFramework: 'foo',
-        }),
-      ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });
 });

@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { TEST_CHAINS, execAsync } from '../test-utils.js';
 import {
@@ -13,7 +11,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec category', () => {
   beforeAll(async () => {
@@ -27,7 +25,7 @@ describe('iexec category', () => {
   });
   describe('as user', () => {
     beforeAll(async () => {
-      await setRandomWallet();
+      await setRandomWallet(testChain)();
     });
 
     test('iexec category init', async () => {
@@ -79,9 +77,6 @@ describe('iexec category', () => {
       expect(res.ok).toBe(true);
       expect(res.catid).toBeDefined();
       expect(res.txHash).toBeDefined();
-      const tx = await testChain.provider.getTransaction(res.txHash);
-      expect(tx).toBeDefined();
-      expect(tx.gasPrice.toString()).toBe('0');
     });
   });
 });

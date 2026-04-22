@@ -1,10 +1,7 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { expectAsyncCustomError, getTestConfig } from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
-  TEE_FRAMEWORKS,
   SERVICE_UNREACHABLE_URL,
   SERVICE_HTTP_500_URL,
   getRandomAddress,
@@ -14,12 +11,12 @@ import { errors } from '../../../src/lib/index.js';
 
 const { SmsCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('secrets', () => {
   describe('pushRequesterSecret()', () => {
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
         },
@@ -34,7 +31,7 @@ describe('secrets', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         options: {
           smsURL: SERVICE_HTTP_500_URL,
         },
@@ -49,7 +46,7 @@ describe('secrets', () => {
     });
 
     test('pushes the secret', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const pushRes = await iexec.secrets.pushRequesterSecret('foo', 'oops');
       expect(pushRes.isPushed).toBe(true);
       await expect(
@@ -57,18 +54,12 @@ describe('secrets', () => {
       ).rejects.toThrow(
         new Error(`Secret "foo" already exists for ${wallet.address}`),
       );
-      const pushForTeeFrameworkRes = await iexec.secrets.pushRequesterSecret(
-        'foo',
-        'oops',
-        { teeFramework: TEE_FRAMEWORKS.GRAMINE },
-      );
-      expect(pushForTeeFrameworkRes.isPushed).toBe(true);
     });
   });
 
   describe('checkRequesterSecretExists()', () => {
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
         },
@@ -86,7 +77,7 @@ describe('secrets', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         options: {
           smsURL: SERVICE_HTTP_500_URL,
         },
@@ -104,8 +95,8 @@ describe('secrets', () => {
     });
 
     test('anyone can check a secret exists', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec, wallet } = await getTestConfig(testChain)();
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
       });
       await expect(
@@ -115,15 +106,6 @@ describe('secrets', () => {
       await expect(
         iexecReadOnly.secrets.checkRequesterSecretExists(wallet.address, 'foo'),
       ).resolves.toBe(true);
-      await expect(
-        iexecReadOnly.secrets.checkRequesterSecretExists(
-          wallet.address,
-          'foo',
-          {
-            teeFramework: TEE_FRAMEWORKS.GRAMINE,
-          },
-        ),
-      ).resolves.toBe(false);
     });
   });
 });

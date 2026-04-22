@@ -1,12 +1,5 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
-import {
-  TEST_CHAINS,
-  TEE_FRAMEWORKS,
-  execAsync,
-  getRandomAddress,
-} from '../test-utils.js';
+import { TEST_CHAINS, execAsync, getRandomAddress } from '../test-utils.js';
 import {
   globalSetup,
   globalTeardown,
@@ -16,7 +9,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 
-const testChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec requester', () => {
   let userWallet;
@@ -26,7 +19,7 @@ describe('iexec requester', () => {
     // init the project
     await execAsync(`${iexecPath} init --skip-wallet --force`);
     await setChain(testChain)();
-    userWallet = await setRandomWallet();
+    userWallet = await setRandomWallet(testChain)();
   });
   afterAll(async () => {
     await globalTeardown();
@@ -85,39 +78,6 @@ describe('iexec requester', () => {
       expect(checkPushed.ok).toBe(true);
       expect(checkPushed.name).toBe('foo');
       expect(checkPushed.isSet).toBe(true);
-
-      // check secret TEE framework validation
-      await expect(
-        execAsync(
-          `${iexecPath} requester check-secret foo ${userWallet.address} --tee-framework tee --raw`,
-        ),
-      ).rejects.toThrow();
-
-      // check secret TEE framework override
-      const checkOtherFramework = JSON.parse(
-        await execAsync(
-          `${iexecPath} requester check-secret foo ${userWallet.address} --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
-        ),
-      );
-      expect(checkOtherFramework.ok).toBe(true);
-      expect(checkOtherFramework.name).toBe('foo');
-      expect(checkOtherFramework.isSet).toBe(false);
-
-      // push secret TEE framework override
-      const pushOtherFramework = JSON.parse(
-        await execAsync(
-          `${iexecPath} requester push-secret foo --secret-value foo --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
-        ),
-      );
-      expect(pushOtherFramework.ok).toBe(true);
-      const checkOtherFrameworkPushed = JSON.parse(
-        await execAsync(
-          `${iexecPath} requester check-secret foo ${userWallet.address} --tee-framework ${TEE_FRAMEWORKS.GRAMINE} --raw`,
-        ),
-      );
-      expect(checkOtherFrameworkPushed.ok).toBe(true);
-      expect(checkOtherFrameworkPushed.name).toBe('foo');
-      expect(checkOtherFrameworkPushed.isSet).toBe(true);
     });
   });
 });

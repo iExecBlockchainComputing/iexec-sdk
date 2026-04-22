@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { join } from 'path';
 import { BN } from 'bn.js';
@@ -11,7 +9,6 @@ import {
 } from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
-  TEE_FRAMEWORKS,
   execAsync,
   getId,
   getRandomAddress,
@@ -25,15 +22,15 @@ const { SmsCallError } = errors;
 
 const { readFile, ensureDir, writeFile } = fsExtra;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('dataset', () => {
   describe('showDataset()', () => {
     test('shows a deployed dataset', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const dataset = {
         owner: await iexec.wallet.getAddress(),
         name: `dataset${getId()}`,
@@ -53,26 +50,22 @@ describe('dataset', () => {
     });
 
     test('fails if the dataset is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
       await expect(readOnlyIExec.dataset.showDataset(address)).rejects.toThrow(
-        new errors.ObjectNotFoundError(
-          'dataset',
-          address,
-          iexecTestChain.chainId,
-        ),
+        new errors.ObjectNotFoundError('dataset', address, testChain.chainId),
       );
     });
   });
 
   describe('showUserDataset()', () => {
     test('shows the user dataset', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const dataset = {
         owner: wallet.address,
         name: `dataset${getId()}`,
@@ -94,7 +87,7 @@ describe('dataset', () => {
     });
 
     test('fails if the dataset is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
@@ -106,10 +99,10 @@ describe('dataset', () => {
 
   describe('countUserDatasets()', () => {
     test('counts user datasets', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const resBeforeDeploy = await readOnlyIExec.dataset.countUserDatasets(
         wallet.address,
       );
@@ -123,7 +116,7 @@ describe('dataset', () => {
 
   describe('deployDataset()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       const dataset = {
         owner: getRandomAddress(),
         name: `dataset${getId()}`,
@@ -139,7 +132,7 @@ describe('dataset', () => {
     });
 
     test('deploys a dataset', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const dataset = {
         owner: await iexec.wallet.getAddress(),
         name: `dataset${getId()}`,
@@ -153,7 +146,7 @@ describe('dataset', () => {
     });
 
     test('cannot deploy twice with the same params', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const dataset = {
         owner: await iexec.wallet.getAddress(),
         name: `dataset${getId()}`,
@@ -170,10 +163,10 @@ describe('dataset', () => {
 
   describe('predictDatasetAddress()', () => {
     test('predicts the deployment address', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const dataset = {
         owner: getRandomAddress(),
         name: `dataset${getId()}`,
@@ -195,10 +188,10 @@ describe('dataset', () => {
 
   describe('checkDeployedDataset()', () => {
     test('checks a dataset is deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const dataset = {
         owner: getRandomAddress(),
         name: `dataset${getId()}`,
@@ -220,7 +213,7 @@ describe('dataset', () => {
 
   describe('transferDataset()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       await expect(
         iexec.dataset.transferDataset(getRandomAddress(), getRandomAddress()),
       ).rejects.toThrow(
@@ -232,8 +225,8 @@ describe('dataset', () => {
 
     test('transfers the ownership', async () => {
       const receiverAddress = getRandomAddress();
-      const { iexec: iexecDatasetOwner } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecRandom } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecDatasetOwner } = await getTestConfig(testChain)();
+      const { iexec: iexecRandom } = await getTestConfig(testChain)();
       const { address } = await deployRandomDataset(iexecDatasetOwner);
       await expect(
         iexecRandom.dataset.transferDataset(
@@ -259,17 +252,19 @@ describe('dataset', () => {
   });
 
   describe('generateEncryptionKey()', () => {
-    const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
-      readOnly: true,
+    test('generates a random 32 bytes key encoded in base64', async () => {
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
+        readOnly: true,
+      });
+      const key = readOnlyIExec.dataset.generateEncryptionKey();
+      expect(typeof key).toBe('string');
+      expect(Buffer.from(key, 'base64').length).toBe(32);
     });
-    const key = readOnlyIExec.dataset.generateEncryptionKey();
-    expect(typeof key).toBe('string');
-    expect(Buffer.from(key, 'base64').length).toBe(32);
   });
 
   describe('encrypt()', () => {
     test('encrypts the input', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const key = iexec.dataset.generateEncryptionKey();
@@ -305,7 +300,7 @@ describe('dataset', () => {
 
   describe('computeEncryptedFileChecksum()', () => {
     test('does the sha256sum of the input', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const key = iexec.dataset.generateEncryptionKey();
@@ -329,13 +324,13 @@ describe('dataset', () => {
   describe('checkDatasetSecretExists()', () => {
     let randomDatasetAddress;
     beforeAll(async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const { address } = await deployRandomDataset(iexec);
       randomDatasetAddress = address;
     });
 
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
@@ -351,7 +346,7 @@ describe('dataset', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
         options: {
           smsURL: SERVICE_HTTP_500_URL,
@@ -366,11 +361,11 @@ describe('dataset', () => {
       );
     });
 
-    test('checks a dataset secret exist on default TEE framework SMS', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+    test('checks a dataset secret exist in the SMS', async () => {
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const { address } = await deployRandomDataset(iexec);
       await expect(
         readOnlyIExec.dataset.checkDatasetSecretExists(address),
@@ -379,38 +374,6 @@ describe('dataset', () => {
       await expect(
         readOnlyIExec.dataset.checkDatasetSecretExists(address),
       ).resolves.toBe(true);
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
-      ).resolves.toBe(true);
-    });
-
-    test('allows teeFramework override', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
-        readOnly: true,
-      });
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomDataset(iexec);
-      await iexec.dataset.pushDatasetSecret(address, 'foo', {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(address, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
-      ).resolves.toBe(false);
-      // validate teeFramework
-      await expect(
-        readOnlyIExec.dataset.checkDatasetSecretExists(getRandomAddress(), {
-          teeFramework: 'foo',
-        }),
-      ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });
 
@@ -418,14 +381,14 @@ describe('dataset', () => {
     let randomDatasetAddress;
     let randomDatasetOwnerWallet;
     beforeAll(async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const { address } = await deployRandomDataset(iexec);
       randomDatasetAddress = address;
       randomDatasetOwnerWallet = wallet;
     });
 
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         privateKey: randomDatasetOwnerWallet.privateKey,
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
@@ -441,7 +404,7 @@ describe('dataset', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         privateKey: randomDatasetOwnerWallet.privateKey,
         options: {
           smsURL: SERVICE_HTTP_500_URL,
@@ -457,9 +420,9 @@ describe('dataset', () => {
     });
 
     test('only owner can push secret', async () => {
-      const { iexec: iexecDatasetOwner } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecDatasetOwner } = await getTestConfig(testChain)();
       const { iexec: iexecRandom, wallet: randomWallet } =
-        getTestConfig(iexecTestChain)();
+        await getTestConfig(testChain)();
       const { address: datasetAddress } =
         await deployRandomDataset(iexecDatasetOwner);
       // only owner can push secret
@@ -472,27 +435,22 @@ describe('dataset', () => {
       );
     });
 
-    test('use the default TEE framework SMS', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address: datasetAddress } = await deployRandomDataset(iexec, {
-        teeFramework: TEE_FRAMEWORKS.GRAMINE,
-      });
+    test('pushes secret to SMS', async () => {
+      const { iexec } = await getTestConfig(testChain)();
+      const { address: datasetAddress } = await deployRandomDataset(iexec);
+      await expect(
+        iexec.dataset.checkDatasetSecretExists(datasetAddress),
+      ).resolves.toBe(false);
       await expect(
         iexec.dataset.pushDatasetSecret(datasetAddress, 'foo'),
       ).resolves.toBe(true);
       await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-        }),
-      ).rejects.toThrow(
-        new Error(
-          `Secret already exists for ${datasetAddress} and can't be updated`,
-        ),
-      );
+        iexec.dataset.checkDatasetSecretExists(datasetAddress),
+      ).resolves.toBe(true);
     });
 
     test('cannot update existing secret', async () => {
-      const { iexec: iexecDatasetOwner } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecDatasetOwner } = await getTestConfig(testChain)();
       const { address: datasetAddress } =
         await deployRandomDataset(iexecDatasetOwner);
 
@@ -507,36 +465,6 @@ describe('dataset', () => {
           `Secret already exists for ${datasetAddress} and can't be updated`,
         ),
       );
-    });
-
-    test('allow teeFramework override', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address: datasetAddress } = await deployRandomDataset(iexec);
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo'),
-      ).resolves.toBe(true);
-      await expect(
-        iexec.dataset.checkDatasetSecretExists(datasetAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(false);
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-      await expect(
-        iexec.dataset.checkDatasetSecretExists(datasetAddress, {
-          teeFramework: TEE_FRAMEWORKS.GRAMINE,
-        }),
-      ).resolves.toBe(true);
-
-      // validate teeFramework
-      await expect(
-        iexec.dataset.pushDatasetSecret(datasetAddress, 'foo', {
-          teeFramework: 'foo',
-        }),
-      ).rejects.toThrow(Error('teeFramework is not a valid TEE framework'));
     });
   });
 });

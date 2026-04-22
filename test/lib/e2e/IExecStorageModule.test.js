@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import { expectAsyncCustomError, getTestConfig } from '../lib-test-utils.js';
 import {
@@ -13,12 +11,12 @@ import { errors } from '../../../src/lib/index.js';
 
 const { SmsCallError, ResultProxyCallError } = errors;
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('storage', () => {
   describe('defaultStorageLogin()', () => {
     test("throw a ResultProxyCallError when the Result Proxy can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         options: {
           resultProxyURL: SERVICE_UNREACHABLE_URL,
         },
@@ -30,7 +28,7 @@ describe('storage', () => {
     });
 
     test('throw a ResultProxyCallError when the Result Proxy encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         options: {
           resultProxyURL: SERVICE_HTTP_500_URL,
         },
@@ -42,7 +40,7 @@ describe('storage', () => {
     });
 
     test('gets a token from the result proxy', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const token = await iexec.storage.defaultStorageLogin();
       expect(typeof token).toBe('string');
       expect(token.split('.').length).toBe(3);
@@ -53,7 +51,7 @@ describe('storage', () => {
 
   describe('pushStorageToken()', () => {
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
         },
@@ -65,7 +63,7 @@ describe('storage', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         options: {
           smsURL: SERVICE_HTTP_500_URL,
         },
@@ -77,7 +75,7 @@ describe('storage', () => {
     });
 
     test('pushes the token on the SMS', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const pushRes = await iexec.storage.pushStorageToken('oops');
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
@@ -86,15 +84,10 @@ describe('storage', () => {
           `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`,
         ),
       );
-      const pushForTeeFramework = await iexec.storage.pushStorageToken('oops', {
-        teeFramework: 'gramine',
-      });
-      expect(pushForTeeFramework.isPushed).toBe(true);
-      expect(pushForTeeFramework.isUpdated).toBe(false);
     });
 
     test('provider "default" pushes result proxy ipfs token', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const pushRes = await iexec.storage.pushStorageToken('oops', {
         provider: 'default',
       });
@@ -110,7 +103,7 @@ describe('storage', () => {
     });
 
     test('provider "dropbox" pushes dropbox token', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const pushRes = await iexec.storage.pushStorageToken('oops', {
         provider: 'dropbox',
       });
@@ -126,7 +119,7 @@ describe('storage', () => {
     });
 
     test('forceUpdate allows updating the token', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const pushRes = await iexec.storage.pushStorageToken('oops', {
         forceUpdate: true,
       });
@@ -142,7 +135,7 @@ describe('storage', () => {
 
   describe('checkStorageTokenExists()', () => {
     test("throw a SmsCallError when the SMS can't be reached", async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         options: {
           smsURL: SERVICE_UNREACHABLE_URL,
         },
@@ -157,7 +150,7 @@ describe('storage', () => {
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         options: {
           smsURL: SERVICE_HTTP_500_URL,
         },
@@ -172,8 +165,8 @@ describe('storage', () => {
     });
 
     test('anyone can check a token exists', async () => {
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecReadOnly } = getTestConfig(iexecTestChain)({
+      const { iexec, wallet } = await getTestConfig(testChain)();
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const withoutSecretRes =
@@ -195,17 +188,6 @@ describe('storage', () => {
           provider: 'test',
         }),
       ).rejects.toThrow(Error('"test" not supported'));
-      const unsetForTeeFramework =
-        await iexecReadOnly.storage.checkStorageTokenExists(wallet.address, {
-          teeFramework: 'gramine',
-        });
-      expect(unsetForTeeFramework).toBe(false);
-      await iexec.storage.pushStorageToken('oops', { teeFramework: 'gramine' });
-      const setForTeeFramework =
-        await iexecReadOnly.storage.checkStorageTokenExists(wallet.address, {
-          teeFramework: 'gramine',
-        });
-      expect(setForTeeFramework).toBe(true);
     });
   });
 });

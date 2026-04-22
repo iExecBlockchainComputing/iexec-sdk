@@ -1,5 +1,3 @@
-// @jest/global comes with jest
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, test, expect } from '@jest/globals';
 import {
   JsonRpcProvider,
@@ -18,7 +16,6 @@ import {
   INFURA_PROJECT_ID,
   InjectedProvider,
   TEST_CHAINS,
-  TEE_FRAMEWORKS,
   getRandomAddress,
   getRandomWallet,
   DEFAULT_PROVIDER_OPTIONS,
@@ -29,8 +26,8 @@ import { utils, IExecConfig, errors } from '../../../src/lib/index.js';
 import IExecContractsClient from '../../../src/common/utils/IExecContractsClient.js';
 import { getChainDefaults } from '../../../src/common/utils/config.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
-const unknownTestChain = TEST_CHAINS['custom-token-chain'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
+const unknownTestChain = TEST_CHAINS['unknown-chain'];
 
 describe('[IExecConfig]', () => {
   describe('constructor', () => {
@@ -58,29 +55,12 @@ describe('[IExecConfig]', () => {
     });
 
     describe('throw Invalid option smsURL', () => {
-      test('IExecConfig({ ethProvider }, { smsURL: { foo: "https://foo.com" } })', () => {
+      test('IExecConfig({ ethProvider }, { smsURL: { } })', () => {
         const createConfig = () =>
-          new IExecConfig(
-            { ethProvider: 'bellecour' },
-            { smsURL: { foo: 'https://foo.com' } },
-          );
-        expect(createConfig).toThrow(
-          new Error('Invalid smsURL: this field has unspecified keys: foo'),
-        );
-        expect(createConfig).toThrow(errors.ConfigurationError);
-      });
-    });
-
-    describe('throw Invalid option defaultTeeFramework', () => {
-      test('IExecConfig({ ethProvider }, { defaultTeeFramework: "foo" })', () => {
-        const createConfig = () =>
-          new IExecConfig(
-            { ethProvider: 'bellecour' },
-            { defaultTeeFramework: 'foo' },
-          );
+          new IExecConfig({ ethProvider: 'bellecour' }, { smsURL: {} });
         expect(createConfig).toThrow(
           new Error(
-            'Invalid defaultTeeFramework: this is not a valid TEE framework',
+            'Invalid smsURL: this must be a `string` type, but the final value was: `{}`.',
           ),
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
@@ -130,6 +110,7 @@ describe('[IExecConfig]', () => {
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
+      // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
         test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
           const createConfig = () =>
@@ -242,6 +223,7 @@ describe('[IExecConfig]', () => {
         );
         expect(createConfig).toThrow(errors.ConfigurationError);
       });
+      // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
         test('throw with experimental chains when allowExperimentalNetworks is not enabled', () => {
           const createConfig = () => new IExecConfig({ ethProvider: 421614 });
@@ -421,6 +403,7 @@ describe('[IExecConfig]', () => {
           network.getPlugin('org.ethers.plugins.network.Ens').address,
         ).toBe('0x5f5B93fca68c9C79318d1F3868A354EE67D8c006');
       });
+      // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
         const experimentalNetworkRpcUrl = getChainDefaults(421614, {
           allowExperimentalNetworks: true,
@@ -460,7 +443,7 @@ describe('[IExecConfig]', () => {
         const wallet = getRandomWallet();
         const config = new IExecConfig({
           ethProvider: utils.getSignerFromPrivateKey(
-            iexecTestChain.rpcURL,
+            testChain.rpcURL,
             wallet.privateKey,
           ),
         });
@@ -469,13 +452,10 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe(iexecTestChain.chainId);
+        expect(chainId).toBe(testChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
-        expect(network.name).toBe(iexecTestChain.defaults.name);
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+        expect(network.chainId).toBe(BigInt(testChain.chainId));
+        expect(network.name).toBe(testChain.defaults.name);
       });
 
       test('getSignerFromPrivateKey() with network fallback', async () => {
@@ -507,7 +487,7 @@ describe('[IExecConfig]', () => {
     describe('web3 provider', () => {
       test('InjectedProvider', async () => {
         const injectedProvider = new InjectedProvider(
-          iexecTestChain.rpcURL,
+          testChain.rpcURL,
           getRandomWallet().privateKey,
         );
         const config = new IExecConfig({
@@ -518,14 +498,12 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeDefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(BrowserProvider);
-        expect(chainId).toBe(iexecTestChain.chainId);
+        expect(chainId).toBe(testChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
-        expect(network.name).toBe(iexecTestChain.defaults.name);
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+        expect(network.chainId).toBe(BigInt(testChain.chainId));
+        expect(network.name).toBe(testChain.defaults.name);
       });
+      // skipped because no experimental networks are currently defined
       describe.skip('allowExperimentalNetworks', () => {
         const experimentalNetworkRpcUrl = getChainDefaults(421614, {
           allowExperimentalNetworks: true,
@@ -570,7 +548,7 @@ describe('[IExecConfig]', () => {
 
     describe('ethers AbstractProvider', () => {
       test('JsonRpcProvider', async () => {
-        const ethersProvider = new JsonRpcProvider(iexecTestChain.rpcURL);
+        const ethersProvider = new JsonRpcProvider(testChain.rpcURL);
         const config = new IExecConfig({
           ethProvider: ethersProvider,
         });
@@ -579,13 +557,10 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeUndefined();
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe(iexecTestChain.chainId);
+        expect(chainId).toBe(testChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
-        expect(network.name).toBe(iexecTestChain.defaults.name);
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+        expect(network.chainId).toBe(BigInt(testChain.chainId));
+        expect(network.name).toBe(testChain.defaults.name);
       });
 
       test('JsonRpcProvider with custom network (including ens)', async () => {
@@ -600,7 +575,6 @@ describe('[IExecConfig]', () => {
           },
           {
             hubAddress: unknownTestChain.hubAddress,
-            ensRegistryAddress: unknownTestChain.ensRegistryAddress,
           },
         );
         const { provider, signer, chainId } =
@@ -631,7 +605,7 @@ describe('[IExecConfig]', () => {
 
       test('Wallet with provider', async () => {
         const ethersSigner = Wallet.createRandom(
-          new JsonRpcProvider(iexecTestChain.rpcURL),
+          new JsonRpcProvider(testChain.rpcURL),
         );
         const config = new IExecConfig({
           ethProvider: ethersSigner,
@@ -642,13 +616,10 @@ describe('[IExecConfig]', () => {
         expect(signer).toBeInstanceOf(HDNodeWallet);
         expect(provider).toBeDefined();
         expect(provider).toBeInstanceOf(JsonRpcProvider);
-        expect(chainId).toBe(iexecTestChain.chainId);
+        expect(chainId).toBe(testChain.chainId);
         const network = await provider.getNetwork();
-        expect(network.chainId).toBe(BigInt(iexecTestChain.chainId));
-        expect(network.name).toBe(iexecTestChain.defaults.name);
-        expect(
-          network.getPlugin('org.ethers.plugins.network.Ens').address,
-        ).toBe(iexecTestChain.defaults.ensRegistryAddress);
+        expect(network.chainId).toBe(BigInt(testChain.chainId));
+        expect(network.name).toBe(testChain.defaults.name);
       });
     });
 
@@ -725,7 +696,7 @@ describe('[IExecConfig]', () => {
       });
       test('IExecConfig({ ethProvider: "http://localhost:8545" }, { hubAddress, bridgedNetworkConf })', async () => {
         const config = new IExecConfig(
-          { ethProvider: iexecTestChain.rpcURL },
+          { ethProvider: testChain.rpcURL },
           {
             bridgedNetworkConf: {
               rpcURL: unknownTestChain.rpcURL,
@@ -752,10 +723,10 @@ describe('[IExecConfig]', () => {
   describe('resolveChainId()', () => {
     test('success', async () => {
       const config = new IExecConfig({
-        ethProvider: iexecTestChain.rpcURL,
+        ethProvider: testChain.rpcURL,
       });
       await expect(config.resolveChainId()).resolves.toBe(
-        parseInt(iexecTestChain.chainId, 10),
+        parseInt(testChain.chainId, 10),
       );
     });
     test('throw on network error', async () => {
@@ -881,74 +852,7 @@ describe('[IExecConfig]', () => {
       expect(typeof url).toBe('string');
       expect(url.length > 0).toBe(true);
     });
-    test('success default resolves to scone', async () => {
-      const defaultSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL();
-      const sconeSmsUrl = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
-      const gramineSmsUrl = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
-      expect(defaultSms).toBe(sconeSmsUrl);
-      expect(defaultSms).not.toBe(gramineSmsUrl);
-    });
-    test('success override defaultTeeFramework', async () => {
-      const defaultSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL();
-      const defaultSmsTeeFrameworkOverride = await new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { defaultTeeFramework: TEE_FRAMEWORKS.GRAMINE },
-      ).resolveSmsURL();
-      const gramineSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE });
-      expect(defaultSmsTeeFrameworkOverride).toBe(gramineSms);
-      expect(defaultSmsTeeFrameworkOverride).not.toBe(defaultSms);
-    });
-    test('success smsURL object override per teeFramework', async () => {
-      const smsMap = {
-        scone: 'http://foo.io',
-        gramine: 'http://bar.io',
-      };
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { smsURL: smsMap },
-      );
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(smsMap.scone);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsMap.gramine);
-    });
-    test('success smsURL object override only one teeFramework', async () => {
-      const sconeDefaultSms = await new IExecConfig({
-        ethProvider: 'bellecour',
-      }).resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE });
-      const smsMap = {
-        gramine: 'http://bar.io',
-      };
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { smsURL: smsMap },
-      );
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(sconeDefaultSms);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsMap.gramine);
-    });
-    test('success smsURL string override all teeFramework', async () => {
+    test('success smsURL override default URL', async () => {
       const smsOverride = 'http://sms-override.iex.ec';
       const config = new IExecConfig(
         {
@@ -957,14 +861,9 @@ describe('[IExecConfig]', () => {
         { smsURL: smsOverride },
       );
       await expect(config.resolveSmsURL()).resolves.toBe(smsOverride);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.SCONE }),
-      ).resolves.toBe(smsOverride);
-      await expect(
-        config.resolveSmsURL({ teeFramework: TEE_FRAMEWORKS.GRAMINE }),
-      ).resolves.toBe(smsOverride);
+      await expect(config.resolveSmsURL()).resolves.toBe(smsOverride);
     });
-    test('success with smsURL string on custom chain', async () => {
+    test('success smsURL sets the URL on custom chain', async () => {
       const smsOverride = 'http://sms-override.iex.ec';
       const config = new IExecConfig(
         {
@@ -994,16 +893,6 @@ describe('[IExecConfig]', () => {
       const promise = config.resolveSmsURL();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
-    });
-    test('throw with invalid TEE framework', async () => {
-      const config = new IExecConfig({
-        ethProvider: iexecTestChain.rpcURL,
-      });
-      const promise = config.resolveSmsURL({ teeFramework: 'foo' });
-      await expect(promise).rejects.toThrow(
-        new Error(`teeFramework is not a valid TEE framework`),
-      );
-      await expect(promise).rejects.toThrow(errors.ValidationError);
     });
   });
 
@@ -1217,57 +1106,6 @@ describe('[IExecConfig]', () => {
     });
   });
 
-  describe('resolveVoucherSubgraphURL()', () => {
-    test('success', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'bellecour',
-      });
-      const promise = config.resolveVoucherSubgraphURL();
-      const url = await promise;
-      expect(typeof url).toBe('string');
-      expect(url.length > 0).toBe(true);
-    });
-    test('success when configured on custom chain', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: unknownTestChain.rpcURL,
-        },
-        { voucherSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
-      );
-      const promise = config.resolveVoucherSubgraphURL();
-      await expect(promise).resolves.toBe(
-        'https://custom-subgraph.iex.ec/subgraph/name',
-      );
-    });
-    test('success voucherSubgraphURL override', async () => {
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { voucherSubgraphURL: 'https://custom-subgraph.iex.ec/subgraph/name' },
-      );
-      const promise = config.resolveVoucherSubgraphURL();
-      await expect(promise).resolves.toBe(
-        'https://custom-subgraph.iex.ec/subgraph/name',
-      );
-    });
-    test('returns null when not configured on custom chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: unknownTestChain.rpcURL,
-      });
-      const res = await config.resolveVoucherSubgraphURL();
-      expect(res).toBe(null);
-    });
-    test('throw on network error', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'http://localhost:8888',
-      });
-      const promise = config.resolveVoucherSubgraphURL();
-      await expect(promise).rejects.toThrow('Failed to detect network:');
-      await expect(promise).rejects.toThrow(Error);
-    });
-  });
-
   describe('resolveBridgeAddress()', () => {
     test('success', async () => {
       const config = new IExecConfig({
@@ -1437,59 +1275,6 @@ describe('[IExecConfig]', () => {
         ethProvider: 'http://localhost:8888',
       });
       const promise = config.resolveEnsPublicResolverAddress();
-      await expect(promise).rejects.toThrow('Failed to detect network:');
-      await expect(promise).rejects.toThrow(Error);
-    });
-  });
-
-  describe('resolveVoucherHubAddress()', () => {
-    test('success', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'bellecour',
-      });
-      const promise = config.resolveVoucherHubAddress();
-      const address = await promise;
-      expect(typeof address).toBe('string');
-      expect(address.length).toBe(42);
-    });
-    test('success voucherHubAddress override', async () => {
-      const voucherHubAddressOverride = getRandomAddress();
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        {
-          voucherHubAddress: voucherHubAddressOverride,
-        },
-      );
-      const promise = config.resolveVoucherHubAddress();
-      await expect(promise).resolves.toBe(voucherHubAddressOverride);
-    });
-    test('success with voucherHubAddress on custom chain', async () => {
-      const voucherHubAddressOverride = getRandomAddress();
-      const config = new IExecConfig(
-        {
-          ethProvider: unknownTestChain.rpcURL,
-        },
-        {
-          voucherHubAddress: voucherHubAddressOverride,
-        },
-      );
-      const promise = config.resolveVoucherHubAddress();
-      await expect(promise).resolves.toBe(voucherHubAddressOverride);
-    });
-    test('returns null on unknown chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: unknownTestChain.rpcURL,
-      });
-      const res = await config.resolveVoucherHubAddress();
-      expect(res).toBe(null);
-    });
-    test('throw on network error', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'http://localhost:8888',
-      });
-      const promise = config.resolveVoucherHubAddress();
       await expect(promise).rejects.toThrow('Failed to detect network:');
       await expect(promise).rejects.toThrow(Error);
     });
