@@ -11,16 +11,6 @@ import {
   BrowserProvider,
 } from 'ethers';
 
-export class EnhancedWallet extends Wallet {
-  constructor(
-    privateKey: string | SigningKey,
-    provider?: Provider,
-    options?: {
-      getTransactionCount?: (blockTag?: BlockTag) => Promise<number>;
-    },
-  );
-}
-
 /**
  * BrowserProvider wrapped in an AbstractSigner
  */

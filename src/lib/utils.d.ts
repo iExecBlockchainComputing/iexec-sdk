@@ -1,5 +1,4 @@
-import { BlockTag } from 'ethers';
-import { EnhancedWallet } from '../common/utils/signers.js';
+import { BlockTag, AbstractSigner } from 'ethers';
 import {
   BN,
   WeiAmount,
@@ -30,17 +29,13 @@ export const getSignerFromPrivateKey: (
   privateKey: string,
   options?: {
     /**
-     * nonce override
-     */
-    getTransactionCount?: (blockTag?: BlockTag) => Promise<number>;
-    /**
      * if true allows using a provider connected to an experimental networks (default false)
      *
      * ⚠️ experimental networks are networks on which the iExec's stack is partially deployed, experimental networks can be subject to instabilities or discontinuity. Access is provided without warranties.
      */
     allowExperimentalNetworks?: boolean;
   },
-) => EnhancedWallet;
+) => AbstractSigner;
 
 /**
  * ethereum null/zero address

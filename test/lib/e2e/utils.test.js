@@ -2,16 +2,10 @@ import { describe, test, expect } from '@jest/globals';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import JSZip from 'jszip';
-import {
-  TEST_CHAINS,
-  getId,
-  getRandomWallet,
-  setBalance,
-} from '../../test-utils.js';
+import { getRandomWallet } from '../../test-utils.js';
 import '../../jest-setup.js';
-import { ONE_ETH, getTestConfigOptions } from '../lib-test-utils.js';
 
-import { IExec, utils } from '../../../src/lib/index.js';
+import { utils } from '../../../src/lib/index.js';
 
 const { BN } = utils;
 
@@ -354,103 +348,6 @@ describe('utils', () => {
   });
 
   describe('getSignerFromPrivateKey()', () => {
-    const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
-
-    test('getTransactionCount option allows custom nonce management', async () => {
-      const wallet = getRandomWallet();
-      await setBalance(testChain)(wallet.address, ONE_ETH);
-
-      const createNonceProvider = (address) => {
-        const initNoncePromise = testChain.provider.getTransactionCount(
-          address,
-          'latest',
-        );
-        let i = 0;
-        const getNonce = () =>
-          initNoncePromise.then((initNonce) => initNonce + i);
-        const increaseNonce = () => {
-          i += 1;
-        };
-        return {
-          getNonce,
-          increaseNonce,
-        };
-      };
-
-      const nonceProvider = createNonceProvider(wallet.address);
-
-      const signer = utils.getSignerFromPrivateKey(
-        testChain.rpcURL,
-        wallet.privateKey,
-        {
-          getTransactionCount: nonceProvider.getNonce,
-        },
-      );
-
-      const iexec = new IExec(
-        {
-          ethProvider: signer,
-        },
-        getTestConfigOptions(testChain)(),
-      );
-
-      const { txHash: tx0 } = await iexec.app.deployApp({
-        owner: wallet.address,
-        name: `app-${getId()}`,
-        type: 'DOCKER',
-        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-        checksum:
-          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      });
-      expect(tx0).toBeTxHash();
-
-      await expect(
-        iexec.app.deployApp({
-          owner: wallet.address,
-          name: `app-${getId()}`,
-          type: 'DOCKER',
-          multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-          checksum:
-            '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-        }),
-      ).rejects.toThrow('nonce too low');
-
-      nonceProvider.increaseNonce();
-
-      const { txHash: tx1 } = await iexec.app.deployApp({
-        owner: wallet.address,
-        name: `app-${getId()}`,
-        type: 'DOCKER',
-        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-        checksum:
-          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      });
-      expect(tx1).toBeTxHash();
-
-      await expect(
-        iexec.app.deployApp({
-          owner: wallet.address,
-          name: `app-${getId()}`,
-          type: 'DOCKER',
-          multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-          checksum:
-            '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-        }),
-      ).rejects.toThrow('nonce too low');
-
-      nonceProvider.increaseNonce();
-
-      const { txHash: tx2 } = await iexec.app.deployApp({
-        owner: wallet.address,
-        name: `app-${getId()}`,
-        type: 'DOCKER',
-        multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
-        checksum:
-          '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-      });
-      expect(tx2).toBeTxHash();
-    });
-
     // skipped because no experimental networks are currently defined
     test.skip('allowExperimentalNetworks option allow creating signer connected to an experimental network', async () => {
       expect(() =>
