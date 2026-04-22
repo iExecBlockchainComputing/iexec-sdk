@@ -177,7 +177,7 @@ show
     }
   });
 
-const sendETH = cli.command('send-ether <amount> [unit]').alias('sendETH'); // DEPRECATED senETH
+const sendETH = cli.command('send-ether <amount> [unit]');
 addGlobalOptions(sendETH);
 addWalletLoadOptions(sendETH);
 sendETH
@@ -332,59 +332,6 @@ sweep
           },
         },
       );
-    } catch (error) {
-      handleError(error, cli, opts);
-    }
-  });
-
-// DEPRECATED
-const sendNRLC = cli.command('sendRLC <amount> [unit]');
-addGlobalOptions(sendNRLC);
-addWalletLoadOptions(sendNRLC);
-sendNRLC
-  .option(...option.chain())
-  .option(...option.txGasPrice())
-  .option(...option.txConfirms())
-  .option(...option.force())
-  .option(...option.to())
-  .description(desc.sendNRLC())
-  .action(async (amount, unit, opts) => {
-    await checkUpdate(opts);
-    const spinner = Spinner(opts);
-    try {
-      const nRlcAmount = await nRlcAmountSchema().validate([amount, unit]);
-      const walletOptions = computeWalletLoadOptions(opts);
-      const txOptions = await computeTxOptions(opts);
-      const keystore = Keystore(walletOptions);
-      const [[address], chain] = await Promise.all([
-        keystore.accounts(),
-        loadChain(opts.chain, { txOptions, spinner }),
-      ]);
-      if (!opts.to) throw new Error('Missing --to option');
-      await connectKeystore(chain, keystore, { txOptions });
-      if (!opts.force) {
-        await prompt.transferRLC(
-          formatRLC(nRlcAmount),
-          chain.name,
-          opts.to,
-          chain.id,
-        );
-      }
-      const message = `${formatRLC(nRlcAmount)} ${
-        chain.name
-      } RLC from ${address} to ${opts.to}`;
-      spinner.start(`Sending ${message}...`);
-
-      const txHash = await walletSendRLC(chain.contracts, nRlcAmount, opts.to);
-
-      spinner.succeed(`Sent ${message}\n`, {
-        raw: {
-          amount: nRlcAmount,
-          from: address,
-          to: opts.to,
-          txHash,
-        },
-      });
     } catch (error) {
       handleError(error, cli, opts);
     }
