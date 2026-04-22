@@ -114,9 +114,7 @@ const deployObj =
       }
       const args = createArgs[objName].map((e) => obj[e]);
       const createFunctionName = 'create'.concat(toUpperFirst(objName));
-      const tx = await wrapSend(
-        registryContract[createFunctionName](...args, contracts.txOptions),
-      );
+      const tx = await wrapSend(registryContract[createFunctionName](...args));
       const txReceipt = await wrapWait(tx.wait(contracts.confirms));
       const event = getEventFromLogs('Transfer', txReceipt.logs, {
         strict: true,
@@ -409,7 +407,6 @@ const transferObj =
           walletAddress,
           to,
           address,
-          contracts.txOptions,
         ),
       );
       await wrapWait(tx.wait(contracts.confirms));

@@ -51,7 +51,6 @@ addGlobalOptions(create);
 addWalletLoadOptions(create);
 create
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.createObj(objName))
   .action(async (opts) => {
@@ -70,7 +69,7 @@ create
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.creating('category'));
       const { catid, txHash } = await createCategory(
         chain.contracts,

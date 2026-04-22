@@ -1,11 +1,6 @@
 import Debug from 'debug';
 import BN from 'bn.js';
-import {
-  bigIntToBn,
-  bnToBigInt,
-  bnNRlcToBnWei,
-  checkSigner,
-} from '../utils/utils.js';
+import { bigIntToBn, bnToBigInt, checkSigner } from '../utils/utils.js';
 import {
   addressSchema,
   uint256Schema,
@@ -34,7 +29,6 @@ const sendNativeToken = async (
         data: '0x',
         to: vAddress,
         value: BigInt(vValue),
-        ...contracts.txOptions,
         ...gasFees,
       }),
     );
@@ -53,7 +47,7 @@ const sendERC20 = async (contracts = throwIfMissing(), nRlcAmount, to) => {
   try {
     const rlcContract = await wrapCall(contracts.fetchTokenContract());
     const tx = await wrapSend(
-      rlcContract.transfer(vAddress, bnToBigInt(vAmount), contracts.txOptions),
+      rlcContract.transfer(vAddress, bnToBigInt(vAmount)),
     );
     await wrapWait(tx.wait(contracts.confirms));
     return tx.hash;
@@ -68,8 +62,6 @@ export const sendETH = async (contracts = throwIfMissing(), amount, to) => {
     checkSigner(contracts);
     const vAddress = await addressSchema().required().validate(to);
     const vAmount = await weiAmountSchema().required().validate(amount);
-    if (contracts.isNative)
-      throw new Error('sendETH() is disabled on sidechain, use sendRLC()');
     const balance = await getEthBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
       throw new Error('Amount to send exceed wallet balance');
@@ -89,11 +81,6 @@ export const sendRLC = async (contracts = throwIfMissing(), nRlcAmount, to) => {
     const balance = await getRlcBalance(contracts, await getAddress(contracts));
     if (balance.lt(new BN(vAmount))) {
       throw new Error('Amount to send exceed wallet balance');
-    }
-    if (contracts.isNative) {
-      debug('send native token');
-      const weiValue = bnNRlcToBnWei(new BN(vAmount)).toString();
-      return await sendNativeToken(contracts, weiValue, vAddress);
     }
     debug('send ERC20 token');
     return await sendERC20(contracts, vAmount, vAddress);
@@ -115,7 +102,7 @@ export const sweep = async (contracts = throwIfMissing(), to) => {
     let balances = await checkBalances(contracts, userAddress);
     const res = {};
     const errors = [];
-    if (!contracts.isNative && balances.nRLC.gt(new BN(0))) {
+    if (balances.nRLC.gt(new BN(0))) {
       try {
         const sendERC20TxHash = await sendERC20(
           contracts,
@@ -134,24 +121,16 @@ export const sweep = async (contracts = throwIfMissing(), to) => {
     }
 
     let maxGasPrice;
-    const gasFees = {
-      gasPrice: contracts.txOptions && contracts.txOptions.gasPrice,
-    };
-    if (gasFees.gasPrice === undefined) {
-      const networkGasFees = await contracts.provider.getFeeData();
-      if (
-        (networkGasFees.gasPrice || 0n) < (networkGasFees.maxFeePerGas || 0n)
-      ) {
-        gasFees.gasPrice = undefined;
-        gasFees.maxFeePerGas = networkGasFees.maxFeePerGas || 0n;
-        gasFees.maxPriorityFeePerGas = gasFees.maxFeePerGas; // pay all
-      } else {
-        gasFees.gasPrice = networkGasFees.gasPrice || 0n;
-      }
-    }
-    if ((gasFees.gasPrice || 0n) < (gasFees.maxFeePerGas || 0n)) {
+    let gasFees = {};
+
+    const networkGasFees = await contracts.provider.getFeeData();
+    if ((networkGasFees.gasPrice || 0n) < (networkGasFees.maxFeePerGas || 0n)) {
+      gasFees.gasPrice = undefined;
+      gasFees.maxFeePerGas = networkGasFees.maxFeePerGas || 0n;
+      gasFees.maxPriorityFeePerGas = gasFees.maxFeePerGas; // pay all
       maxGasPrice = gasFees.maxFeePerGas;
     } else {
+      gasFees.gasPrice = networkGasFees.gasPrice || 0n;
       maxGasPrice = gasFees.gasPrice;
     }
 

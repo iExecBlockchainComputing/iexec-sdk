@@ -382,10 +382,7 @@ const cancelOrder = async (
       throw new Error(`${orderName} already canceled`);
     const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
-      iexecContract[objDesc[orderName].cancelMethod](
-        [args, 1, NULL_BYTES],
-        contracts.txOptions,
-      ),
+      iexecContract[objDesc[orderName].cancelMethod]([args, 1, NULL_BYTES]),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEventFromLogs(objDesc[orderName].cancelEvent, txReceipt.logs))
@@ -863,7 +860,6 @@ export const matchOrders = async ({
         datasetOrderStruct,
         workerpoolOrderStruct,
         requestOrderStruct,
-        contracts.txOptions,
       ),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));

@@ -1,14 +1,8 @@
 import { Buffer } from 'buffer';
 import { BN } from 'bn.js';
-import { getDefaultProvider } from 'ethers';
 import fsExtra from 'fs-extra';
 import { join } from 'path';
-import {
-  ALCHEMY_API_KEY,
-  ETHERSCAN_API_KEY,
-  INFURA_PROJECT_ID,
-  TEE_FRAMEWORKS,
-} from '../../test-utils.js';
+import { TEE_FRAMEWORKS } from '../../test-utils.js';
 import {
   uint256Schema,
   weiAmountSchema,
@@ -33,13 +27,6 @@ import { DATASET_INFINITE_VOLUME } from '../../../src/lib/utils.js';
 const { ValidationError } = errors;
 
 const { readFile } = fsExtra;
-
-const mainnetDefaultProvider = getDefaultProvider('mainnet', {
-  cloudflare: true,
-  alchemy: ALCHEMY_API_KEY || '-',
-  etherscan: ETHERSCAN_API_KEY || '-',
-  infura: INFURA_PROJECT_ID || '-',
-});
 
 describe('[positiveIntSchema]', () => {
   test('int', async () => {

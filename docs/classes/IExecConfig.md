@@ -41,7 +41,7 @@ const config = new IExecConfig({ ethProvider: window.ethereum });
 
 ```js
 import { getSignerFromPrivateKey } from 'iexec/utils';
-const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet', privateKey) });
+const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('arbitrum-sepolia-testnet', privateKey) });
 ```
 
 #### Parameters

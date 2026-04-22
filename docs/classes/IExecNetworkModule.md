@@ -54,21 +54,19 @@ current IExecConfig
 
 ### getNetwork()
 
-> **getNetwork**(): `Promise`\<\{ `chainId`: `string`; `isNative`: `boolean`; \}\>
+> **getNetwork**(): `Promise`\<\{ `chainId`: `string`; \}\>
 
 get info about the current iExec network
 
-_NB_: `isNative` is true when the iExec instance use the chain's native token for payment (otherwise the payment token is an ERC20)
-
 example:
 ```js
-const { chainId, isNative } = await getNetwork();
-console.log(`working on chain ${chainId}, using native token: ${isNative}`);
+const { chainId } = await getNetwork();
+console.log(`working on chain ${chainId}`);
 ```
 
 #### Returns
 
-`Promise`\<\{ `chainId`: `string`; `isNative`: `boolean`; \}\>
+`Promise`\<\{ `chainId`: `string`; \}\>
 
 ***
 

@@ -24,9 +24,7 @@ export const approve = async (
       .required()
       .validate(spenderAddress);
     const iexecContract = contracts.getIExecContract();
-    const tx = await wrapSend(
-      iexecContract.approve(vSpenderAddress, vAmount, contracts.txOptions),
-    );
+    const tx = await wrapSend(iexecContract.approve(vSpenderAddress, vAmount));
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
 
     if (!checkEventFromLogs('Approval', txReceipt.logs))

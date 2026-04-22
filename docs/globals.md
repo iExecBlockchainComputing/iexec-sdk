@@ -42,12 +42,10 @@
 - [Eip1193Provider](interfaces/Eip1193Provider.md)
 - [IExecConfigArgs](interfaces/IExecConfigArgs.md)
 - [IExecConfigOptions](interfaces/IExecConfigOptions.md)
-- [ProviderOptions](interfaces/ProviderOptions.md)
 
 ## Type Aliases
 
 - [Address](type-aliases/Address.md)
-- [AnyRecord](type-aliases/AnyRecord.md)
 - [BNish](type-aliases/BNish.md)
 - [Bytes](type-aliases/Bytes.md)
 - [Bytes32](type-aliases/Bytes32.md)

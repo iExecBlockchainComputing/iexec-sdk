@@ -1,17 +1,11 @@
 import { Wallet, BrowserProvider, AbstractSigner } from 'ethers';
 import { getReadOnlyProvider } from './providers.js';
 
+// DEPRECATED
 export class EnhancedWallet extends Wallet {
   constructor(privateKey, provider, options = {}) {
     super(privateKey, provider);
     this._options = options;
-    if (options.gasPrice) {
-      try {
-        BigInt(options.gasPrice);
-      } catch {
-        throw new Error('Invalid gasPrice option');
-      }
-    }
     if (
       options.getTransactionCount !== undefined &&
       typeof options.getTransactionCount !== 'function'
@@ -28,27 +22,10 @@ export class EnhancedWallet extends Wallet {
     return new EnhancedWallet(this.privateKey, provider, this._options);
   }
 
-  getFeeData() {
-    if (this._options.gasPrice === undefined) return super.getFeeData();
-    return {
-      gasPrice: BigInt(this._options.gasPrice),
-      maxFeePerGas: null,
-      maxPriorityFeePerGas: null,
-    };
-  }
-
   getNonce(...args) {
     if (this._options.getTransactionCount === undefined)
       return super.getNonce(...args);
     return this._options.getTransactionCount(...args);
-  }
-
-  sendTransaction(tx) {
-    let gasPrice;
-    if (this._options.gasPrice !== undefined) {
-      gasPrice = BigInt(this._options.gasPrice);
-    }
-    return super.sendTransaction({ ...tx, gasPrice: tx.gasPrice ?? gasPrice });
   }
 }
 
@@ -100,18 +77,12 @@ export class BrowserProviderSignerAdapter extends AbstractSigner {
 export const getSignerFromPrivateKey = (
   host,
   privateKey,
-  {
-    gasPrice, // TODO remove this option (not applicable on supported chains)
-    getTransactionCount,
-    providers,
-    allowExperimentalNetworks = false,
-  } = {},
+  { getTransactionCount, allowExperimentalNetworks = false } = {},
 ) =>
   new EnhancedWallet(
     privateKey,
-    getReadOnlyProvider(host, { providers, allowExperimentalNetworks }),
+    getReadOnlyProvider(host, { allowExperimentalNetworks }),
     {
-      gasPrice,
       getTransactionCount,
     },
   );
