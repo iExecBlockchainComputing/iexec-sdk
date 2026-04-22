@@ -74,7 +74,6 @@ export const setChain =
             hub: chain.hubAddress,
             sms: chain.smsURL,
             iexecGateway: chain.iexecGatewayURL,
-            resultProxy: chain.resultProxyURL,
             useGas: chain.useGas,
             native: chain.isNative,
             ...chainOptions,

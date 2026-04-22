@@ -27,39 +27,6 @@ describe('iexec storage', () => {
     await globalTeardown();
   });
 
-  test('iexec storage init', async () => {
-    const raw = await execAsync(`${iexecPath} storage init --raw`);
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.isInitialized).toBe(true);
-    expect(res.isUpdated).toBe(false);
-    const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage init --raw`,
-    ).catch((e) => e.message);
-    const resAlreadyExists = JSON.parse(rawAlreadyExists);
-    expect(resAlreadyExists.ok).toBe(false);
-    expect(resAlreadyExists.error.message).toBe(
-      'default storage is already initialized, use --force-update option to update your storage token',
-    );
-  });
-
-  test('iexec storage init --force-update', async () => {
-    const raw = await execAsync(
-      `${iexecPath} storage init --force-update --raw`,
-    );
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.isInitialized).toBe(true);
-    expect(res.isUpdated).toBe(false);
-    const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage init --force-update --raw`,
-    );
-    const resAlreadyExists = JSON.parse(rawAlreadyExists);
-    expect(resAlreadyExists.ok).toBe(true);
-    expect(resAlreadyExists.isInitialized).toBe(true);
-    expect(resAlreadyExists.isUpdated).toBe(true);
-  });
-
   test('iexec storage init dropbox', async () => {
     const raw = await execAsync(
       `${iexecPath} storage init dropbox --token oops --raw`,
@@ -78,44 +45,43 @@ describe('iexec storage', () => {
     );
   });
 
-  test('iexec storage init unsupported', async () => {
+  test('iexec storage init dropbox --force-update', async () => {
+    const raw = await execAsync(
+      `${iexecPath} storage init dropbox --token oops --force-update --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.isInitialized).toBe(true);
+    expect(res.isUpdated).toBe(false);
+    const rawAlreadyExists = await execAsync(
+      `${iexecPath} storage init dropbox --token oops --force-update --raw`,
+    );
+    const resAlreadyExists = JSON.parse(rawAlreadyExists);
+    expect(resAlreadyExists.ok).toBe(true);
+    expect(resAlreadyExists.isInitialized).toBe(true);
+    expect(resAlreadyExists.isUpdated).toBe(true);
+  });
+
+  test('iexec storage init ipfs - authentication not supported', async () => {
+    const raw = await execAsync(
+      `${iexecPath} storage init ipfs --token oops --raw`,
+    ).catch((e) => e.message);
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.error.message).toBe(
+      'Storage provider "ipfs" does not support authentication tokens',
+    );
+  });
+
+  test('iexec storage init - unsupported provider', async () => {
     const raw = await execAsync(
       `${iexecPath} storage init unsupported --token oops --raw`,
     ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
-    expect(res.error.message).toBe('"unsupported" not supported');
-  });
-
-  test('iexec storage check', async () => {
-    const raw = await execAsync(`${iexecPath} storage check --raw`);
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.isInitialized).toBe(false);
-    await execAsync(`${iexecPath} storage init --raw`);
-    const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage check --raw`,
+    expect(res.error.message).toBe(
+      '"unsupported" is not a valid storage provider, use one of the supported providers (dropbox, ipfs)',
     );
-    const resAlreadyExists = JSON.parse(rawAlreadyExists);
-    expect(resAlreadyExists.ok).toBe(true);
-    expect(resAlreadyExists.isInitialized).toBe(true);
-  });
-
-  test('iexec storage check --user', async () => {
-    const randomAddress = getRandomAddress();
-    const raw = await execAsync(
-      `${iexecPath} storage check --user ${randomAddress} --raw`,
-    );
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.isInitialized).toBe(false);
-    await execAsync(`${iexecPath} storage init --raw`);
-    const rawAlreadyExists = await execAsync(
-      `${iexecPath} storage check --user ${randomAddress} --raw`,
-    );
-    const resAlreadyExists = JSON.parse(rawAlreadyExists);
-    expect(resAlreadyExists.ok).toBe(true);
-    expect(resAlreadyExists.isInitialized).toBe(false);
   });
 
   test('iexec storage check dropbox', async () => {
@@ -132,12 +98,42 @@ describe('iexec storage', () => {
     expect(resAlreadyExists.isInitialized).toBe(true);
   });
 
-  test('iexec storage check unsupported', async () => {
+  test('iexec storage check ipfs - authentication not supported', async () => {
+    const raw = await execAsync(`${iexecPath} storage check ipfs --raw`).catch(
+      (e) => e.message,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(false);
+    expect(res.error.message).toBe(
+      'Storage provider "ipfs" does not support authentication tokens',
+    );
+  });
+
+  test('iexec storage check - unsupported provider', async () => {
     const raw = await execAsync(
       `${iexecPath} storage check unsupported --raw`,
     ).catch((e) => e.message);
     const res = JSON.parse(raw);
     expect(res.ok).toBe(false);
-    expect(res.error.message).toBe('"unsupported" not supported');
+    expect(res.error.message).toBe(
+      '"unsupported" is not a valid storage provider, use one of the supported providers (dropbox, ipfs)',
+    );
+  });
+
+  test('iexec storage check dropbox --user', async () => {
+    const randomAddress = getRandomAddress();
+    const raw = await execAsync(
+      `${iexecPath} storage check dropbox --user ${randomAddress} --raw`,
+    );
+    const res = JSON.parse(raw);
+    expect(res.ok).toBe(true);
+    expect(res.isInitialized).toBe(false);
+    await execAsync(`${iexecPath} storage init dropbox --token oops --raw`);
+    const rawAlreadyExists = await execAsync(
+      `${iexecPath} storage check dropbox --user ${randomAddress} --raw`,
+    );
+    const resAlreadyExists = JSON.parse(rawAlreadyExists);
+    expect(resAlreadyExists.ok).toBe(true);
+    expect(resAlreadyExists.isInitialized).toBe(false);
   });
 });

@@ -50,10 +50,6 @@ export interface IExecConfigOptions {
    */
   hubAddress?: string;
   /**
-   * override the result proxy URL to target a custom instance
-   */
-  resultProxyURL?: string;
-  /**
    * override the SMS URL to target a custom instance
    */
   smsURL?: string;
@@ -143,10 +139,6 @@ export default class IExecConfig {
    * resolve the current SMS URL
    */
   resolveSmsURL(): Promise<string>;
-  /**
-   * resolve the current result proxy URL
-   */
-  resolveResultProxyURL(): Promise<string>;
   /**
    * resolve the current IExec market URL
    */

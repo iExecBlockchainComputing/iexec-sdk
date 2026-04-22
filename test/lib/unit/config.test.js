@@ -29,7 +29,6 @@ describe('getChainDefaults', () => {
       ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
       name: 'bellecour',
       pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
-      resultProxy: 'https://result.v8-bellecour.iex.ec',
       sms: 'https://sms.iex.ec',
       compass: undefined,
     });

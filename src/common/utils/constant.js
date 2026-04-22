@@ -32,8 +32,8 @@ export const TEE_FRAMEWORKS = {
 };
 
 export const STORAGE_PROVIDERS = {
-  IPFS: 'ipfs',
   DROPBOX: 'dropbox',
+  IPFS: 'ipfs',
 };
 
 export const IEXEC_REQUEST_PARAMS = {
@@ -42,7 +42,6 @@ export const IEXEC_REQUEST_PARAMS = {
   IEXEC_SECRETS: 'iexec_secrets',
   IEXEC_RESULT_ENCRYPTION: 'iexec_result_encryption',
   IEXEC_RESULT_STORAGE_PROVIDER: 'iexec_result_storage_provider',
-  IEXEC_RESULT_STORAGE_PROXY: 'iexec_result_storage_proxy',
   IEXEC_BULK_CID: 'bulk_cid',
 };
 

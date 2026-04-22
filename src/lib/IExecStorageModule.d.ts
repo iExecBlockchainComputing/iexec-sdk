@@ -10,61 +10,41 @@ import { Address } from '../common/types.js';
  */
 export default class IExecStorageModule extends IExecModule {
   /**
-   * check if a storage token exists for the beneficiary in the Secret Management Service
+   * check if a storage access token exists for the beneficiary in the Secret Management Service
    *
-   * _NB_: specify the storage provider with the option `provider` (supported values `'ipfs'`|`'dropbox'` default `'ipfs'`)
+   * _NB_: currently only 'dropbox' storage provider authentication is supported.
    *
    * example:
    * ```js
-   * const isIpfsStorageInitialized = await checkStorageTokenExists(userAddress);
-   * console.log('IPFS storage initialized:', isIpfsStorageInitialized);
+   * const isStorageInitialized = await checkStorageTokenExists(userAddress, 'dropbox');
+   * console.log('Dropbox storage initialized:', isStorageInitialized);
    * ```
    */
   checkStorageTokenExists(
     beneficiaryAddress: Address,
-    options?: {
-      provider?: string;
-    },
+    storageProvider: string,
   ): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY BENEFICIARY**
    *
-   * get an authorization token from the default IPFS based remote storage
-   *
-   * example:
-   * ```js
-   * const token = await defaultStorageLogin();
-   * const { isPushed } = await pushStorageToken(token);
-   * console.log('default storage initialized:', isPushed);
-   * ```
-   */
-  defaultStorageLogin(): Promise<string>;
-  /**
-   * **SIGNER REQUIRED, ONLY BENEFICIARY**
-   *
-   * push a personal storage token to the Secret Management Service to allow result archive upload
+   * push a storage access token to the Secret Management Service to allow result archive upload
+   * supported storage provider 'dropbox'.
    *
    * _NB_:
-   * - specify the storage provider with the option `provider` (supported values `'ipfs'`|`'dropbox'` default `'ipfs'`)
+   * - currently only 'dropbox' storage provider authentication is supported.
    * - this method will throw an error if a token already exists for the target storage provider in the Secret Management Service unless the option `forceUpdate: true` is used.
    *
    * example:
-   * - init default storage
+   * - init Dropbox storage
    * ```js
-   * const token = await defaultStorageLogin();
-   * const { isPushed } = await pushStorageToken(token);
-   * console.log('default storage initialized:', isPushed);
-   * ```
-   * - init dropbox storage
-   * ```js
-   * const { isPushed } = await pushStorageToken(dropboxApiToken, {provider: 'dropbox'});
-   * console.log('dropbox storage initialized:', isPushed);
+   * const { isPushed } = await pushStorageToken(dropboxApiToken, 'dropbox');
+   * console.log('Dropbox storage initialized:', isPushed);
    * ```
    */
   pushStorageToken(
     token: string,
+    storageProvider: string,
     options?: {
-      provider?: string;
       forceUpdate?: boolean;
     },
   ): Promise<{ isPushed: boolean; isUpdated: boolean }>;

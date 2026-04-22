@@ -146,18 +146,6 @@ resolve the current PoCo subgraph URL
 
 ***
 
-### resolveResultProxyURL()
-
-> **resolveResultProxyURL**(): `Promise`\<`string`\>
-
-resolve the current result proxy URL
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
 ### resolveSmsURL()
 
 > **resolveSmsURL**(): `Promise`\<`string`\>
