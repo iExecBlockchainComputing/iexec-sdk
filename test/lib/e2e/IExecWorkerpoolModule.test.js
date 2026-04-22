@@ -10,16 +10,17 @@ import {
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
+import { ConfigurationError } from '../../../src/lib/errors.js';
 
-const iexecTestChain = TEST_CHAINS['bellecour-fork'];
+const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('workerpool', () => {
   describe('showWorkerpool()', () => {
     test('shows a deployed workerpool', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const workerpool = {
         owner: await iexec.wallet.getAddress(),
         description: `workerpool${getId()}`,
@@ -36,7 +37,7 @@ describe('workerpool', () => {
     });
 
     test('fails if the workerpool is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
@@ -46,7 +47,7 @@ describe('workerpool', () => {
         new errors.ObjectNotFoundError(
           'workerpool',
           address,
-          iexecTestChain.chainId,
+          testChain.chainId,
         ),
       );
     });
@@ -54,10 +55,10 @@ describe('workerpool', () => {
 
   describe('showUserWorkerpool()', () => {
     test('shows the user workerpool', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const workerpool = {
         owner: wallet.address,
         description: `workerpool${getId()}`,
@@ -76,7 +77,7 @@ describe('workerpool', () => {
     });
 
     test('fails if the workerpool is not deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const address = getRandomAddress();
@@ -88,10 +89,10 @@ describe('workerpool', () => {
 
   describe('countUserWorkerpools()', () => {
     test('counts user workerpools', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec, wallet } = getTestConfig(iexecTestChain)();
+      const { iexec, wallet } = await getTestConfig(testChain)();
       const resBeforeDeploy =
         await readOnlyIExec.workerpool.countUserWorkerpools(wallet.address);
       await deployRandomWorkerpool(iexec);
@@ -106,7 +107,7 @@ describe('workerpool', () => {
 
   describe('deployWorkerpool()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({
+      const { iexec } = await getTestConfig(testChain)({
         readOnly: true,
       });
       const workerpool = {
@@ -123,7 +124,7 @@ describe('workerpool', () => {
     });
 
     test('deploys a workerpool', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const workerpool = {
         owner: await iexec.wallet.getAddress(),
         description: `workerpool${getId()}`,
@@ -134,7 +135,7 @@ describe('workerpool', () => {
     });
 
     test('cannot deploy twice with the same params', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const workerpool = {
         owner: await iexec.wallet.getAddress(),
         description: `workerpool${getId()}`,
@@ -150,10 +151,10 @@ describe('workerpool', () => {
 
   describe('predictWorkerpoolAddress()', () => {
     test('predicts the deployment address', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const workerpool = {
         owner: getRandomAddress(),
         description: `workerpool${getId()}`,
@@ -172,10 +173,10 @@ describe('workerpool', () => {
 
   describe('checkDeployedWorkerpool()', () => {
     test('checks a workerpool is deployed', async () => {
-      const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+      const { iexec: readOnlyIExec } = await getTestConfig(testChain)({
         readOnly: true,
       });
-      const { iexec } = getTestConfig(iexecTestChain)();
+      const { iexec } = await getTestConfig(testChain)();
       const workerpool = {
         owner: getRandomAddress(),
         description: `workerpool${getId()}`,
@@ -194,7 +195,7 @@ describe('workerpool', () => {
 
   describe('transferWorkerpool()', () => {
     test('require a signer', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)({ readOnly: true });
+      const { iexec } = await getTestConfig(testChain)({ readOnly: true });
       await expect(
         iexec.workerpool.transferWorkerpool(
           getRandomAddress(),
@@ -209,8 +210,8 @@ describe('workerpool', () => {
 
     test('transfers the ownership', async () => {
       const receiverAddress = getRandomAddress();
-      const { iexec: iexecWorkerpoolOwner } = getTestConfig(iexecTestChain)();
-      const { iexec: iexecRandom } = getTestConfig(iexecTestChain)();
+      const { iexec: iexecWorkerpoolOwner } = await getTestConfig(testChain)();
+      const { iexec: iexecRandom } = await getTestConfig(testChain)();
       const { address } = await deployRandomWorkerpool(iexecWorkerpoolOwner);
       await expect(
         iexecRandom.workerpool.transferWorkerpool(
@@ -238,11 +239,12 @@ describe('workerpool', () => {
 
   describe('getWorkerpoolApiUrl()', () => {
     describe('on networks with ENS', () => {
+      const testChainWithEns = TEST_CHAINS['bellecour-fork'];
       test('resolves the url against ENS', async () => {
-        const { iexec: readOnlyIExec } = getTestConfig(iexecTestChain)({
+        const { iexec: readOnlyIExec } = await getTestConfig(testChainWithEns)({
           readOnly: true,
         });
-        const { iexec } = getTestConfig(iexecTestChain)();
+        const { iexec } = await getTestConfig(testChainWithEns)();
         const { address } = await deployRandomWorkerpool(iexec);
         const resNoApiUrl =
           await readOnlyIExec.workerpool.getWorkerpoolApiUrl(address);
@@ -261,10 +263,8 @@ describe('workerpool', () => {
     });
 
     describe('on networks relying on compass', () => {
-      const noEnsTestChain = TEST_CHAINS['custom-token-chain-no-ens'];
-
       test('resolves the url against Compass', async () => {
-        const { iexec: readOnlyIExec } = getTestConfig(noEnsTestChain)();
+        const { iexec: readOnlyIExec } = await getTestConfig(testChain)();
         const apiUrl = await readOnlyIExec.workerpool.getWorkerpoolApiUrl(
           '0xB967057a21dc6A66A29721d96b8Aa7454B7c383F',
         );
@@ -273,7 +273,7 @@ describe('workerpool', () => {
       });
 
       test('returns undefined if the workerpool does not exist in Compass', async () => {
-        const { iexec: readOnlyIExec } = getTestConfig(noEnsTestChain)();
+        const { iexec: readOnlyIExec } = await getTestConfig(testChain)();
         const address = getRandomAddress();
         await expect(
           readOnlyIExec.workerpool.getWorkerpoolApiUrl(address),
@@ -281,7 +281,7 @@ describe('workerpool', () => {
       });
 
       test('fails with CompassCallError if Compass is not available', async () => {
-        const { iexec: iexecCompassNotFound } = getTestConfig(noEnsTestChain)({
+        const { iexec: iexecCompassNotFound } = await getTestConfig(testChain)({
           options: {
             compassURL: SERVICE_UNREACHABLE_URL,
           },
@@ -296,8 +296,8 @@ describe('workerpool', () => {
           ),
         );
 
-        const { iexec: iexecCompassInternalError } = getTestConfig(
-          noEnsTestChain,
+        const { iexec: iexecCompassInternalError } = await getTestConfig(
+          testChain,
         )({
           options: {
             compassURL: SERVICE_HTTP_500_URL,
@@ -318,32 +318,53 @@ describe('workerpool', () => {
   });
 
   describe('setWorkerpoolApiUrl()', () => {
-    test('require a configured ens name for the workerpool', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomWorkerpool(iexec);
-      await expect(
-        iexec.workerpool.setWorkerpoolApiUrl(
+    describe('on networks with ENS', () => {
+      const testChainWithEns = TEST_CHAINS['bellecour-fork'];
+
+      test('require a configured ens name for the workerpool', async () => {
+        const { iexec } = await getTestConfig(testChainWithEns)();
+        const { address } = await deployRandomWorkerpool(iexec);
+        await expect(
+          iexec.workerpool.setWorkerpoolApiUrl(
+            address,
+            'https://my-workerpool.com',
+          ),
+        ).rejects.toThrow(
+          new Error(`No ENS name reverse resolution configured for ${address}`),
+        );
+      });
+
+      test('sets the workerpool api url', async () => {
+        const { iexec } = await getTestConfig(testChainWithEns)();
+        const { address } = await deployRandomWorkerpool(iexec);
+        const label = address.toLowerCase();
+        const domain = 'pools.iexec.eth';
+        const name = `${label}.${domain}`;
+        await iexec.ens.claimName(label, domain);
+        await iexec.ens.configureResolution(name, address);
+        const res = await iexec.workerpool.setWorkerpoolApiUrl(
           address,
           'https://my-workerpool.com',
-        ),
-      ).rejects.toThrow(
-        new Error(`No ENS name reverse resolution configured for ${address}`),
-      );
+        );
+        expect(res).toBeTxHash();
+      });
     });
 
-    test('sets the workerpool api url', async () => {
-      const { iexec } = getTestConfig(iexecTestChain)();
-      const { address } = await deployRandomWorkerpool(iexec);
-      const label = address.toLowerCase();
-      const domain = 'pools.iexec.eth';
-      const name = `${label}.${domain}`;
-      await iexec.ens.claimName(label, domain);
-      await iexec.ens.configureResolution(name, address);
-      const res = await iexec.workerpool.setWorkerpoolApiUrl(
-        address,
-        'https://my-workerpool.com',
-      );
-      expect(res).toBeTxHash();
+    describe('on networks relying on compass', () => {
+      test('setWorkerpoolApiUrl is not supported', async () => {
+        const { iexec } = await getTestConfig(testChain)();
+        const { address } = await deployRandomWorkerpool(iexec);
+        await expect(
+          iexec.workerpool.setWorkerpoolApiUrl(
+            address,
+            'https://my-workerpool.com',
+          ),
+        ).rejects.toThrow(
+          new ConfigurationError(
+            'Workerpool API Registration is not available on network arbitrum-sepolia-testnet',
+          ),
+        );
+      });
     });
   });
 });
