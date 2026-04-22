@@ -9,46 +9,11 @@ import {
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
 
-const { SmsCallError, ResultProxyCallError } = errors;
+const { SmsCallError } = errors;
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('storage', () => {
-  describe('defaultStorageLogin()', () => {
-    test("throw a ResultProxyCallError when the Result Proxy can't be reached", async () => {
-      const { iexec } = await getTestConfig(testChain)({
-        options: {
-          resultProxyURL: SERVICE_UNREACHABLE_URL,
-        },
-      });
-      await expectAsyncCustomError(iexec.storage.defaultStorageLogin(), {
-        constructor: ResultProxyCallError,
-        message: `Result Proxy error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-      });
-    });
-
-    test('throw a ResultProxyCallError when the Result Proxy encounters an error', async () => {
-      const { iexec } = await getTestConfig(testChain)({
-        options: {
-          resultProxyURL: SERVICE_HTTP_500_URL,
-        },
-      });
-      await expectAsyncCustomError(iexec.storage.defaultStorageLogin(), {
-        constructor: ResultProxyCallError,
-        message: `Result Proxy error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-      });
-    });
-
-    test('gets a token from the result proxy', async () => {
-      const { iexec } = await getTestConfig(testChain)();
-      const token = await iexec.storage.defaultStorageLogin();
-      expect(typeof token).toBe('string');
-      expect(token.split('.').length).toBe(3);
-      const token2 = await iexec.storage.defaultStorageLogin();
-      expect(token2).toBe(token);
-    });
-  });
-
   describe('pushStorageToken()', () => {
     test("throw a SmsCallError when the SMS can't be reached", async () => {
       const { iexec } = await getTestConfig(testChain)({
@@ -56,10 +21,13 @@ describe('storage', () => {
           smsURL: SERVICE_UNREACHABLE_URL,
         },
       });
-      await expectAsyncCustomError(iexec.storage.pushStorageToken('oops'), {
-        constructor: SmsCallError,
-        message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
-      });
+      await expectAsyncCustomError(
+        iexec.storage.pushStorageToken('oops', 'dropbox'),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
+        },
+      );
     });
 
     test('throw a SmsCallError when the SMS encounters an error', async () => {
@@ -68,49 +36,22 @@ describe('storage', () => {
           smsURL: SERVICE_HTTP_500_URL,
         },
       });
-      await expectAsyncCustomError(iexec.storage.pushStorageToken('oops'), {
-        constructor: SmsCallError,
-        message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
-      });
-    });
-
-    test('pushes the token on the SMS', async () => {
-      const { iexec, wallet } = await getTestConfig(testChain)();
-      const pushRes = await iexec.storage.pushStorageToken('oops');
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(iexec.storage.pushStorageToken('oops')).rejects.toThrow(
-        new Error(
-          `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`,
-        ),
-      );
-    });
-
-    test('provider "default" pushes result proxy ipfs token', async () => {
-      const { iexec, wallet } = await getTestConfig(testChain)();
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
-        provider: 'default',
-      });
-      expect(pushRes.isPushed).toBe(true);
-      expect(pushRes.isUpdated).toBe(false);
-      await expect(
-        iexec.storage.pushStorageToken('oops', { provider: 'default' }),
-      ).rejects.toThrow(
-        new Error(
-          `Secret "iexec-result-iexec-ipfs-token" already exists for ${wallet.address}`,
-        ),
+      await expectAsyncCustomError(
+        iexec.storage.pushStorageToken('oops', 'dropbox'),
+        {
+          constructor: SmsCallError,
+          message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
+        },
       );
     });
 
     test('provider "dropbox" pushes dropbox token', async () => {
       const { iexec, wallet } = await getTestConfig(testChain)();
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
-        provider: 'dropbox',
-      });
+      const pushRes = await iexec.storage.pushStorageToken('oops', 'dropbox');
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
       await expect(
-        iexec.storage.pushStorageToken('oops', { provider: 'dropbox' }),
+        iexec.storage.pushStorageToken('oops', 'dropbox'),
       ).rejects.toThrow(
         new Error(
           `Secret "iexec-result-dropbox-token" already exists for ${wallet.address}`,
@@ -118,16 +59,31 @@ describe('storage', () => {
       );
     });
 
+    test('provider "ipfs" does not support token', async () => {
+      const { iexec } = await getTestConfig(testChain)();
+      await expect(
+        iexec.storage.pushStorageToken('oops', 'ipfs'),
+      ).rejects.toThrow(
+        new Error(
+          'Storage provider "ipfs" does not support authentication tokens',
+        ),
+      );
+    });
+
     test('forceUpdate allows updating the token', async () => {
       const { iexec } = await getTestConfig(testChain)();
-      const pushRes = await iexec.storage.pushStorageToken('oops', {
+      const pushRes = await iexec.storage.pushStorageToken('oops', 'dropbox', {
         forceUpdate: true,
       });
       expect(pushRes.isPushed).toBe(true);
       expect(pushRes.isUpdated).toBe(false);
-      const updateRes = await iexec.storage.pushStorageToken('oops', {
-        forceUpdate: true,
-      });
+      const updateRes = await iexec.storage.pushStorageToken(
+        'oops',
+        'dropbox',
+        {
+          forceUpdate: true,
+        },
+      );
       expect(updateRes.isPushed).toBe(true);
       expect(updateRes.isUpdated).toBe(true);
     });
@@ -141,7 +97,10 @@ describe('storage', () => {
         },
       });
       await expectAsyncCustomError(
-        iexecReadOnly.storage.checkStorageTokenExists(getRandomAddress()),
+        iexecReadOnly.storage.checkStorageTokenExists(
+          getRandomAddress(),
+          'dropbox',
+        ),
         {
           constructor: SmsCallError,
           message: `SMS error: Connection to ${SERVICE_UNREACHABLE_URL} failed with a network error`,
@@ -156,7 +115,10 @@ describe('storage', () => {
         },
       });
       await expectAsyncCustomError(
-        iexecReadOnly.storage.checkStorageTokenExists(getRandomAddress()),
+        iexecReadOnly.storage.checkStorageTokenExists(
+          getRandomAddress(),
+          'dropbox',
+        ),
         {
           constructor: SmsCallError,
           message: `SMS error: Server at ${SERVICE_HTTP_500_URL} encountered an internal error`,
@@ -170,24 +132,33 @@ describe('storage', () => {
         readOnly: true,
       });
       const withoutSecretRes =
-        await iexecReadOnly.storage.checkStorageTokenExists(wallet.address, {
-          provider: 'dropbox',
-        });
+        await iexecReadOnly.storage.checkStorageTokenExists(
+          wallet.address,
+          'dropbox',
+        );
       expect(withoutSecretRes).toBe(false);
-      await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+      await iexec.storage.pushStorageToken('oops', 'dropbox');
       const withSecretRes = await iexecReadOnly.storage.checkStorageTokenExists(
         wallet.address,
-        { provider: 'dropbox' },
+        'dropbox',
       );
       expect(withSecretRes).toBe(true);
-      const unsetProviderRes =
-        await iexecReadOnly.storage.checkStorageTokenExists(wallet.address);
-      expect(unsetProviderRes).toBe(false);
+    });
+
+    test('provider "ipfs" does not support token', async () => {
+      const { iexec: iexecReadOnly } = await getTestConfig(testChain)({
+        readOnly: true,
+      });
       await expect(
-        iexecReadOnly.storage.checkStorageTokenExists(wallet.address, {
-          provider: 'test',
-        }),
-      ).rejects.toThrow(Error('"test" not supported'));
+        iexecReadOnly.storage.checkStorageTokenExists(
+          getRandomAddress(),
+          'ipfs',
+        ),
+      ).rejects.toThrow(
+        new Error(
+          `Storage provider "ipfs" does not support authentication tokens`,
+        ),
+      );
     });
   });
 });

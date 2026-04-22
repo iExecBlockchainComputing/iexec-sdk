@@ -92,14 +92,6 @@ override the PoCo subgraph URL to target a custom instance
 
 ***
 
-### resultProxyURL?
-
-> `optional` **resultProxyURL**: `string`
-
-override the result proxy URL to target a custom instance
-
-***
-
 ### smsURL?
 
 > `optional` **smsURL**: `string`

@@ -265,7 +265,6 @@ describe('order', () => {
           params: {
             iexec_result_storage_provider: 'dropbox',
             iexec_result_encryption: true,
-            iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
           },
           tag: ['tee', 'scone'],
           trust: '100',
@@ -282,7 +281,6 @@ describe('order', () => {
           params: {
             iexec_result_storage_provider: 'dropbox',
             iexec_result_encryption: true,
-            iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
           },
           requester: wallet.address,
           tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
@@ -507,7 +505,7 @@ describe('order', () => {
           ),
         );
 
-        await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+        await iexec.storage.pushStorageToken('oops', 'dropbox');
         const res = await iexec.order.signRequestorder(order);
         expect(res.salt).toBeTxHash();
         expect(res.sign).toMatch(signRegex);
@@ -525,9 +523,6 @@ describe('order', () => {
           category: 5,
           params: { iexec_result_encryption: true },
         });
-        await iexec.storage
-          .defaultStorageLogin()
-          .then(iexec.storage.pushStorageToken);
         await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
           new Error(
             'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
@@ -549,10 +544,6 @@ describe('order', () => {
           await getTestConfig(testChain)();
         const { iexec: iexecDatasetConsumer } =
           await getTestConfig(testChain)();
-
-        await iexecDatasetConsumer.storage
-          .defaultStorageLogin()
-          .then(iexecDatasetConsumer.storage.pushStorageToken);
         const { address: dataset } =
           await deployRandomDataset(iexecDatasetProvider);
 
@@ -617,10 +608,6 @@ describe('order', () => {
 
       test('preflightCheck requester secrets exist', async () => {
         const { iexec, wallet } = await getTestConfig(testChain)();
-        await iexec.storage
-          .defaultStorageLogin()
-          .then(iexec.storage.pushStorageToken);
-
         // non requester secret pass
         await expect(
           iexec.order
@@ -756,7 +743,7 @@ describe('order', () => {
           dataset: '0x69d4a400CFf9838985cD2950aafF28289afc6ad3',
           workerpool: '0x0000000000000000000000000000000000000000',
           params:
-            '{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"https://result.v8-bellecour.iex.ec","iexec_result_encryption":false,"iexec_args":"\\"0x4e64fb5fa96eb73ef37dacd416eb2bade0ea8f9e7efebe42abe9a062a9caede836ee4da1ec1a72264e1287e74fba7fdc76edce05729c4b2ecf6fb8970f13f8321b 22\\""}',
+            '{"iexec_result_encryption":false,"iexec_args":"\\"0x4e64fb5fa96eb73ef37dacd416eb2bade0ea8f9e7efebe42abe9a062a9caede836ee4da1ec1a72264e1287e74fba7fdc76edce05729c4b2ecf6fb8970f13f8321b 22\\""}',
           appmaxprice: 0,
           datasetmaxprice: 0,
           workerpoolmaxprice: 0,
@@ -773,7 +760,7 @@ describe('order', () => {
         const res = await iexec.order.hashRequestorder(order);
         expect(res).toBeTxHash();
         expect(res).toBe(
-          '0xa8216862377a316c180fa28ed3bda170e7ef95b20a1b96daaa24c7dae84e35a5',
+          '0x46872d0a641b78875f1fd2b59086073ac1fefd1ab54d4cb333ade2a868aaf975',
         );
       });
     });
@@ -1039,7 +1026,7 @@ describe('order', () => {
             'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
           ),
         );
-        await iexec.storage.pushStorageToken(`foo`, { provider: 'dropbox' });
+        await iexec.storage.pushStorageToken('foo', 'dropbox');
         const orderHash = await iexec.order.publishRequestorder(requestorder);
         expect(orderHash).toBeTxHash();
       });

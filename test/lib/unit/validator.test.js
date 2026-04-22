@@ -567,7 +567,7 @@ describe('[objParamsSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        'iexec_result_storage_provider "foo" is not a valid storage provider, use one of the supported providers (ipfs, dropbox)',
+        'iexec_result_storage_provider "foo" is not a valid storage provider, use one of the supported providers (dropbox, ipfs)',
       ),
     );
   });
@@ -710,17 +710,6 @@ describe('[objParamsSchema]', () => {
         'iexec_input_files[1] "iex.ec/wp-content/uploads/pdf/iExec-WPv3.0-English.pdf" is not a valid URL',
       ),
     );
-  });
-
-  test('with custom result-proxy', async () => {
-    await expect(
-      objParamsSchema().validate({
-        iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
-      }),
-    ).resolves.toEqual({
-      iexec_result_storage_provider: 'ipfs',
-      iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
-    });
   });
 
   test('with encryption (true)', async () => {

@@ -674,60 +674,6 @@ describe('[IExecConfig]', () => {
     });
   });
 
-  describe('resolveResultProxyURL()', () => {
-    test('success', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'bellecour',
-      });
-      const promise = config.resolveResultProxyURL();
-      const url = await promise;
-      expect(typeof url).toBe('string');
-      expect(url.length > 0).toBe(true);
-    });
-    test('success resultProxyURL override', async () => {
-      const resultProxyOverride = 'http://rp-override.iex.ec';
-      const config = new IExecConfig(
-        {
-          ethProvider: 'bellecour',
-        },
-        { resultProxyURL: resultProxyOverride },
-      );
-      const promise = config.resolveResultProxyURL();
-      await expect(promise).resolves.toBe(resultProxyOverride);
-    });
-    test('success with resultProxyURL on custom chain', async () => {
-      const resultProxyOverride = 'http://rp-override.iex.ec';
-      const config = new IExecConfig(
-        {
-          ethProvider: unknownTestChain.rpcURL,
-        },
-        { resultProxyURL: resultProxyOverride },
-      );
-      const promise = config.resolveResultProxyURL();
-      await expect(promise).resolves.toBe(resultProxyOverride);
-    });
-    test('throw on unknown chain', async () => {
-      const config = new IExecConfig({
-        ethProvider: unknownTestChain.rpcURL,
-      });
-      const promise = config.resolveResultProxyURL();
-      await expect(promise).rejects.toThrow(
-        new Error(
-          `resultProxyURL option not set and no default value for your chain ${unknownTestChain.chainId}`,
-        ),
-      );
-      await expect(promise).rejects.toThrow(errors.ConfigurationError);
-    });
-    test('throw on network error', async () => {
-      const config = new IExecConfig({
-        ethProvider: 'http://localhost:8888',
-      });
-      const promise = config.resolveResultProxyURL();
-      await expect(promise).rejects.toThrow('Failed to detect network:');
-      await expect(promise).rejects.toThrow(Error);
-    });
-  });
-
   describe('resolveIexecGatewayURL()', () => {
     test('success', async () => {
       const config = new IExecConfig({

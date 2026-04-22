@@ -13,7 +13,6 @@ const networkConfigs = [
     hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
     host: 'https://bellecour.iex.ec',
     sms: 'https://sms.iex.ec',
-    resultProxy: 'https://result.v8-bellecour.iex.ec',
     ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
     ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
     iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
@@ -32,7 +31,6 @@ const networkConfigs = [
     hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
     host: 'mainnet',
     sms: undefined, // no protocol running
-    resultProxy: undefined, // no protocol running
     ipfsGateway: undefined, // no protocol running
     ipfsNode: undefined, // no protocol running
     iexecGateway: undefined, // no protocol running
@@ -51,7 +49,6 @@ const networkConfigs = [
     hub: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
     host: 'https://sepolia-rollup.arbitrum.io/rpc',
     sms: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
-    resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
     ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
     iexecGateway: 'https://api-market.arbitrum-sepolia-testnet.iex.ec',
@@ -69,7 +66,6 @@ const networkConfigs = [
     hub: '0x098bFCb1E50ebcA0BaA92C12eA0c3F045A1aD9f0',
     host: 'https://arb1.arbitrum.io/rpc',
     sms: 'https://sms.arbitrum-mainnet.iex.ec',
-    resultProxy: undefined, // not exposed
     ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
     ipfsNode: 'https://ipfs-upload.arbitrum-mainnet.iex.ec',
     iexecGateway: 'https://api.market.arbitrum-mainnet.iex.ec',
@@ -103,7 +99,6 @@ export const getChainDefaults = (
     host,
     hub,
     sms,
-    resultProxy,
     iexecGateway,
     ipfsGateway,
     ipfsNode,
@@ -121,7 +116,6 @@ export const getChainDefaults = (
     host,
     hub,
     sms,
-    resultProxy,
     iexecGateway,
     ipfsGateway,
     ipfsNode,

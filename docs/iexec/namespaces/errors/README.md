@@ -14,7 +14,6 @@
 - [IpfsGatewayCallError](classes/IpfsGatewayCallError.md)
 - [MarketCallError](classes/MarketCallError.md)
 - [ObjectNotFoundError](classes/ObjectNotFoundError.md)
-- [ResultProxyCallError](classes/ResultProxyCallError.md)
 - [SmsCallError](classes/SmsCallError.md)
 - [ValidationError](classes/ValidationError.md)
 - [Web3ProviderCallError](classes/Web3ProviderCallError.md)

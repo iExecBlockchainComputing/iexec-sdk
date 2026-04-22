@@ -15,7 +15,6 @@ ApiCallError encapsulates an error occurring during a call to an API such as a n
 ## Extended by
 
 - [`SmsCallError`](SmsCallError.md)
-- [`ResultProxyCallError`](ResultProxyCallError.md)
 - [`MarketCallError`](MarketCallError.md)
 - [`IpfsGatewayCallError`](IpfsGatewayCallError.md)
 - [`CompassCallError`](CompassCallError.md)

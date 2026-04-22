@@ -10,7 +10,6 @@ import {
   NULL_ADDRESS,
   NULL_BYTES32,
   IEXEC_REQUEST_PARAMS,
-  STORAGE_PROVIDERS,
   TEE_FRAMEWORKS,
 } from '../utils/constant.js';
 import {
@@ -117,24 +116,22 @@ export const checkRequestRequirements = async (
     }
   }
 
-  // check dropbox storage token
-  if (
-    paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER] ===
-    STORAGE_PROVIDERS.DROPBOX
-  ) {
-    const isStorageTokenSet = await checkWeb2SecretExists(
-      smsURL,
-      requester,
-      getStorageTokenKeyName(
-        paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER],
-      ),
-    );
-    if (!isStorageTokenSet) {
-      throw new Error(
-        `Requester storage token is not set for selected provider "${
-          paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER]
-        }". Result archive upload will fail.`,
+  // check storage token
+  const storageProvider =
+    paramsObj[IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROVIDER];
+  if (storageProvider) {
+    const storageTokenKeyName = getStorageTokenKeyName(storageProvider);
+    if (storageTokenKeyName) {
+      const isStorageTokenSet = await checkWeb2SecretExists(
+        smsURL,
+        requester,
+        storageTokenKeyName,
       );
+      if (!isStorageTokenSet) {
+        throw new Error(
+          `Requester storage token is not set for selected provider "${storageProvider}". Result archive upload will fail.`,
+        );
+      }
     }
   }
 

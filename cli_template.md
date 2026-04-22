@@ -397,7 +397,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
   - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
   - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
-  - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `iexecGateway` set the url of the iexec marketplace gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `pocoSubgraph` set the url of the PoCo subgraph used by the SDK cli on each chain (overwrite default value).
@@ -419,7 +418,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "sms": {
         "scone": "http://localhost:5000"
       },
-      "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca"
     },
@@ -429,7 +427,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "sms": {
         "scone": "http://localhost:15000"
       },
-      "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:18080",
       "native": true,
       "useGas": false,
