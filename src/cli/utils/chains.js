@@ -1,10 +1,10 @@
 import Debug from 'debug';
 import { getId, getChainDefaults } from '../../common/utils/config.js';
 import IExecContractsClient from '../../common/utils/IExecContractsClient.js';
-import { EnhancedWallet } from '../../common/utils/signers.js';
 import { loadChainConf } from './fs.js';
 import { Spinner } from './cli-helper.js';
 import { getReadOnlyProvider } from '../../common/utils/providers.js';
+import { Wallet } from 'ethers';
 
 const debug = Debug('iexec:chains');
 
@@ -112,5 +112,5 @@ export const loadChain = async (
 
 export const connectKeystore = async (chain, keystore) => {
   const { privateKey } = await keystore.load();
-  chain.contracts.setSigner(new EnhancedWallet(privateKey, undefined));
+  chain.contracts.setSigner(new Wallet(privateKey));
 };

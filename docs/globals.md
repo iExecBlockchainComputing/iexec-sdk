@@ -16,7 +16,6 @@
 ## Classes
 
 - [BrowserProviderSignerAdapter](classes/BrowserProviderSignerAdapter.md)
-- [EnhancedWallet](classes/EnhancedWallet.md)
 - [IExec](classes/IExec.md)
 - [IExecAccountModule](classes/IExecAccountModule.md)
 - [IExecAppModule](classes/IExecAppModule.md)

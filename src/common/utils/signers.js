@@ -1,33 +1,5 @@
-import { Wallet, BrowserProvider, AbstractSigner } from 'ethers';
+import { BrowserProvider, AbstractSigner, Wallet } from 'ethers';
 import { getReadOnlyProvider } from './providers.js';
-
-// DEPRECATED
-export class EnhancedWallet extends Wallet {
-  constructor(privateKey, provider, options = {}) {
-    super(privateKey, provider);
-    this._options = options;
-    if (
-      options.getTransactionCount !== undefined &&
-      typeof options.getTransactionCount !== 'function'
-    ) {
-      throw new Error('Invalid getTransactionCount option, must be a function');
-    }
-  }
-
-  static createRandom() {
-    return new EnhancedWallet(super.createRandom().privateKey);
-  }
-
-  connect(provider) {
-    return new EnhancedWallet(this.privateKey, provider, this._options);
-  }
-
-  getNonce(...args) {
-    if (this._options.getTransactionCount === undefined)
-      return super.getNonce(...args);
-    return this._options.getTransactionCount(...args);
-  }
-}
 
 /**
  * BrowserProvider wrapped in an AbstractSigner
@@ -77,12 +49,9 @@ export class BrowserProviderSignerAdapter extends AbstractSigner {
 export const getSignerFromPrivateKey = (
   host,
   privateKey,
-  { getTransactionCount, allowExperimentalNetworks = false } = {},
+  { allowExperimentalNetworks = false } = {},
 ) =>
-  new EnhancedWallet(
+  new Wallet(
     privateKey,
     getReadOnlyProvider(host, { allowExperimentalNetworks }),
-    {
-      getTransactionCount,
-    },
   );
