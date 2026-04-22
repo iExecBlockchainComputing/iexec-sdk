@@ -26,7 +26,6 @@ const chainConfSchema = () =>
     host: string(),
     hub: string(), // todo address
     sms: basicUrlSchema(),
-    resultProxy: string(),
     ipfsGateway: string(),
     iexecGateway: string(),
     compass: string(),

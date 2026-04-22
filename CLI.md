@@ -931,7 +931,7 @@ Options:
 | --secret \<secretMapping...\> | specify the requester secrets mappings (\<appSecretKey\>=\<requesterSecretName\>) to use in the app (only available for TEE tasks, use with --tag tee)<br/>\* usage: <br/>  \* \[command\] \[args\] --secret 1=login 2=password<br/>  \* \[command\] \[args\] --secret 1=login --secret 2=password<br/>  \* \[command\] --secret 1=login --secret 2=password -- \[args\]<br/>\* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list<br/> |
 | --category \<id\> | id of the task category |
 | --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
-| --storage-provider \<"ipfs"\|"dropbox"\> | specify the storage to use to store the result archive |
+| --storage-provider \<"dropbox"\|"ipfs"\> | specify the storage to use to store the result archive |
 | --callback \<address\> | specify the callback address of the request |
 | --encrypt-result | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee) |
 | --trust \<integer\> | trust level |
@@ -972,7 +972,7 @@ Options:
 | --category \<id\> | id of the task category |
 | --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
 | --volume \<volume\> | number of run |
-| --storage-provider \<"ipfs"\|"dropbox"\> | specify the storage to use to store the result archive |
+| --storage-provider \<"dropbox"\|"ipfs"\> | specify the storage to use to store the result archive |
 | --callback \<address\> | specify the callback address of the request |
 | --encrypt-result | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee) |
 | --trust \<integer\> | trust level |
@@ -2037,7 +2037,7 @@ initialize the remote storage
 Usage:
 
 ```sh
-iexec storage init [provider] [options]
+iexec storage init <provider> [options]
 ```
 
 Options:
@@ -2061,7 +2061,7 @@ check if the remote storage is initialized
 Usage:
 
 ```sh
-iexec storage check [provider] [options]
+iexec storage check <provider> [options]
 ```
 
 Options:
@@ -2421,7 +2421,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
   - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
   - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
-  - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `iexecGateway` set the url of the iexec marketplace gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `pocoSubgraph` set the url of the PoCo subgraph used by the SDK cli on each chain (overwrite default value).
@@ -2443,7 +2442,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "sms": {
         "scone": "http://localhost:5000"
       },
-      "resultProxy": "http://localhost:8089",
       "ipfsGateway": "http://localhost:8080",
       "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca"
     },
@@ -2453,7 +2451,6 @@ The `chain.json` file, located in every iExec project, describes the parameters 
       "sms": {
         "scone": "http://localhost:15000"
       },
-      "resultProxy": "http://localhost:18089",
       "ipfsGateway": "http://localhost:18080",
       "native": true,
       "useGas": false,

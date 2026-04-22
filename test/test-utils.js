@@ -62,7 +62,6 @@ export const TEST_CHAINS = {
     chainId: '134',
     smsURL: 'http://localhost:13300',
     iexecGatewayURL: 'http://localhost:3000',
-    resultProxyURL: 'http://localhost:13200',
     ipfsNodeURL: 'http://localhost:5001',
     ipfsGatewayURL: 'http://localhost:8080',
     pocoAdminWallet: new Wallet(
@@ -84,7 +83,6 @@ export const TEST_CHAINS = {
     chainId: '421614',
     smsURL: 'http://localhost:13350',
     iexecGatewayURL: 'http://localhost:3050',
-    resultProxyURL: 'http://localhost:13250',
     ipfsNodeURL: 'http://localhost:5001',
     ipfsGatewayURL: 'http://localhost:8080',
     compassURL: 'http://localhost:8069',

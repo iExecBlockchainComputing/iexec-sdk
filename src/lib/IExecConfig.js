@@ -18,7 +18,6 @@ export default class IExecConfig {
       useGas = true,
       confirms,
       smsURL,
-      resultProxyURL,
       ipfsGatewayURL,
       ipfsNodeURL,
       iexecGatewayURL,
@@ -126,13 +125,6 @@ export default class IExecConfig {
       throw new ConfigurationError(`Invalid pocoSubgraphURL: ${err.message}`);
     }
 
-    let vResultProxyURL;
-    try {
-      vResultProxyURL = basicUrlSchema().validateSync(resultProxyURL);
-    } catch (err) {
-      throw new ConfigurationError(`Invalid resultProxyURL: ${err.message}`);
-    }
-
     let vCompassURL;
     try {
       vCompassURL = basicUrlSchema().validateSync(compassURL);
@@ -206,18 +198,6 @@ export default class IExecConfig {
       }
       throw new ConfigurationError(
         `smsURL option not set and no default value for your chain ${chainId}`,
-      );
-    };
-
-    this.resolveResultProxyURL = async () => {
-      const { chainId } = await networkPromise;
-      const chainConfDefaults = await chainConfDefaultsPromise;
-      const value = vResultProxyURL || chainConfDefaults.resultProxy;
-      if (value !== undefined) {
-        return value;
-      }
-      throw new ConfigurationError(
-        `resultProxyURL option not set and no default value for your chain ${chainId}`,
       );
     };
 

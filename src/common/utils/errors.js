@@ -64,13 +64,6 @@ export class SmsCallError extends ApiCallError {
   }
 }
 
-export class ResultProxyCallError extends ApiCallError {
-  constructor(message, ...args) {
-    super(`Result Proxy error: ${message}`, ...args);
-    this.name = this.constructor.name;
-  }
-}
-
 export class MarketCallError extends ApiCallError {
   constructor(message, ...args) {
     super(`Market API error: ${message}`, ...args);

@@ -58,14 +58,6 @@ default `'ipfs'`
 
 ***
 
-### iexec\_result\_storage\_proxy?
-
-> `optional` **iexec\_result\_storage\_proxy**: `string`
-
-result proxy url
-
-***
-
 ### iexec\_secrets?
 
 > `optional` **iexec\_secrets**: `Record`\<`number`, `string`\>

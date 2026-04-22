@@ -206,6 +206,12 @@ export const paramsInputFilesArraySchema = () =>
 
 export const paramsEncryptResultSchema = () => boolean();
 
+export const storageProviderSchema = () =>
+  string().oneOf(
+    Object.values(STORAGE_PROVIDERS),
+    '"${value}" is not a valid storage provider, use one of the supported providers (${values})',
+  );
+
 const addAllStorageProviders = (schema) =>
   schema.oneOf(
     Object.values(STORAGE_PROVIDERS),
@@ -289,8 +295,6 @@ export const objParamsSchema = () =>
             (value) => value === undefined,
           ),
     ),
-    [IEXEC_REQUEST_PARAMS.IEXEC_RESULT_STORAGE_PROXY]:
-      basicUrlSchema().notRequired(),
   })
     .json()
     .noUnknown(true, 'Unknown key "${unknown}" in params');

@@ -100,57 +100,6 @@ services:
     depends_on:
       arbitrum-sepolia-fork:
         condition: service_healthy
-
-  result-proxy-bellecour:
-    image: iexechub/iexec-result-proxy:7.1.0
-    restart: unless-stopped
-    environment:
-      IEXEC_PRIVATE_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_PUBLIC_CHAIN_ADDRESS: http://bellecour-fork:8545
-      IEXEC_HUB_ADDRESS: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f'
-      MONGO_HOST: result-proxy-mongo
-      MONGO_PORT: 13202
-      IEXEC_IPFS_HOST: ipfs
-    ports:
-      - 13200:13200
-    depends_on:
-      bellecour-fork:
-        condition: service_healthy
-      result-proxy-mongo:
-        condition: service_started
-      ipfs:
-        condition: service_healthy
-
-  result-proxy-arbitrum-sepolia:
-    image: iexechub/iexec-result-proxy:7.1.0
-    restart: unless-stopped
-    environment:
-      IEXEC_PRIVATE_CHAIN_ADDRESS: http://arbitrum-sepolia-fork:8545
-      IEXEC_PUBLIC_CHAIN_ADDRESS: http://arbitrum-sepolia-fork:8545
-      IEXEC_HUB_ADDRESS: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E'
-      MONGO_HOST: result-proxy-mongo
-      MONGO_PORT: 13202
-      IEXEC_IPFS_HOST: ipfs
-    ports:
-      - 13250:13200
-    depends_on:
-      arbitrum-sepolia-fork:
-        condition: service_healthy
-      result-proxy-mongo:
-        condition: service_started
-      ipfs:
-        condition: service_healthy
-
-  result-proxy-mongo:
-    restart: unless-stopped
-    image: library/mongo:4.2
-    entrypoint: '/bin/bash'
-    command: -c "mongod --bind_ip_all --port 13202"
-    expose:
-      - 13202
-    ports:
-      - 13202:13202
-
   ipfs:
     restart: unless-stopped
     image: ipfs/go-ipfs:v0.9.1
@@ -307,8 +256,6 @@ services:
         condition: service_started
       market-api-bellecour:
         condition: service_started
-      result-proxy-bellecour:
-        condition: service_started
       # arbitrum-sepolia stack
       arbitrum-sepolia-fork:
         condition: service_healthy
@@ -317,8 +264,6 @@ services:
       market-watcher-arbitrum-sepolia:
         condition: service_started
       market-api-arbitrum-sepolia:
-        condition: service_started
-      result-proxy-arbitrum-sepolia:
         condition: service_started
       compass-arbitrum-sepolia:
         condition: service_healthy
