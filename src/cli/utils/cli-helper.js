@@ -358,6 +358,7 @@ export const option = {
     'specify the original dataset directory',
   ],
   txGasPrice: () => [
+    // TODO remove this option (not applicable on supported chains)
     '--gas-price <amount unit...>',
     'set custom gas price for transactions (default unit wei)',
   ],

@@ -1,13 +1,18 @@
 [
   {
-    "chainId": "65535",
-    "description": "custom-token-chain-no-ens",
+    "chainId": "421614",
+    "description": "arbitrum-sepolia-fork",
     "iapps": [],
     "workerpools": [
       {
-        "name": "custom-token-chain-no-ens-workerpool",
-        "apiUrl": "https://core.custom-token-chain-no-ens.iex.ec",
+        "name": "unreachable-workerpool",
+        "apiUrl": "https://unreachable-workerpool.iex.ec",
         "address": "0xB967057a21dc6A66A29721d96b8Aa7454B7c383F"
+      },
+      {
+        "name": "workerpool-http-500",
+        "apiUrl": "http://localhost:5500",
+        "address": "0x2956f0cb779904795a5f30d3b3ea88b714c3123f"
       }
     ]
   }
