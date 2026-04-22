@@ -16,7 +16,6 @@ export class EnhancedWallet extends Wallet {
     privateKey: string | SigningKey,
     provider?: Provider,
     options?: {
-      gasPrice?: string;
       getTransactionCount?: (blockTag?: BlockTag) => Promise<number>;
     },
   );

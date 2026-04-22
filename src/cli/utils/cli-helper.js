@@ -6,10 +6,7 @@ import inquirer from 'inquirer';
 import { render } from 'prettyjson';
 import checkForUpdate from 'update-check';
 import isDocker from 'is-docker';
-import {
-  weiAmountSchema,
-  positiveStrictIntSchema,
-} from '../../common/utils/validator.js';
+import { positiveStrictIntSchema } from '../../common/utils/validator.js';
 import {
   TEE_FRAMEWORKS,
   STORAGE_PROVIDERS,
@@ -348,11 +345,6 @@ export const option = {
   originalDatasetDir: () => [
     '--original-dataset-dir <path>',
     'specify the original dataset directory',
-  ],
-  txGasPrice: () => [
-    // TODO remove this option (not applicable on supported chains)
-    '--gas-price <amount unit...>',
-    'set custom gas price for transactions (default unit wei)',
   ],
   txConfirms: () => [
     '--confirms <blockCount>',
@@ -841,16 +833,7 @@ export const publicKeyName = (address) => `${address}_key.pub`;
 export const privateKeyName = (address) => `${address}_key`;
 
 export const computeTxOptions = async (opts) => {
-  let gasPrice;
   let confirms;
-  if (opts.gasPrice) {
-    debug('opts.gasPrice', opts.gasPrice);
-    const stringGasPrice = await weiAmountSchema({ defaultUnit: 'wei' })
-      .label('gas-price')
-      .validate(opts.gasPrice);
-    gasPrice = BigInt(stringGasPrice);
-  }
-  debug('gasPrice', gasPrice);
   if (opts.confirms !== undefined) {
     debug('opts.confirms', opts.confirms);
     confirms = await positiveStrictIntSchema()
@@ -860,7 +843,7 @@ export const computeTxOptions = async (opts) => {
       });
   }
   debug('confirms', confirms);
-  return { gasPrice, confirms };
+  return { confirms };
 };
 
 export const getPropertyFromChain = (

@@ -154,7 +154,7 @@ show
       spinner.start(info.checkBalance(''));
       const balances = await checkBalances(chain.contracts, addressToShow);
       const displayBalances = {
-        ether: chain.contracts.isNative ? undefined : formatEth(balances.wei),
+        ether: formatEth(balances.wei),
         RLC: formatRLC(balances.nRLC),
       };
       spinner.succeed(
@@ -164,9 +164,7 @@ show
             balance: {
               ...displayBalances,
               nRLC: balances.nRLC.toString(),
-              wei: chain.contracts.isNative
-                ? undefined
-                : balances.wei.toString(),
+              wei: balances.wei.toString(),
             },
             ...(!address && displayedWallet && { wallet: displayedWallet }),
           },
@@ -182,7 +180,6 @@ addGlobalOptions(sendETH);
 addWalletLoadOptions(sendETH);
 sendETH
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.to())
@@ -201,7 +198,7 @@ sendETH
         keystore.accounts(),
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
         await prompt.transferETH(
@@ -234,7 +231,6 @@ addGlobalOptions(sendRLC);
 addWalletLoadOptions(sendRLC);
 sendRLC
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.to())
@@ -254,7 +250,7 @@ sendRLC
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
       if (!opts.to) throw new Error('Missing --to option');
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       if (!opts.force) {
         await prompt.transferRLC(
           formatRLC(nRlcAmount),
@@ -288,7 +284,6 @@ addGlobalOptions(sweep);
 addWalletLoadOptions(sweep);
 sweep
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.to())
@@ -304,14 +299,10 @@ sweep
         keystore.accounts(),
         loadChain(opts.chain, { txOptions, spinner }),
       ]);
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
-        await prompt.sweep(chain.contracts.isNative ? 'RLC' : 'ether and RLC')(
-          chain.name,
-          opts.to,
-          chain.id,
-        );
+        await prompt.sweep('ether and RLC')(chain.name, opts.to, chain.id);
       }
       spinner.start('Sweeping wallet...');
       const { sendNativeTxHash, sendERC20TxHash, errors } = await walletSweep(

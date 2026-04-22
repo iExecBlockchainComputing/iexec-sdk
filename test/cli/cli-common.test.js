@@ -69,24 +69,25 @@ describe('chain.json', () => {
     await loadJSONFile('chain.json').then((obj) => {
       const chainJson = {
         ...obj,
-        providers: {
-          infura: process.env.INFURA_PROJECT_ID,
-        },
       };
       saveJSONToFile(chainJson, 'chain.json');
     });
   });
 
-  test('no "native" overwrites in templates', async () => {
-    const { chains } = await loadJSONFile('chain.json');
-    expect(chains.mainnet.native).toBeUndefined();
-    expect(chains.bellecour.native).toBeUndefined();
+  test('chains arbitrum-mainnet and arbitrum-sepolia-testnet are available', async () => {
+    const chainJson = await loadJSONFile('chain.json');
+    expect(chainJson).toHaveProperty('chains');
+
+    expect(chainJson.chains).toStrictEqual({
+      'arbitrum-sepolia-testnet': {},
+      'arbitrum-mainnet': {},
+    });
   });
 
-  test('bellecour is native', async () => {
-    const raw = await execAsync(`${iexecPath} info --chain bellecour --raw`);
-    const res = JSON.parse(raw);
-    expect(res.ok).toBe(true);
-    expect(res.useNative).toBe(true);
+  test('default chain is arbitrum-sepolia-testnet', async () => {
+    const chainJson = await loadJSONFile('chain.json');
+    expect(chainJson).toBeDefined();
+    expect(chainJson).toHaveProperty('default');
+    expect(chainJson.default).toBe('arbitrum-sepolia-testnet');
   });
 });

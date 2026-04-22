@@ -36,12 +36,6 @@ number of block to wait for transactions confirmation (default 1)
 
 IExec contract address
 
-###### isNative?
-
-`boolean`
-
-true if IExec contract use the chain native token
-
 ###### provider
 
 `Provider`
@@ -53,12 +47,6 @@ ethers Provider
 `Signer`
 
 ethers Signer, required to sign transactions and messages
-
-###### useGas?
-
-`boolean`
-
-if false set the gasPrice to 0 (default true)
 
 #### Returns
 
@@ -90,14 +78,6 @@ current IExec contract address
 
 ***
 
-### isNative
-
-> **isNative**: `string`
-
-true if current instance use native token
-
-***
-
 ### pocoVersion
 
 > **pocoVersion**: `string`
@@ -119,20 +99,6 @@ current Provider
 > `optional` **signer**: `Signer`
 
 current Signer
-
-***
-
-### txOptions
-
-> **txOptions**: `object`
-
-transaction options
-
-#### gasPrice?
-
-> `optional` **gasPrice**: `bigint`
-
-gasPrice override
 
 ## Methods
 
@@ -176,7 +142,7 @@ fetch the IExec registry Contract instance of specified resource
 
 > **fetchTokenAddress**(`resourceName`): `Promise`\<`string`\>
 
-fetch the IExec token contract address, not available when isNative is true
+fetch the IExec token contract address
 
 #### Parameters
 
@@ -194,7 +160,7 @@ fetch the IExec token contract address, not available when isNative is true
 
 > `optional` **fetchTokenContract**(`resourceName`): `Promise`\<`Contract`\>
 
-fetch the IExec token Contract instance, not available when isNative is true
+fetch the IExec token Contract instance
 
 #### Parameters
 

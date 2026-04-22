@@ -22,14 +22,6 @@ export default class IExecContractsClient {
      */
     hubAddress: string;
     /**
-     * if false set the gasPrice to 0 (default true)
-     */
-    useGas?: boolean;
-    /**
-     * true if IExec contract use the chain native token
-     */
-    isNative?: boolean;
-    /**
      * number of block to wait for transactions confirmation (default 1)
      */
     confirms?: number;
@@ -47,10 +39,6 @@ export default class IExecContractsClient {
    */
   chainId: string;
   /**
-   * true if current instance use native token
-   */
-  isNative: string;
-  /**
    * current IExec contract address
    */
   hubAddress: string;
@@ -58,15 +46,6 @@ export default class IExecContractsClient {
    * IExec PoCo ABI version
    */
   pocoVersion: string;
-  /**
-   * transaction options
-   */
-  txOptions: {
-    /**
-     * gasPrice override
-     */
-    gasPrice?: bigint;
-  };
   /**
    * number of block to wait for transactions confirmation
    */
@@ -92,11 +71,11 @@ export default class IExecContractsClient {
    */
   fetchRegistryAddress(resourceName: string): Promise<string>;
   /**
-   * fetch the IExec token Contract instance, not available when isNative is true
+   * fetch the IExec token Contract instance
    */
   fetchTokenContract?(resourceName: string): Promise<Contract>;
   /**
-   * fetch the IExec token contract address, not available when isNative is true
+   * fetch the IExec token contract address
    */
   fetchTokenAddress(resourceName: string): Promise<string>;
 }

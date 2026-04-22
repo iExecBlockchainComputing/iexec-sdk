@@ -6,7 +6,6 @@ import {
   NRLCAmount,
   HumanSingleTag,
   Bytes32,
-  ProviderOptions,
 } from '../common/types.js';
 
 export { BN } from '../common/bn.js';
@@ -31,17 +30,9 @@ export const getSignerFromPrivateKey: (
   privateKey: string,
   options?: {
     /**
-     * gas price override
-     */
-    gasPrice?: bigint | number | string; // TODO remove this option (not applicable on supported chains)
-    /**
      * nonce override
      */
     getTransactionCount?: (blockTag?: BlockTag) => Promise<number>;
-    /**
-     * providers options
-     */
-    providers?: ProviderOptions;
     /**
      * if true allows using a provider connected to an experimental networks (default false)
      *

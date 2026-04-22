@@ -2,7 +2,6 @@ import Debug from 'debug';
 import { Contract } from 'ethers';
 import { version as pocoVersion } from '../generated/@iexec/poco/package.js';
 import iexecTokenDesc from '../generated/@iexec/poco/IexecInterfaceToken.js';
-import iexecNativeDesc from '../generated/@iexec/poco/IexecInterfaceNative.js';
 import appRegistryDesc from '../generated/@iexec/poco/AppRegistry.js';
 import workerpoolRegistryDesc from '../generated/@iexec/poco/WorkerpoolRegistry.js';
 import datasetRegistryDesc from '../generated/@iexec/poco/DatasetRegistry.js';
@@ -13,29 +12,12 @@ import rlcDesc from '../generated/@iexec/rlc/RLC.js';
 
 const debug = Debug('iexec:IExecContractsClient');
 
-const nativeNetworks = ['134'];
-
-const gasPriceByNetwork = {
-  134: 0n,
-};
-
-const getIsNative = (chainId) => nativeNetworks.includes(chainId);
-
-const getGasPriceOverride = (chainId) => gasPriceByNetwork[chainId];
-
-const getTokenDesc = (isNative) => {
-  if (isNative) {
-    return undefined;
-  }
-  return rlcDesc;
-};
-
-const getContractsDescMap = (isNative) => ({
+const contractsDescMap = {
   hub: {
-    contractDesc: isNative ? iexecNativeDesc : iexecTokenDesc,
+    contractDesc: iexecTokenDesc,
   },
   token: {
-    contractDesc: getTokenDesc(isNative),
+    contractDesc: rlcDesc,
     hubPropName: 'token',
   },
   app: {
@@ -62,13 +44,11 @@ const getContractsDescMap = (isNative) => ({
     contractDesc: workerpoolRegistryDesc,
     hubPropName: 'workerpoolregistry',
   },
-});
+};
 
-const createClient = ({ ethSigner, ethProvider, hubAddress, isNative }) => {
+const createClient = ({ ethSigner, ethProvider, hubAddress }) => {
   const cachedAddresses = {};
   if (!hubAddress) throw new Error('Missing iExec contract address');
-
-  const contractsDescMap = getContractsDescMap(isNative);
 
   const getContract = (objName, address) => {
     try {
@@ -142,27 +122,18 @@ const createClient = ({ ethSigner, ethProvider, hubAddress, isNative }) => {
 
   return {
     pocoVersion,
-    isNative,
     hubAddress,
     getContract,
     getIExecContract,
     fetchRegistryContract,
-    ...(!isNative && { fetchTokenContract }),
-    ...(!isNative && { fetchTokenAddress }),
+    fetchTokenContract,
+    fetchTokenAddress,
     fetchRegistryAddress,
   };
 };
 
 class IExecContractsClient {
-  constructor({
-    provider,
-    signer,
-    chainId,
-    hubAddress,
-    useGas = true,
-    isNative,
-    confirms = 1,
-  } = {}) {
+  constructor({ provider, signer, chainId, hubAddress, confirms = 1 } = {}) {
     const stringChainId = `${chainId}`;
     if (!provider) throw new Error('missing provider key');
     if (!hubAddress) throw new Error('missing hubAddress key');
@@ -175,21 +146,12 @@ class IExecContractsClient {
       signer,
       chainId: stringChainId,
       hubAddress,
-      useGas,
-      isNative,
     };
-
-    const native =
-      isNative !== undefined ? !!isNative : getIsNative(stringChainId);
-
-    const gasPriceOverride =
-      useGas === false ? 0n : getGasPriceOverride(stringChainId);
 
     const client = createClient({
       ethSigner: signer,
       ethProvider: provider,
       hubAddress,
-      isNative: native,
     });
 
     this.setSigner = (ethSigner) => {
@@ -204,7 +166,6 @@ class IExecContractsClient {
       provider,
       signer,
       chainId: stringChainId,
-      txOptions: { gasPrice: gasPriceOverride },
       confirms,
       ...client,
     });

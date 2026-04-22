@@ -198,9 +198,7 @@ export const claim = async (
     }
 
     const iexecContract = contracts.getIExecContract();
-    const claimTx = await wrapSend(
-      iexecContract.claim(taskid, contracts.txOptions),
-    );
+    const claimTx = await wrapSend(iexecContract.claim(taskid));
 
     const claimTxReceipt = await wrapWait(claimTx.wait(contracts.confirms));
     if (!checkEventFromLogs('TaskClaimed', claimTxReceipt.logs))

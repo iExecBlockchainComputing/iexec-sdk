@@ -11,12 +11,11 @@ const debug = Debug('iexec:chains');
 const createChainFromConf = (
   chainName,
   chainConf,
-  { providerOptions, txOptions = {}, allowExperimentalNetworks = false } = {},
+  { txOptions = {}, allowExperimentalNetworks = false } = {},
 ) => {
   try {
     const chain = { ...chainConf };
     const provider = getReadOnlyProvider(chainConf.host, {
-      providers: providerOptions,
       allowExperimentalNetworks,
     });
 
@@ -25,8 +24,6 @@ const createChainFromConf = (
       provider,
       chainId: chain.id,
       hubAddress: chain.hub,
-      useGas: chain.useGas,
-      isNative: chain.native,
       confirms: txOptions.confirms,
     });
     chain.contracts = contracts;
@@ -44,7 +41,6 @@ export const loadChain = async (
   try {
     const chainsConf = await loadChainConf();
     const { allowExperimentalNetworks } = chainsConf;
-    const providerOptions = chainsConf.providers;
     let name;
     let loadedConf;
     if (chainNameOrId) {
@@ -103,7 +99,6 @@ export const loadChain = async (
       );
     }
     const chain = createChainFromConf(name, conf, {
-      providerOptions,
       txOptions,
       allowExperimentalNetworks,
     });
@@ -115,14 +110,7 @@ export const loadChain = async (
   }
 };
 
-export const connectKeystore = async (
-  chain,
-  keystore,
-  { txOptions = {} } = {},
-) => {
+export const connectKeystore = async (chain, keystore) => {
   const { privateKey } = await keystore.load();
-  const keystoreOptions = { gasPrice: txOptions.gasPrice };
-  chain.contracts.setSigner(
-    new EnhancedWallet(privateKey, undefined, keystoreOptions),
-  );
+  chain.contracts.setSigner(new EnhancedWallet(privateKey, undefined));
 };

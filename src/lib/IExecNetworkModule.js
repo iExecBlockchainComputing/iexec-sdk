@@ -6,7 +6,7 @@ export default class IExecNetworkModule extends IExecModule {
 
     this.getNetwork = async () => {
       const contracts = await this.config.resolveContractsClient();
-      return { chainId: contracts.chainId, isNative: contracts.isNative };
+      return { chainId: contracts.chainId };
     };
   }
 }

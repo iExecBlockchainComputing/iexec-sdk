@@ -20,7 +20,6 @@ import {
 import '../jest-setup.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
-const nativeTestChain = TEST_CHAINS['bellecour-fork'];
 
 describe('iexec wallet', () => {
   let userWallet;
@@ -284,16 +283,21 @@ describe('iexec wallet', () => {
 
   describe('send-ether', () => {
     test('iexec wallet send-ether (error on sidechain)', async () => {
-      await setChain(nativeTestChain)();
-      await setBalance(nativeTestChain)(userWallet.address, 10n * 10n ** 18n);
+      await setChain(testChain)();
+      await setBalance(testChain)(userWallet.address, 10n * 10n ** 18n);
       const to = getRandomAddress();
       const res = await runIExecCliRaw(
         `${iexecPath} wallet send-ether 1 gwei --to ${to} --force`,
       );
-      expect(res.ok).toBe(false);
-      expect(res.error.message).toBe(
-        'sendETH() is disabled on sidechain, use sendRLC()',
+      expect(res.ok).toBe(true);
+      expect(res.from).toBe(userWallet.address);
+      expect(res.to).toBe(to);
+      expect(res.amount).toBe('1000000000');
+      expect(res.txHash).toBeDefined();
+      const { balance } = await runIExecCliRaw(
+        `${iexecPath} wallet show ${to}`,
       );
+      expect(balance.wei).toBe('1000000000');
     });
   });
 
