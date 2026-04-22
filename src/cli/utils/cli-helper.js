@@ -133,8 +133,6 @@ export const desc = {
   revoke: () => 'revoke the approval for the spender to use your iExec account',
   sendETH: () => 'send ether to an address (default unit ether)',
   sendRLC: () => 'send RLC to an address (default unit RLC)',
-  sendNRLC: () =>
-    '[DEPRECATED see send-RLC] send RLC to an address (WARNING! default unit nRLC)',
   sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
   decrypt: () => 'decrypt work result',

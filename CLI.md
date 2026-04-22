@@ -355,7 +355,6 @@ Commands:
 - [send-ether](#iexec-wallet-send-ether)
 - [send-RLC](#iexec-wallet-send-rlc)
 - [sweep](#iexec-wallet-sweep)
-- [sendRLC](#iexec-wallet-sendrlc)
 
 #### iexec wallet create
 
@@ -424,8 +423,6 @@ Options:
 
 #### iexec wallet send-ether
 
-_Alias: sendETH_
-
 send ether to an address (default unit ether)
 
 Usage:
@@ -484,32 +481,6 @@ Usage:
 
 ```sh
 iexec wallet sweep [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force | force perform action without prompting user |
-| --to \<address\> | receiver address |
-
-#### iexec wallet sendRLC
-
-\[DEPRECATED see send-RLC\] send RLC to an address (WARNING! default unit nRLC)
-
-Usage:
-
-```sh
-iexec wallet sendRLC <amount> [unit] [options]
 ```
 
 Options:
