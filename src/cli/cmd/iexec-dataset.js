@@ -123,7 +123,6 @@ addGlobalOptions(deploy);
 addWalletLoadOptions(deploy);
 deploy
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.deployObj(objName))
   .action(async (opts) => {
@@ -142,7 +141,7 @@ deploy
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.deploying(objName));
       const { address, txHash } = await deployDataset(
         chain.contracts,
@@ -615,7 +614,6 @@ addGlobalOptions(transfer);
 addWalletLoadOptions(transfer);
 transfer
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.to())
@@ -628,7 +626,7 @@ transfer
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
         await prompt.transferObj(objName, objAddress, opts.to, chain.id);

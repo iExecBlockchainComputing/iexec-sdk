@@ -1,6 +1,6 @@
 import { describe, test, expect } from '@jest/globals';
 import { BN } from 'bn.js';
-import { ONE_ETH, ONE_RLC, getTestConfig } from '../lib-test-utils.js';
+import { ONE_ETH, getTestConfig } from '../lib-test-utils.js';
 import {
   TEST_CHAINS,
   getRandomAddress,
@@ -11,7 +11,6 @@ import '../../jest-setup.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 const tokenTestChain = TEST_CHAINS['arbitrum-sepolia-fork'];
-const nativeTestChain = TEST_CHAINS['bellecour-fork'];
 
 describe('account', () => {
   describe('checkBalance()', () => {
@@ -207,162 +206,64 @@ describe('account', () => {
       );
     });
 
-    describe('native chain', () => {
-      test('deposits native asset (1 nRLC = 10⁹ wei)', async () => {
-        const { iexec, wallet } = await getTestConfig(nativeTestChain)();
-        await setNRlcBalance(nativeTestChain)(wallet.address, 10);
-        const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        const res = await iexec.account.deposit(5);
-        const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        expect(res.txHash).toBeTxHash();
-        expect(res.amount).toBe('5');
-        expect(
-          accountFinalBalance.stake
-            .sub(new BN(5))
-            .eq(accountInitialBalance.stake),
-        ).toBe(true);
-        expect(
-          walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC),
-        ).toBe(true);
-        expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked),
-        ).toBe(true);
-      });
-
-      test('deposits specified unit', async () => {
-        const { iexec, wallet } = await getTestConfig(nativeTestChain)();
-        await setNRlcBalance(nativeTestChain)(wallet.address, ONE_RLC);
-        const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        const res = await iexec.account.deposit('0.005 RLC');
-        const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        expect(res.txHash).toBeTxHash();
-        expect(res.amount).toBe('5000000');
-        expect(
-          accountFinalBalance.stake
-            .sub(new BN('5000000'))
-            .eq(accountInitialBalance.stake),
-        ).toBe(true);
-        expect(
-          walletFinalBalance.nRLC
-            .add(new BN('5000000'))
-            .eq(walletInitialBalance.nRLC),
-        ).toBe(true);
-        expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked),
-        ).toBe(true);
-      });
-
-      test('fails if amount exceed wallet balance', async () => {
-        const { iexec, wallet } = await getTestConfig(nativeTestChain)();
-        const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        await expect(iexec.account.deposit(100)).rejects.toThrow(
-          new Error('Deposit amount exceed wallet balance'),
-        );
-        const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
-          true,
-        );
-        expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(
-          true,
-        );
-        expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked),
-        ).toBe(true);
-      });
+    test('deposits ERC20', async () => {
+      const { iexec, wallet } = await getTestConfig(tokenTestChain)();
+      await setNRlcBalance(tokenTestChain)(wallet.address, 10);
+      await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
+      const accountInitialBalance = await iexec.account.checkBalance(
+        wallet.address,
+      );
+      const walletInitialBalance = await iexec.wallet.checkBalances(
+        wallet.address,
+      );
+      const res = await iexec.account.deposit(5);
+      const accountFinalBalance = await iexec.account.checkBalance(
+        wallet.address,
+      );
+      const walletFinalBalance = await iexec.wallet.checkBalances(
+        wallet.address,
+      );
+      expect(res.txHash).toBeTxHash();
+      expect(res.amount).toBe('5');
+      expect(
+        accountFinalBalance.stake
+          .sub(new BN(5))
+          .eq(accountInitialBalance.stake),
+      ).toBe(true);
+      expect(
+        walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC),
+      ).toBe(true);
+      expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+        true,
+      );
     });
 
-    describe('token chain', () => {
-      test('deposits ERC20', async () => {
-        const { iexec, wallet } = await getTestConfig(tokenTestChain)();
-        await setNRlcBalance(tokenTestChain)(wallet.address, 10);
-        await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
-        const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        const res = await iexec.account.deposit(5);
-        const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        expect(res.txHash).toBeTxHash();
-        expect(res.amount).toBe('5');
-        expect(
-          accountFinalBalance.stake
-            .sub(new BN(5))
-            .eq(accountInitialBalance.stake),
-        ).toBe(true);
-        expect(
-          walletFinalBalance.nRLC.add(new BN(5)).eq(walletInitialBalance.nRLC),
-        ).toBe(true);
-        expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked),
-        ).toBe(true);
-      });
-
-      test('fails if amount exceed wallet balance', async () => {
-        const { iexec, wallet } = await getTestConfig(tokenTestChain)();
-        await setNRlcBalance(tokenTestChain)(wallet.address, 10);
-        await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
-        const accountInitialBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletInitialBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        await expect(iexec.account.deposit(100)).rejects.toThrow(
-          new Error('Deposit amount exceed wallet balance'),
-        );
-        const accountFinalBalance = await iexec.account.checkBalance(
-          wallet.address,
-        );
-        const walletFinalBalance = await iexec.wallet.checkBalances(
-          wallet.address,
-        );
-        expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
-          true,
-        );
-        expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(
-          true,
-        );
-        expect(
-          accountFinalBalance.locked.eq(accountInitialBalance.locked),
-        ).toBe(true);
-      });
+    test('fails if amount exceed wallet balance', async () => {
+      const { iexec, wallet } = await getTestConfig(tokenTestChain)();
+      await setNRlcBalance(tokenTestChain)(wallet.address, 10);
+      await setBalance(tokenTestChain)(wallet.address, ONE_ETH);
+      const accountInitialBalance = await iexec.account.checkBalance(
+        wallet.address,
+      );
+      const walletInitialBalance = await iexec.wallet.checkBalances(
+        wallet.address,
+      );
+      await expect(iexec.account.deposit(100)).rejects.toThrow(
+        new Error('Deposit amount exceed wallet balance'),
+      );
+      const accountFinalBalance = await iexec.account.checkBalance(
+        wallet.address,
+      );
+      const walletFinalBalance = await iexec.wallet.checkBalances(
+        wallet.address,
+      );
+      expect(accountFinalBalance.stake.eq(accountInitialBalance.stake)).toBe(
+        true,
+      );
+      expect(walletFinalBalance.nRLC.eq(walletInitialBalance.nRLC)).toBe(true);
+      expect(accountFinalBalance.locked.eq(accountInitialBalance.locked)).toBe(
+        true,
+      );
     });
   });
 

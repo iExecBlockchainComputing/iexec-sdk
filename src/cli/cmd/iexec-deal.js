@@ -95,7 +95,6 @@ addGlobalOptions(claimDeal);
 addWalletLoadOptions(claimDeal);
 claimDeal
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.claimObj(objName))
   .action(async (dealid, opts) => {
@@ -106,7 +105,7 @@ claimDeal
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(opts);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.claiming(objName));
       const { claimed, transactions } = await claim(chain.contracts, dealid);
       spinner.succeed(

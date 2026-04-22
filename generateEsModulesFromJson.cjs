@@ -36,10 +36,6 @@ const sources = [
     { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/poco/artifacts/contracts/IexecInterfaceNative.sol/IexecInterfaceNative.json',
-    { dir: '@iexec/poco', minifier: minifiers.abi },
-  ],
-  [
     '@iexec/poco/artifacts/contracts/registries/apps/AppRegistry.sol/AppRegistry.json',
     { dir: '@iexec/poco', minifier: minifiers.abi },
   ],

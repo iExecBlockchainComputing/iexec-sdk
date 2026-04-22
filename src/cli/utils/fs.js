@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import Debug from 'debug';
 import fsExtra from 'fs-extra';
-import { object, string, number, boolean, lazy } from 'yup';
+import { object, string, boolean } from 'yup';
 import { APP, DATASET } from '../../common/utils/constant.js';
 import {
   addressSchema,
@@ -30,8 +30,6 @@ const chainConfSchema = () =>
     iexecGateway: string(),
     compass: string(),
     pocoSubgraph: string(),
-    native: boolean(),
-    useGas: boolean().default(true),
   })
     .noUnknown(true, 'Unknown key "${unknown}"')
     .strict();
@@ -51,24 +49,6 @@ const chainsConfSchema = () =>
         return true;
       })
       .required(),
-    providers: object({
-      alchemy: string().notRequired(),
-      etherscan: string().notRequired(),
-      infura: lazy((value) => {
-        if (typeof value === 'object') {
-          return object({
-            projectId: string().required(),
-            projectSecret: string(),
-          })
-            .noUnknown(true, 'Unknown key "${unknown}" in providers.infura')
-            .strict();
-        }
-        return string();
-      }),
-      quorum: number().integer().min(1).max(3).notRequired(),
-    })
-      .noUnknown(true, 'Unknown key "${unknown}" in providers')
-      .strict(),
   })
     .noUnknown(true, 'Unknown key "${unknown}"')
     .strict();

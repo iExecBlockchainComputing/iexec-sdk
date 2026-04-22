@@ -395,7 +395,6 @@ addGlobalOptions(fill);
 addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.fillAppOrder())
@@ -468,7 +467,7 @@ fill
       if (!workerpoolorder) throw new Error('Missing workerpoolorder');
 
       const computeRequestOrder = async () => {
-        await connectKeystore(chain, keystore, { txOptions });
+        await connectKeystore(chain, keystore);
         const unsignedOrder = await createRequestorder(
           {
             contracts: chain.contracts,
@@ -563,7 +562,7 @@ fill
         });
       }
 
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.filling(objName));
       const { dealid, volume, txHash } = await matchOrders({
         contracts: chain.contracts,
@@ -861,7 +860,6 @@ addGlobalOptions(cancel);
 addWalletLoadOptions(cancel);
 cancel
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.cancelAppOrder())
@@ -885,7 +883,7 @@ cancel
         loadChain(opts.chain, { txOptions, spinner }),
         loadSignedOrders(),
       ]);
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       const success = {};
       const failed = [];
 

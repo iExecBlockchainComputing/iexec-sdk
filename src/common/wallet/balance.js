@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import { bigIntToBn, truncateBnWeiToBnNRlc } from '../utils/utils.js';
+import { bigIntToBn } from '../utils/utils.js';
 import { addressSchema, throwIfMissing } from '../utils/validator.js';
 import { wrapCall } from '../utils/errorWrappers.js';
 
@@ -7,11 +7,6 @@ const debug = Debug('iexec:wallet:balance');
 
 export const getRlcBalance = async (contracts = throwIfMissing(), address) => {
   const vAddress = await addressSchema().required().validate(address);
-  const { isNative } = contracts;
-  if (isNative) {
-    const weiBalance = await contracts.provider.getBalance(vAddress);
-    return truncateBnWeiToBnNRlc(bigIntToBn(weiBalance));
-  }
   const rlcContract = await wrapCall(contracts.fetchTokenContract());
   const nRlcBalance = await wrapCall(rlcContract.balanceOf(vAddress));
   return bigIntToBn(nRlcBalance);

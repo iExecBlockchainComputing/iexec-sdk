@@ -83,18 +83,6 @@ export const parseEth = (value, defaultUnit = 'ether') => {
   }
 };
 
-export const truncateBnWeiToBnNRlc = (bnWei) => {
-  const weiString = bnWei.toString();
-  const nRlcString = weiString.length > 9 ? weiString.slice(0, -9) : '0';
-  return new BN(nRlcString);
-};
-
-export const bnNRlcToBnWei = (bnNRlc) => {
-  const nRlcString = bnNRlc.toString();
-  const weiString = nRlcString !== '0' ? nRlcString.concat('000000000') : '0';
-  return new BN(weiString);
-};
-
 export const bnifyNestedBigInt = (obj) => {
   const objOut = Array.isArray(obj) ? [] : {};
   Object.entries(obj).forEach((e) => {

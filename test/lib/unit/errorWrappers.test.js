@@ -19,7 +19,7 @@ describe('wrapPersonalSign', () => {
   test('detects user signature rejection', async () => {
     const userRejectSigner = await new BrowserProvider(
       new InjectedProvider(
-        'https://bellecour.iex.ec',
+        'https://sepolia-rollup.arbitrum.io/rpc',
         getRandomWallet().privateKey,
         {
           mockUserRejection: true,
@@ -34,7 +34,7 @@ describe('wrapPersonalSign', () => {
 
     const errorSigner = await new BrowserProvider(
       new InjectedProvider(
-        'https://bellecour.iex.ec',
+        'https://sepolia-rollup.arbitrum.io/rpc',
         getRandomWallet().privateKey,
         {
           mockError: true,
@@ -53,7 +53,7 @@ describe('wrapSignTypedData', () => {
   test('detects user signature rejection', async () => {
     const userRejectSigner = await new BrowserProvider(
       new InjectedProvider(
-        'https://bellecour.iex.ec',
+        'https://sepolia-rollup.arbitrum.io/rpc',
         getRandomWallet().privateKey,
         {
           mockUserRejection: true,
@@ -72,7 +72,7 @@ describe('wrapSignTypedData', () => {
 
     const errorSigner = await new BrowserProvider(
       new InjectedProvider(
-        'https://bellecour.iex.ec',
+        'https://sepolia-rollup.arbitrum.io/rpc',
         getRandomWallet().privateKey,
         {
           mockError: true,
@@ -95,7 +95,7 @@ describe('wrapSend', () => {
   test('detects user signature rejection', async () => {
     const userRejectSigner = await new BrowserProvider(
       new InjectedProvider(
-        'https://bellecour.iex.ec',
+        'https://sepolia-rollup.arbitrum.io/rpc',
         getRandomWallet().privateKey,
         {
           mockUserRejection: true,
@@ -110,7 +110,7 @@ describe('wrapSend', () => {
 
     const errorSigner = await new BrowserProvider(
       new InjectedProvider(
-        'https://bellecour.iex.ec',
+        'https://sepolia-rollup.arbitrum.io/rpc',
         getRandomWallet().privateKey,
         {
           mockError: true,

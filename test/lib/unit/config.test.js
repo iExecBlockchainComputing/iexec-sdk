@@ -1,36 +1,31 @@
 import { describe, test, expect } from '@jest/globals';
-import { Network } from 'ethers';
-import {
-  CHAIN_SPECIFIC_FEATURES,
-  checkImplementedOnChain,
-  getChainDefaults,
-  getId,
-} from '../../../src/common/utils/config.js';
+import { getChainDefaults, getId } from '../../../src/common/utils/config.js';
 
 describe('getId()', () => {
   test('chain id as number returns id', () => {
-    expect(getId(134)).toBe(134);
+    expect(getId(421614)).toBe(421614);
   });
   test('chain id as string returns id', () => {
-    expect(getId('134')).toBe(134);
+    expect(getId('421614')).toBe(421614);
   });
   test('chain name returns id', () => {
-    expect(getId('bellecour')).toBe(134);
+    expect(getId('arbitrum-sepolia-testnet')).toBe(421614);
   });
 });
 
 describe('getChainDefaults', () => {
-  test('id 134 returns bellecour config', () => {
-    expect(getChainDefaults(134)).toEqual({
-      host: 'https://bellecour.iex.ec',
-      hub: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
-      iexecGateway: 'https://api.market.v8-bellecour.iex.ec',
-      ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
-      ipfsNode: 'https://ipfs-upload.v8-bellecour.iex.ec',
-      name: 'bellecour',
-      pocoSubgraph: 'https://thegraph.iex.ec/subgraphs/name/bellecour/poco-v5',
-      sms: 'https://sms.iex.ec',
-      compass: undefined,
+  test('id 421614 returns arbitrum-sepolia-testnet config', () => {
+    expect(getChainDefaults(421614)).toEqual({
+      host: 'https://sepolia-rollup.arbitrum.io/rpc',
+      hub: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
+      iexecGateway: 'https://api-market.arbitrum-sepolia-testnet.iex.ec',
+      ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
+      ipfsNode: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
+      name: 'arbitrum-sepolia-testnet',
+      pocoSubgraph:
+        'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/2GCj8gzLCihsiEDq8cYvC5nUgK6VfwZ6hm3Wj8A3kcxz',
+      sms: 'https://sms.arbitrum-sepolia-testnet.iex.ec',
+      compass: 'https://compass.arbitrum-sepolia-testnet.iex.ec',
     });
   });
   test('unknown id returns empty object', () => {
@@ -42,58 +37,5 @@ describe('getChainDefaults', () => {
     expect(
       getChainDefaults(421614, { allowExperimentalNetworks: true }).host,
     ).toBeDefined();
-  });
-});
-
-describe('Networks', () => {
-  test('ethers Networks is populated with bellecour', () => {
-    const networkFromId = Network.from(134);
-    expect(networkFromId.chainId).toBe(134n);
-    expect(networkFromId.name).toBe('bellecour');
-
-    const networkFromName = Network.from('bellecour');
-    expect(networkFromName.chainId).toBe(134n);
-    expect(networkFromName.name).toBe('bellecour');
-  });
-});
-
-describe('checkImplementedOnChain', () => {
-  describe(`feature ${CHAIN_SPECIFIC_FEATURES.COMPASS}`, () => {
-    const feature = CHAIN_SPECIFIC_FEATURES.COMPASS;
-    test('is not implemented on bellecour', () => {
-      expect(() => checkImplementedOnChain(134, feature)).toThrow(
-        `${feature} is not available on network bellecour`,
-      );
-    });
-    test('is not implemented on mainnet', () => {
-      expect(() => checkImplementedOnChain(1, feature)).toThrow(
-        `${feature} is not available on network mainnet`,
-      );
-    });
-    test('is implemented on arbitrum-mainnet', () => {
-      expect(() => checkImplementedOnChain(42161, feature)).not.toThrow();
-    });
-    test('is implemented on arbitrum-sepolia-testnet', () => {
-      expect(() => checkImplementedOnChain(421614, feature)).not.toThrow();
-    });
-  });
-  describe(`feature ${CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING}`, () => {
-    const feature = CHAIN_SPECIFIC_FEATURES.BULK_PROCESSING;
-    test('is not implemented on bellecour', () => {
-      expect(() => checkImplementedOnChain(134, feature)).toThrow(
-        `${feature} is not available on network bellecour`,
-      );
-    });
-    test('is not implemented on mainnet', () => {
-      expect(() => checkImplementedOnChain(1, feature)).toThrow(
-        `${feature} is not available on network mainnet`,
-      );
-    });
-    test('is not implemented on arbitrum-mainnet', () => {
-      expect(() => checkImplementedOnChain(42161, feature)).not.toThrow();
-    });
-    test('is implemented on arbitrum-sepolia-testnet', () => {
-      expect(() => checkImplementedOnChain(421614, feature)).not.toThrow();
-    });
   });
 });

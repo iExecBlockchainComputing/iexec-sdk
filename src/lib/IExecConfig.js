@@ -11,11 +11,9 @@ const debug = Debug('iexec:IExecConfig');
 
 export default class IExecConfig {
   constructor(
-    { ethProvider } = {},
+    { ethProvider } = {}, // TODO DEPRECATE pass ethProvider as first argument
     {
       hubAddress,
-      isNative,
-      useGas = true,
       confirms,
       smsURL,
       ipfsGatewayURL,
@@ -23,7 +21,6 @@ export default class IExecConfig {
       iexecGatewayURL,
       compassURL,
       pocoSubgraphURL,
-      providerOptions,
       allowExperimentalNetworks = false,
     } = {},
   ) {
@@ -67,7 +64,6 @@ export default class IExecConfig {
     try {
       if (isRpcUrlProvider) {
         provider = getReadOnlyProvider(ethProvider, {
-          providers: providerOptions,
           allowExperimentalNetworks,
         });
       } else if (isEthersAbstractSignerWithProvider) {
@@ -170,9 +166,7 @@ export default class IExecConfig {
           provider,
           signer,
           hubAddress: resolvedHubAddress,
-          useGas,
           confirms,
-          isNative,
         });
       } catch (err) {
         throw new ConfigurationError(

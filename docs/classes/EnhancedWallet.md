@@ -28,10 +28,6 @@
 
 ##### options?
 
-###### gasPrice?
-
-`string`
-
 ###### getTransactionCount?
 
 (`blockTag?`) => `Promise`\<`number`\>

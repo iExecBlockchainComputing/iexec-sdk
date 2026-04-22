@@ -68,14 +68,6 @@ override the IPFS node URL to target a custom instance
 
 ***
 
-### isNative?
-
-> `optional` **isNative**: `boolean`
-
-true if IExec contract use the chain native token (default false)
-
-***
-
 ### pocoSubgraphURL?
 
 > `optional` **pocoSubgraphURL**: `string`
@@ -84,24 +76,8 @@ override the PoCo subgraph URL to target a custom instance
 
 ***
 
-### providerOptions?
-
-> `optional` **providerOptions**: [`ProviderOptions`](ProviderOptions.md) \| [`AnyRecord`](../type-aliases/AnyRecord.md)
-
-[ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
-
-***
-
 ### smsURL?
 
 > `optional` **smsURL**: `string`
 
 override the SMS URL to target a custom instance
-
-***
-
-### useGas?
-
-> `optional` **useGas**: `boolean`
-
-if false set the gasPrice to 0 (default true)

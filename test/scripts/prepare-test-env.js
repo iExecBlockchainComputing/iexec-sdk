@@ -1,15 +1,12 @@
 import { writeFileSync } from 'fs';
 
-const bellecourForkUrl =
-  process.env.BELLECOUR_FORK_URL || 'https://bellecour.iex.ec';
 const arbitrumSepoliaForkUrl =
   process.env.ARBITRUM_SEPOLIA_FORK_URL ||
   'https://sepolia-rollup.arbitrum.io/rpc';
 
-const [bellecourForkBlock, arbitrumSepoliaForkBlock] = await Promise.all([
-  getCurrentBlockNumber(bellecourForkUrl),
-  getCurrentBlockNumber(arbitrumSepoliaForkUrl),
-]);
+const arbitrumSepoliaForkBlock = await getCurrentBlockNumber(
+  arbitrumSepoliaForkUrl,
+);
 
 console.log('Creating .env file for docker-compose test-stack');
 writeFileSync(
@@ -17,11 +14,6 @@ writeFileSync(
   `############ THIS FILE IS GENERATED ############
 # run "node prepare-test-env.js" to regenerate #
 ################################################
-
-# blockchain node to use as the reference for the local fork
-BELLECOUR_FORK_URL=${bellecourForkUrl}
-# block number to fork from
-BELLECOUR_FORK_BLOCK=${bellecourForkBlock}
 
 # blockchain node to use as the reference for the local fork
 ARBITRUM_SEPOLIA_FORK_URL=${arbitrumSepoliaForkUrl}

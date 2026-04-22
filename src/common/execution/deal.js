@@ -288,9 +288,7 @@ export const claim = async (
         const taskidToProcess = initializedToProcess.map(
           ({ taskid }) => taskid,
         );
-        const tx = await wrapSend(
-          iexecContract.claimArray(taskidToProcess, contracts.txOptions),
-        );
+        const tx = await wrapSend(iexecContract.claimArray(taskidToProcess));
         debug(`claimArray ${tx.hash} (${initializedToProcess.length} tasks)`);
         await wrapWait(tx.wait(contracts.confirms));
         transactions.push({
@@ -318,11 +316,7 @@ export const claim = async (
         const idxToProcess = notInitializedToProcess.map(({ idx }) => idx);
         const dealidArray = new Array(idxToProcess.length).fill(vDealid);
         const tx = await wrapSend(
-          iexecContract.initializeAndClaimArray(
-            dealidArray,
-            idxToProcess,
-            contracts.txOptions,
-          ),
+          iexecContract.initializeAndClaimArray(dealidArray, idxToProcess),
         );
         debug(
           `initializeAndClaimArray ${tx.hash} (${notInitializedToProcess.length} tasks)`,
