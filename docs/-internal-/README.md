@@ -37,7 +37,6 @@
 - [PublishedWorkerpoolorder](interfaces/PublishedWorkerpoolorder.md)
 - [RequestorderParams](interfaces/RequestorderParams.md)
 - [RequestorderTemplate](interfaces/RequestorderTemplate.md)
-- [SconeMREnclave](interfaces/SconeMREnclave.md)
 - [SignableApporder](interfaces/SignableApporder.md)
 - [SignableDatasetorder](interfaces/SignableDatasetorder.md)
 - [SignableRequestorder](interfaces/SignableRequestorder.md)

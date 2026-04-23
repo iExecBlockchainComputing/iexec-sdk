@@ -33,14 +33,14 @@ describe('app', () => {
         multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
         checksum:
           '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-        mrenclave: {
+        mrenclave: JSON.stringify({
           framework: 'SCONE',
           version: 'v5',
           entrypoint: 'python /app/app.py',
           heapSize: 1073741824,
           fingerprint:
             'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
-        },
+        }),
       };
       const { address } = await iexec.app.deployApp(app);
       const res = await readOnlyIExec.app.showApp(address);
@@ -51,7 +51,7 @@ describe('app', () => {
       expect(res.app.appType).toBe(app.type);
       expect(res.app.appMultiaddr).toBe(app.multiaddr);
       expect(res.app.appChecksum).toBe(app.checksum);
-      expect(res.app.appMREnclave).toBe(JSON.stringify(app.mrenclave));
+      expect(res.app.appMREnclave).toBe(app.mrenclave);
     });
 
     test('fails if the app is not deployed', async () => {
@@ -78,14 +78,6 @@ describe('app', () => {
         multiaddr: 'registry.hub.docker.com/iexechub/vanityeth:1.1.1',
         checksum:
           '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
-        mrenclave: {
-          framework: 'SCONE',
-          version: 'v5',
-          entrypoint: 'python /app/app.py',
-          heapSize: 1073741824,
-          fingerprint:
-            'eca3ace86f1e8a5c47123c8fd271319e9eb25356803d36666dc620f30365c0c1',
-        },
       };
       const { address } = await iexec.app.deployApp(app);
       const res = await readOnlyIExec.app.showUserApp(0, wallet.address);
@@ -96,7 +88,7 @@ describe('app', () => {
       expect(res.app.appType).toBe(app.type);
       expect(res.app.appMultiaddr).toBe(app.multiaddr);
       expect(res.app.appChecksum).toBe(app.checksum);
-      expect(res.app.appMREnclave).toBe(JSON.stringify(app.mrenclave));
+      expect(res.app.appMREnclave).toBe('');
     });
 
     test('fails if the app is not deployed', async () => {

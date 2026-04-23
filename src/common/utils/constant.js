@@ -27,7 +27,6 @@ export const NULL_DATASETORDER = {
 };
 
 export const TEE_FRAMEWORKS = {
-  SCONE: 'scone',
   TDX: 'tdx',
 };
 

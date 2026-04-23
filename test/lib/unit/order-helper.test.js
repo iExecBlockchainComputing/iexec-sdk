@@ -19,15 +19,5 @@ describe('order-helper', () => {
       const framework = await resolveTeeFrameworkFromTag(['tee']);
       expect(framework).toBeUndefined();
     });
-
-    test('returns SCONE for tag [tee, scone]', async () => {
-      const framework = await resolveTeeFrameworkFromTag(['tee', 'scone']);
-      expect(framework).toBe(TEE_FRAMEWORKS.SCONE);
-    });
-
-    test('returns GRAMINE for tag [tee, gramine]', async () => {
-      const framework = await resolveTeeFrameworkFromTag(['tee', 'gramine']);
-      expect(framework).toBe(TEE_FRAMEWORKS.GRAMINE);
-    });
   });
 });

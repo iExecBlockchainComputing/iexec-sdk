@@ -407,9 +407,7 @@ The `chain.json` file, located in every iExec project, describes the parameters 
     "dev": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": {
-        "scone": "http://localhost:5000"
-      },
+      "sms": "http://localhost:5000",
       "ipfsGateway": "http://localhost:8080",
       "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca"
     },

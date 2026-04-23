@@ -12,29 +12,6 @@ import {
   TxHash,
 } from '../common/types.js';
 
-export interface SconeMREnclave {
-  /**
-   * TEE framework name 'SCONE'
-   */
-  framework: string;
-  /**
-   * app entrypoint path
-   */
-  entrypoint: string;
-  /**
-   * dedicated memory in bytes
-   */
-  heapSize: number;
-  /**
-   * framework's protocol version
-   */
-  version: string;
-  /**
-   * app tee fingerprint
-   */
-  fingerprint: string;
-}
-
 export interface AppDeploymentArgs {
   /**
    * the app owner
@@ -57,9 +34,9 @@ export interface AppDeploymentArgs {
    */
   checksum: Bytes32;
   /**
-   * optional for TEE apps only, specify the TEE protocol to use
+   * @deprecated used for legacy TEE apps only, should not be set for modern TEE apps
    */
-  mrenclave?: SconeMREnclave;
+  mrenclave?: string;
 }
 /**
  * IExec app
@@ -86,7 +63,7 @@ export interface App {
    */
   appChecksum: Bytes32;
   /**
-   * for TEE apps only, specify the TEE protocol to use
+   * used for legacy TEE apps only, should be an empty string for modern TEE apps
    */
   appMREnclave: string;
   /**
