@@ -31,7 +31,6 @@ import {
   tagSchema,
   positiveStrictIntSchema,
   signedDatasetorderBulkSchema,
-  objMrenclaveSchema,
 } from '../utils/validator.js';
 import { showApp } from '../protocol/registries.js';
 import { add } from '../utils/ipfs.js';
@@ -40,23 +39,8 @@ const debug = Debug('iexec:execution:order-helper');
 
 export const resolveTeeFrameworkFromTag = async (tag) => {
   const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
-  if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.SCONE])) {
-    return TEE_FRAMEWORKS.SCONE;
-  }
   if (checkActiveBitInTag(vTag, TAG_MAP[TEE_FRAMEWORKS.TDX])) {
     return TEE_FRAMEWORKS.TDX;
-  }
-  return undefined;
-};
-
-const resolveTeeFrameworkFromApp = async (app) => {
-  if (app.appMREnclave) {
-    try {
-      const mrenclave = await objMrenclaveSchema().validate(app.appMREnclave);
-      return mrenclave.framework;
-    } catch (err) {
-      debug('resolveTeeFrameworkFromApp()', err);
-    }
   }
   return undefined;
 };
@@ -192,21 +176,14 @@ export const checkDatasetRequirements = async (
 export const checkAppRequirements = async (
   { contracts = throwIfMissing() } = throwIfMissing(),
   apporder = throwIfMissing(),
-  { tagOverride } = {},
 ) => {
   const vApporder = await apporderSchema().validate(apporder);
-  const { tag, app } = vApporder;
-  const tagTeeFramework = await resolveTeeFrameworkFromTag(
-    tagOverride ? await tagSchema().validate(tagOverride) : tag,
-  );
-  const appTeeFramework = await showApp(contracts, app).then((res) =>
-    resolveTeeFrameworkFromApp(res.app),
-  );
-  const tagMatchesApp =
-    appTeeFramework === tagTeeFramework ||
-    (tagTeeFramework === TEE_FRAMEWORKS.TDX && appTeeFramework === undefined);
-  if (!tagMatchesApp) {
-    throw new Error('Tag mismatch the TEE framework specified by app');
+  const { app } = vApporder;
+  const registeredApp = await showApp(contracts, app);
+  if (registeredApp.app.appMREnclave) {
+    throw new Error(
+      `App ${app} has an MREnclave, which is no longer supported`,
+    );
   }
 };
 

@@ -13,5 +13,5 @@ task tag used to specify the runtime
 example:
 ```js
 const gpuTag = ['gpu'];
-const sconeTeeTag = ['tee', 'scone'];
+const tdxTeeTag = ['tee', 'tdx'];
 ```

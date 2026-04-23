@@ -203,7 +203,7 @@ export const getSalt = () => hexlify(randomBytes(32));
 
 export const TAG_MAP = {
   tee: 0,
-  [TEE_FRAMEWORKS.SCONE]: 1,
+  scone: 1, // previously supported tee framework
   gramine: 2, // previously supported tee framework
   [TEE_FRAMEWORKS.TDX]: 3,
   gpu: 8,

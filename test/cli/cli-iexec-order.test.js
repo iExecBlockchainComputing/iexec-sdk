@@ -129,21 +129,21 @@ describe('iexec order', () => {
     expect(res.requestorder.app).toBeDefined();
 
     await editRequestorder({
-      tag: ['tee', 'scone'],
+      tag: ['tee', 'tdx'],
     });
     await editWorkerpoolorder({
       tag: ['tee'],
     });
-    await editApporder({ tag: ['tee', 'scone'] });
-    await editDatasetorder({ tag: ['tee', 'scone'] });
+    await editApporder({ tag: ['tdx'] });
+    await editDatasetorder({ tag: ['tee', 'tdx'] });
     const failRes = await execAsync(`${iexecPath} order sign --raw`).then(
       JSON.parse,
     );
     expect(failRes.ok).toBe(false);
     expect(failRes.fail).toStrictEqual([
-      'apporder: App requirements check failed: Tag mismatch the TEE framework specified by app (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)',
+      "apporder: 'tdx' tag must be used with 'tee' tag",
       `datasetorder: Dataset requirements check failed: Dataset encryption key is not set for dataset ${userDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
-      "workerpoolorder: 'tee' tag must be used with a tee framework ('scone'|'tdx')",
+      "workerpoolorder: 'tee' tag must be used with a tee framework ('tdx')",
       `requestorder: Request requirements check failed: Dataset encryption key is not set for dataset ${userDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
     ]);
   });
