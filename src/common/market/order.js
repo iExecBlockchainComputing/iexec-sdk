@@ -607,7 +607,7 @@ const getMatchableVolume = async (
     // app tag check
     const teeAppRequired = checkActiveBitInTag(
       sumTags([vRequestOrder.tag, stripTeeFrameworkFromTag(vDatasetOrder.tag)]),
-      1,
+      TAG_MAP.tee,
     );
     if (teeAppRequired && !checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
       throw new Error('Missing tag [tee] in apporder');
@@ -910,7 +910,10 @@ export const createDatasetorder = async ({
   dataset: await addressSchema().label('dataset').required().validate(dataset),
   datasetprice: await nRlcAmountSchema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
-  tag: await tagSchema({ allowAgnosticTee: true }).validate(tag),
+  tag: await tagSchema({
+    allowAgnosticTee: true,
+    ignoreLegacyTeeFramework: true,
+  }).validate(tag),
   apprestrict: await addressSchema().validate(apprestrict),
   workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
   requesterrestrict: await addressSchema().validate(requesterrestrict),

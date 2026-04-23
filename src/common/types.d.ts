@@ -112,7 +112,7 @@ export type HumanSingleTag = string;
  * example:
  * ```js
  * const gpuTag = ['gpu'];
- * const sconeTeeTag = ['tee', 'scone'];
+ * const tdxTeeTag = ['tee', 'tdx'];
  * ```
  */
 export type Tag = Bytes32 | HumanSingleTag[];
@@ -126,8 +126,3 @@ export type Tag = Bytes32 | HumanSingleTag[];
  * ```
  */
 export type Multiaddress = string | Buffer;
-
-/**
- * Trusted Execution Environment name
- */
-export type TeeFramework = 'scone' | 'tdx';

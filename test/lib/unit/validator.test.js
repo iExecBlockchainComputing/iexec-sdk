@@ -17,7 +17,6 @@ import {
   objParamsSchema,
   base64Encoded256bitsKeySchema,
   fileBufferSchema,
-  teeFrameworkSchema,
   addressOrAnySchema,
   signedDatasetorderBulkSchema,
 } from '../../../src/common/utils/validator.js';
@@ -757,10 +756,10 @@ describe('[tagSchema]', () => {
   test('bytes 32 tags', async () => {
     await expect(
       tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000103',
+        '0x0000000000000000000000000000000000000000000000000000000000000109',
       ),
     ).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000103',
+      '0x0000000000000000000000000000000000000000000000000000000000000109',
     );
   });
   test('unknown bytes 32 tag is allowed', async () => {
@@ -773,8 +772,8 @@ describe('[tagSchema]', () => {
     );
   });
   test('array of tags', async () => {
-    await expect(tagSchema().validate(['tee', 'scone', 'gpu'])).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000103',
+    await expect(tagSchema().validate(['tee', 'tdx', 'gpu'])).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000109',
     );
   });
   test('empty tag', async () => {
@@ -788,8 +787,8 @@ describe('[tagSchema]', () => {
     );
   });
   test('comma separated tags', async () => {
-    await expect(tagSchema().validate('gpu,tee,scone')).resolves.toBe(
-      '0x0000000000000000000000000000000000000000000000000000000000000103',
+    await expect(tagSchema().validate('gpu,tee,tdx')).resolves.toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000109',
     );
   });
   test('unknown tag in array', async () => {
@@ -805,7 +804,7 @@ describe('[tagSchema]', () => {
   test('invalid tee tag', async () => {
     await expect(tagSchema().validate('tee')).rejects.toThrow(
       new ValidationError(
-        "'tee' tag must be used with a tee framework ('scone'|'tdx')",
+        "'tee' tag must be used with a tee framework ('tdx')",
       ),
     );
     await expect(
@@ -814,18 +813,8 @@ describe('[tagSchema]', () => {
       ),
     ).rejects.toThrow(
       new ValidationError(
-        "'tee' tag must be used with a tee framework ('scone'|'tdx')",
+        "'tee' tag must be used with a tee framework ('tdx')",
       ),
-    );
-    await expect(tagSchema().validate('scone')).rejects.toThrow(
-      new ValidationError("'scone' tag must be used with 'tee' tag"),
-    );
-    await expect(
-      tagSchema().validate(
-        '0x0000000000000000000000000000000000000000000000000000000000000002',
-      ),
-    ).rejects.toThrow(
-      new ValidationError("'scone' tag must be used with 'tee' tag"),
     );
     await expect(tagSchema().validate('tdx')).rejects.toThrow(
       new ValidationError("'tdx' tag must be used with 'tee' tag"),
@@ -844,14 +833,14 @@ describe('[tagSchema]', () => {
       '0x0000000000000000000000000000000000000000000000000000000000000001',
     );
     await expect(tagSchema().validate('tee,scone,tdx')).rejects.toThrow(
-      new ValidationError("tee framework tags are exclusive ('scone'|'tdx')"),
+      new ValidationError("Unsupported legacy TEE framework tag ('scone')"),
     );
     await expect(
       tagSchema().validate(
-        '0x000000000000000000000000000000000000000000000000000000000000000b',
+        '0x0000000000000000000000000000000000000000000000000000000000000003',
       ),
     ).rejects.toThrow(
-      new ValidationError("tee framework tags are exclusive ('scone'|'tdx')"),
+      new ValidationError("Unsupported legacy TEE framework tag ('scone')"),
     );
     const teeTdxTag = await tagSchema().validate(['tee', 'tdx']);
     expect(teeTdxTag).toBe(
@@ -981,20 +970,7 @@ describe('[fileBufferSchema]', () => {
 });
 
 describe('[mrenclaveSchema]', () => {
-  test('valid SCONE obj', async () => {
-    const obj = {
-      framework: 'SCONE',
-      version: 'v5',
-      entrypoint: '/app/helloworld',
-      heapSize: 1073741824,
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-    };
-    await expect(mrenclaveSchema().validate(obj)).resolves.toEqual(
-      Buffer.from(JSON.stringify(obj), 'utf8'),
-    );
-  });
-  test('valid string', async () => {
+  test('any string', async () => {
     const str = JSON.stringify({
       framework: 'SCONE',
       version: 'v5',
@@ -1007,7 +983,7 @@ describe('[mrenclaveSchema]', () => {
       Buffer.from(str, 'utf8'),
     );
   });
-  test('valid bytes', async () => {
+  test('any bytes', async () => {
     const bytes = Buffer.from(
       JSON.stringify({
         framework: 'SCONE',
@@ -1041,7 +1017,7 @@ describe('[mrenclaveSchema]', () => {
   });
   test('throw with null', async () => {
     await expect(mrenclaveSchema().validate(null)).rejects.toThrow(
-      new ValidationError('this is not a valid mrenclave'),
+      new ValidationError('this cannot be null'),
     );
   });
   test('throw with number', async () => {
@@ -1052,129 +1028,6 @@ describe('[mrenclaveSchema]', () => {
   test('throw with boolean', async () => {
     await expect(mrenclaveSchema().validate(false)).rejects.toThrow(
       new ValidationError('this is not a valid mrenclave'),
-    );
-  });
-  test('throw when unexpected key is found in obj', async () => {
-    const obj = {
-      framework: 'SCONE',
-      version: 'v5',
-      entrypoint: '/app/helloworld',
-      heapSize: 1073741824,
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-      foo: 'bar',
-    };
-    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('Unknown key "foo" in mrenclave'),
-    );
-  });
-  test('throw when unexpected key is found in JSON string', async () => {
-    const str = JSON.stringify({
-      framework: 'SCONE',
-      version: 'v5',
-      entrypoint: '/app/helloworld',
-      heapSize: 1073741824,
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-      foo: 'bar',
-    });
-    await expect(mrenclaveSchema().validate(str)).rejects.toThrow(
-      new ValidationError('Unknown key "foo" in mrenclave'),
-    );
-  });
-  test('throw when unexpected key is found in decoded bytes', async () => {
-    const bytes = Buffer.from(
-      JSON.stringify({
-        framework: 'SCONE',
-        version: 'v5',
-        entrypoint: '/app/helloworld',
-        heapSize: 1073741824,
-        fingerprint:
-          '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-        foo: 'bar',
-      }),
-      'utf8',
-    );
-    await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
-      new ValidationError('Unknown key "foo" in mrenclave'),
-    );
-  });
-  test('throw when a key is missing in obj', async () => {
-    const obj = {
-      version: 'v5',
-      entrypoint: '/app/helloworld',
-      heapSize: 1073741824,
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-    };
-    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('framework is a required field'),
-    );
-  });
-  test('throw when a key is missing in JSON string', async () => {
-    const str = JSON.stringify({
-      framework: 'SCONE',
-      entrypoint: '/app/helloworld',
-      heapSize: 1073741824,
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-    });
-    await expect(mrenclaveSchema().validate(str)).rejects.toThrow(
-      new ValidationError('version is a required field'),
-    );
-  });
-  test('throw when a key is missing in decoded bytes', async () => {
-    const bytes = Buffer.from(
-      JSON.stringify({
-        framework: 'SCONE',
-        version: 'v5',
-        heapSize: 1073741824,
-        fingerprint:
-          '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-      }),
-      'utf8',
-    );
-    await expect(mrenclaveSchema().validate(bytes)).rejects.toThrow(
-      new ValidationError('entrypoint is a required field'),
-    );
-  });
-  test('throw when framework is not a valid TEE framework', async () => {
-    const obj = {
-      framework: 'FOO',
-      version: 'v5',
-      entrypoint: '/app/helloworld',
-      heapSize: 1073741824,
-      fingerprint:
-        '5036854f3f108465726a1374430ad0963b72a27a0e83dfea2ca11dae4cdbdf7d',
-    };
-    await expect(mrenclaveSchema().validate(obj)).rejects.toThrow(
-      new ValidationError('framework is not a valid TEE framework'),
-    );
-  });
-});
-
-describe('[teeFrameworkSchema]', () => {
-  test('allow known TEE frameworks', async () => {
-    await Promise.all(
-      Object.values(TEE_FRAMEWORKS).map(async (name) => {
-        await expect(teeFrameworkSchema().validate(name)).resolves.toBe(name);
-        await expect(
-          teeFrameworkSchema().validate(name.toUpperCase()),
-        ).resolves.toBe(name);
-      }),
-    );
-  });
-  test('allow undefined', async () => {
-    await expect(teeFrameworkSchema().validate()).resolves.toBe(undefined);
-  });
-  test('throw with unknown TEE framework', async () => {
-    await expect(teeFrameworkSchema().validate('foo')).rejects.toThrow(
-      'this is not a valid TEE framework',
-    );
-  });
-  test('throw with empty string', async () => {
-    await expect(teeFrameworkSchema().validate('')).rejects.toThrow(
-      'this is not a valid TEE framework',
     );
   });
 });

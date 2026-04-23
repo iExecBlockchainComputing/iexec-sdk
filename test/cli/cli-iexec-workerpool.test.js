@@ -16,6 +16,7 @@ import {
   iexecPath,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
+import { encodeTag } from '../../src/lib/utils.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
@@ -164,7 +165,7 @@ describe('iexec workerpool', () => {
 
     test('from workerpool address with options', async () => {
       const res = await runIExecCliRaw(
-        `${iexecPath} workerpool publish ${userFirstDeployedWorkerpoolAddress} --price 0.000000002 RLC --volume 5 --tag tee,scone --trust 20 --category 1 --force`,
+        `${iexecPath} workerpool publish ${userFirstDeployedWorkerpoolAddress} --price 0.000000002 RLC --volume 5 --tag tee,tdx --trust 20 --category 1 --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.orderHash).toBeDefined();
@@ -177,7 +178,7 @@ describe('iexec workerpool', () => {
         workerpool: userFirstDeployedWorkerpoolAddress,
         workerpoolprice: 2,
         volume: 5,
-        tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+        tag: encodeTag(['tee', 'tdx']),
         trust: 20,
         category: 1,
         apprestrict: NULL_ADDRESS,

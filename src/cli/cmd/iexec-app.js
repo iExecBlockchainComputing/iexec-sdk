@@ -15,12 +15,11 @@ import {
   paramsEncryptResultSchema,
   paramsRequesterSecretsSchema,
   nRlcAmountSchema,
-  teeFrameworkSchema,
   datasetorderSchema,
   apporderSchema,
   requestorderSchema,
 } from '../../common/utils/validator.js';
-import { app, sconeTeeApp } from '../utils/templates.js';
+import { app } from '../utils/templates.js';
 import {
   deployApp,
   showApp,
@@ -104,7 +103,6 @@ import {
   info,
   renderTasksStatus,
   getPropertyFromChain,
-  optionCreator,
 } from '../utils/cli-helper.js';
 import {
   loadIExecConf,
@@ -131,40 +129,26 @@ cli
 const init = cli.command('init');
 addGlobalOptions(init);
 addWalletLoadOptions(init);
-init
-  .addOption(optionCreator.teeFramework())
-  .description(desc.initObj(objName))
-  .action(async (opts) => {
-    await checkUpdate(opts);
-    const spinner = Spinner(opts);
-    try {
-      const walletOptions = computeWalletLoadOptions(opts);
-      const keystore = Keystore({ ...walletOptions, isSigner: false });
-      const [address] = await keystore.accounts();
-
-      const teeFramework = await teeFrameworkSchema().validate(
-        opts.teeFramework,
-      );
-      let teeTemplate = {};
-      if (teeFramework === TEE_FRAMEWORKS.SCONE) {
-        teeTemplate = sconeTeeApp;
-      }
-      if (teeFramework === TEE_FRAMEWORKS.TDX) {
-        teeTemplate = app;
-      }
-      const { saved, fileName } = await initObj(objName, {
-        overwrite: { ...teeTemplate, owner: address },
-      });
-      spinner.succeed(
-        `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
-          saved,
-        )}`,
-        { raw: { app: saved } },
-      );
-    } catch (error) {
-      handleError(error, cli, opts);
-    }
-  });
+init.description(desc.initObj(objName)).action(async (opts) => {
+  await checkUpdate(opts);
+  const spinner = Spinner(opts);
+  try {
+    const walletOptions = computeWalletLoadOptions(opts);
+    const keystore = Keystore({ ...walletOptions, isSigner: false });
+    const [address] = await keystore.accounts();
+    const { saved, fileName } = await initObj(objName, {
+      overwrite: { ...app, owner: address },
+    });
+    spinner.succeed(
+      `Saved default ${objName} in "${fileName}", you can edit it:${pretty(
+        saved,
+      )}`,
+      { raw: { app: saved } },
+    );
+  } catch (error) {
+    handleError(error, cli, opts);
+  }
+});
 
 const deploy = cli.command('deploy');
 addGlobalOptions(deploy);
@@ -925,18 +909,19 @@ run
               .validate(requestorderToSign)
           ).tag,
           (await apporderSchema().label('apporder').validate(apporder)).tag,
-          (
-            await datasetorderSchema()
-              .label('datasetorder')
-              .validate(datasetorder)
-          ).tag,
+          stripTeeFrameworkFromTag(
+            (
+              await datasetorderSchema()
+                .label('datasetorder')
+                .validate(datasetorder)
+            ).tag,
+          ),
         ]);
         await checkAppRequirements(
           {
             contracts: chain.contracts,
           },
           apporder,
-          { tagOverride: resolvedTag },
         ).catch((e) => {
           throw new Error(
             `App requirements check failed: ${

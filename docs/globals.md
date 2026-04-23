@@ -56,6 +56,5 @@
 - [Tag](type-aliases/Tag.md)
 - [Taskid](type-aliases/Taskid.md)
 - [TaskIndex](type-aliases/TaskIndex.md)
-- [TeeFramework](type-aliases/TeeFramework.md)
 - [TxHash](type-aliases/TxHash.md)
 - [WeiAmount](type-aliases/WeiAmount.md)
