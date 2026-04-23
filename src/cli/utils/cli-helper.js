@@ -1,16 +1,12 @@
 import { isAbsolute, join } from 'node:path';
 import Debug from 'debug';
-import { Option } from 'commander';
 import Ora from 'ora';
 import inquirer from 'inquirer';
 import { render } from 'prettyjson';
 import checkForUpdate from 'update-check';
 import isDocker from 'is-docker';
 import { positiveStrictIntSchema } from '../../common/utils/validator.js';
-import {
-  TEE_FRAMEWORKS,
-  STORAGE_PROVIDERS,
-} from '../../common/utils/constant.js';
+import { STORAGE_PROVIDERS } from '../../common/utils/constant.js';
 import packageJSON, { version } from '../../common/generated/sdk/package.js';
 
 const debug = Debug('help');
@@ -376,14 +372,6 @@ export const option = {
     '--requester-strict',
     'fetch orders created strictly for the specified requester',
   ],
-};
-
-export const optionCreator = {
-  teeFramework: () =>
-    new Option(
-      `--tee-framework <name>`,
-      'specify the TEE framework to use',
-    ).choices(Object.values(TEE_FRAMEWORKS)),
 };
 
 export const orderOption = {

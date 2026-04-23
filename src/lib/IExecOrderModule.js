@@ -309,7 +309,6 @@ export default class IExecOrderModule extends IExecModule {
               contracts,
             },
             apporder,
-            { tagOverride: resolvedTag },
           ).then(() => apporder),
           datasetorder: await checkDatasetRequirements(
             {

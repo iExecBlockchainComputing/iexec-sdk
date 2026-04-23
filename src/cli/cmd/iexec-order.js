@@ -519,7 +519,6 @@ fill
             contracts: chain.contracts,
           },
           apporder,
-          { tagOverride: resolvedTag },
         ).catch((e) => {
           throw new Error(
             `App requirements check failed: ${

@@ -1,5 +1,5 @@
 import { expect } from '@jest/globals';
-import { NULL_ADDRESS, TEE_FRAMEWORKS, getId, sleep } from '../test-utils.js';
+import { NULL_ADDRESS, getId, sleep } from '../test-utils.js';
 export { getTestConfig, getTestConfigOptions } from '../test-config-utils.js';
 
 export const ONE_ETH = 10n ** 18n;
@@ -17,14 +17,14 @@ export const deployRandomApp = async (iexec, { owner, teeFramework } = {}) =>
     checksum:
       '0x00f51494d7a42a3c1c43464d9f09e06b2a99968e3b978f6cd11ab3410b7bcd14',
     mrenclave:
-      teeFramework === TEE_FRAMEWORKS.SCONE
-        ? {
-            framework: teeFramework,
+      teeFramework === 'scone' // keep to test legacy scone app detection
+        ? JSON.stringify({
+            framework: 'SCONE',
             version: 'v1',
             fingerprint: 'fingerprint',
             entrypoint: 'entrypoint.sh',
             heapSize: 4096,
-          }
+          })
         : undefined,
   });
 

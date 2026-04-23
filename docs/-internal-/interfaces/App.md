@@ -22,7 +22,7 @@ app image digest
 
 > **appMREnclave**: `string`
 
-for TEE apps only, specify the TEE protocol to use
+used for legacy TEE apps only, should be an empty string for modern TEE apps
 
 ***
 

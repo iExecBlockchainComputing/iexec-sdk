@@ -30,14 +30,7 @@ const posIntRegex = /^\d+$/;
 
 const posStrictIntRegex = /^[1-9]\d*$/;
 
-const teeFrameworksList = Object.values(TEE_FRAMEWORKS);
-
 export const stringSchema = string;
-
-export const teeFrameworkSchema = () =>
-  string()
-    .transform((name) => name.toLowerCase())
-    .oneOf(teeFrameworksList, '${path} is not a valid TEE framework');
 
 export const stringNumberSchema = ({ message } = {}) =>
   string()
@@ -327,8 +320,12 @@ export const paramsSchema = () =>
  * tag validation schema
  * @param {*} options
  * @param {boolean} options.allowAgnosticTee - allow 'tee' tag without tee framework tag (use for datasetorders and requestorders that don't need to specify tee framework)
+ * @param {boolean} options.ignoreLegacyTeeFramework - ignore TEE framework validation (use for legacy TEE framework tags)
  */
-export const tagSchema = ({ allowAgnosticTee = false } = {}) =>
+export const tagSchema = ({
+  allowAgnosticTee = false,
+  ignoreLegacyTeeFramework = false,
+} = {}) =>
   mixed()
     .transform((value) => {
       if (Array.isArray(value)) {
@@ -376,6 +373,18 @@ export const tagSchema = ({ allowAgnosticTee = false } = {}) =>
       (value, { createError }) => {
         if (value instanceof Error) {
           return true;
+        }
+        if (!ignoreLegacyTeeFramework) {
+          const unsupportedTeeFrameworks = ['gramine', 'scone'].filter(
+            (teeFramework) => checkActiveBitInTag(value, TAG_MAP[teeFramework]),
+          );
+          if (unsupportedTeeFrameworks.length > 0) {
+            throw new Error(
+              `Unsupported legacy TEE framework tag (${unsupportedTeeFrameworks
+                .map((name) => `'${name}'`)
+                .join(', ')})`,
+            );
+          }
         }
         const isTee = checkActiveBitInTag(value, TAG_MAP.tee);
         const teeFrameworks = Object.values(TEE_FRAMEWORKS).filter(
@@ -445,7 +454,10 @@ export const datasetorderSchema = () =>
       dataset: addressSchema().required(),
       datasetprice: nRlcAmountSchema().required(),
       volume: uint256Schema().required(),
-      tag: tagSchema({ allowAgnosticTee: true }).required(),
+      tag: tagSchema({
+        allowAgnosticTee: true,
+        ignoreLegacyTeeFramework: true,
+      }).required(),
       apprestrict: addressSchema().required(),
       workerpoolrestrict: addressSchema().required(),
       requesterrestrict: addressSchema().required(),
@@ -482,7 +494,10 @@ export const signedDatasetorderBulkSchema = () =>
           (value) => parseInt(value) >= DATASET_INFINITE_VOLUME - 1, // (DATASET_INFINITE_VOLUME - 1) is accepted for compatibility with already created orders
         )
         .required(),
-      tag: tagSchema({ allowAgnosticTee: true }).required(),
+      tag: tagSchema({
+        allowAgnosticTee: true,
+        ignoreLegacyTeeFramework: true,
+      }).required(),
       apprestrict: addressSchema().required(),
       workerpoolrestrict: addressSchema().required(),
       requesterrestrict: addressSchema().required(),
@@ -562,67 +577,16 @@ export const multiaddressSchema = () =>
     throw new ValidationError('${originalValue} is not a valid multiaddr');
   });
 
-export const objMrenclaveSchema = () =>
-  object({
-    framework: teeFrameworkSchema().required(),
-    version: string().required(),
-    fingerprint: string().required(),
-    entrypoint: string().required(),
-    heapSize: positiveIntSchema().required(),
-  })
-    .json()
-    .noUnknown(true, 'Unknown key "${unknown}" in mrenclave');
-
 export const mrenclaveSchema = () =>
   mixed()
     .transform((value) => {
-      if (value instanceof Uint8Array) {
-        return value;
-      }
       if (typeof value === 'string') {
         return utf8ToBuffer(value);
       }
-      if (typeof value === 'object') {
-        return utf8ToBuffer(JSON.stringify(value));
-      }
-      return utf8ToBuffer('');
+      return value;
     })
-    .test(
-      'is-valid-mrenclave',
-      '${path} is not a valid mrenclave',
-      async (value, { originalValue, createError }) => {
-        let stringValue;
-        let objValue;
-        if (originalValue instanceof Uint8Array) {
-          try {
-            stringValue = Buffer.from(originalValue).toString();
-          } catch {
-            return false;
-          }
-        } else if (typeof originalValue === 'string') {
-          stringValue = originalValue;
-        } else if (originalValue && typeof originalValue === 'object') {
-          objValue = originalValue;
-        } else if (originalValue !== undefined) {
-          return false;
-        }
-        try {
-          if (stringValue !== undefined && stringValue !== '') {
-            objValue = JSON.parse(stringValue);
-          }
-          if (objValue) {
-            await objMrenclaveSchema().validate(objValue, {
-              stripUnknown: false,
-            });
-          }
-          return true;
-        } catch (e) {
-          if (e instanceof ValidationError) {
-            return createError({ message: e.message });
-          }
-          return false;
-        }
-      },
+    .test('is-buffer', '${path} is not a valid mrenclave', (value) =>
+      Buffer.isBuffer(value),
     )
     .default(() => utf8ToBuffer(''));
 
