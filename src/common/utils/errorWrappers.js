@@ -17,8 +17,8 @@ const getMessage = (err) => {
 export const wrapCall = async (promise) => {
   try {
     return await promise;
-  } catch (err) {
-    throw new Web3ProviderCallError(getMessage(err), err);
+  } catch (cause) {
+    throw new Web3ProviderCallError(getMessage(cause), { cause });
   }
 };
 
@@ -27,16 +27,16 @@ export const wrapWait = wrapCall;
 export const wrapSend = async (promise) => {
   try {
     return await promise;
-  } catch (err) {
-    throw new Web3ProviderSendError(getMessage(err), err);
+  } catch (cause) {
+    throw new Web3ProviderSendError(getMessage(cause), { cause });
   }
 };
 
 export const wrapSign = async (promise) => {
   try {
     return await promise;
-  } catch (err) {
-    throw new Web3ProviderSignMessageError(getMessage(err), err);
+  } catch (cause) {
+    throw new Web3ProviderSignMessageError(getMessage(cause), { cause });
   }
 };
 

@@ -8,7 +8,6 @@ export default class IExecSecretModule extends IExecModule {
 
     this.checkRequesterSecretExists = async (address, secretName) =>
       checkRequesterSecretExists(
-        await this.config.resolveContractsClient(),
         await this.config.resolveSmsURL(),
         address,
         secretName,

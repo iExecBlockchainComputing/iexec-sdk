@@ -5,7 +5,6 @@ import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
 import {
   Address,
-  Addressish,
   BNish,
   Bytes,
   Bytes32,
@@ -254,10 +253,6 @@ export interface RequestorderParams {
    */
   iexec_result_storage_provider?: string;
   /**
-   * result proxy url
-   */
-  iexec_result_storage_proxy?: string;
-  /**
    * bulk CID for the request
    *
    * default none
@@ -369,7 +364,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   createApporder(overrides: {
-    app: Addressish;
+    app: Address;
     /**
      * price per task
      *
@@ -393,19 +388,19 @@ export default class IExecOrderModule extends IExecModule {
      *
      * default no restrict
      */
-    datasetrestrict?: Addressish;
+    datasetrestrict?: Address;
     /**
      * restrict usage to a specific workerpool
      *
      * default no restrict
      */
-    workerpoolrestrict?: Addressish;
+    workerpoolrestrict?: Address;
     /**
      * restrict usage to a specific requester
      *
      * default no restrict
      */
-    requesterrestrict?: Addressish;
+    requesterrestrict?: Address;
   }): Promise<ApporderTemplate>;
   /**
    * create a datasetorder template with specified parameters
@@ -416,7 +411,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   createDatasetorder(overrides: {
-    dataset: Addressish;
+    dataset: Address;
     /**
      * price per task
      *
@@ -440,19 +435,19 @@ export default class IExecOrderModule extends IExecModule {
      *
      * default no restrict
      */
-    apprestrict?: Addressish;
+    apprestrict?: Address;
     /**
      * restrict usage to a specific workerpool
      *
      * default no restrict
      */
-    workerpoolrestrict?: Addressish;
+    workerpoolrestrict?: Address;
     /**
      * restrict usage to a specific requester
      *
      * default no restrict
      */
-    requesterrestrict?: Addressish;
+    requesterrestrict?: Address;
   }): Promise<DatasetorderTemplate>;
   /**
    * create a workerpoolorder template with specified parameters
@@ -463,7 +458,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   createWorkerpoolorder(overrides: {
-    workerpool: Addressish;
+    workerpool: Address;
     /**
      * computation category
      */
@@ -497,19 +492,19 @@ export default class IExecOrderModule extends IExecModule {
      *
      * default no restrict
      */
-    apprestrict?: Addressish;
+    apprestrict?: Address;
     /**
      * restrict usage to a specific dataset
      *
      * default no restrict
      */
-    datasetrestrict?: Addressish;
+    datasetrestrict?: Address;
     /**
      * restrict usage to a specific requester
      *
      * default no restrict
      */
-    requesterrestrict?: Addressish;
+    requesterrestrict?: Address;
   }): Promise<WorkerpoolorderTemplate>;
   /**
    * create a requestorder template with specified parameters
@@ -527,7 +522,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * app to run
      */
-    app: Addressish;
+    app: Address;
     /**
      * computation category
      */
@@ -537,13 +532,13 @@ export default class IExecOrderModule extends IExecModule {
      *
      * default none
      */
-    dataset?: Addressish;
+    dataset?: Address;
     /**
      * run one specified workerpool
      *
      * default run on any workerpool
      */
-    workerpool?: Addressish;
+    workerpool?: Address;
     /**
      * execution parameters
      */
@@ -594,13 +589,13 @@ export default class IExecOrderModule extends IExecModule {
      *
      * default connected wallet address
      */
-    requester?: Addressish;
+    requester?: Address;
     /**
      * beneficiary
      *
      * default connected wallet address
      */
-    beneficiary?: Addressish;
+    beneficiary?: Address;
   }): Promise<RequestorderTemplate>;
   /**
    * **ONLY APP OWNER**
@@ -906,7 +901,7 @@ export default class IExecOrderModule extends IExecModule {
    * console.log('published order hash:', orderHash);
    * ```
    */
-  unpublishLastApporder(appAddress: Addressish): Promise<OrderHash>;
+  unpublishLastApporder(appAddress: Address): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY DATASETORDER SIGNER**
    *
@@ -920,7 +915,7 @@ export default class IExecOrderModule extends IExecModule {
    * console.log('unpublished order hash:', orderHash);
    * ```
    */
-  unpublishLastDatasetorder(datasetAddress: Addressish): Promise<OrderHash>;
+  unpublishLastDatasetorder(datasetAddress: Address): Promise<OrderHash>;
   /**
    * ****SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
    *
@@ -934,9 +929,7 @@ export default class IExecOrderModule extends IExecModule {
    * console.log('unpublished order hash:', orderHash);
    * ```
    */
-  unpublishLastWorkerpoolorder(
-    workerpoolAddress: Addressish,
-  ): Promise<OrderHash>;
+  unpublishLastWorkerpoolorder(workerpoolAddress: Address): Promise<OrderHash>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**
    *
@@ -964,7 +957,7 @@ export default class IExecOrderModule extends IExecModule {
    * console.log('published orders count:', orderHashes.length);
    * ```
    */
-  unpublishAllApporders(appAddress: Addressish): Promise<OrderHash[]>;
+  unpublishAllApporders(appAddress: Address): Promise<OrderHash[]>;
   /**
    * **SIGNER REQUIRED, ONLY DATASETORDER SIGNER**
    *
@@ -978,7 +971,7 @@ export default class IExecOrderModule extends IExecModule {
    * console.log('unpublished orders count:', orderHashes.length);
    * ```
    */
-  unpublishAllDatasetorders(datasetAddress: Addressish): Promise<OrderHash[]>;
+  unpublishAllDatasetorders(datasetAddress: Address): Promise<OrderHash[]>;
   /**
    * **SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
    *
@@ -993,7 +986,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```
    */
   unpublishAllWorkerpoolorders(
-    workerpoolAddress: Addressish,
+    workerpoolAddress: Address,
   ): Promise<OrderHash[]>;
   /**
    * **SIGNER REQUIRED, ONLY REQUESTER**

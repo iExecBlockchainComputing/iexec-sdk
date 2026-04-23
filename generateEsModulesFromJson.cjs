@@ -36,10 +36,6 @@ const sources = [
     { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
   [
-    '@iexec/poco/artifacts/contracts/IexecInterfaceNative.sol/IexecInterfaceNative.json',
-    { dir: '@iexec/poco', minifier: minifiers.abi },
-  ],
-  [
     '@iexec/poco/artifacts/contracts/registries/apps/AppRegistry.sol/AppRegistry.json',
     { dir: '@iexec/poco', minifier: minifiers.abi },
   ],
@@ -62,22 +58,6 @@ const sources = [
   [
     '@iexec/poco/artifacts/contracts/registries/datasets/Dataset.sol/Dataset.json',
     { dir: '@iexec/poco', minifier: minifiers.abi },
-  ],
-  [
-    '@ensdomains/ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.abi },
-  ],
-  [
-    '@ensdomains/ens-contracts/artifacts/contracts/registry/FIFSRegistrar.sol/FIFSRegistrar.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.abi },
-  ],
-  [
-    '@ensdomains/ens-contracts/artifacts/contracts/reverseRegistrar/ReverseRegistrar.sol/ReverseRegistrar.json',
-    { dir: '@ensdomains/registry', minifier: minifiers.abi },
-  ],
-  [
-    '@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json',
-    { dir: '@ensdomains/resolvers', minifier: minifiers.abi },
   ],
 ];
 

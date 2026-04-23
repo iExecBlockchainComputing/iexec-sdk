@@ -9,9 +9,7 @@
 ## Extended by
 
 - [`DealObservable`](../-internal-/classes/DealObservable.md)
-- [`ENSConfigurationObservable`](../-internal-/classes/ENSConfigurationObservable.md)
 - [`TaskObservable`](../-internal-/classes/TaskObservable.md)
-- [`BridgeObservable`](../-internal-/classes/BridgeObservable.md)
 
 ## Constructors
 

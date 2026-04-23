@@ -5,7 +5,6 @@ import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
 import {
   Address,
-  Addressish,
   BN,
   BNish,
   Bytes32,
@@ -13,34 +12,11 @@ import {
   TxHash,
 } from '../common/types.js';
 
-export interface SconeMREnclave {
-  /**
-   * TEE framework name 'SCONE'
-   */
-  framework: string;
-  /**
-   * app entrypoint path
-   */
-  entrypoint: string;
-  /**
-   * dedicated memory in bytes
-   */
-  heapSize: number;
-  /**
-   * framework's protocol version
-   */
-  version: string;
-  /**
-   * app tee fingerprint
-   */
-  fingerprint: string;
-}
-
 export interface AppDeploymentArgs {
   /**
    * the app owner
    */
-  owner: Addressish;
+  owner: Address;
   /**
    * a name for the app
    */
@@ -58,9 +34,9 @@ export interface AppDeploymentArgs {
    */
   checksum: Bytes32;
   /**
-   * optional for TEE apps only, specify the TEE protocol to use
+   * @deprecated used for legacy TEE apps only, should not be set for modern TEE apps
    */
-  mrenclave?: SconeMREnclave;
+  mrenclave?: string;
 }
 /**
  * IExec app
@@ -87,7 +63,7 @@ export interface App {
    */
   appChecksum: Bytes32;
   /**
-   * for TEE apps only, specify the TEE protocol to use
+   * used for legacy TEE apps only, should be an empty string for modern TEE apps
    */
   appMREnclave: string;
   /**
@@ -145,7 +121,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('app deployed', isDeployed);
    * ```
    */
-  checkDeployedApp(appAddress: Addressish): Promise<Boolean>;
+  checkDeployedApp(appAddress: Address): Promise<Boolean>;
   /**
    * show a deployed app details
    *
@@ -155,7 +131,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('app:', app);
    * ```
    */
-  showApp(appAddress: Addressish): Promise<{ objAddress: Address; app: App }>;
+  showApp(appAddress: Address): Promise<{ objAddress: Address; app: App }>;
   /**
    * count the apps owned by an address.
    *
@@ -165,7 +141,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('app count:', count);
    * ```
    */
-  countUserApps(userAddress: Addressish): Promise<BN>;
+  countUserApps(userAddress: Address): Promise<BN>;
   /**
    * show deployed app details by index for specified user user
    *
@@ -177,7 +153,7 @@ export default class IExecAppModule extends IExecModule {
    */
   showUserApp(
     index: BNish,
-    address: Addressish,
+    address: Address,
   ): Promise<{ objAddress: Address; app: App }>;
   /**
    * check if a secret exists for the app in the Secret Management Service
@@ -191,7 +167,7 @@ export default class IExecAppModule extends IExecModule {
    * - each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
    *
    */
-  checkAppSecretExists(appAddress: Addressish): Promise<boolean>;
+  checkAppSecretExists(appAddress: Address): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY APP OWNER**
    *
@@ -208,7 +184,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('pushed App secret:', isPushed);
    * ```
    */
-  pushAppSecret(appAddress: Addressish, secretValue: String): Promise<boolean>;
+  pushAppSecret(appAddress: Address, secretValue: String): Promise<boolean>;
   /**
    * **ONLY APP OWNER**
    *
@@ -223,8 +199,8 @@ export default class IExecAppModule extends IExecModule {
    * ```
    */
   transferApp(
-    appAddress: Addressish,
-    to: Addressish,
+    appAddress: Address,
+    to: Address,
   ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
   /**
    * Create an IExecAppModule instance using an IExecConfig instance

@@ -1,19 +1,12 @@
 import { isAbsolute, join } from 'node:path';
 import Debug from 'debug';
-import { Option } from 'commander';
 import Ora from 'ora';
 import inquirer from 'inquirer';
 import { render } from 'prettyjson';
 import checkForUpdate from 'update-check';
 import isDocker from 'is-docker';
-import {
-  weiAmountSchema,
-  positiveStrictIntSchema,
-} from '../../common/utils/validator.js';
-import {
-  TEE_FRAMEWORKS,
-  STORAGE_PROVIDERS,
-} from '../../common/utils/constant.js';
+import { positiveStrictIntSchema } from '../../common/utils/validator.js';
+import { STORAGE_PROVIDERS } from '../../common/utils/constant.js';
 import packageJSON, { version } from '../../common/generated/sdk/package.js';
 
 const debug = Debug('help');
@@ -97,8 +90,6 @@ export const info = {
   downloaded: (filePath) => `Downloaded task result to file ${filePath}`,
   missingAddressOrDeployed: (objName, chainId) =>
     `Missing ${objName}Address and no ${objName} found in "deployed.json" for chain ${chainId}`,
-  missingEnsForObjectAtAddress: (objName, address) =>
-    `Missing ENS for ${objName} ${address}. You probably forgot to run "iexec ens register <name> --for ${address}"`,
   checking: (obj) => `Checking ${obj}...`,
   missingOrder: (orderName, optionName) =>
     `Missing ${orderName}. You probably forgot to run "iexec order init --${optionName}"`,
@@ -135,8 +126,6 @@ export const desc = {
   revoke: () => 'revoke the approval for the spender to use your iExec account',
   sendETH: () => 'send ether to an address (default unit ether)',
   sendRLC: () => 'send RLC to an address (default unit RLC)',
-  sendNRLC: () =>
-    '[DEPRECATED see send-RLC] send RLC to an address (WARNING! default unit nRLC)',
   sweep: () => 'send all ether and RLC to an address',
   info: () => 'show iExec contracts addresses',
   decrypt: () => 'decrypt work result',
@@ -159,10 +148,6 @@ export const desc = {
   generateKeys: () =>
     'generate a beneficiary key pair to encrypt and decrypt the results',
   decryptResults: () => 'decrypt encrypted results with beneficiary key',
-  bridgeToSidechain: () =>
-    'send RLC from the mainchain to the sidechain (default unit nRLC)',
-  bridgeToMainchain: () =>
-    'send RLC from the sidechain to the mainchain (default unit nRLC)',
   appRun: () =>
     'run an iExec application at market price (default run last deployed app)',
   requestRun: () => 'request an iExec application execution at limit price',
@@ -357,11 +342,6 @@ export const option = {
     '--original-dataset-dir <path>',
     'specify the original dataset directory',
   ],
-  txGasPrice: () => [
-    // TODO remove this option (not applicable on supported chains)
-    '--gas-price <amount unit...>',
-    'set custom gas price for transactions (default unit wei)',
-  ],
   txConfirms: () => [
     '--confirms <blockCount>',
     'set custom block count to wait for transactions confirmation (default 1 block)',
@@ -392,14 +372,6 @@ export const option = {
     '--requester-strict',
     'fetch orders created strictly for the specified requester',
   ],
-};
-
-export const optionCreator = {
-  teeFramework: () =>
-    new Option(
-      `--tee-framework <name>`,
-      'specify the TEE framework to use',
-    ).choices(Object.values(TEE_FRAMEWORKS)),
 };
 
 export const orderOption = {
@@ -849,16 +821,7 @@ export const publicKeyName = (address) => `${address}_key.pub`;
 export const privateKeyName = (address) => `${address}_key`;
 
 export const computeTxOptions = async (opts) => {
-  let gasPrice;
   let confirms;
-  if (opts.gasPrice) {
-    debug('opts.gasPrice', opts.gasPrice);
-    const stringGasPrice = await weiAmountSchema({ defaultUnit: 'wei' })
-      .label('gas-price')
-      .validate(opts.gasPrice);
-    gasPrice = BigInt(stringGasPrice);
-  }
-  debug('gasPrice', gasPrice);
   if (opts.confirms !== undefined) {
     debug('opts.confirms', opts.confirms);
     confirms = await positiveStrictIntSchema()
@@ -868,7 +831,7 @@ export const computeTxOptions = async (opts) => {
       });
   }
   debug('confirms', confirms);
-  return { gasPrice, confirms };
+  return { confirms };
 };
 
 export const getPropertyFromChain = (
@@ -919,19 +882,6 @@ export const prettyRPC = (rpcObj) => {
     return acc;
   }, {});
   return pretty(prettyObj);
-};
-
-export const isEthAddress = (address, { strict = false } = {}) => {
-  const isHexString =
-    typeof address === 'string' && address.substr(0, 2) === '0x';
-  const isEns =
-    typeof address === 'string' &&
-    address.substring(address.length - 4) === '.eth';
-  const isAddress = isEns || (isHexString && address.length === 42);
-  if (!isAddress && strict) {
-    throw new Error(`Address ${address} is not a valid Ethereum address`);
-  }
-  return isAddress;
 };
 
 export const isBytes32 = (str, { strict = false } = {}) => {

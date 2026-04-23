@@ -278,12 +278,6 @@ describe('orderbook', () => {
           workerpool: 'any',
         });
         expect(res7.count >= 32).toBe(true);
-
-        // backward compatibility: deprecated appAddress parameter
-        const res1deprecated = await iexecReadOnly.orderbook.fetchAppOrderbook(
-          apporder.app,
-        );
-        expect(res1.orders).toLooseEqual(res1deprecated.orders);
       });
 
       test('appOwner returns orders from app owner', async () => {
@@ -589,13 +583,6 @@ describe('orderbook', () => {
           workerpool: 'any',
         });
         expect(res7.count >= 33).toBe(true);
-
-        // backward compatibility: deprecated datasetAddress parameter
-        const res1deprecated =
-          await iexecReadOnly.orderbook.fetchDatasetOrderbook(
-            datasetorder.dataset,
-          );
-        expect(res1.orders).toLooseEqual(res1deprecated.orders);
       });
 
       test('datasetOwner returns orders from dataset owner', async () => {

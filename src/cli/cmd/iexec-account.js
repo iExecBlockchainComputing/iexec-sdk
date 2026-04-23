@@ -38,7 +38,6 @@ addGlobalOptions(deposit);
 addWalletLoadOptions(deposit);
 deposit
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.deposit())
   .action(async (amount, unit, opts) => {
@@ -49,7 +48,7 @@ deposit
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.depositing());
       const depositRes = await accountDeposit(chain.contracts, [amount, unit]);
       spinner.succeed(info.deposited(formatRLC(depositRes.amount)), {
@@ -65,7 +64,6 @@ addGlobalOptions(withdraw);
 addWalletLoadOptions(withdraw);
 withdraw
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.withdraw())
   .action(async (amount, unit, opts) => {
@@ -76,7 +74,7 @@ withdraw
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.withdrawing());
       const res = await accountWithdraw(chain.contracts, [amount, unit]);
       spinner.succeed(info.withdrawn(formatRLC(res.amount)), {
@@ -144,7 +142,6 @@ addGlobalOptions(approve);
 addWalletLoadOptions(approve);
 approve
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.approve())
   .action(async (amount, spender, unit = 'nRLC', opts) => {
@@ -155,7 +152,7 @@ approve
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.approving());
       const txHash = await accountApprove(
         chain.contracts,
@@ -203,7 +200,6 @@ addGlobalOptions(revoke);
 addWalletLoadOptions(revoke);
 revoke
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.revoke())
   .action(async (spender, opts) => {
@@ -214,7 +210,7 @@ revoke
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.revoking(spender));
       const txHash = await accountApprove(chain.contracts, 0, spender);
       spinner.succeed(info.revoked(spender), {

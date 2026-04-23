@@ -105,8 +105,6 @@ cli.command('storage', 'manage remote storage');
 
 cli.command('result', 'manage results encryption');
 
-cli.command('ens', 'manage ENS names');
-
 cli.command('category', 'manage iExec categories');
 
 const infoCmd = cli.command('info');
@@ -123,13 +121,8 @@ infoCmd
       const host =
         chain.host === getChainDefaults(chain.id).host ? 'default' : chain.host;
       spinner.info(`Ethereum host: ${host}`);
-
       spinner.start(info.checking('iExec contracts info'));
-
-      const useNative = !!chain.contracts.isNative;
-      const rlcAddress = useNative
-        ? undefined
-        : await wrapCall(chain.contracts.fetchTokenAddress());
+      const rlcAddress = await wrapCall(chain.contracts.fetchTokenAddress());
       const [
         appRegistryAddress,
         datasetRegistryAddress,
@@ -143,9 +136,7 @@ infoCmd
 
       const iexecAddresses = {
         'iExec PoCo version': pocoVersion,
-        ...((useNative && {
-          'native RLC': true,
-        }) || { 'RLC ERC20 address': rlcAddress }),
+        'RLC ERC20 address': rlcAddress,
         'iExec contract address': chain.contracts.hubAddress,
         'app registry address': appRegistryAddress,
         'dataset registry address': datasetRegistryAddress,
@@ -160,7 +151,6 @@ infoCmd
           appRegistryAddress,
           datasetRegistryAddress,
           workerpoolRegistryAddress,
-          useNative,
         },
       });
     } catch (error) {

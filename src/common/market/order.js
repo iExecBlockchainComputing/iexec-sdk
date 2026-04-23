@@ -211,24 +211,16 @@ export const computeOrderHash = async (
     let vOrder;
     switch (orderName) {
       case APP_ORDER:
-        vOrder = await saltedApporderSchema({
-          ethProvider: contracts.provider,
-        }).validate(order);
+        vOrder = await saltedApporderSchema().validate(order);
         break;
       case DATASET_ORDER:
-        vOrder = await saltedDatasetorderSchema({
-          ethProvider: contracts.provider,
-        }).validate(order);
+        vOrder = await saltedDatasetorderSchema().validate(order);
         break;
       case WORKERPOOL_ORDER:
-        vOrder = await saltedWorkerpoolorderSchema({
-          ethProvider: contracts.provider,
-        }).validate(order);
+        vOrder = await saltedWorkerpoolorderSchema().validate(order);
         break;
       case REQUEST_ORDER:
-        vOrder = await saltedRequestorderSchema({
-          ethProvider: contracts.provider,
-        }).validate(order);
+        vOrder = await saltedRequestorderSchema().validate(order);
         break;
       default:
     }
@@ -257,9 +249,7 @@ export const hashApporder = async (
   computeOrderHash(
     contracts,
     APP_ORDER,
-    await saltedApporderSchema({
-      ethProvider: contracts.provider,
-    }).validate(order),
+    await saltedApporderSchema().validate(order),
   );
 export const hashDatasetorder = async (
   contracts = throwIfMissing(),
@@ -268,9 +258,7 @@ export const hashDatasetorder = async (
   computeOrderHash(
     contracts,
     DATASET_ORDER,
-    await saltedDatasetorderSchema({
-      ethProvider: contracts.provider,
-    }).validate(order),
+    await saltedDatasetorderSchema().validate(order),
   );
 export const hashWorkerpoolorder = async (
   contracts = throwIfMissing(),
@@ -279,9 +267,7 @@ export const hashWorkerpoolorder = async (
   computeOrderHash(
     contracts,
     WORKERPOOL_ORDER,
-    await saltedWorkerpoolorderSchema({
-      ethProvider: contracts.provider,
-    }).validate(order),
+    await saltedWorkerpoolorderSchema().validate(order),
   );
 export const hashRequestorder = async (
   contracts = throwIfMissing(),
@@ -290,9 +276,7 @@ export const hashRequestorder = async (
   computeOrderHash(
     contracts,
     REQUEST_ORDER,
-    await saltedRequestorderSchema({
-      ethProvider: contracts.provider,
-    }).validate(order),
+    await saltedRequestorderSchema().validate(order),
   );
 
 export const getRemainingVolume = async (
@@ -349,14 +333,7 @@ const signOrder = async (
 export const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
-) =>
-  signOrder(
-    contracts,
-    APP_ORDER,
-    await apporderSchema({ ethProvider: contracts.provider }).validate(
-      apporder,
-    ),
-  );
+) => signOrder(contracts, APP_ORDER, await apporderSchema().validate(apporder));
 
 export const signDatasetorder = async (
   contracts = throwIfMissing(),
@@ -365,9 +342,7 @@ export const signDatasetorder = async (
   signOrder(
     contracts,
     DATASET_ORDER,
-    await datasetorderSchema({
-      ethProvider: contracts.provider,
-    }).validate(datasetorder),
+    await datasetorderSchema().validate(datasetorder),
   );
 
 export const signWorkerpoolorder = async (
@@ -377,9 +352,7 @@ export const signWorkerpoolorder = async (
   signOrder(
     contracts,
     WORKERPOOL_ORDER,
-    await workerpoolorderSchema({
-      ethProvider: contracts.provider,
-    }).validate(workerpoolorder),
+    await workerpoolorderSchema().validate(workerpoolorder),
   );
 
 export const signRequestorder = async (
@@ -389,9 +362,7 @@ export const signRequestorder = async (
   signOrder(
     contracts,
     REQUEST_ORDER,
-    await requestorderSchema({
-      ethProvider: contracts.provider,
-    }).validate(requestorder),
+    await requestorderSchema().validate(requestorder),
   );
 
 const cancelOrder = async (
@@ -411,10 +382,7 @@ const cancelOrder = async (
       throw new Error(`${orderName} already canceled`);
     const iexecContract = contracts.getIExecContract();
     const tx = await wrapSend(
-      iexecContract[objDesc[orderName].cancelMethod](
-        [args, 1, NULL_BYTES],
-        contracts.txOptions,
-      ),
+      iexecContract[objDesc[orderName].cancelMethod]([args, 1, NULL_BYTES]),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEventFromLogs(objDesc[orderName].cancelEvent, txReceipt.logs))
@@ -639,7 +607,7 @@ const getMatchableVolume = async (
     // app tag check
     const teeAppRequired = checkActiveBitInTag(
       sumTags([vRequestOrder.tag, stripTeeFrameworkFromTag(vDatasetOrder.tag)]),
-      1,
+      TAG_MAP.tee,
     );
     if (teeAppRequired && !checkActiveBitInTag(vAppOrder.tag, TAG_MAP.tee)) {
       throw new Error('Missing tag [tee] in apporder');
@@ -892,7 +860,6 @@ export const matchOrders = async ({
         datasetOrderStruct,
         workerpoolOrderStruct,
         requestOrderStruct,
-        contracts.txOptions,
       ),
     );
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
@@ -913,99 +880,65 @@ export const matchOrders = async ({
   }
 };
 
-export const createApporder = async (
-  contracts = throwIfMissing(),
-  {
-    app,
-    appprice = '0',
-    volume = '1',
-    tag = NULL_BYTES32,
-    datasetrestrict = NULL_ADDRESS,
-    workerpoolrestrict = NULL_ADDRESS,
-    requesterrestrict = NULL_ADDRESS,
-  } = {},
-) => ({
-  app: await addressSchema({ ethProvider: contracts.provider })
-    .required()
-    .label('app')
-    .validate(app),
+export const createApporder = async ({
+  app,
+  appprice = '0',
+  volume = '1',
+  tag = NULL_BYTES32,
+  datasetrestrict = NULL_ADDRESS,
+  workerpoolrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  app: await addressSchema().required().label('app').validate(app),
   appprice: await nRlcAmountSchema().validate(appprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema().validate(tag),
-  datasetrestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(datasetrestrict),
-  workerpoolrestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(workerpoolrestrict),
-  requesterrestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(requesterrestrict),
+  datasetrestrict: await addressSchema().validate(datasetrestrict),
+  workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
+  requesterrestrict: await addressSchema().validate(requesterrestrict),
 });
 
-export const createDatasetorder = async (
-  contracts = throwIfMissing(),
-  {
-    dataset,
-    datasetprice = '0',
-    volume = '1',
-    tag = NULL_BYTES32,
-    apprestrict = NULL_ADDRESS,
-    workerpoolrestrict = NULL_ADDRESS,
-    requesterrestrict = NULL_ADDRESS,
-  } = {},
-) => ({
-  dataset: await addressSchema({
-    ethProvider: contracts.provider,
-  })
-    .label('dataset')
-    .required()
-    .validate(dataset),
+export const createDatasetorder = async ({
+  dataset,
+  datasetprice = '0',
+  volume = '1',
+  tag = NULL_BYTES32,
+  apprestrict = NULL_ADDRESS,
+  workerpoolrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  dataset: await addressSchema().label('dataset').required().validate(dataset),
   datasetprice: await nRlcAmountSchema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
-  tag: await tagSchema({ allowAgnosticTee: true }).validate(tag),
-  apprestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(apprestrict),
-  workerpoolrestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(workerpoolrestrict),
-  requesterrestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(requesterrestrict),
+  tag: await tagSchema({
+    allowAgnosticTee: true,
+    ignoreLegacyTeeFramework: true,
+  }).validate(tag),
+  apprestrict: await addressSchema().validate(apprestrict),
+  workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
+  requesterrestrict: await addressSchema().validate(requesterrestrict),
 });
 
-export const createWorkerpoolorder = async (
-  contracts = throwIfMissing(),
-  {
-    workerpool = throwIfMissing(),
-    category = throwIfMissing(),
-    workerpoolprice = '0',
-    volume = '1',
-    trust = '0',
-    tag = NULL_BYTES32,
-    apprestrict = NULL_ADDRESS,
-    datasetrestrict = NULL_ADDRESS,
-    requesterrestrict = NULL_ADDRESS,
-  } = {},
-) => ({
-  workerpool: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(workerpool),
+export const createWorkerpoolorder = async ({
+  workerpool = throwIfMissing(),
+  category = throwIfMissing(),
+  workerpoolprice = '0',
+  volume = '1',
+  trust = '0',
+  tag = NULL_BYTES32,
+  apprestrict = NULL_ADDRESS,
+  datasetrestrict = NULL_ADDRESS,
+  requesterrestrict = NULL_ADDRESS,
+} = {}) => ({
+  workerpool: await addressSchema().validate(workerpool),
   workerpoolprice: await nRlcAmountSchema().validate(workerpoolprice),
   volume: await uint256Schema().validate(volume),
   category: await uint256Schema().validate(category),
   trust: await uint256Schema().validate(trust),
   tag: await tagSchema().validate(tag),
-  apprestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(apprestrict),
-  datasetrestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(datasetrestrict),
-  requesterrestrict: await addressSchema({
-    ethProvider: contracts.provider,
-  }).validate(requesterrestrict),
+  apprestrict: await addressSchema().validate(apprestrict),
+  datasetrestrict: await addressSchema().validate(datasetrestrict),
+  requesterrestrict: await addressSchema().validate(requesterrestrict),
 });
 
 export const createRequestorder = async (
@@ -1030,38 +963,21 @@ export const createRequestorder = async (
   const requesterOrUser = requester || (await getAddress(contracts));
   const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
   return {
-    app: await addressSchema({
-      ethProvider: contracts.provider,
-    })
-      .required()
-      .label('app')
-      .validate(app),
+    app: await addressSchema().required().label('app').validate(app),
     appmaxprice: await nRlcAmountSchema().validate(appmaxprice),
-    dataset: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(dataset),
+    dataset: await addressSchema().validate(dataset),
     datasetmaxprice: await nRlcAmountSchema().validate(datasetmaxprice),
-    workerpool: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(workerpool),
+    workerpool: await addressSchema().validate(workerpool),
     workerpoolmaxprice: await nRlcAmountSchema().validate(workerpoolmaxprice),
-    requester: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(requesterOrUser),
-    beneficiary: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(beneficiary || requesterOrUser),
+    requester: await addressSchema().validate(requesterOrUser),
+    beneficiary: await addressSchema().validate(beneficiary || requesterOrUser),
     volume: await uint256Schema().validate(volume),
     params: await createObjParams({
       params,
       tag: vTag,
-      callback: await addressSchema({
-        ethProvider: contracts.provider,
-      }).validate(callback),
+      callback: await addressSchema().validate(callback),
     }),
-    callback: await addressSchema({
-      ethProvider: contracts.provider,
-    }).validate(callback),
+    callback: await addressSchema().validate(callback),
     category: await uint256Schema()
       .required()
       .label('category')

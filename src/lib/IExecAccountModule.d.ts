@@ -3,7 +3,7 @@ export type * from './IExecConfig.js';
 
 import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
-import { Addressish, BN, NRLCAmount, TxHash } from '../common/types.js';
+import { Address, BN, NRLCAmount, TxHash } from '../common/types.js';
 
 /**
  * module exposing account methods
@@ -20,7 +20,7 @@ export default class IExecAccountModule extends IExecModule {
    * console.log('tx:', txHash);
    * ```
    */
-  approve(amount: NRLCAmount, spenderAddress: Addressish): Promise<TxHash>;
+  approve(amount: NRLCAmount, spenderAddress: Address): Promise<TxHash>;
   /**
    * checks the amount of allowance approved for the specified spender to use the account of the owner.
    *
@@ -31,8 +31,8 @@ export default class IExecAccountModule extends IExecModule {
    * ```
    */
   checkAllowance(
-    ownerAddress: Addressish,
-    spenderAddress: Addressish,
+    ownerAddress: Address,
+    spenderAddress: Address,
   ): Promise<NRLCAmount>;
   /**
    * **SIGNER REQUIRED**
@@ -45,7 +45,7 @@ export default class IExecAccountModule extends IExecModule {
    * console.log('tx:', txHash);
    * ```
    */
-  revokeApproval(spenderAddress: Addressish): Promise<TxHash>;
+  revokeApproval(spenderAddress: Address): Promise<TxHash>;
   /**
    * **SIGNER REQUIRED**
    *
@@ -82,17 +82,7 @@ export default class IExecAccountModule extends IExecModule {
    * console.log('Nano RLC locked:', balance.locked.toString());
    * ```
    */
-  checkBalance(address: Addressish): Promise<{ stake: BN; locked: BN }>;
-  /**
-   * check the account balance on bridged chain of specified address ie: when connected to mainnet, check the account ballance on bellecour
-   * example:
-   * ```js
-   * const balance = await checkBridgedBalance(ethAddress);
-   * console.log('Nano RLC staked:', balance.stake.toString());
-   * console.log('Nano RLC locked:', balance.locked.toString());
-   * ```
-   */
-  checkBridgedBalance(address: Addressish): Promise<{ stake: BN; locked: BN }>;
+  checkBalance(address: Address): Promise<{ stake: BN; locked: BN }>;
   /**
    * Create an IExecAccountModule instance using an IExecConfig instance
    */

@@ -16,11 +16,13 @@ app image digest
 
 ***
 
-### mrenclave?
+### ~~mrenclave?~~
 
-> `optional` **mrenclave**: [`SconeMREnclave`](SconeMREnclave.md)
+> `optional` **mrenclave**: `string`
 
-optional for TEE apps only, specify the TEE protocol to use
+#### Deprecated
+
+used for legacy TEE apps only, should not be set for modern TEE apps
 
 ***
 

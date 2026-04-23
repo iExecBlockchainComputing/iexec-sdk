@@ -139,7 +139,7 @@ _NB_: resolve to `undefined` if the workerpool API url was not declared.
 
 example:
 ```js
-const url = await getWorkerpoolApiUrl('my-workerpool.eth');
+const url = await getWorkerpoolApiUrl(address);
 console.log('workerpool API url:', url);
 ```
 
@@ -175,38 +175,6 @@ console.log('address', address);
 ##### workerpool
 
 [`WorkerpoolDeploymentArgs`](../-internal-/interfaces/WorkerpoolDeploymentArgs.md)
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
-### setWorkerpoolApiUrl()
-
-> **setWorkerpoolApiUrl**(`workerpoolAddress`, `url`): `Promise`\<`string`\>
-
-**ONLY WORKERPOOL ENS NAME OWNER**
-
-declare the workerpool API url on the blockchain
-
-_NB_: declaring the workerpool API url require an ENS name with a configured reverse resolution on the workerpool address (see: IExecENSModule obsConfigureResolution/configureResolution)
-
-example:
-```js
-const txHash = await setWorkerpoolApiUrl('my-workerpool.eth', 'my-workerpool.com');
-console.log('txHash:', txHash);
-```
-
-#### Parameters
-
-##### workerpoolAddress
-
-`string`
-
-##### url
-
-`string`
 
 #### Returns
 

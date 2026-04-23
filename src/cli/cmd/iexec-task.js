@@ -247,7 +247,6 @@ addGlobalOptions(claimTask);
 addWalletLoadOptions(claimTask);
 claimTask
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.claimObj(objName))
   .action(async (taskid, opts) => {
@@ -258,7 +257,7 @@ claimTask
       const keystore = Keystore(walletOptions);
       const txOptions = await computeTxOptions(opts);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
 
       spinner.start(info.claiming(objName));
       const txHash = await claim(chain.contracts, taskid);

@@ -41,7 +41,7 @@ const config = new IExecConfig({ ethProvider: window.ethereum });
 
 ```js
 import { getSignerFromPrivateKey } from 'iexec/utils';
-const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet', privateKey) });
+const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('arbitrum-sepolia-testnet', privateKey) });
 ```
 
 #### Parameters
@@ -59,42 +59,6 @@ const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet',
 `IExecConfig`
 
 ## Methods
-
-### resolveBridgeAddress()
-
-> **resolveBridgeAddress**(): `Promise`\<`string`\>
-
-resolve the current bridge contract address
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
-### resolveBridgeBackAddress()
-
-> **resolveBridgeBackAddress**(): `Promise`\<`string`\>
-
-resolve the bridge contract address on bridged chain
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
-### resolveBridgedContractsClient()
-
-> **resolveBridgedContractsClient**(): `Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
-
-resolve the current bridged IExecContractsClient
-
-#### Returns
-
-`Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
-
-***
 
 ### resolveChainId()
 
@@ -131,18 +95,6 @@ resolve the current IExecContractsClient
 #### Returns
 
 `Promise`\<[`IExecContractsClient`](../-internal-/classes/IExecContractsClient.md)\>
-
-***
-
-### resolveEnsPublicResolverAddress()
-
-> **resolveEnsPublicResolverAddress**(): `Promise`\<`string`\>
-
-resolve the current ENS public resolver contract address
-
-#### Returns
-
-`Promise`\<`string`\>
 
 ***
 
@@ -187,18 +139,6 @@ resolve the current IPFS node URL
 > **resolvePocoSubgraphURL**(): `Promise`\<`string`\>
 
 resolve the current PoCo subgraph URL
-
-#### Returns
-
-`Promise`\<`string`\>
-
-***
-
-### resolveResultProxyURL()
-
-> **resolveResultProxyURL**(): `Promise`\<`string`\>
-
-resolve the current result proxy URL
 
 #### Returns
 

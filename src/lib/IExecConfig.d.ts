@@ -2,7 +2,6 @@ export type * from '../common/types.js';
 export type * from './IExecConfig.js';
 
 import IExecContractsClient from '../common/utils/IExecContractsClient.js';
-import { AnyRecord, ProviderOptions } from '../common/types.js';
 import { AbstractProvider, AbstractSigner, BrowserProvider } from 'ethers';
 
 export interface Eip1193Provider {
@@ -16,16 +15,15 @@ export interface IExecConfigArgs {
    * A web3 Eth provider, a network name, a chain id or an ethers provider
    *
    * read-only provider examples:
-   * - `"mainnet"` or `1` or `"1"` for ethereum mainnet provider
-   * - `"bellecour"` or `134` or `"134"` for iExec sidechain
+   * - `"arbitrum-sepolia-testnet"` or `421614` or `"421614"` for arbitrum sepolia testnet provider
    * - `"arbitrum-mainnet"` or `42161` or `"42161"` for arbitrum mainnet provider
    * - `"http://localhost:8545"` for local chain
-   * - `new ethers.JsonRpcProvider("https://bellecour.iex.ec")` ethers provider connected to bellecour
+   * - `new ethers.JsonRpcProvider("https://<rpc-provider>")` ethers provider connected to your RPC provider
    *
    * signer provider examples:
    * - `window.ethereum` for browser injected wallet provider
-   * - `utils.getSignerFromPrivateKey('bellecour', PRIVATE_KEY)` signer connected to bellecour
-   * - `new ethers.Wallet(PRIVATE_KEY, new ethers.JsonRpcProvider("https://bellecour.iex.ec"))` ethers wallet connected to bellecour
+   * - `utils.getSignerFromPrivateKey('arbitrum-sepolia-testnet', PRIVATE_KEY)` signer connected to arbitrum sepolia testnet using a private key
+   * - `new ethers.Wallet(PRIVATE_KEY, new ethers.JsonRpcProvider("https://<rpc-provider>"))` ethers wallet connected to a specific network
    */
   ethProvider:
     | Eip1193Provider
@@ -38,50 +36,9 @@ export interface IExecConfigArgs {
 
 export interface IExecConfigOptions {
   /**
-   * true if IExec contract use the chain native token (default false)
-   */
-  isNative?: boolean;
-  /**
-   * if false set the gasPrice to 0 (default true)
-   */
-  useGas?: boolean;
-  /**
    * override the IExec contract address to target a custom instance
    */
   hubAddress?: string;
-  /**
-   * override the ENS public resolver contract address to target a custom instance
-   */
-  ensPublicResolverAddress?: string;
-  /**
-   * override the bridge contract address to target a custom instance
-   */
-  bridgeAddress?: string;
-  /**
-   * override the bridged network configuration
-   */
-  bridgedNetworkConf?: {
-    /**
-     * bridged network chainId
-     */
-    chainId?: number | string;
-    /**
-     * bridged network node url
-     */
-    rpcURL?: string;
-    /**
-     * IExec contract address on bridged network
-     */
-    hubAddress?: string;
-    /**
-     * bridge contract address on bridged network
-     */
-    bridgeAddress?: string;
-  };
-  /**
-   * override the result proxy URL to target a custom instance
-   */
-  resultProxyURL?: string;
   /**
    * override the SMS URL to target a custom instance
    */
@@ -112,10 +69,6 @@ export interface IExecConfigOptions {
    * number of block to wait for transactions confirmation (default 1)
    */
   confirms?: number;
-  /**
-   * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
-   */
-  providerOptions?: ProviderOptions | AnyRecord;
   /**
    * if true allows using a provider connected to an experimental networks (default false)
    *
@@ -156,7 +109,7 @@ export default class IExecConfig {
    *
    * ```js
    * import { getSignerFromPrivateKey } from 'iexec/utils';
-   * const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('mainnet', privateKey) });
+   * const config = new IExecConfig({ ethProvider: getSignerFromPrivateKey('arbitrum-sepolia-testnet', privateKey) });
    * ```
    */
   constructor(args: IExecConfigArgs, options?: IExecConfigOptions);
@@ -169,17 +122,9 @@ export default class IExecConfig {
    */
   resolveContractsClient(): Promise<IExecContractsClient>;
   /**
-   * resolve the current bridged IExecContractsClient
-   */
-  resolveBridgedContractsClient(): Promise<IExecContractsClient>;
-  /**
    * resolve the current SMS URL
    */
   resolveSmsURL(): Promise<string>;
-  /**
-   * resolve the current result proxy URL
-   */
-  resolveResultProxyURL(): Promise<string>;
   /**
    * resolve the current IExec market URL
    */
@@ -201,16 +146,4 @@ export default class IExecConfig {
    * resolve the current PoCo subgraph URL
    */
   resolvePocoSubgraphURL(): Promise<string>;
-  /**
-   * resolve the current bridge contract address
-   */
-  resolveBridgeAddress(): Promise<string>;
-  /**
-   * resolve the bridge contract address on bridged chain
-   */
-  resolveBridgeBackAddress(): Promise<string>;
-  /**
-   * resolve the current ENS public resolver contract address
-   */
-  resolveEnsPublicResolverAddress(): Promise<string>;
 }

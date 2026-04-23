@@ -5,23 +5,15 @@ import { setBalance } from './test-utils.js';
 export const getTestConfigOptions =
   (chain) =>
   ({ options = {} } = {}) => ({
-    bridgeAddress: options.bridgeAddress ?? chain.bridgeAddress,
-    bridgedNetworkConf: options.bridgedNetworkConf ?? chain.bridgedNetworkConf,
     confirms: options.confirms ?? chain.confirms,
-    ensPublicResolverAddress:
-      options.ensPublicResolverAddress ?? chain.ensPublicResolverAddress,
-    ensRegistryAddress: options.ensRegistryAddress ?? chain.ensRegistryAddress,
     hubAddress: options.hubAddress ?? chain.hubAddress,
     iexecGatewayURL: options.iexecGatewayURL ?? chain.iexecGatewayURL,
     ipfsNodeURL: options.ipfsNodeURL ?? chain.ipfsNodeURL,
     ipfsGatewayURL: options.ipfsGatewayURL ?? chain.ipfsGatewayURL,
     pocoSubgraphURL: options.pocoSubgraphURL ?? chain.pocoSubgraphURL,
-    isNative: options.isNative ?? chain.isNative,
     providerOptions: options.providerOptions ?? chain.providerOptions,
-    resultProxyURL: options.resultProxyURL ?? chain.resultProxyURL,
     compassURL: options.compassURL ?? chain.compassURL,
     smsURL: options.smsURL ?? chain.smsURL,
-    useGas: options.useGas ?? chain.useGas,
   });
 
 export const getTestConfig =

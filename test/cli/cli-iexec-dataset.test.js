@@ -296,7 +296,7 @@ describe('iexec dataset', () => {
       const appAddress = getRandomAddress();
       await expect(
         execAsync(
-          `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --tag tee,scone --app-restrict ${appAddress} --force`,
+          `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --tag tee,tdx --app-restrict ${appAddress} --force`,
         ),
       ).rejects.toThrow(
         `Dataset encryption key is not set for dataset ${userFirstDeployedDatasetAddress} in the SMS. Dataset decryption will fail.`,

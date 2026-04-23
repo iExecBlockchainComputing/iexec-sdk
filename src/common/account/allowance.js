@@ -20,15 +20,11 @@ export const approve = async (
     const vAmount = await nRlcAmountSchema().required().validate(amount);
     if (new BN(vAmount).lten(new BN(0)))
       throw new Error('Approve amount must be less than or equals 0');
-    const vSpenderAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
+    const vSpenderAddress = await addressSchema()
       .required()
       .validate(spenderAddress);
     const iexecContract = contracts.getIExecContract();
-    const tx = await wrapSend(
-      iexecContract.approve(vSpenderAddress, vAmount, contracts.txOptions),
-    );
+    const tx = await wrapSend(iexecContract.approve(vSpenderAddress, vAmount));
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
 
     if (!checkEventFromLogs('Approval', txReceipt.logs))
@@ -47,14 +43,10 @@ export const checkAllowance = async (
   spenderAddress,
 ) => {
   try {
-    const vOwnerAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
+    const vOwnerAddress = await addressSchema()
       .required()
       .validate(ownerAddress);
-    const vSpenderAddress = await addressSchema({
-      ethProvider: contracts.provider,
-    })
+    const vSpenderAddress = await addressSchema()
       .required()
       .validate(spenderAddress);
 

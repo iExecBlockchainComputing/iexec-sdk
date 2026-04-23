@@ -65,20 +65,22 @@ export const httpRequest =
       ...makeHeaders(method, headers, body),
       ...makeBody(method, body),
     })
-      .catch((error) => {
-        debug(`httpRequest() fetch:`, error);
+      .catch((cause) => {
+        debug(`httpRequest() fetch:`, cause);
         throw new ApiCallErrorClass(
           `Connection to ${api} failed with a network error`,
-          error,
+          { cause },
         );
       })
       .then((response) => {
         if (response.status >= 500 && response.status <= 599) {
           throw new ApiCallErrorClass(
             `Server at ${api} encountered an internal error`,
-            new Error(
-              `Server internal error: ${response.status} ${response.statusText}`,
-            ),
+            {
+              cause: new Error(
+                `Server internal error: ${response.status} ${response.statusText}`,
+              ),
+            },
           );
         }
         return response;

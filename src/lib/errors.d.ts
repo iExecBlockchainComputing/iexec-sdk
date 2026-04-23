@@ -16,19 +16,17 @@ export class Web3ProviderError extends Error {
      * A descriptive error message detailing the nature of the error.
      */
     message: string,
-    /**
-     * The original Error object that caused this web3 provider error.
-     */
-    originalError: Error,
+    options?: {
+      /**
+       * The original error that caused this web3 provider error.
+       */
+      cause?: unknown;
+    },
   );
   /**
-   * @deprecated use Error cause instead.
+   * The original error that caused this web3 provider error.
    */
-  originalError: Error;
-  /**
-   * The original Error object that caused this web3 provider error.
-   */
-  cause: Error;
+  cause?: unknown;
   /**
    * Wether the error was caused by a user rejection
    */
@@ -77,33 +75,6 @@ export class ObjectNotFoundError extends Error {
    */
   chainId: string;
 }
-/**
- * BridgeError is thrown when bridging RLC between mainchain and sidechain fail before the value transfer confirmation.
- */
-export class BridgeError extends Error {
-  constructor(
-    /**
-     * The original Error object that caused this API call error.
-     */
-    originalError: Error,
-    /**
-     * Hash of the transaction sending the value to the bridge contract.
-     */
-    sendTxHash: string,
-  );
-  /**
-   * Hash of the transaction sending the value to the bridge contract.
-   */
-  sendTxHash: string;
-  /**
-   * @deprecated use Error cause instead
-   */
-  originalError: Error;
-  /**
-   * The original Error object that caused this API call error.
-   */
-  cause: Error;
-}
 
 /**
  * ApiCallError encapsulates an error occurring during a call to an API such as a network error or a server-side internal error.
@@ -114,30 +85,23 @@ export class ApiCallError extends Error {
      * A descriptive error message detailing the nature of the error.
      */
     message: string,
-    /**
-     * The original Error object that caused this API call error.
-     */
-    originalError: Error,
+    options?: {
+      /**
+       * The original error that caused this API call error.
+       */
+      cause?: unknown;
+    },
   );
   /**
-   * @deprecated use Error cause instead.
+   * The original error that caused this API call error.
    */
-  originalError: Error;
-  /**
-   * The original Error object that caused this API call error.
-   */
-  cause: Error;
+  cause?: unknown;
 }
 
 /**
  * SmsCallError encapsulates an error occurring during a call to the SMS API such as a network error or a server-side internal error.
  */
 export class SmsCallError extends ApiCallError {}
-
-/**
- * ResultProxyCallError encapsulates an error occurring during a call to the Result Proxy API such as a network error or a server-side internal error.
- */
-export class ResultProxyCallError extends ApiCallError {}
 
 /**
  * MarketCallError encapsulates an error occurring during a call to the Market API such as a network error or a server-side internal error.

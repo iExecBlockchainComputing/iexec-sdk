@@ -1,12 +1,10 @@
-import { BlockTag } from 'ethers';
-import { EnhancedWallet } from '../common/utils/signers.js';
+import { BlockTag, AbstractSigner } from 'ethers';
 import {
   BN,
   WeiAmount,
   NRLCAmount,
   HumanSingleTag,
   Bytes32,
-  ProviderOptions,
 } from '../common/types.js';
 
 export { BN } from '../common/bn.js';
@@ -31,25 +29,13 @@ export const getSignerFromPrivateKey: (
   privateKey: string,
   options?: {
     /**
-     * gas price override
-     */
-    gasPrice?: bigint | number | string; // TODO remove this option (not applicable on supported chains)
-    /**
-     * nonce override
-     */
-    getTransactionCount?: (blockTag?: BlockTag) => Promise<number>;
-    /**
-     * providers options
-     */
-    providers?: ProviderOptions;
-    /**
      * if true allows using a provider connected to an experimental networks (default false)
      *
      * ⚠️ experimental networks are networks on which the iExec's stack is partially deployed, experimental networks can be subject to instabilities or discontinuity. Access is provided without warranties.
      */
     allowExperimentalNetworks?: boolean;
   },
-) => EnhancedWallet;
+) => AbstractSigner;
 
 /**
  * ethereum null/zero address

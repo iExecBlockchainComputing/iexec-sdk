@@ -35,9 +35,7 @@ export const createCategory = async (
       vCategory.description,
       vCategory.workClockTimeRef,
     ];
-    const tx = await wrapSend(
-      iexecContract.createCategory(...args, contracts.txOptions),
-    );
+    const tx = await wrapSend(iexecContract.createCategory(...args));
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     const { catid: catidBigInt } = getEventFromLogs(
       'CreateCategory',

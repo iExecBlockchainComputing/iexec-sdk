@@ -211,7 +211,7 @@ sign
           if (!loadedOrder) {
             throw new Error(info.missingOrder(APP_ORDER, 'app'));
           }
-          const orderObj = await createApporder(chain.contracts, loadedOrder);
+          const orderObj = await createApporder(loadedOrder);
           if (!(await checkDeployedApp(chain.contracts, orderObj.app)))
             throw new Error(`No app deployed at address ${orderObj.app}`);
           if (!opts.skipPreflightCheck) {
@@ -252,10 +252,7 @@ sign
           if (!loadedOrder) {
             throw new Error(info.missingOrder(DATASET_ORDER, 'dataset'));
           }
-          const orderObj = await createDatasetorder(
-            chain.contracts,
-            loadedOrder,
-          );
+          const orderObj = await createDatasetorder(loadedOrder);
           if (!(await checkDeployedDataset(chain.contracts, orderObj.dataset)))
             throw new Error(
               `No dataset deployed at address ${orderObj.dataset}`,
@@ -263,7 +260,6 @@ sign
           if (!opts.skipPreflightCheck) {
             await checkDatasetRequirements(
               {
-                contracts: chain.contracts,
                 smsURL: getPropertyFromChain(chain, 'sms'),
               },
               orderObj,
@@ -301,10 +297,7 @@ sign
           if (!loadedOrder) {
             throw new Error(info.missingOrder(WORKERPOOL_ORDER, 'workerpool'));
           }
-          const orderObj = await createWorkerpoolorder(
-            chain.contracts,
-            loadedOrder,
-          );
+          const orderObj = await createWorkerpoolorder(loadedOrder);
           if (
             !(await checkDeployedWorkerpool(
               chain.contracts,
@@ -350,7 +343,6 @@ sign
           if (!opts.skipPreflightCheck) {
             await checkRequestRequirements(
               {
-                contracts: chain.contracts,
                 smsURL: getPropertyFromChain(chain, 'sms'),
               },
               orderObj,
@@ -403,7 +395,6 @@ addGlobalOptions(fill);
 addWalletLoadOptions(fill);
 fill
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.fillAppOrder())
@@ -476,7 +467,7 @@ fill
       if (!workerpoolorder) throw new Error('Missing workerpoolorder');
 
       const computeRequestOrder = async () => {
-        await connectKeystore(chain, keystore, { txOptions });
+        await connectKeystore(chain, keystore);
         const unsignedOrder = await createRequestorder(
           {
             contracts: chain.contracts,
@@ -528,7 +519,6 @@ fill
             contracts: chain.contracts,
           },
           apporder,
-          { tagOverride: resolvedTag },
         ).catch((e) => {
           throw new Error(
             `App requirements check failed: ${
@@ -541,7 +531,6 @@ fill
         if (useDataset) {
           await checkDatasetRequirements(
             {
-              contracts: chain.contracts,
               smsURL: getPropertyFromChain(chain, 'sms'),
             },
             datasetorder,
@@ -558,7 +547,6 @@ fill
         }
         await checkRequestRequirements(
           {
-            contracts: chain.contracts,
             smsURL: getPropertyFromChain(chain, 'sms'),
           },
           requestorder,
@@ -573,7 +561,7 @@ fill
         });
       }
 
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.filling(objName));
       const { dealid, volume, txHash } = await matchOrders({
         contracts: chain.contracts,
@@ -665,7 +653,6 @@ publish
               if (!opts.skipPreflightCheck) {
                 await checkDatasetRequirements(
                   {
-                    contracts: chain.contracts,
                     smsURL: getPropertyFromChain(chain, 'sms'),
                   },
                   orderToPublish,
@@ -696,7 +683,6 @@ publish
               if (!opts.skipPreflightCheck) {
                 await checkRequestRequirements(
                   {
-                    contracts: chain.contracts,
                     smsURL: getPropertyFromChain(chain, 'sms'),
                   },
                   orderToPublish,
@@ -873,7 +859,6 @@ addGlobalOptions(cancel);
 addWalletLoadOptions(cancel);
 cancel
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.cancelAppOrder())
@@ -897,7 +882,7 @@ cancel
         loadChain(opts.chain, { txOptions, spinner }),
         loadSignedOrders(),
       ]);
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       const success = {};
       const failed = [];
 

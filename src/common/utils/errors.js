@@ -1,19 +1,6 @@
 /* eslint-disable sonarjs/no-identical-functions */
 export { ValidationError } from 'yup';
 
-const getPropsToCopy = (error) => {
-  const {
-    name,
-    message,
-    stack,
-    constructor,
-    originalError,
-    toJSON,
-    ...propsToCopy
-  } = error;
-  return propsToCopy;
-};
-
 export class ConfigurationError extends Error {
   constructor(...args) {
     super(...args);
@@ -22,15 +9,11 @@ export class ConfigurationError extends Error {
 }
 
 export class Web3ProviderError extends Error {
-  constructor(message, originalError) {
-    super(message, { cause: originalError });
+  constructor(message, options = {}) {
+    super(message, options);
     this.name = this.constructor.name;
-    this.originalError = originalError; // deprecated
-    if (originalError && typeof originalError === 'object') {
-      Object.assign(this, getPropsToCopy(originalError));
-    }
     // detect user rejection from ethers error code
-    if (originalError?.code === 'ACTION_REJECTED') {
+    if (options?.cause?.code === 'ACTION_REJECTED') {
       this.isUserRejection = true;
     }
   }
@@ -67,39 +50,16 @@ export class ObjectNotFoundError extends Error {
   }
 }
 
-export class BridgeError extends Error {
-  constructor(originalError, sendTxHash) {
-    super(
-      `Failed to get bridged chain confirmation for transaction ${sendTxHash}`,
-      { cause: originalError },
-    );
-    this.name = this.constructor.name;
-    this.sendTxHash = sendTxHash;
-    this.originalError = originalError; // deprecated
-    if (originalError && typeof originalError === 'object') {
-      Object.assign(this, getPropsToCopy(originalError));
-    }
-  }
-}
-
 export class ApiCallError extends Error {
-  constructor(message, originalError) {
-    super(message, { cause: originalError });
+  constructor(message, options = {}) {
+    super(message, options);
     this.name = this.constructor.name;
-    this.originalError = originalError; // deprecated
   }
 }
 
 export class SmsCallError extends ApiCallError {
   constructor(message, ...args) {
     super(`SMS error: ${message}`, ...args);
-    this.name = this.constructor.name;
-  }
-}
-
-export class ResultProxyCallError extends ApiCallError {
-  constructor(message, ...args) {
-    super(`Result Proxy error: ${message}`, ...args);
     this.name = this.constructor.name;
   }
 }
@@ -119,8 +79,8 @@ export class IpfsGatewayCallError extends ApiCallError {
 }
 
 export class CompassCallError extends ApiCallError {
-  constructor(message, originalError) {
-    super(`Compass API error: ${message}`, originalError);
+  constructor(message, ...args) {
+    super(`Compass API error: ${message}`, ...args);
     this.name = this.constructor.name;
   }
 }

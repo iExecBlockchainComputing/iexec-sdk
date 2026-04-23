@@ -5,7 +5,6 @@ import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
 import {
   Address,
-  Addressish,
   BN,
   BNish,
   Bytes32,
@@ -17,7 +16,7 @@ export interface DatasetDeploymentArgs {
   /**
    * the dataset owner
    */
-  owner: Addressish;
+  owner: Address;
   /**
    * a name for the dataset
    */
@@ -105,7 +104,7 @@ export default class IExecDatasetModule extends IExecModule {
    * console.log('dataset deployed', isDeployed);
    * ```
    */
-  checkDeployedDataset(datasetAddress: Addressish): Promise<Boolean>;
+  checkDeployedDataset(datasetAddress: Address): Promise<Boolean>;
   /**
    * show a deployed dataset details
    *
@@ -116,7 +115,7 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   showDataset(
-    datasetAddress: Addressish,
+    datasetAddress: Address,
   ): Promise<{ objAddress: Address; dataset: Dataset }>;
   /**
    * count the datasets owned by an address.
@@ -127,7 +126,7 @@ export default class IExecDatasetModule extends IExecModule {
    * console.log('dataset count:', count);
    * ```
    */
-  countUserDatasets(userAddress: Addressish): Promise<BN>;
+  countUserDatasets(userAddress: Address): Promise<BN>;
   /**
    * show deployed dataset details by index for specified user user
    *
@@ -139,7 +138,7 @@ export default class IExecDatasetModule extends IExecModule {
    */
   showUserDataset(
     index: BNish,
-    address: Addressish,
+    address: Address,
   ): Promise<{ objAddress: Address; dataset: Dataset }>;
   /**
    * generate an encryption key to encrypt a dataset
@@ -211,7 +210,7 @@ export default class IExecDatasetModule extends IExecModule {
    * console.log('secret exists:', isSecretSet);
    * ```
    */
-  checkDatasetSecretExists(datasetAddress: Addressish): Promise<boolean>;
+  checkDatasetSecretExists(datasetAddress: Address): Promise<boolean>;
   /**
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
@@ -226,7 +225,7 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   pushDatasetSecret(
-    datasetAddress: Addressish,
+    datasetAddress: Address,
     encryptionKey: string,
   ): Promise<boolean>;
   /**
@@ -243,8 +242,8 @@ export default class IExecDatasetModule extends IExecModule {
    * ```
    */
   transferDataset(
-    datasetAddress: Addressish,
-    to: Addressish,
+    datasetAddress: Address,
+    to: Address,
   ): Promise<{ address: Address; to: Address; txHash: TxHash }>;
   /**
    * Create an IExecDatasetModule instance using an IExecConfig instance

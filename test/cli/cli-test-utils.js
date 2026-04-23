@@ -7,8 +7,6 @@ import { execAsync, getId, setBalance } from '../test-utils.js';
 const IEXEC_JSON = 'iexec.json';
 const CHAIN_JSON = 'chain.json';
 
-const { INFURA_PROJECT_ID } = process.env;
-
 export const iexecPath = 'iexec';
 
 export const globalSetup = async (testid = 'shared') => {
@@ -63,7 +61,7 @@ export const removeWallet = () => remove('./wallet.json').catch(() => {});
 
 export const setChain =
   (chain) =>
-  (chainOptions = {}, providerOptions = {}) =>
+  (chainOptions = {}) =>
     saveJSONToFile(
       {
         default: 'dev',
@@ -74,18 +72,10 @@ export const setChain =
             hub: chain.hubAddress,
             sms: chain.smsURL,
             iexecGateway: chain.iexecGatewayURL,
-            resultProxy: chain.resultProxyURL,
-            ensPublicResolver: chain.ensPublicResolverAddress,
-            useGas: chain.useGas,
-            native: chain.isNative,
             ...chainOptions,
           },
-          bellecour: {},
-          mainnet: {},
-        },
-        providers: {
-          infura: INFURA_PROJECT_ID,
-          ...providerOptions,
+          'arbitrum-sepolia-testnet': {},
+          'arbitrum-mainnet': {},
         },
       },
       CHAIN_JSON,

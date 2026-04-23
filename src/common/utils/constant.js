@@ -26,16 +26,13 @@ export const NULL_DATASETORDER = {
   sign: NULL_BYTES,
 };
 
-export const WORKERPOOL_URL_TEXT_RECORD_KEY = 'iexec:workerpool-api:url';
-
 export const TEE_FRAMEWORKS = {
-  SCONE: 'scone',
   TDX: 'tdx',
 };
 
 export const STORAGE_PROVIDERS = {
-  IPFS: 'ipfs',
   DROPBOX: 'dropbox',
+  IPFS: 'ipfs',
 };
 
 export const IEXEC_REQUEST_PARAMS = {
@@ -44,7 +41,6 @@ export const IEXEC_REQUEST_PARAMS = {
   IEXEC_SECRETS: 'iexec_secrets',
   IEXEC_RESULT_ENCRYPTION: 'iexec_result_encryption',
   IEXEC_RESULT_STORAGE_PROVIDER: 'iexec_result_storage_provider',
-  IEXEC_RESULT_STORAGE_PROXY: 'iexec_result_storage_proxy',
   IEXEC_BULK_CID: 'bulk_cid',
 };
 

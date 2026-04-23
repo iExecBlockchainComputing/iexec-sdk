@@ -15,7 +15,6 @@ ApiCallError encapsulates an error occurring during a call to an API such as a n
 ## Extended by
 
 - [`SmsCallError`](SmsCallError.md)
-- [`ResultProxyCallError`](ResultProxyCallError.md)
 - [`MarketCallError`](MarketCallError.md)
 - [`IpfsGatewayCallError`](IpfsGatewayCallError.md)
 - [`CompassCallError`](CompassCallError.md)
@@ -25,7 +24,7 @@ ApiCallError encapsulates an error occurring during a call to an API such as a n
 
 ### Constructor
 
-> **new ApiCallError**(`message`, `originalError`): `ApiCallError`
+> **new ApiCallError**(`message`, `options?`): `ApiCallError`
 
 #### Parameters
 
@@ -35,11 +34,13 @@ ApiCallError encapsulates an error occurring during a call to an API such as a n
 
 A descriptive error message detailing the nature of the error.
 
-##### originalError
+##### options?
 
-`Error`
+###### cause?
 
-The original Error object that caused this API call error.
+`unknown`
+
+The original error that caused this API call error.
 
 #### Returns
 
@@ -51,18 +52,8 @@ The original Error object that caused this API call error.
 
 ## Properties
 
-### cause
+### cause?
 
-> **cause**: `Error`
+> `optional` **cause**: `unknown`
 
-The original Error object that caused this API call error.
-
-***
-
-### ~~originalError~~
-
-> **originalError**: `Error`
-
-#### Deprecated
-
-use Error cause instead.
+The original error that caused this API call error.

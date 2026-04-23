@@ -8,9 +8,7 @@
 
 ## Classes
 
-- [BridgeObservable](classes/BridgeObservable.md)
 - [DealObservable](classes/DealObservable.md)
-- [ENSConfigurationObservable](classes/ENSConfigurationObservable.md)
 - [IExecContractsClient](classes/IExecContractsClient.md)
 - [TaskObservable](classes/TaskObservable.md)
 
@@ -39,7 +37,6 @@
 - [PublishedWorkerpoolorder](interfaces/PublishedWorkerpoolorder.md)
 - [RequestorderParams](interfaces/RequestorderParams.md)
 - [RequestorderTemplate](interfaces/RequestorderTemplate.md)
-- [SconeMREnclave](interfaces/SconeMREnclave.md)
 - [SignableApporder](interfaces/SignableApporder.md)
 - [SignableDatasetorder](interfaces/SignableDatasetorder.md)
 - [SignableRequestorder](interfaces/SignableRequestorder.md)

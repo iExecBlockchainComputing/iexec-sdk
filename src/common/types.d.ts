@@ -20,19 +20,6 @@ export type BNish = BN | bigint | string | number;
  */
 export type Address = string;
 /**
- * ENS
- *
- * example:
- * ```js
- * const ensName = 'iexec.eth';
- * ```
- */
-export type ENS = string;
-/**
- * ethereum address or ENS
- */
-export type Addressish = Address | ENS;
-/**
  * bytes hex string
  *
  * example:
@@ -125,7 +112,7 @@ export type HumanSingleTag = string;
  * example:
  * ```js
  * const gpuTag = ['gpu'];
- * const sconeTeeTag = ['tee', 'scone'];
+ * const tdxTeeTag = ['tee', 'tdx'];
  * ```
  */
 export type Tag = Bytes32 | HumanSingleTag[];
@@ -139,47 +126,3 @@ export type Tag = Bytes32 | HumanSingleTag[];
  * ```
  */
 export type Multiaddress = string | Buffer;
-
-/**
- * Trusted Execution Environment name
- */
-export type TeeFramework = 'scone' | 'tdx';
-
-export type AnyRecord = Record<string, any>;
-
-/**
- * [ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
- */
-export interface ProviderOptions {
-  /**
-   * [Alchemy](https://alchemyapi.io/) API key
-   */
-  alchemy?: string;
-  /**
-   * [Etherscan](https://etherscan.io/) API key
-   */
-  etherscan?: string;
-  /**
-   * [INFURA](https://infura.io/) Project ID or { projectId, projectSecret }
-   */
-  infura?:
-    | string
-    | {
-        /**
-         * [INFURA](https://infura.io/) project ID
-         */
-        projectId: string;
-        /**
-         * [INFURA](https://infura.io/) project secret
-         */
-        projectSecret: string;
-      };
-  /**
-   * allow Cloudflare provider
-   */
-  cloudflare?: boolean;
-  /**
-   * the number of backends that must agree (default: 2 for mainnet, 1 for testnets)
-   */
-  quorum?: number;
-}

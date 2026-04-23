@@ -11,7 +11,7 @@ import {
   toBeHex,
 } from 'ethers';
 import { IExec } from '../src/lib/index.js';
-import { getSignerFromPrivateKey, NULL_ADDRESS } from '../src/lib/utils.js';
+import { getSignerFromPrivateKey } from '../src/lib/utils.js';
 
 export {
   TEE_FRAMEWORKS,
@@ -37,34 +37,19 @@ export const execAsync = (cmd) =>
     });
   });
 
-export const { INFURA_PROJECT_ID, ETHERSCAN_API_KEY, ALCHEMY_API_KEY } =
-  process.env;
-
-console.log('using env INFURA_PROJECT_ID', !!INFURA_PROJECT_ID);
-console.log('using env ETHERSCAN_API_KEY', !!ETHERSCAN_API_KEY);
-console.log('using env ALCHEMY_API_KEY', !!ALCHEMY_API_KEY);
-
-export const DEFAULT_PROVIDER_OPTIONS = {
-  cloudflare: true,
-  alchemy: ALCHEMY_API_KEY,
-  etherscan: ETHERSCAN_API_KEY,
-  infura: INFURA_PROJECT_ID,
-  quorum: 1,
-};
-
 export const SERVICE_HTTP_500_URL = 'http://localhost:5500';
 
 export const SERVICE_UNREACHABLE_URL = 'http://unreachable:80';
 
 export const TEST_CHAINS = {
-  'bellecour-fork': {
+  'arbitrum-sepolia-fork': {
     rpcURL: 'http://localhost:8545',
-    chainId: '134',
-    smsURL: 'http://localhost:13300',
-    iexecGatewayURL: 'http://localhost:3000',
-    resultProxyURL: 'http://localhost:13200',
+    chainId: '421614',
+    smsURL: 'http://localhost:13350',
+    iexecGatewayURL: 'http://localhost:3050',
     ipfsNodeURL: 'http://localhost:5001',
     ipfsGatewayURL: 'http://localhost:8080',
+    compassURL: 'http://localhost:8069',
     pocoAdminWallet: new Wallet(
       '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
     ),
@@ -72,34 +57,7 @@ export const TEST_CHAINS = {
       pollingInterval: 100,
     }),
     defaults: {
-      hubAddress: '0x3eca1B216A7DF1C7689aEb259fFB83ADFB894E7f',
-      ensRegistryAddress: '0x5f5B93fca68c9C79318d1F3868A354EE67D8c006',
-      ensPublicResolverAddress: '0x1347d8a1840A810B990d0B774A6b7Bb8A1bd62BB',
-      isNative: true,
-      useGas: false,
-      name: 'bellecour',
-    },
-    defaultInitBalance: 0n,
-  },
-  'arbitrum-sepolia-fork': {
-    rpcURL: 'http://localhost:8555',
-    chainId: '421614',
-    smsURL: 'http://localhost:13350',
-    iexecGatewayURL: 'http://localhost:3050',
-    resultProxyURL: 'http://localhost:13250',
-    ipfsNodeURL: 'http://localhost:5001',
-    ipfsGatewayURL: 'http://localhost:8080',
-    compassURL: 'http://localhost:8069',
-    pocoAdminWallet: new Wallet(
-      '0x564a9db84969c8159f7aa3d5393c5ecd014fce6a375842a45b12af6677b12407',
-    ),
-    provider: new JsonRpcProvider('http://localhost:8555', undefined, {
-      pollingInterval: 100,
-    }),
-    defaults: {
       hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
-      isNative: false,
-      useGas: true,
       name: 'arbitrum-sepolia',
     },
     defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
@@ -108,14 +66,11 @@ export const TEST_CHAINS = {
     rpcURL: 'http://localhost:8565',
     chainId: '421615',
     hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
-    isNative: false,
-    useGas: true,
     name: 'unknown-chain',
     provider: new JsonRpcProvider('http://localhost:8565', undefined, {
       pollingInterval: 100,
     }),
     defaultInitBalance: 1n * 10n ** 18n, // 1 ETH for gas
-    ensRegistryAddress: NULL_ADDRESS,
   },
 };
 
@@ -251,15 +206,11 @@ const anvilSetNRlcTokenBalance =
     });
   };
 
-export const setBalance = (chain) => async (address, targetWeiBalance) =>
-  anvilSetBalance(chain)(address, targetWeiBalance);
+export const setBalance = (chain) => async (address, targetWeiBalance) => {
+  await anvilSetBalance(chain)(address, targetWeiBalance);
+};
 
 export const setNRlcBalance = (chain) => async (address, nRlcTargetBalance) => {
-  if (chain.isNative || chain.defaults?.isNative) {
-    const weiAmount = BigInt(`${nRlcTargetBalance}`) * 10n ** 9n; // 1 nRLC is 10^9 wei
-    await anvilSetBalance(chain)(address, weiAmount);
-    return;
-  }
   await anvilSetNRlcTokenBalance(chain)(address, nRlcTargetBalance);
 };
 

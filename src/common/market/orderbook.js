@@ -20,94 +20,44 @@ const ERROR_GETTING_ORDERBOOK = 'An error occurred while getting orderbook';
 export const fetchAppOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  appOrOptions = throwIfMissing(),
-  options,
+  {
+    app,
+    appOwner,
+    dataset,
+    workerpool,
+    requester,
+    minTag,
+    maxTag,
+    minVolume,
+    page = 0,
+    pageSize = 20,
+    isDatasetStrict = false,
+    isWorkerpoolStrict = false,
+    isRequesterStrict = false,
+  } = {},
 ) => {
   try {
-    let app;
-    let appOwner;
-    let dataset;
-    let workerpool;
-    let requester;
-    let minTag;
-    let maxTag;
-    let minVolume;
-    let page;
-    let pageSize;
-    let isDatasetStrict;
-    let isWorkerpoolStrict;
-    let isRequesterStrict;
-    if (typeof appOrOptions === 'object' && appOrOptions !== null) {
-      ({
-        app,
-        appOwner,
-        dataset,
-        workerpool,
-        requester,
-        minTag,
-        maxTag,
-        minVolume,
-        page = 0,
-        pageSize = 20,
-        isDatasetStrict = false,
-        isWorkerpoolStrict = false,
-        isRequesterStrict = false,
-      } = appOrOptions);
-    } else {
-      // deprecated
-      // eslint-disable-next-line no-console
-      console.warn(
-        'passing app as first argument is deprecated, please pass the options object containing app or appOwner instead',
-      );
-      app = appOrOptions;
-      ({
-        dataset,
-        workerpool,
-        requester,
-        minTag,
-        maxTag,
-        minVolume,
-        page = 0,
-        pageSize = 20,
-        isDatasetStrict = false,
-        isWorkerpoolStrict = false,
-        isRequesterStrict = false,
-      } = options || {});
-    }
     if (!app && !appOwner) {
       throw Error('app or appOwner is required');
     }
-
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
       ...(app && {
-        app: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('app')
-          .validate(app),
+        app: await addressOrAnySchema().label('app').validate(app),
       }),
       ...(appOwner && {
-        appOwner: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        appOwner: await addressOrAnySchema()
           .label('appOwner')
           .validate(appOwner),
       }),
       ...(dataset && {
-        dataset: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('dataset')
-          .validate(dataset),
+        dataset: await addressOrAnySchema().label('dataset').validate(dataset),
       }),
       isDatasetStrict: await booleanSchema()
         .label('isDatasetStrict')
         .validate(isDatasetStrict),
       ...(workerpool && {
-        workerpool: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        workerpool: await addressOrAnySchema()
           .label('workerpool')
           .validate(workerpool),
       }),
@@ -115,9 +65,7 @@ export const fetchAppOrderbook = async (
         .label('isWorkerpoolStrict')
         .validate(isWorkerpoolStrict),
       ...(requester && {
-        requester: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        requester: await addressOrAnySchema()
           .label('requester')
           .validate(requester),
       }),
@@ -168,97 +116,45 @@ export const fetchAppOrderbook = async (
 export const fetchDatasetOrderbook = async (
   contracts = throwIfMissing(),
   iexecGatewayURL = throwIfMissing(),
-  datasetOrOptions = throwIfMissing(),
-  options,
+  {
+    dataset,
+    datasetOwner,
+    app,
+    workerpool,
+    requester,
+    minTag,
+    maxTag,
+    minVolume,
+    page = 0,
+    pageSize = 20,
+    isAppStrict = false,
+    isWorkerpoolStrict = false,
+    isRequesterStrict = false,
+    bulkOnly = false,
+  } = {},
 ) => {
   try {
-    let dataset;
-    let datasetOwner;
-    let app;
-    let workerpool;
-    let requester;
-    let minTag;
-    let maxTag;
-    let minVolume;
-    let page;
-    let pageSize;
-    let isAppStrict;
-    let isWorkerpoolStrict;
-    let isRequesterStrict;
-    let bulkOnly;
-    if (typeof datasetOrOptions === 'object' && datasetOrOptions !== null) {
-      ({
-        dataset,
-        datasetOwner,
-        app,
-        workerpool,
-        requester,
-        minTag,
-        maxTag,
-        minVolume,
-        page = 0,
-        pageSize = 20,
-        isAppStrict = false,
-        isWorkerpoolStrict = false,
-        isRequesterStrict = false,
-        bulkOnly = false,
-      } = datasetOrOptions);
-    } else {
-      // deprecated
-      // eslint-disable-next-line no-console
-      console.warn(
-        'passing dataset as first argument is deprecated, please pass the options object containing dataset or datasetOwner instead',
-      );
-      dataset = datasetOrOptions;
-      ({
-        app,
-        workerpool,
-        requester,
-        minTag,
-        maxTag,
-        minVolume,
-        page = 0,
-        pageSize = 20,
-        isAppStrict = false,
-        isWorkerpoolStrict = false,
-        isRequesterStrict = false,
-        bulkOnly = false,
-      } = options || {});
-    }
     if (!dataset && !datasetOwner) {
       throw Error('dataset or datasetOwner is required');
     }
-
     const query = {
       chainId: await chainIdSchema().validate(contracts.chainId),
       ...(dataset && {
-        dataset: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('dataset')
-          .validate(dataset),
+        dataset: await addressOrAnySchema().label('dataset').validate(dataset),
       }),
       ...(datasetOwner && {
-        datasetOwner: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        datasetOwner: await addressOrAnySchema()
           .label('datasetOwner')
           .validate(datasetOwner),
       }),
       ...(app && {
-        app: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('app')
-          .validate(app),
+        app: await addressOrAnySchema().label('app').validate(app),
       }),
       isAppStrict: await booleanSchema()
         .label('isAppStrict')
         .validate(isAppStrict),
       ...(workerpool && {
-        workerpool: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        workerpool: await addressOrAnySchema()
           .label('workerpool')
           .validate(workerpool),
       }),
@@ -266,9 +162,7 @@ export const fetchDatasetOrderbook = async (
         .label('isWorkerpoolStrict')
         .validate(isWorkerpoolStrict),
       ...(requester && {
-        requester: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        requester: await addressOrAnySchema()
           .label('requester')
           .validate(requester),
       }),
@@ -345,36 +239,24 @@ export const fetchWorkerpoolOrderbook = async (
         .validate(contracts.chainId),
       category: await uint256Schema().label('category').validate(category),
       ...(workerpool && {
-        workerpool: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        workerpool: await addressOrAnySchema()
           .label('workerpool')
           .validate(workerpool),
       }),
       ...(app && {
-        app: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('app')
-          .validate(app),
+        app: await addressOrAnySchema().label('app').validate(app),
       }),
       isAppStrict: await booleanSchema()
         .label('isAppStrict')
         .validate(isAppStrict),
       ...(dataset && {
-        dataset: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('dataset')
-          .validate(dataset),
+        dataset: await addressOrAnySchema().label('dataset').validate(dataset),
       }),
       isDatasetStrict: await booleanSchema()
         .label('isDatasetStrict')
         .validate(isDatasetStrict),
       ...(requester && {
-        requester: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        requester: await addressOrAnySchema()
           .label('requester')
           .validate(requester),
       }),
@@ -392,9 +274,7 @@ export const fetchWorkerpoolOrderbook = async (
           .validate(maxTag),
       }),
       ...(workerpoolOwner && {
-        workerpoolOwner: await addressSchema({
-          ethProvider: contracts.provider,
-        })
+        workerpoolOwner: await addressSchema()
           .label('workerpoolOwner')
           .validate(workerpoolOwner),
       }),
@@ -460,37 +340,23 @@ export const fetchRequestOrderbook = async (
         .validate(contracts.chainId),
       category: await uint256Schema().label('category').validate(category),
       ...(requester && {
-        requester: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        requester: await addressOrAnySchema()
           .label('requester')
           .validate(requester),
       }),
       ...(beneficiary && {
-        beneficiary: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        beneficiary: await addressOrAnySchema()
           .label('beneficiary')
           .validate(beneficiary),
       }),
       ...(app && {
-        app: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('app')
-          .validate(app),
+        app: await addressOrAnySchema().label('app').validate(app),
       }),
       ...(dataset && {
-        dataset: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
-          .label('dataset')
-          .validate(dataset),
+        dataset: await addressOrAnySchema().label('dataset').validate(dataset),
       }),
       ...(workerpool && {
-        workerpool: await addressOrAnySchema({
-          ethProvider: contracts.provider,
-        })
+        workerpool: await addressOrAnySchema()
           .label('workerpool')
           .validate(workerpool),
       }),

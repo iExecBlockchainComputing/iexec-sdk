@@ -3,7 +3,6 @@ import IExecAccountModule from './IExecAccountModule.js';
 import IExecAppModule from './IExecAppModule.js';
 import IExecDatasetModule from './IExecDatasetModule.js';
 import IExecDealModule from './IExecDealModule.js';
-import IExecENSModule from './IExecENSModule.js';
 import IExecHubModule from './IExecHubModule.js';
 import IExecNetworkModule from './IExecNetworkModule.js';
 import IExecOrderModule from './IExecOrderModule.js';
@@ -32,7 +31,6 @@ export default class IExec extends IExecModule {
     this.result = IExecResultModule.fromConfig(this.config);
     this.secrets = IExecSecretsModule.fromConfig(this.config);
     this.storage = IExecStorageModule.fromConfig(this.config);
-    this.ens = IExecENSModule.fromConfig(this.config);
     this.network = IExecNetworkModule.fromConfig(this.config);
   }
 }

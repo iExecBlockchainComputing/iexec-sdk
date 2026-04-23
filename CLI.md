@@ -68,7 +68,7 @@ iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
-> _NB:_ iExec SDK CLI access the public blockchain (mainnet) through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
+> _NB:_ iExec SDK CLI access the blockchain through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
 >
 > Default API keys for backend services are provided for convenience.
 > As these keys are shared across all users and are subject to rate limits, **you must use your own API keys** or better **your own node**.
@@ -103,8 +103,7 @@ iexec storage init # initialize your remote storage
 >    "default": ...,
 >    "chains": {
 >       ...
->       "mainnet": {
->         "id": "1",
+>       "arbitrum-mainnet": {
 >         "host": "http://localhost:8545"
 >       }
 >    }
@@ -312,7 +311,6 @@ Commands:
 - [iexec task](#iexec-task)
 - [iexec storage](#iexec-storage)
 - [iexec result](#iexec-result)
-- [iexec ens](#iexec-ens)
 - [iexec category](#iexec-category)
 - [info](#iexec-info)
 
@@ -356,9 +354,6 @@ Commands:
 - [send-ether](#iexec-wallet-send-ether)
 - [send-RLC](#iexec-wallet-send-rlc)
 - [sweep](#iexec-wallet-sweep)
-- [bridge-to-sidechain](#iexec-wallet-bridge-to-sidechain)
-- [bridge-to-mainchain](#iexec-wallet-bridge-to-mainchain)
-- [sendRLC](#iexec-wallet-sendrlc)
 
 #### iexec wallet create
 
@@ -427,8 +422,6 @@ Options:
 
 #### iexec wallet send-ether
 
-_Alias: sendETH_
-
 send ether to an address (default unit ether)
 
 Usage:
@@ -448,7 +441,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --to \<address\> | receiver address |
@@ -474,7 +466,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --to \<address\> | receiver address |
@@ -500,83 +491,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force | force perform action without prompting user |
-| --to \<address\> | receiver address |
-
-#### iexec wallet bridge-to-sidechain
-
-send RLC from the mainchain to the sidechain (default unit nRLC)
-
-Usage:
-
-```sh
-iexec wallet bridge-to-sidechain <amount> [unit] [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force | force perform action without prompting user |
-
-#### iexec wallet bridge-to-mainchain
-
-send RLC from the sidechain to the mainchain (default unit nRLC)
-
-Usage:
-
-```sh
-iexec wallet bridge-to-mainchain <amount> [unit] [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --force | force perform action without prompting user |
-
-#### iexec wallet sendRLC
-
-\[DEPRECATED see send-RLC\] send RLC to an address (WARNING! default unit nRLC)
-
-Usage:
-
-```sh
-iexec wallet sendRLC <amount> [unit] [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --to \<address\> | receiver address |
@@ -621,7 +535,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec account withdraw
@@ -645,7 +558,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec account show
@@ -691,7 +603,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec account allowance
@@ -738,7 +649,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 ### iexec app
@@ -785,7 +695,6 @@ Options:
 | --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --tee-framework \<name\> | specify the TEE framework to use |
 
 #### iexec app deploy
 
@@ -808,7 +717,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec app show
@@ -973,7 +881,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --watch | watch execution status changes |
@@ -984,7 +891,7 @@ Options:
 | --secret \<secretMapping...\> | specify the requester secrets mappings (\<appSecretKey\>=\<requesterSecretName\>) to use in the app (only available for TEE tasks, use with --tag tee)<br/>\* usage: <br/>  \* \[command\] \[args\] --secret 1=login 2=password<br/>  \* \[command\] \[args\] --secret 1=login --secret 2=password<br/>  \* \[command\] --secret 1=login --secret 2=password -- \[args\]<br/>\* please note that this option is variadic, any number of mappings can be passed, use `--` to stop the list<br/> |
 | --category \<id\> | id of the task category |
 | --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
-| --storage-provider \<"ipfs"\|"dropbox"\> | specify the storage to use to store the result archive |
+| --storage-provider \<"dropbox"\|"ipfs"\> | specify the storage to use to store the result archive |
 | --callback \<address\> | specify the callback address of the request |
 | --encrypt-result | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee) |
 | --trust \<integer\> | trust level |
@@ -1025,7 +932,7 @@ Options:
 | --category \<id\> | id of the task category |
 | --tag \<tag\> | specify tags<br/>\* usage: --tag tag1,tag2 |
 | --volume \<volume\> | number of run |
-| --storage-provider \<"ipfs"\|"dropbox"\> | specify the storage to use to store the result archive |
+| --storage-provider \<"dropbox"\|"ipfs"\> | specify the storage to use to store the result archive |
 | --callback \<address\> | specify the callback address of the request |
 | --encrypt-result | encrypt the result archive with the beneficiary public key (only available for TEE tasks, use with --tag tee) |
 | --trust \<integer\> | trust level |
@@ -1054,7 +961,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --to \<address\> | receiver address |
@@ -1129,7 +1035,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec dataset show
@@ -1315,7 +1220,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --to \<address\> | receiver address |
@@ -1334,7 +1238,6 @@ Commands:
 
 - [init](#iexec-workerpool-init)
 - [deploy](#iexec-workerpool-deploy)
-- [set-api-url](#iexec-workerpool-set-api-url)
 - [show](#iexec-workerpool-show)
 - [count](#iexec-workerpool-count)
 - [publish](#iexec-workerpool-publish)
@@ -1383,31 +1286,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-
-#### iexec workerpool set-api-url
-
-declare the workerpool API URL on the blockchain
-
-Usage:
-
-```sh
-iexec workerpool set-api-url <apiUrl> [workerpoolAddress] [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec workerpool show
@@ -1532,7 +1410,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --to \<address\> | receiver address |
@@ -1692,7 +1569,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --app \<orderHash\> | specify the app order from the marketplace to fill |
@@ -1778,7 +1654,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 | --force | force perform action without prompting user |
 | --app | cancel a signed apporder |
@@ -2000,7 +1875,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 ### iexec task
@@ -2090,7 +1964,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 ### iexec storage
@@ -2115,7 +1988,7 @@ initialize the remote storage
 Usage:
 
 ```sh
-iexec storage init [provider] [options]
+iexec storage init <provider> [options]
 ```
 
 Options:
@@ -2139,7 +2012,7 @@ check if the remote storage is initialized
 Usage:
 
 ```sh
-iexec storage check [provider] [options]
+iexec storage check <provider> [options]
 ```
 
 Options:
@@ -2271,104 +2144,6 @@ Options:
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
 
-### iexec ens
-
-manage ENS names
-
-Usage:
-
-```sh
-iexec ens <command> [options]
-```
-
-Commands:
-
-- [resolve](#iexec-ens-resolve)
-- [lookup](#iexec-ens-lookup)
-- [get-owner](#iexec-ens-get-owner)
-- [register](#iexec-ens-register)
-
-#### iexec ens resolve
-
-resolve an ENS name to an address
-
-Usage:
-
-```sh
-iexec ens resolve <name> [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --chain \<name\> | chain name from "chain.json" |
-
-#### iexec ens lookup
-
-lookup for the ENS name of an address
-
-Usage:
-
-```sh
-iexec ens lookup <address> [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --chain \<name\> | chain name from "chain.json" |
-
-#### iexec ens get-owner
-
-find the the owner address of an ENS name
-
-Usage:
-
-```sh
-iexec ens get-owner <name> [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --chain \<name\> | chain name from "chain.json" |
-
-#### iexec ens register
-
-register an ENS if needed and setup both ENS resolution and reverse resolution
-
-Usage:
-
-```sh
-iexec ens register <label> [options]
-```
-
-Options:
-
-| option | description |
-| --- | --- |
-| --raw | use raw output |
-| --quiet | stop prompting updates |
-| --password \<password\> | password used to encrypt the wallet (unsafe) |
-| --wallet-file \<walletFileName\> | specify the name of the wallet file to use |
-| --wallet-address \<walletAddress\> | specify the address of the wallet to use |
-| --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
-| --chain \<name\> | chain name from "chain.json" |
-| --force | force perform action without prompting user |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
-| --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
-| --domain \<domain\> | use the specified ENS domain (default `users.iexec.eth`)<br/> - if the ENS name (label.domain) is not owned by the user, the domain must be controlled by a FIFS registrar<br/> - if the ENS name (label.domain) is already owned by the user, the registration will be skipped |
-| --for \<address\> | register for an owned iExec app, dataset or workerpool |
-
 ### iexec category
 
 manage iExec categories
@@ -2424,7 +2199,6 @@ Options:
 | --wallet-address \<walletAddress\> | specify the address of the wallet to use |
 | --keystoredir \<path\> | specify the wallet directory \<"global"\|"local"\|custom\> |
 | --chain \<name\> | chain name from "chain.json" |
-| --gas-price \<amount unit...\> | set custom gas price for transactions (default unit wei) |
 | --confirms \<blockCount\> | set custom block count to wait for transactions confirmation (default 1 block) |
 
 #### iexec category show
@@ -2597,64 +2371,23 @@ The `chain.json` file, located in every iExec project, describes the parameters 
   - optional key `host` set the url of the ethereum node used by the SDK cli on each chain (overwrite default value).
   - optional key `hub` set the address of the hub used by the SDK cli on each chain (overwrite default value).
   - optional key `sms` set the url of the Secret Management Service used by the SDK cli on each chain (overwrite default value).
-  - optional key `resultProxy` set the url of the Result Proxy used by the SDK cli on each chain (overwrite default value).
   - optional key `iexecGateway` set the url of the iexec marketplace gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `ipfsGateway` set the url of the IPFS gateway used by the SDK cli on each chain (overwrite default value).
   - optional key `pocoSubgraph` set the url of the PoCo subgraph used by the SDK cli on each chain (overwrite default value).
-  - optional key `bridge` set the bridge used by the SDK cli when working with bridged networks (sidechain). `bridge.contract` set the address of the RLC bridge on the chain, `bridge.bridgedChainName` set the reference to the bridged network.
-  - optional key `native` specify whether or not the chain native token is RLC (overwrite default value: chain value or `false`).
-  - optional key `useGas` specify whether or not the chain requires to spend gas to send a transaction (overwrite default value: chain value or `true`).
-- optional key `providers` set the backends for public chains
-  - optional key `alchemy` set Alchemy API Token
-  - optional key `etherscan` set Etherscan API Token
-  - optional key `infura` set INFURA Project ID or ProjectID and Project Secret
-  - optional key `quorum` set minimum number of backends that must agree before forwarding blockchain responses
 
 ```json
 {
-  "default": "bellecour",
+  "default": "arbitrum-sepolia-testnet",
   "chains": {
     "dev": {
       "host": "http://localhost:8545",
       "id": "65535",
-      "sms": {
-        "scone": "http://localhost:5000"
-      },
-      "resultProxy": "http://localhost:8089",
+      "sms": "http://localhost:5000",
       "ipfsGateway": "http://localhost:8080",
-      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
-      "bridge": {
-        "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedChainName": "dev-sidechain"
-      }
+      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca"
     },
-    "dev-sidechain": {
-      "host": "http://localhost:18545",
-      "id": "123456",
-      "sms": {
-        "scone": "http://localhost:15000"
-      },
-      "resultProxy": "http://localhost:18089",
-      "ipfsGateway": "http://localhost:18080",
-      "native": true,
-      "useGas": false,
-      "hub": "0xC129e7917b7c7DeDfAa5Fff1FB18d5D7050fE8ca",
-      "bridge": {
-        "contract": "0x1e32aFA55854B6c015D284E3ccA9aA5a463A1418",
-        "bridgedChainName": "development"
-      }
-    },
-    "mainnet": {},
-    "bellecour": {}
-  },
-  "providers": {
-    "alchemy": "ALCHEMY_API_KEY",
-    "etherscan": "ETHERSCAN_API_KEY",
-    "infura": {
-      "projectId": "INFURA_PROJECT_ID",
-      "projectSecret": "INFURA_PROJECT_SECRET"
-    },
-    "quorum": 1
+    "arbitrum-sepolia-testnet": {},
+    "arbitrum-mainnet": {}
   }
 }
 ```

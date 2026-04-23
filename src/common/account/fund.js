@@ -3,12 +3,7 @@ import BN from 'bn.js';
 import { checkBalance } from './balance.js';
 import { getAddress } from '../wallet/address.js';
 import { checkBalances } from '../wallet/balance.js';
-import {
-  checkEventFromLogs,
-  bnNRlcToBnWei,
-  bnToBigInt,
-  checkSigner,
-} from '../utils/utils.js';
+import { checkEventFromLogs, checkSigner } from '../utils/utils.js';
 import { NULL_BYTES } from '../utils/constant.js';
 import { nRlcAmountSchema, throwIfMissing } from '../utils/validator.js';
 import { wrapCall, wrapSend, wrapWait } from '../utils/errorWrappers.js';
@@ -31,36 +26,16 @@ export const deposit = async (
     );
     if (nRLC.lt(new BN(vAmount)))
       throw new Error('Deposit amount exceed wallet balance');
-    const iexecContract = contracts.getIExecContract();
-    if (!contracts.isNative) {
-      const rlcContract = await wrapCall(contracts.fetchTokenContract());
-      const tx = await wrapSend(
-        rlcContract.approveAndCall(
-          contracts.hubAddress,
-          vAmount,
-          NULL_BYTES,
-          contracts.txOptions,
-        ),
-      );
-      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      if (!checkEventFromLogs('Approval', txReceipt.logs))
-        throw new Error('Approval not confirmed');
-      if (!checkEventFromLogs('Transfer', txReceipt.logs))
-        throw new Error('Transfer not confirmed');
-      txHash = tx.hash;
-    } else {
-      const weiAmount = bnToBigInt(bnNRlcToBnWei(new BN(vAmount)));
-      const tx = await wrapSend(
-        iexecContract.deposit({
-          value: weiAmount,
-          ...contracts.txOptions,
-        }),
-      );
-      const txReceipt = await wrapWait(tx.wait(contracts.confirms));
-      if (!checkEventFromLogs('Transfer', txReceipt.logs))
-        throw new Error('Deposit not confirmed');
-      txHash = tx.hash;
-    }
+    const rlcContract = await wrapCall(contracts.fetchTokenContract());
+    const tx = await wrapSend(
+      rlcContract.approveAndCall(contracts.hubAddress, vAmount, NULL_BYTES),
+    );
+    const txReceipt = await wrapWait(tx.wait(contracts.confirms));
+    if (!checkEventFromLogs('Approval', txReceipt.logs))
+      throw new Error('Approval not confirmed');
+    if (!checkEventFromLogs('Transfer', txReceipt.logs))
+      throw new Error('Transfer not confirmed');
+    txHash = tx.hash;
     return { amount: vAmount, txHash };
   } catch (error) {
     debug('deposit()', error);
@@ -84,9 +59,7 @@ export const withdraw = async (
     );
     if (stake.lt(new BN(vAmount)))
       throw new Error('Withdraw amount exceed account balance');
-    const tx = await wrapSend(
-      iexecContract.withdraw(vAmount, contracts.txOptions),
-    );
+    const tx = await wrapSend(iexecContract.withdraw(vAmount));
     const txReceipt = await wrapWait(tx.wait(contracts.confirms));
     if (!checkEventFromLogs('Transfer', txReceipt.logs))
       throw new Error('Withdraw not confirmed');

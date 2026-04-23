@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 
 import { program as cli } from 'commander';
-import { checkWeb2SecretExists } from '../../common/sms/check.js';
-import { pushWeb2Secret } from '../../common/sms/push.js';
-import { login as resultProxyLogin } from '../../common/storage/result-proxy.js';
-import { getStorageTokenKeyName } from '../../common/utils/secrets-utils.js';
 import {
   finalizeCli,
   addGlobalOptions,
@@ -20,10 +16,15 @@ import {
 } from '../utils/cli-helper.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
 import { Keystore } from '../utils/keystore.js';
+import { STORAGE_PROVIDERS } from '../../common/utils/constant.js';
+import {
+  checkStorageTokenExists,
+  pushStorageToken,
+} from '../../common/execution/storage.js';
 
 cli.name('iexec storage').usage('<command> [options]');
 
-const initStorage = cli.command('init [provider]');
+const initStorage = cli.command('init <provider>');
 addGlobalOptions(initStorage);
 addWalletLoadOptions(initStorage);
 initStorage
@@ -43,14 +44,11 @@ initStorage
       ]);
       const { contracts } = chain;
       const smsURL = getPropertyFromChain(chain, 'sms');
-      const resultProxyURL = getPropertyFromChain(chain, 'resultProxy');
-      const providerName = provider || 'default';
-      const tokenKeyName = getStorageTokenKeyName(providerName);
-      const tokenExists = await checkWeb2SecretExists(
-        contracts,
-        smsURL,
+      const providerName = provider || STORAGE_PROVIDERS.IPFS;
+      const tokenExists = await checkStorageTokenExists(
+        { smsURL },
         address,
-        tokenKeyName,
+        providerName,
       );
       if (tokenExists && !opts.forceUpdate) {
         throw new Error(
@@ -59,24 +57,16 @@ initStorage
           } option to update your storage token`,
         );
       }
-
-      let token;
-      if (providerName === 'default') {
-        await connectKeystore(chain, keystore);
-        token = await resultProxyLogin(contracts, resultProxyURL);
-      } else {
-        token =
-          opts.token ||
-          (await prompt.password(`Paste your ${provider} token`, {
-            useMask: true,
-          }));
-        await connectKeystore(chain, keystore);
-      }
-      const { isPushed, isUpdated } = await pushWeb2Secret(
-        contracts,
-        smsURL,
-        tokenKeyName,
+      const token =
+        opts.token ||
+        (await prompt.password(`Paste your ${provider} token`, {
+          useMask: true,
+        }));
+      await connectKeystore(chain, keystore);
+      const { isPushed, isUpdated } = await pushStorageToken(
+        { contracts, smsURL },
         token,
+        providerName,
         { forceUpdate: !!opts.forceUpdate },
       );
       if (isPushed) {
@@ -94,7 +84,7 @@ initStorage
     }
   });
 
-const checkStorage = cli.command('check [provider]');
+const checkStorage = cli.command('check <provider>');
 addGlobalOptions(checkStorage);
 addWalletLoadOptions(checkStorage);
 checkStorage
@@ -111,19 +101,16 @@ checkStorage
         loadChain(opts.chain, { spinner }),
         keystore.accounts(),
       ]);
-      const { contracts } = chain;
       const smsURL = getPropertyFromChain(chain, 'sms');
-      const providerName = provider || 'default';
-      const tokenKeyName = getStorageTokenKeyName(providerName);
+      const providerName = provider || STORAGE_PROVIDERS.IPFS;
       const userAddress = opts.user || address;
       spinner.info(
         `Checking ${providerName} storage token for user ${userAddress}`,
       );
-      const tokenExists = await checkWeb2SecretExists(
-        contracts,
-        smsURL,
+      const tokenExists = await checkStorageTokenExists(
+        { smsURL },
         userAddress,
-        tokenKeyName,
+        providerName,
       );
       if (tokenExists) {
         spinner.succeed('Storage already initialized', {

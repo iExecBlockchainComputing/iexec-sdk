@@ -107,7 +107,7 @@ describe('order', () => {
           datasetrestrict,
           workerpoolrestrict,
           requesterrestrict,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
           volume: 100,
         });
         expect(order).toEqual({
@@ -115,7 +115,7 @@ describe('order', () => {
           appprice: '1000000000',
           datasetrestrict,
           requesterrestrict,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+          tag: encodeTag(['tee', 'tdx']),
           volume: '100',
           workerpoolrestrict,
         });
@@ -201,7 +201,7 @@ describe('order', () => {
           apprestrict,
           datasetrestrict,
           requesterrestrict,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
           trust: '10',
           volume: '100',
         });
@@ -210,7 +210,7 @@ describe('order', () => {
           category: '5',
           datasetrestrict,
           requesterrestrict,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+          tag: encodeTag(['tee', 'tdx']),
           trust: '10',
           volume: '100',
           workerpool,
@@ -265,9 +265,8 @@ describe('order', () => {
           params: {
             iexec_result_storage_provider: 'dropbox',
             iexec_result_encryption: true,
-            iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
           },
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
           trust: '100',
           volume: '5',
         });
@@ -282,10 +281,9 @@ describe('order', () => {
           params: {
             iexec_result_storage_provider: 'dropbox',
             iexec_result_encryption: true,
-            iexec_result_storage_proxy: 'https://custom-result-proxy.iex.ec',
           },
           requester: wallet.address,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+          tag: encodeTag(['tee', 'tdx']),
           trust: '100',
           volume: '5',
           workerpool,
@@ -313,36 +311,19 @@ describe('order', () => {
         });
       });
 
-      test('preflightCheck TEE framework', async () => {
+      test('prevent creation of order for legacy TEE apps', async () => {
         const { iexec } = await getTestConfig(testChain)();
-        const { address: sconeAppAddress } = await deployRandomApp(iexec, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
+        const { address: appAddress } = await deployRandomApp(iexec, {
+          teeFramework: 'scone', // legacy SCONE app
         });
-
         const sconeAppOrder = await iexec.order.createApporder({
-          app: sconeAppAddress,
+          app: appAddress,
         });
         await expect(iexec.order.signApporder(sconeAppOrder)).rejects.toThrow(
-          new Error('Tag mismatch the TEE framework specified by app'),
+          new Error(
+            `App ${appAddress} has an MREnclave, which is no longer supported`,
+          ),
         );
-        await expect(
-          iexec.order.signApporder({ ...sconeAppOrder, tag: ['tee', 'scone'] }),
-        ).resolves.toBeDefined();
-
-        const { address: tdxAppAddress } = await deployRandomApp(iexec, {
-          teeFramework: TEE_FRAMEWORKS.TDX,
-        });
-        const tdxAppOrder = await iexec.order.createApporder({
-          app: tdxAppAddress,
-        });
-        await expect(
-          iexec.order.signApporder({ ...tdxAppOrder, tag: ['tee', 'scone'] }),
-        ).rejects.toThrow(
-          new Error('Tag mismatch the TEE framework specified by app'),
-        );
-        await expect(
-          iexec.order.signApporder({ ...tdxAppOrder, tag: ['tee', 'tdx'] }),
-        ).resolves.toBeDefined();
       });
 
       test('preflightCheck fails with invalid tag', async () => {
@@ -353,23 +334,18 @@ describe('order', () => {
         await expect(
           iexec.order.signApporder({ ...order, tag: ['tee'] }),
         ).rejects.toThrow(
-          new Error(
-            "'tee' tag must be used with a tee framework ('scone'|'tdx')",
-          ),
+          new Error("'tee' tag must be used with a tee framework ('tdx')"),
         );
-        await expect(
-          iexec.order.signApporder({ ...order, tag: ['scone'] }),
-        ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
         await expect(
           iexec.order.signApporder({ ...order, tag: ['tdx'] }),
         ).rejects.toThrow(Error("'tdx' tag must be used with 'tee' tag"));
         await expect(
           iexec.order.signApporder({
             ...order,
-            tag: ['tee', 'scone', 'tdx'],
+            tag: ['scone', 'tdx'],
           }),
         ).rejects.toThrow(
-          new Error("tee framework tags are exclusive ('scone'|'tdx')"),
+          new Error("Unsupported legacy TEE framework tag ('scone')"),
         );
       });
     });
@@ -421,8 +397,8 @@ describe('order', () => {
           dataset: getRandomAddress(),
         });
         await expect(
-          iexec.order.signDatasetorder({ ...order, tag: ['scone'] }),
-        ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
+          iexec.order.signDatasetorder({ ...order, tag: ['tdx'] }),
+        ).rejects.toThrow(Error("'tdx' tag must be used with 'tee' tag"));
       });
     });
 
@@ -465,7 +441,7 @@ describe('order', () => {
         });
       });
 
-      test('preflightCheck fails with invalid tag', async () => {
+      test('legacy TEE framework tags are not supported', async () => {
         const { iexec } = await getTestConfig(testChain)();
         const order = await iexec.order.createRequestorder({
           app: getRandomAddress(),
@@ -473,21 +449,30 @@ describe('order', () => {
         });
         await expect(
           iexec.order.signRequestorder({ ...order, tag: ['scone'] }),
-        ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
+        ).rejects.toThrow(
+          Error("Unsupported legacy TEE framework tag ('scone')"),
+        );
+        await expect(
+          iexec.order.signRequestorder({ ...order, tag: ['gramine'] }),
+        ).rejects.toThrow(
+          Error("Unsupported legacy TEE framework tag ('gramine')"),
+        );
+      });
+
+      test('TEE framework tag requires tee tag', async () => {
+        const { iexec } = await getTestConfig(testChain)();
+        const order = await iexec.order.createRequestorder({
+          app: getRandomAddress(),
+          category: 5,
+        });
         await expect(
           iexec.order.signRequestorder({ ...order, tag: ['scone'] }),
-        ).rejects.toThrow(Error("'scone' tag must be used with 'tee' tag"));
+        ).rejects.toThrow(
+          Error("Unsupported legacy TEE framework tag ('scone')"),
+        );
         await expect(
           iexec.order.signRequestorder({ ...order, tag: ['tdx'] }),
         ).rejects.toThrow(Error("'tdx' tag must be used with 'tee' tag"));
-        await expect(
-          iexec.order.signRequestorder({
-            ...order,
-            tag: ['tee', 'scone', 'tdx'],
-          }),
-        ).rejects.toThrow(
-          new Error("tee framework tags are exclusive ('scone'|'tdx')"),
-        );
       });
 
       test('preflightCheck dropbox storage token exists', async () => {
@@ -495,7 +480,7 @@ describe('order', () => {
         const order = await iexec.order.createRequestorder({
           app: getRandomAddress(),
           category: 5,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
           params: {
             iexec_result_storage_provider: 'dropbox',
           },
@@ -507,7 +492,7 @@ describe('order', () => {
           ),
         );
 
-        await iexec.storage.pushStorageToken('oops', { provider: 'dropbox' });
+        await iexec.storage.pushStorageToken('oops', 'dropbox');
         const res = await iexec.order.signRequestorder(order);
         expect(res.salt).toBeTxHash();
         expect(res.sign).toMatch(signRegex);
@@ -525,9 +510,6 @@ describe('order', () => {
           category: 5,
           params: { iexec_result_encryption: true },
         });
-        await iexec.storage
-          .defaultStorageLogin()
-          .then(iexec.storage.pushStorageToken);
         await expect(iexec.order.signRequestorder(order)).rejects.toThrow(
           new Error(
             'Beneficiary result encryption key is not set in the SMS. Result encryption will fail.',
@@ -549,10 +531,6 @@ describe('order', () => {
           await getTestConfig(testChain)();
         const { iexec: iexecDatasetConsumer } =
           await getTestConfig(testChain)();
-
-        await iexecDatasetConsumer.storage
-          .defaultStorageLogin()
-          .then(iexecDatasetConsumer.storage.pushStorageToken);
         const { address: dataset } =
           await deployRandomDataset(iexecDatasetProvider);
 
@@ -574,7 +552,7 @@ describe('order', () => {
               app: getRandomAddress(),
               category: 5,
               dataset,
-              tag: ['tee', 'scone'],
+              tag: ['tee', 'tdx'],
             })
             .then(iexecDatasetConsumer.order.signRequestorder),
         ).rejects.toThrow(
@@ -609,7 +587,7 @@ describe('order', () => {
               app: getRandomAddress(),
               category: 5,
               dataset,
-              tag: ['tee', 'scone'],
+              tag: ['tee', 'tdx'],
             })
             .then(iexecDatasetConsumer.order.signRequestorder),
         ).resolves.toBeDefined();
@@ -617,17 +595,13 @@ describe('order', () => {
 
       test('preflightCheck requester secrets exist', async () => {
         const { iexec, wallet } = await getTestConfig(testChain)();
-        await iexec.storage
-          .defaultStorageLogin()
-          .then(iexec.storage.pushStorageToken);
-
         // non requester secret pass
         await expect(
           iexec.order
             .createRequestorder({
               app: getRandomAddress(),
               category: 5,
-              tag: ['tee', 'scone'],
+              tag: ['tee', 'tdx'],
             })
             .then(iexec.order.signRequestorder),
         ).resolves.toBeDefined();
@@ -639,7 +613,7 @@ describe('order', () => {
             .createRequestorder({
               app: getRandomAddress(),
               category: 5,
-              tag: ['tee', 'scone'],
+              tag: ['tee', 'tdx'],
               params: {
                 iexec_secrets: {
                   1: 'foo',
@@ -660,7 +634,7 @@ describe('order', () => {
             .createRequestorder({
               app: getRandomAddress(),
               category: 5,
-              tag: ['tee', 'scone'],
+              tag: ['tee', 'tdx'],
               params: {
                 iexec_secrets: {
                   1: 'foo',
@@ -684,7 +658,7 @@ describe('order', () => {
           app: '0x76fE91568d50C5fF9411223df5A0c50Ec5fa326A',
           appprice: 0,
           volume: 1000000,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000003',
+          tag: '0x0000000000000000000000000000000000000000000000000000000000000009',
           datasetrestrict: '0x0000000000000000000000000000000000000000',
           workerpoolrestrict: '0x0000000000000000000000000000000000000000',
           requesterrestrict: '0x0000000000000000000000000000000000000000',
@@ -693,7 +667,7 @@ describe('order', () => {
         };
         const res = await iexec.order.hashApporder(order);
         expect(res).toBe(
-          '0x735c56b20217f96aa9a0938cbaf4889721bb4a6421a5fcf47d9bb90b8dcd2b95',
+          '0xdf5b460cef1d8420f358a93d85f206415cfcf34f1be87a9e15886fca910a0363',
         );
       });
     });
@@ -756,7 +730,7 @@ describe('order', () => {
           dataset: '0x69d4a400CFf9838985cD2950aafF28289afc6ad3',
           workerpool: '0x0000000000000000000000000000000000000000',
           params:
-            '{"iexec_result_storage_provider":"ipfs","iexec_result_storage_proxy":"https://result.v8-bellecour.iex.ec","iexec_result_encryption":false,"iexec_args":"\\"0x4e64fb5fa96eb73ef37dacd416eb2bade0ea8f9e7efebe42abe9a062a9caede836ee4da1ec1a72264e1287e74fba7fdc76edce05729c4b2ecf6fb8970f13f8321b 22\\""}',
+            '{"iexec_result_encryption":false,"iexec_args":"\\"0x4e64fb5fa96eb73ef37dacd416eb2bade0ea8f9e7efebe42abe9a062a9caede836ee4da1ec1a72264e1287e74fba7fdc76edce05729c4b2ecf6fb8970f13f8321b 22\\""}',
           appmaxprice: 0,
           datasetmaxprice: 0,
           workerpoolmaxprice: 0,
@@ -773,7 +747,7 @@ describe('order', () => {
         const res = await iexec.order.hashRequestorder(order);
         expect(res).toBeTxHash();
         expect(res).toBe(
-          '0xa8216862377a316c180fa28ed3bda170e7ef95b20a1b96daaa24c7dae84e35a5',
+          '0x46872d0a641b78875f1fd2b59086073ac1fefd1ab54d4cb333ade2a868aaf975',
         );
       });
     });
@@ -972,8 +946,7 @@ describe('order', () => {
         const { iexec } = await getTestConfig(testChain)();
         const { iexec: iexecAppDev } = await getTestConfig(testChain)();
         const apporder = await deployAndGetApporder(iexecAppDev, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
         });
         await iexecAppDev.order.publishApporder(apporder);
         const requestorder = await iexec.order
@@ -1017,8 +990,7 @@ describe('order', () => {
         const { iexec } = await getTestConfig(testChain)();
         const { iexec: iexecAppDev } = await getTestConfig(testChain)();
         const apporder = await deployAndGetApporder(iexecAppDev, {
-          teeFramework: TEE_FRAMEWORKS.SCONE,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
         });
         await iexecAppDev.order.publishApporder(apporder);
         const requestorder = await iexec.order
@@ -1027,7 +999,7 @@ describe('order', () => {
             appmaxprice: apporder.appprice,
             category: 1,
             params: { iexec_result_storage_provider: 'dropbox' },
-            tag: ['tee', 'scone'],
+            tag: ['tee', 'tdx'],
           })
           .then((o) =>
             iexec.order.signRequestorder(o, { preflightCheck: false }),
@@ -1039,7 +1011,7 @@ describe('order', () => {
             'Requester storage token is not set for selected provider "dropbox". Result archive upload will fail.',
           ),
         );
-        await iexec.storage.pushStorageToken(`foo`, { provider: 'dropbox' });
+        await iexec.storage.pushStorageToken('foo', 'dropbox');
         const orderHash = await iexec.order.publishRequestorder(requestorder);
         expect(orderHash).toBeTxHash();
       });
@@ -1722,7 +1694,7 @@ describe('order', () => {
       const requestorderTagTeeGpu = await iexecRequester.order.signRequestorder(
         {
           ...requestorderTemplate,
-          tag: ['tee', 'scone', 'gpu'],
+          tag: ['tee', 'tdx', 'gpu'],
         },
         { preflightCheck: false },
       );
@@ -1734,7 +1706,7 @@ describe('order', () => {
       const workerpoolorderTagTee =
         await iexecPoolManager.order.signWorkerpoolorder({
           ...workerpoolorderTemplate,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
         });
       await expect(
         iexecBroker.order.matchOrders(
@@ -1746,7 +1718,7 @@ describe('order', () => {
           },
           { preflightCheck: false },
         ),
-      ).rejects.toThrow(Error('Missing tags [tee,scone] in workerpoolorder'));
+      ).rejects.toThrow(Error('Missing tags [tee,tdx] in workerpoolorder'));
       const apporderTagGpu = await iexecAppProvider.order.signApporder({
         ...apporderTemplate,
         tag: ['gpu'],
@@ -1785,7 +1757,7 @@ describe('order', () => {
       const requestorderTagTee = await iexecRequester.order.signRequestorder(
         {
           ...requestorderTemplate,
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
         },
         { preflightCheck: false },
       );
@@ -2100,8 +2072,7 @@ describe('order', () => {
       });
 
       const teeApporder = await deployAndGetApporder(iexecResourcesProvider, {
-        teeFramework: TEE_FRAMEWORKS.SCONE,
-        tag: ['tee', 'scone'],
+        tag: ['tee', 'tdx'],
       });
       const teeDatasetorder = await deployAndGetDatasetorder(
         iexecResourcesProvider,
@@ -2110,7 +2081,7 @@ describe('order', () => {
       const teeWorkerpoolorder = await deployAndGetWorkerpoolorder(
         iexecResourcesProvider,
         {
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
         },
       );
       const res = await iexecRequester.order.matchOrders({
@@ -2123,27 +2094,6 @@ describe('order', () => {
       expect(res.volume).toBeInstanceOf(BN);
       expect(res.volume.eq(new BN(1))).toBe(true);
       expect(res.dealid).toBeTxHash();
-
-      // trigger app check
-      await expect(
-        iexecRequester.order.matchOrders({
-          apporder,
-          datasetorder,
-          workerpoolorder: teeWorkerpoolorder,
-          requestorder: await getMatchableRequestorder(iexecRequester, {
-            apporder,
-            datasetorder,
-            workerpoolorder: teeWorkerpoolorder,
-          }).then((o) =>
-            iexecRequester.order.signRequestorder(
-              { ...o, tag: ['tee', 'scone'] },
-              { preflightCheck: false },
-            ),
-          ),
-        }),
-      ).rejects.toThrow(
-        Error('Tag mismatch the TEE framework specified by app'),
-      );
 
       // trigger dataset check
       await expect(
@@ -2166,8 +2116,7 @@ describe('order', () => {
         await getTestConfig(testChain)();
 
       const apporder = await deployAndGetApporder(iexecResourcesProvider, {
-        teeFramework: TEE_FRAMEWORKS.SCONE,
-        tag: ['tee', 'scone'],
+        tag: ['tee', 'tdx'],
       });
       const datasetorder = await deployAndGetDatasetorder(
         iexecResourcesProvider,
@@ -2182,7 +2131,7 @@ describe('order', () => {
       const workerpoolorder = await deployAndGetWorkerpoolorder(
         iexecResourcesProvider,
         {
-          tag: ['tee', 'scone'],
+          tag: ['tee', 'tdx'],
         },
       );
       const requestorder = await getMatchableRequestorder(iexecRequester, {
@@ -2197,7 +2146,7 @@ describe('order', () => {
         requestorder,
       });
       const deal = await iexecRequester.deal.show(dealid);
-      expect(deal.tag).toEqual(encodeTag(['tee', 'scone']));
+      expect(deal.tag).toEqual(encodeTag(['tee', 'tdx']));
     });
 
     test('TDX tag with app without mrenclave passes checkAppRequirements (preflight)', async () => {

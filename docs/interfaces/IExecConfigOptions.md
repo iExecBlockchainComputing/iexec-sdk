@@ -18,46 +18,6 @@ if true allows using a provider connected to an experimental networks (default f
 
 ***
 
-### bridgeAddress?
-
-> `optional` **bridgeAddress**: `string`
-
-override the bridge contract address to target a custom instance
-
-***
-
-### bridgedNetworkConf?
-
-> `optional` **bridgedNetworkConf**: `object`
-
-override the bridged network configuration
-
-#### bridgeAddress?
-
-> `optional` **bridgeAddress**: `string`
-
-bridge contract address on bridged network
-
-#### chainId?
-
-> `optional` **chainId**: `string` \| `number`
-
-bridged network chainId
-
-#### hubAddress?
-
-> `optional` **hubAddress**: `string`
-
-IExec contract address on bridged network
-
-#### rpcURL?
-
-> `optional` **rpcURL**: `string`
-
-bridged network node url
-
-***
-
 ### compassURL?
 
 > `optional` **compassURL**: `string`
@@ -73,14 +33,6 @@ override the compass URL to target a custom instance
 > `optional` **confirms**: `number`
 
 number of block to wait for transactions confirmation (default 1)
-
-***
-
-### ensPublicResolverAddress?
-
-> `optional` **ensPublicResolverAddress**: `string`
-
-override the ENS public resolver contract address to target a custom instance
 
 ***
 
@@ -116,14 +68,6 @@ override the IPFS node URL to target a custom instance
 
 ***
 
-### isNative?
-
-> `optional` **isNative**: `boolean`
-
-true if IExec contract use the chain native token (default false)
-
-***
-
 ### pocoSubgraphURL?
 
 > `optional` **pocoSubgraphURL**: `string`
@@ -132,32 +76,8 @@ override the PoCo subgraph URL to target a custom instance
 
 ***
 
-### providerOptions?
-
-> `optional` **providerOptions**: [`ProviderOptions`](ProviderOptions.md) \| [`AnyRecord`](../type-aliases/AnyRecord.md)
-
-[ethers default provider](https://docs.ethers.io/v5/api/providers/#providers-getDefaultProvider) options
-
-***
-
-### resultProxyURL?
-
-> `optional` **resultProxyURL**: `string`
-
-override the result proxy URL to target a custom instance
-
-***
-
 ### smsURL?
 
 > `optional` **smsURL**: `string`
 
 override the SMS URL to target a custom instance
-
-***
-
-### useGas?
-
-> `optional` **useGas**: `boolean`
-
-if false set the gasPrice to 0 (default true)

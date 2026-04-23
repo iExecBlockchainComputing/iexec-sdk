@@ -37,7 +37,6 @@ import {
   info,
   prompt,
   getPropertyFromChain,
-  isEthAddress,
 } from '../utils/cli-helper.js';
 import {
   loadIExecConf,
@@ -47,10 +46,8 @@ import {
 } from '../utils/fs.js';
 import { Keystore } from '../utils/keystore.js';
 import { loadChain, connectKeystore } from '../utils/chains.js';
-import { setWorkerpoolApiUrl } from '../../common/execution/workerpool.js';
 import { getWorkerpoolApiUrl } from '../../common/execution/debug.js';
-import { lookupAddress } from '../../common/ens/resolution.js';
-import { ConfigurationError } from '../../common/utils/errors.js';
+import { isAddress } from 'ethers';
 
 const debug = Debug('iexec:iexec-workerpool');
 
@@ -90,7 +87,6 @@ addGlobalOptions(deploy);
 addWalletLoadOptions(deploy);
 deploy
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .description(desc.deployObj(objName))
   .action(async (opts) => {
@@ -109,7 +105,7 @@ deploy
           `Missing ${objName} in "iexec.json". Did you forget to run "iexec ${objName} init"?`,
         );
       }
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       spinner.start(info.deploying(objName));
       const { address, txHash } = await deployWorkerpool(
         chain.contracts,
@@ -119,49 +115,6 @@ deploy
         raw: { address, txHash },
       });
       await saveDeployedObj(objName, chain.id, address);
-    } catch (error) {
-      handleError(error, cli, opts);
-    }
-  });
-
-const setApiUrl = cli.command('set-api-url <apiUrl> [workerpoolAddress]');
-addGlobalOptions(setApiUrl);
-addWalletLoadOptions(setApiUrl);
-setApiUrl
-  .option(...option.chain())
-  .option(...option.txGasPrice())
-  .option(...option.txConfirms())
-  .description('declare the workerpool API URL on the blockchain')
-  .action(async (url, workerpoolAddress, opts) => {
-    await checkUpdate(opts);
-    const spinner = Spinner(opts);
-    try {
-      const walletOptions = computeWalletLoadOptions(opts);
-      const txOptions = await computeTxOptions(opts);
-      const keystore = Keystore(walletOptions);
-      const chain = await loadChain(opts.chain, { txOptions, spinner });
-      const address =
-        workerpoolAddress ||
-        (await loadDeployedObj(objName).then(
-          (deployedObj) => deployedObj && deployedObj[chain.id],
-        ));
-      if (!address) {
-        throw new Error(info.missingAddressOrDeployed(objName, chain.id));
-      }
-      const ens = await lookupAddress(chain.contracts, address);
-      if (!ens) {
-        throw new Error(info.missingEnsForObjectAtAddress(objName, address));
-      }
-
-      await connectKeystore(chain, keystore, { txOptions });
-      spinner.start(`Setting API URL for workerpool ${address}`);
-      const txHash = await setWorkerpoolApiUrl(chain.contracts, address, url);
-      spinner.succeed(
-        `API URL "${url}" is set for ${objName} at address ${address}`,
-        {
-          raw: { address, url, txHash },
-        },
-      );
     } catch (error) {
       handleError(error, cli, opts);
     }
@@ -190,9 +143,9 @@ show
           (deployedObj) => deployedObj && deployedObj[chain.id],
         ));
 
-      const isAddress = isEthAddress(addressOrIndex, { strict: false });
+      const isAddr = isAddress(addressOrIndex);
       const userAddress = opts.user || (address !== NULL_ADDRESS && address);
-      if (!isAddress && !userAddress)
+      if (!isAddr && !userAddress)
         throw new Error(`Missing option ${option.user()[0]} or wallet`);
 
       if (!addressOrIndex)
@@ -200,18 +153,10 @@ show
 
       spinner.start(info.showing(objName));
       let showInfo;
-      let ens;
       let apiUrl;
-      if (isAddress) {
-        [showInfo, ens, apiUrl] = await Promise.all([
+      if (isAddr) {
+        [showInfo, apiUrl] = await Promise.all([
           showWorkerpool(chain.contracts, addressOrIndex),
-          lookupAddress(chain.contracts, addressOrIndex).catch((e) => {
-            if (e instanceof ConfigurationError) {
-              /** no ENS */
-            } else {
-              throw e;
-            }
-          }),
           getWorkerpoolApiUrl(
             chain.contracts,
             chain.compass,
@@ -224,31 +169,21 @@ show
           addressOrIndex,
           userAddress,
         );
-        [ens, apiUrl] = await Promise.all([
-          lookupAddress(chain.contracts, showInfo.objAddress).catch((e) => {
-            if (e instanceof ConfigurationError) {
-              /** no ENS */
-            } else {
-              throw e;
-            }
-          }),
-          getWorkerpoolApiUrl(
-            chain.contracts,
-            chain.compass,
-            showInfo.objAddress,
-          ).catch(() => undefined),
-        ]);
+        apiUrl = await getWorkerpoolApiUrl(
+          chain.contracts,
+          chain.compass,
+          showInfo.objAddress,
+        ).catch(() => undefined);
       }
       const { workerpool, objAddress } = showInfo;
       const cleanObj = stringifyNestedBn(workerpool);
       spinner.succeed(
         `Workerpool ${objAddress} details:${pretty({
-          ...(ens && { ENS: ens }),
           ...cleanObj,
           url: apiUrl,
         })}`,
         {
-          raw: { address: objAddress, workerpool: cleanObj, ens, apiUrl },
+          raw: { address: objAddress, workerpool: cleanObj, apiUrl },
         },
       );
     } catch (error) {
@@ -344,10 +279,7 @@ publish
         datasetrestrict: opts.datasetRestrict,
         requesterrestrict: opts.requesterRestrict,
       };
-      const orderToSign = await createWorkerpoolorder(
-        chain.contracts,
-        overrides,
-      );
+      const orderToSign = await createWorkerpoolorder(overrides);
       if (!opts.force) {
         await prompt.publishOrder(`${objName}order`, pretty(orderToSign));
       }
@@ -440,7 +372,6 @@ addGlobalOptions(transfer);
 addWalletLoadOptions(transfer);
 transfer
   .option(...option.chain())
-  .option(...option.txGasPrice())
   .option(...option.txConfirms())
   .option(...option.force())
   .option(...option.to())
@@ -453,7 +384,7 @@ transfer
       const txOptions = await computeTxOptions(opts);
       const keystore = Keystore(walletOptions);
       const chain = await loadChain(opts.chain, { txOptions, spinner });
-      await connectKeystore(chain, keystore, { txOptions });
+      await connectKeystore(chain, keystore);
       if (!opts.to) throw new Error('Missing --to option');
       if (!opts.force) {
         await prompt.transferObj(objName, objAddress, opts.to, chain.id);

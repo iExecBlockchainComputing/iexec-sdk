@@ -5,7 +5,6 @@ import IExecConfig from './IExecConfig.js';
 import IExecModule from './IExecModule.js';
 import {
   Address,
-  Addressish,
   BNish,
   Bytes,
   Bytes32,
@@ -150,118 +149,60 @@ export default class IExecOrderbookModule extends IExecModule {
    * console.log('total orders:', count);
    * ```
    */
-  fetchAppOrderbook(
-    appAddressOrOptions:
-      | Addressish
-      | 'any'
-      | {
-          /**
-           * filter by app
-           */
-          app?: Addressish | 'any';
-          /**
-           * filter by app owner
-           */
-          appOwner?: Addressish;
-          /**
-           * include orders restricted to specified dataset (use `'any'` to include any dataset)
-           */
-          dataset?: Addressish | 'any';
-          /**
-           * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
-           */
-          workerpool?: Addressish | 'any';
-          /**
-           * include orders restricted to specified requester (use `'any'` to include any requester)
-           */
-          requester?: Addressish | 'any';
-          /**
-           * filter by minimum volume remaining
-           */
-          minVolume?: BNish;
-          /**
-           * filter by minimum tag required
-           */
-          minTag?: Tag | HumanSingleTag[];
-          /**
-           * filter by maximum tag accepted
-           */
-          maxTag?: Tag | HumanSingleTag[];
-          /**
-           * index of the page to fetch
-           */
-          page?: number;
-          /**
-           * size of the page to fetch
-           */
-          pageSize?: number;
-          /**
-           * filters out orders allowing “any” dataset (default: `false`)
-           */
-          isDatasetStrict?: boolean;
-          /**
-           * filters out orders allowing “any” requester (default: `false`)
-           */
-          isRequesterStrict?: boolean;
-          /**
-           * filters out orders allowing “any” workerpool (default: `false`)
-           */
-          isWorkerpoolStrict?: boolean;
-        },
+  fetchAppOrderbook(options: {
     /**
-     * @deprecated use first parameter instead
-     *
-     * migration:
-     *
-     * replace `fetchAppOrderbook(appAddress, options)` by `fetchAppOrderbook({ app: appAddress, ...options })`
+     * filter by app
      */
-    options?: {
-      /**
-       * include orders restricted to specified dataset (use `'any'` to include any dataset)
-       */
-      dataset?: Addressish | 'any';
-      /**
-       * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
-       */
-      workerpool?: Addressish | 'any';
-      /**
-       * include orders restricted to specified requester (use `'any'` to include any requester)
-       */
-      requester?: Addressish | 'any';
-      /**
-       * filter by minimum volume remaining
-       */
-      minVolume?: BNish;
-      /**
-       * filter by minimum tag required
-       */
-      minTag?: Tag | HumanSingleTag[];
-      /**
-       * filter by maximum tag accepted
-       */
-      maxTag?: Tag | HumanSingleTag[];
-      /**
-       * index of the page to fetch
-       */
-      page?: number;
-      /**
-       * size of the page to fetch
-       */
-      pageSize?: number;
-      /**
-       * filters out orders allowing “any” dataset (default: `false`)
-       */
-      isDatasetStrict?: boolean;
-      /**
-       * filters out orders allowing “any” requester (default: `false`)
-       */
-      isRequesterStrict?: boolean;
-      /**
-       * filters out orders allowing “any” workerpool (default: `false`)
-       */
-      isWorkerpoolStrict?: boolean;
-    },
-  ): Promise<PaginableOrders<PublishedApporder>>;
+    app?: Address | 'any';
+    /**
+     * filter by app owner
+     */
+    appOwner?: Address;
+    /**
+     * include orders restricted to specified dataset (use `'any'` to include any dataset)
+     */
+    dataset?: Address | 'any';
+    /**
+     * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
+     */
+    workerpool?: Address | 'any';
+    /**
+     * include orders restricted to specified requester (use `'any'` to include any requester)
+     */
+    requester?: Address | 'any';
+    /**
+     * filter by minimum volume remaining
+     */
+    minVolume?: BNish;
+    /**
+     * filter by minimum tag required
+     */
+    minTag?: Tag | HumanSingleTag[];
+    /**
+     * filter by maximum tag accepted
+     */
+    maxTag?: Tag | HumanSingleTag[];
+    /**
+     * index of the page to fetch
+     */
+    page?: number;
+    /**
+     * size of the page to fetch
+     */
+    pageSize?: number;
+    /**
+     * filters out orders allowing “any” dataset (default: `false`)
+     */
+    isDatasetStrict?: boolean;
+    /**
+     * filters out orders allowing “any” requester (default: `false`)
+     */
+    isRequesterStrict?: boolean;
+    /**
+     * filters out orders allowing “any” workerpool (default: `false`)
+     */
+    isWorkerpoolStrict?: boolean;
+  }): Promise<PaginableOrders<PublishedApporder>>;
   /**
    * find the cheapest orders for the specified dataset.
    *
@@ -274,126 +215,64 @@ export default class IExecOrderbookModule extends IExecModule {
    * console.log('total orders:', count);
    * ```
    */
-  fetchDatasetOrderbook(
-    datasetAddressOrOptions:
-      | Addressish
-      | 'any'
-      | {
-          /**
-           * filter by dataset
-           */
-          dataset?: Addressish | 'any';
-          /**
-           * filter by dataset owner
-           */
-          datasetOwner?: Addressish;
-          /**
-           * include orders restricted to specified app (use `'any'` to include any app)
-           */
-          app?: Addressish | 'any';
-          /**
-           * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
-           */
-          workerpool?: Addressish | 'any';
-          /**
-           * include orders restricted to specified requester (use `'any'` to include any requester)
-           */
-          requester?: Addressish | 'any';
-          /**
-           * filter by minimum volume remaining
-           */
-          minVolume?: BNish;
-          /**
-           * filter by minimum tag required
-           */
-          minTag?: Tag | HumanSingleTag[];
-          /**
-           * filter by maximum tag accepted
-           */
-          maxTag?: Tag | HumanSingleTag[];
-          /**
-           * index of the page to fetch
-           */
-          page?: number;
-          /**
-           * size of the page to fetch
-           */
-          pageSize?: number;
-          /**
-           * filters out orders allowing “any” app (default: `false`)
-           */
-          isAppStrict?: boolean;
-          /**
-           * filters out orders allowing “any” requester (default: `false`)
-           */
-          isRequesterStrict?: boolean;
-          /**
-           * filters out orders allowing “any” workerpool (default: `false`)
-           */
-          isWorkerpoolStrict?: boolean;
-          /**
-           * filters out orders that don't allow bulk processing (default: `false`)
-           */
-          bulkOnly?: boolean;
-        },
+  fetchDatasetOrderbook(options: {
     /**
-     * @deprecated use first parameter instead
-     *
-     * migration:
-     *
-     * replace `fetchDatasetOrderbook(datasetAddress, options)` by `fetchDatasetOrderbook({ dataset: datasetAddress, ...options })`
+     * filter by dataset
      */
-    options?: {
-      /**
-       * include orders restricted to specified app (use `'any'` to include any app)
-       */
-      app?: Addressish | 'any';
-      /**
-       * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
-       */
-      workerpool?: Addressish | 'any';
-      /**
-       * include orders restricted to specified requester (use `'any'` to include any requester)
-       */
-      requester?: Addressish | 'any';
-      /**
-       * filter by minimum volume remaining
-       */
-      minVolume?: BNish;
-      /**
-       * filter by minimum tag required
-       */
-      minTag?: Tag | HumanSingleTag[];
-      /**
-       * filter by maximum tag accepted
-       */
-      maxTag?: Tag | HumanSingleTag[];
-      /**
-       * index of the page to fetch
-       */
-      page?: number;
-      /**
-       * size of the page to fetch
-       */
-      pageSize?: number;
-      /**
-       * filters out orders allowing “any” app (default: `false`)
-       */
-      isAppStrict?: boolean;
-      /**
-       * filters out orders allowing “any” requester (default: `false`)
-       */
-      isRequesterStrict?: boolean;
-      /**
-       * filters out orders allowing “any” workerpool (default: `false`)
-       */
-      isWorkerpoolStrict?: boolean;
-      /**
-       * filters out orders that don't allow bulk processing (default: `false`)
-       */
-      bulkOnly?: boolean;
-    },
-  ): Promise<PaginableOrders<PublishedDatasetorder>>;
+    dataset?: Address | 'any';
+    /**
+     * filter by dataset owner
+     */
+    datasetOwner?: Address;
+    /**
+     * include orders restricted to specified app (use `'any'` to include any app)
+     */
+    app?: Address | 'any';
+    /**
+     * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
+     */
+    workerpool?: Address | 'any';
+    /**
+     * include orders restricted to specified requester (use `'any'` to include any requester)
+     */
+    requester?: Address | 'any';
+    /**
+     * filter by minimum volume remaining
+     */
+    minVolume?: BNish;
+    /**
+     * filter by minimum tag required
+     */
+    minTag?: Tag | HumanSingleTag[];
+    /**
+     * filter by maximum tag accepted
+     */
+    maxTag?: Tag | HumanSingleTag[];
+    /**
+     * index of the page to fetch
+     */
+    page?: number;
+    /**
+     * size of the page to fetch
+     */
+    pageSize?: number;
+    /**
+     * filters out orders allowing “any” app (default: `false`)
+     */
+    isAppStrict?: boolean;
+    /**
+     * filters out orders allowing “any” requester (default: `false`)
+     */
+    isRequesterStrict?: boolean;
+    /**
+     * filters out orders allowing “any” workerpool (default: `false`)
+     */
+    isWorkerpoolStrict?: boolean;
+    /**
+     * filters out orders that don't allow bulk processing (default: `false`)
+     */
+    bulkOnly?: boolean;
+  }): Promise<PaginableOrders<PublishedDatasetorder>>;
   /**
    * find the cheapest orders for the specified computing resource.
    *
@@ -410,11 +289,11 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * filter by workerpool
      */
-    workerpool?: Addressish;
+    workerpool?: Address;
     /**
      * filter by workerpool owner
      */
-    workerpoolOwner?: Addressish;
+    workerpoolOwner?: Address;
     /**
      * filter by category
      */
@@ -422,15 +301,15 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * include orders restricted to specified app (use `'any'` to include any app)
      */
-    app?: Addressish | 'any';
+    app?: Address | 'any';
     /**
      * include orders restricted to specified dataset (use `'any'` to include any dataset)
      */
-    dataset?: Addressish | 'any';
+    dataset?: Address | 'any';
     /**
      * include orders restricted to specified requester (use `'any'` to include any requester)
      */
-    requester?: Addressish | 'any';
+    requester?: Address | 'any';
     /**
      * filter by minimum volume remaining
      */
@@ -484,7 +363,7 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * filter by requester
      */
-    requester?: Addressish;
+    requester?: Address;
     /**
      * filter by category
      */
@@ -492,15 +371,15 @@ export default class IExecOrderbookModule extends IExecModule {
     /**
      * filter by specified app
      */
-    app?: Addressish;
+    app?: Address;
     /**
      * filter by specified dataset
      */
-    dataset?: Addressish;
+    dataset?: Address;
     /**
      * include orders restricted to specified workerpool (use `'any'` to include any workerpool)
      */
-    workerpool?: Addressish | 'any';
+    workerpool?: Address | 'any';
     /**
      * filter by minimum volume remaining
      */

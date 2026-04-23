@@ -79,7 +79,7 @@ console.log('remaining volume:', remaining);
 
 ### fetchAppOrderbook()
 
-> **fetchAppOrderbook**(`appAddressOrOptions`, `options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedApporder`](../-internal-/interfaces/PublishedApporder.md)\>\>
+> **fetchAppOrderbook**(`options`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedApporder`](../-internal-/interfaces/PublishedApporder.md)\>\>
 
 find the cheapest orders for the specified app.
 
@@ -94,11 +94,7 @@ console.log('total orders:', count);
 
 #### Parameters
 
-##### appAddressOrOptions
-
-`string` |
-
-\{ `app?`: `string`; `appOwner?`: `string`; `dataset?`: `string`; `isDatasetStrict?`: `boolean`; `isRequesterStrict?`: `boolean`; `isWorkerpoolStrict?`: `boolean`; `maxTag?`: [`Tag`](../type-aliases/Tag.md) \| `string`[]; `minTag?`: [`Tag`](../type-aliases/Tag.md) \| `string`[]; `minVolume?`: [`BNish`](../type-aliases/BNish.md); `page?`: `number`; `pageSize?`: `number`; `requester?`: `string`; `workerpool?`: `string`; \}
+##### options
 
 ###### app?
 
@@ -111,82 +107,6 @@ filter by app
 `string`
 
 filter by app owner
-
-###### dataset?
-
-`string`
-
-include orders restricted to specified dataset (use `'any'` to include any dataset)
-
-###### isDatasetStrict?
-
-`boolean`
-
-filters out orders allowing “any” dataset (default: `false`)
-
-###### isRequesterStrict?
-
-`boolean`
-
-filters out orders allowing “any” requester (default: `false`)
-
-###### isWorkerpoolStrict?
-
-`boolean`
-
-filters out orders allowing “any” workerpool (default: `false`)
-
-###### maxTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by maximum tag accepted
-
-###### minTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by minimum tag required
-
-###### minVolume?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum volume remaining
-
-###### page?
-
-`number`
-
-index of the page to fetch
-
-###### pageSize?
-
-`number`
-
-size of the page to fetch
-
-###### requester?
-
-`string`
-
-include orders restricted to specified requester (use `'any'` to include any requester)
-
-###### workerpool?
-
-`string`
-
-include orders restricted to specified workerpool (use `'any'` to include any workerpool)
-
-##### options?
-
-**Deprecated**
-
-use first parameter instead
-
-migration:
-
-replace `fetchAppOrderbook(appAddress, options)` by `fetchAppOrderbook({ app: appAddress, ...options })`
 
 ###### dataset?
 
@@ -287,7 +207,7 @@ console.log('remaining volume:', remaining);
 
 ### fetchDatasetOrderbook()
 
-> **fetchDatasetOrderbook**(`datasetAddressOrOptions`, `options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedDatasetorder`](../-internal-/interfaces/PublishedDatasetorder.md)\>\>
+> **fetchDatasetOrderbook**(`options`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedDatasetorder`](../-internal-/interfaces/PublishedDatasetorder.md)\>\>
 
 find the cheapest orders for the specified dataset.
 
@@ -302,11 +222,7 @@ console.log('total orders:', count);
 
 #### Parameters
 
-##### datasetAddressOrOptions
-
-`string` |
-
-\{ `app?`: `string`; `bulkOnly?`: `boolean`; `dataset?`: `string`; `datasetOwner?`: `string`; `isAppStrict?`: `boolean`; `isRequesterStrict?`: `boolean`; `isWorkerpoolStrict?`: `boolean`; `maxTag?`: [`Tag`](../type-aliases/Tag.md) \| `string`[]; `minTag?`: [`Tag`](../type-aliases/Tag.md) \| `string`[]; `minVolume?`: [`BNish`](../type-aliases/BNish.md); `page?`: `number`; `pageSize?`: `number`; `requester?`: `string`; `workerpool?`: `string`; \}
+##### options
 
 ###### app?
 
@@ -331,88 +247,6 @@ filter by dataset
 `string`
 
 filter by dataset owner
-
-###### isAppStrict?
-
-`boolean`
-
-filters out orders allowing “any” app (default: `false`)
-
-###### isRequesterStrict?
-
-`boolean`
-
-filters out orders allowing “any” requester (default: `false`)
-
-###### isWorkerpoolStrict?
-
-`boolean`
-
-filters out orders allowing “any” workerpool (default: `false`)
-
-###### maxTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by maximum tag accepted
-
-###### minTag?
-
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
-
-filter by minimum tag required
-
-###### minVolume?
-
-[`BNish`](../type-aliases/BNish.md)
-
-filter by minimum volume remaining
-
-###### page?
-
-`number`
-
-index of the page to fetch
-
-###### pageSize?
-
-`number`
-
-size of the page to fetch
-
-###### requester?
-
-`string`
-
-include orders restricted to specified requester (use `'any'` to include any requester)
-
-###### workerpool?
-
-`string`
-
-include orders restricted to specified workerpool (use `'any'` to include any workerpool)
-
-##### options?
-
-**Deprecated**
-
-use first parameter instead
-
-migration:
-
-replace `fetchDatasetOrderbook(datasetAddress, options)` by `fetchDatasetOrderbook({ dataset: datasetAddress, ...options })`
-
-###### app?
-
-`string`
-
-include orders restricted to specified app (use `'any'` to include any app)
-
-###### bulkOnly?
-
-`boolean`
-
-filters out orders that don't allow bulk processing (default: `false`)
 
 ###### isAppStrict?
 
