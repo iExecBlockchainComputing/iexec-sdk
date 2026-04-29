@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file.
 
+## [9.0.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.24.0...v9.0.0) (2026-04-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove SGX SCONE
+* EnhancedWallet is removed, any ethers AbstractSigner can be used instead
+* bellecour and ethereum mainnet are removed; native mode is removed; gas price customization is removed; embedded ethers FallbackProvider and related provider options are removed
+* remove deprecated CLI commands sendRLC and sendETH
+* remove result proxy related methods and configuration; update `checkStorageTokenExists` and `pushStorageToken`, provider is now required
+* remove originalError from errors (use cause instead)
+* remove legacy API compatibility for `fetchAppOrderbook` and `fetchDatasetOrderbook`
+* remove ENS related methods and configuration
+* remove methods for setting workerpool API url
+* remove bridge related methods and configuration
+* remove multi SMS and gramine support ([#517](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/517))
+* remove voucher support ([#511](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/511))
+
+### Added
+
+* remove multi SMS and gramine support ([#517](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/517)) ([83dce56](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/83dce56a8a79d056e1ef3d414a968652360962c9))
+* remove voucher support ([#511](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/511)) ([7182335](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/71823358dadc222f97a7adf03a305f6240861d32))
+
+
+### Changed
+
+* remove bellecour and ethereum mainnet chains ([04c07cf](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/04c07cf84bf976b0a2c1d401bfab3bb010c234ba))
+* remove bridge related methods and configuration ([60f3549](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/60f35490abc37e98afed7365b7b14971deed46d0))
+* remove deprecated CLI commands sendRLC and sendETH ([689aa2e](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/689aa2e3da185e55d5a42ec17269a5d50e7c312a))
+* remove EnhancedWallet ([7a500a9](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/7a500a95bbd8beb2e2d7c43a402969e662fd95c5))
+* remove ENS related methods and configuration ([a026490](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/a026490bec185c108cfd669e9fba792717215234))
+* remove legacy API compatibility for `fetchAppOrderbook` and `fetchDatasetOrderbook` ([584f436](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/584f436d2614c32d07998e0d4ce55064f7727219))
+* remove methods for setting workerpool API url ([15562e4](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/15562e4eab413dd09821ebb531fe24edde37e0a0))
+* remove originalError from errors (use cause instead) ([7d79228](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/7d79228ad22873a3b1736c176b4592d1273c97dc))
+* remove result proxy related methods and configuration; update `checkStorageTokenExists` and `pushStorageToken`, provider is now required ([9d66ba1](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/9d66ba188eda6ca9fe62e4b1b90c1509af8ed6cc))
+* remove SGX SCONE ([7734efe](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/7734efe442ab3e32351276c52becfb6e821b6ee5))
+
 ## [8.24.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.23.1...v8.24.0) (2026-04-09)
 
 
