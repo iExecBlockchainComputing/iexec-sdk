@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM node:26-alpine
 
 ENV NODE_NO_WARNINGS=1
 ENV user=node
