@@ -73,12 +73,6 @@ Run tests when the stack is up
 npm run test
 ```
 
-> Some tests relies on RPC API providers, to have them running smoothly you can provide the following envs
->
-> - ALCHEMY_API_KEY (obtained from <https://alchemy.com>)
-> - ETHERSCAN_API_KEY (obtained from <https://etherscan.io>)
-> - INFURA_PROJECT_ID (obtained from <https://infura.io>)
-
 ## Changelog
 
 Find changes in the [CHANGELOG](./CHANGELOG.md)

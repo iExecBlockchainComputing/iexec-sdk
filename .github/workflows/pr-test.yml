@@ -41,10 +41,6 @@ jobs:
     with:
       node-version: '20'
       upload-coverage: true
-    secrets:
-      infura-project-id: ${{ secrets.INFURA_PROJECT_ID }}
-      etherscan-api-key: ${{ secrets.ETHERSCAN_API_KEY }}
-      alchemy-api-key: ${{ secrets.ALCHEMY_API_KEY }}
 
   test-supported-node-versions:
     uses: ./.github/workflows/reusable-test.yml
@@ -55,10 +51,6 @@ jobs:
         node-version: ['22', '24']
     with:
       node-version: ${{ matrix.node-version }}
-    secrets:
-      infura-project-id: ${{ secrets.INFURA_PROJECT_ID }}
-      etherscan-api-key: ${{ secrets.ETHERSCAN_API_KEY }}
-      alchemy-api-key: ${{ secrets.ALCHEMY_API_KEY }}
 
   # sonar:
   #   runs-on: ubuntu-latest

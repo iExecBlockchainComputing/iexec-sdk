@@ -68,35 +68,17 @@ iexec wallet show # show your wallet
 iexec storage init # initialize your remote storage
 ```
 
-> _NB:_ iExec SDK CLI access the blockchain through [ethers](https://github.com/ethers-io/ethers.js/) to connect different backends ([Alchemy](https://alchemyapi.io/), [Etherscan](https://etherscan.io/), [INFURA](https://infura.io/)).
->
-> Default API keys for backend services are provided for convenience.
-> As these keys are shared across all users and are subject to rate limits, **you must use your own API keys** or better **your own node**.
+> _NB:_ iExec SDK CLI access the blockchain through RPC nodes
+> Default RPCs are provided for convenience.
+> As these RPC nodes are shared across all users and are subject to limitations, **you must use your own API keys** or better **your own node**.
 >
 > Get API keys for backend services:
 >
-> - [INFURA](https://infura.io/register) ([more details on Infura's blog](https://blog.infura.io/getting-started-with-infura-28e41844cc89/))
+> - [INFURA](https://app.infura.io/register)
 > - [Etherscan](https://etherscan.io/apis)
-> - [Alchemy](https://alchemyapi.io/signup)
+> - [Alchemy](https://www.alchemy.com)
 >
-> Once you created your access, you can add your API keys in the `chains.json` configuration file:
->
-> ```json
-> {
->    "default": ...,
->    "chains": { ... },
->    "providers": {
->      "infura": {
->        "projectId": "INFURA_PROJECT_ID",
->        "projectSecret": "INFURA_PROJECT_SECRET"
->       },
->     "etherscan": "ETHERSCAN_API_KEY",
->     "alchemy": "ALCHEMY_API_KEY"
->    }
-> }
-> ```
->
-> If you run your own node, you can add an `host` key in the `chains.json` configuration file to target your node:
+> You can add your RPC as `host` in the `chains.json` configuration file:
 >
 > ```json
 > {
@@ -104,7 +86,7 @@ iexec storage init # initialize your remote storage
 >    "chains": {
 >       ...
 >       "arbitrum-mainnet": {
->         "host": "http://localhost:8545"
+>         "host": "https://<your_node_url>",
 >       }
 >    }
 > }

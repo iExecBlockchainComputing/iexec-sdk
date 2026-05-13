@@ -1,5 +1,4 @@
 name: test SDK
-description: reusable test workflow for this project
 
 on:
   workflow_call:
@@ -12,13 +11,6 @@ on:
         description: 'Upload coverage data for later reuse'
         type: boolean
         default: false
-    secrets:
-      infura-project-id:
-        required: true
-      etherscan-api-key:
-        required: true
-      alchemy-api-key:
-        required: true
     outputs:
       coverage-artifact-id:
         description: 'Coverage artifact id (if `upload-coverage: true`)'
@@ -54,9 +46,6 @@ jobs:
         run: npm test
         env:
           USE_LOCAL_CLI: true
-          INFURA_PROJECT_ID: ${{ secrets.infura-project-id }}
-          ETHERSCAN_API_KEY: ${{ secrets.etherscan-api-key }}
-          ALCHEMY_API_KEY: ${{ secrets.alchemy-api-key }}
 
       - name: Stop e2e test stack
         if: always()
