@@ -53,6 +53,7 @@ jobs:
       - name: Test
         run: npm test
         env:
+          USE_LOCAL_CLI: true
           INFURA_PROJECT_ID: ${{ secrets.infura-project-id }}
           ETHERSCAN_API_KEY: ${{ secrets.etherscan-api-key }}
           ALCHEMY_API_KEY: ${{ secrets.alchemy-api-key }}
