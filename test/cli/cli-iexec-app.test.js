@@ -20,6 +20,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 import { encodeTag } from '../../src/lib/utils.js';
+import { TDX_DEFAULT_TAG } from '../../src/common/utils/constant.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
@@ -202,7 +203,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.beneficiary).toBe(userWallet.address);
       expect(resDeal.deal.botFirst).toBe('0');
       expect(resDeal.deal.botSize).toBe('1');
-      expect(resDeal.deal.tag).toBe(NULL_BYTES32);
+      expect(resDeal.deal.tag).toBe(TDX_DEFAULT_TAG);
       expect(resDeal.deal.trust).toBe('1');
       expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
       expect(resDeal.deal.tasks['0']).toBeDefined();
@@ -241,7 +242,7 @@ describe('iexec app', () => {
       expect(resDeal.deal.beneficiary).toBe(userWallet.address);
       expect(resDeal.deal.botFirst).toBe('0');
       expect(resDeal.deal.botSize).toBe('1');
-      expect(resDeal.deal.tag).toBe(NULL_BYTES32);
+      expect(resDeal.deal.tag).toBe(TDX_DEFAULT_TAG);
       expect(resDeal.deal.trust).toBe('1');
       expect(Object.keys(resDeal.deal.tasks).length).toBe(1);
       expect(resDeal.deal.tasks['0']).toBeDefined();
@@ -400,7 +401,7 @@ describe('iexec app', () => {
         app: address,
         appprice: 0,
         volume: 1000000,
-        tag: NULL_BYTES32,
+        tag: TDX_DEFAULT_TAG,
         datasetrestrict: NULL_ADDRESS,
         workerpoolrestrict: NULL_ADDRESS,
         requesterrestrict: NULL_ADDRESS,
@@ -422,7 +423,7 @@ describe('iexec app', () => {
         app: userFirstDeployedAppAddress,
         appprice: 100000000,
         volume: 100,
-        tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        tag: TDX_DEFAULT_TAG,
         datasetrestrict: NULL_ADDRESS,
         workerpoolrestrict: NULL_ADDRESS,
         requesterrestrict: NULL_ADDRESS,

@@ -1,4 +1,7 @@
-import { IEXEC_REQUEST_PARAMS } from '../../common/utils/constant.js';
+import {
+  IEXEC_REQUEST_PARAMS,
+  TDX_DEFAULT_TAG,
+} from '../../common/utils/constant.js';
 
 export const main = {
   description:
@@ -25,7 +28,7 @@ export const buyConf = {
   params: {
     [IEXEC_REQUEST_PARAMS.IEXEC_ARGS]: '',
   },
-  tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  tag: TDX_DEFAULT_TAG,
   trust: '0',
   callback: '0x0000000000000000000000000000000000000000',
 };
@@ -58,7 +61,7 @@ export const order = {
     app: '0x0000000000000000000000000000000000000000',
     appprice: '0',
     volume: '1000000',
-    tag: [],
+    tag: ['tee', 'tdx'],
     datasetrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
     workerpoolrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
     requesterrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
@@ -67,7 +70,7 @@ export const order = {
     dataset: '0x0000000000000000000000000000000000000000',
     datasetprice: '0',
     volume: '1000000',
-    tag: [], // todo remove from default
+    tag: ['tee', 'tdx'], // todo remove from default
     apprestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
     workerpoolrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
     requesterrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
@@ -78,7 +81,7 @@ export const order = {
     volume: '1',
     category: '0',
     trust: '0',
-    tag: [], // todo remove from default
+    tag: ['tee', 'tdx'], // todo remove from default
     apprestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
     datasetrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
     requesterrestrict: '0x0000000000000000000000000000000000000000', // todo remove from default
@@ -93,7 +96,7 @@ export const order = {
     volume: '1',
     category: '0',
     trust: '0', // todo remove from default
-    tag: [], // todo remove from default
+    tag: ['tee', 'tdx'], // todo remove from default
     beneficiary: '0x0000000000000000000000000000000000000000', // todo remove from default
     callback: '0x0000000000000000000000000000000000000000', // todo remove from default
     params: {

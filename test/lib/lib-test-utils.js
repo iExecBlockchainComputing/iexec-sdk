@@ -81,9 +81,13 @@ export const deployAndGetDatasetorder = async (
     workerpoolrestrict,
     requesterrestrict,
     tag,
+    pushDatasetSecret = true,
   } = {},
 ) => {
   const datasetDeployRes = await deployRandomDataset(iexec);
+  if (pushDatasetSecret) {
+    await iexec.dataset.pushDatasetSecret(datasetDeployRes.address, 'foo');
+  }
   const dataset = datasetDeployRes.address;
   return iexec.order
     .createDatasetorder({

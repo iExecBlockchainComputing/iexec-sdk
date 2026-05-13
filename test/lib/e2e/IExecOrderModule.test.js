@@ -25,7 +25,12 @@ import {
 } from '../../test-utils.js';
 import '../../jest-setup.js';
 import { errors } from '../../../src/lib/index.js';
-import { DATASET_INFINITE_VOLUME, encodeTag } from '../../../src/lib/utils.js';
+import {
+  DATASET_INFINITE_VOLUME,
+  encodeTag,
+  sumTags,
+} from '../../../src/lib/utils.js';
+import { TDX_DEFAULT_TAG } from '../../../src/common/utils/constant.js';
 
 const { MarketCallError } = errors;
 
@@ -50,6 +55,7 @@ describe('order', () => {
           .map(async () => {
             const { iexec: iexecDataOwner } = await getTestConfig(testChain)();
             const { address } = await deployRandomDataset(iexecDataOwner);
+            await iexecDataOwner.dataset.pushDatasetSecret(address, 'foo');
             const datasetBulkOrder = await iexecDataOwner.order
               .createDatasetorder({
                 dataset: address,
@@ -89,7 +95,7 @@ describe('order', () => {
           appprice: '0',
           datasetrestrict: '0x0000000000000000000000000000000000000000',
           requesterrestrict: '0x0000000000000000000000000000000000000000',
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+          tag: TDX_DEFAULT_TAG,
           volume: '1',
           workerpoolrestrict: '0x0000000000000000000000000000000000000000',
         });
@@ -134,7 +140,7 @@ describe('order', () => {
           dataset,
           datasetprice: '0',
           requesterrestrict: '0x0000000000000000000000000000000000000000',
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+          tag: TDX_DEFAULT_TAG,
           volume: '1',
           workerpoolrestrict: '0x0000000000000000000000000000000000000000',
         });
@@ -152,7 +158,7 @@ describe('order', () => {
           apprestrict,
           workerpoolrestrict,
           requesterrestrict,
-          tag: ['tee'],
+          tag: '0x1000000000000000000000000000000000000000000000000000000000000000',
           volume: 100,
         });
         expect(order).toEqual({
@@ -160,7 +166,10 @@ describe('order', () => {
           datasetprice: '1000000000',
           apprestrict,
           requesterrestrict,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+          tag: sumTags([
+            '0x1000000000000000000000000000000000000000000000000000000000000000',
+            TDX_DEFAULT_TAG,
+          ]), // tee tdx is added by default
           volume: '100',
           workerpoolrestrict,
         });
@@ -180,7 +189,7 @@ describe('order', () => {
           category: '5',
           datasetrestrict: '0x0000000000000000000000000000000000000000',
           requesterrestrict: '0x0000000000000000000000000000000000000000',
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+          tag: TDX_DEFAULT_TAG,
           trust: '0',
           volume: '1',
           workerpool,
@@ -201,7 +210,7 @@ describe('order', () => {
           apprestrict,
           datasetrestrict,
           requesterrestrict,
-          tag: ['tee', 'tdx'],
+          tag: '0x1000000000000000000000000000000000000000000000000000000000000000',
           trust: '10',
           volume: '100',
         });
@@ -210,7 +219,10 @@ describe('order', () => {
           category: '5',
           datasetrestrict,
           requesterrestrict,
-          tag: encodeTag(['tee', 'tdx']),
+          tag: sumTags([
+            '0x1000000000000000000000000000000000000000000000000000000000000000',
+            TDX_DEFAULT_TAG,
+          ]), // tee tdx is added by default
           trust: '10',
           volume: '100',
           workerpool,
@@ -239,7 +251,7 @@ describe('order', () => {
             iexec_result_storage_provider: 'ipfs',
           },
           requester: wallet.address,
-          tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+          tag: TDX_DEFAULT_TAG,
           trust: '0',
           volume: '1',
           workerpool: '0x0000000000000000000000000000000000000000',
@@ -266,7 +278,7 @@ describe('order', () => {
             iexec_result_storage_provider: 'dropbox',
             iexec_result_encryption: true,
           },
-          tag: ['tee', 'tdx'],
+          tag: '0x1000000000000000000000000000000000000000000000000000000000000000',
           trust: '100',
           volume: '5',
         });
@@ -283,7 +295,10 @@ describe('order', () => {
             iexec_result_encryption: true,
           },
           requester: wallet.address,
-          tag: encodeTag(['tee', 'tdx']),
+          tag: sumTags([
+            '0x1000000000000000000000000000000000000000000000000000000000000000',
+            TDX_DEFAULT_TAG,
+          ]), // tee tdx is added by default
           trust: '100',
           volume: '5',
           workerpool,
@@ -531,36 +546,12 @@ describe('order', () => {
           await getTestConfig(testChain)();
         const { iexec: iexecDatasetConsumer } =
           await getTestConfig(testChain)();
-        const { address: dataset } =
-          await deployRandomDataset(iexecDatasetProvider);
-
-        // non tee pass
-        await expect(
-          iexecDatasetConsumer.order
-            .createRequestorder({
-              app: getRandomAddress(),
-              category: 5,
-              dataset,
-            })
-            .then(iexecDatasetConsumer.order.signRequestorder),
-        ).resolves.toBeDefined();
-
-        // tee fail without secret
-        await expect(
-          iexecDatasetConsumer.order
-            .createRequestorder({
-              app: getRandomAddress(),
-              category: 5,
-              dataset,
-              tag: ['tee', 'tdx'],
-            })
-            .then(iexecDatasetConsumer.order.signRequestorder),
-        ).rejects.toThrow(
-          new Error(
-            `Dataset encryption key is not set for dataset ${dataset} in the SMS. Dataset decryption will fail.`,
-          ),
+        const { address: dataset } = await deployRandomDataset(
+          iexecDatasetProvider,
+          { pushDatasetSecret: false },
         );
 
+        // tee fail without secret
         await expect(
           iexecDatasetConsumer.order
             .createRequestorder({
@@ -876,6 +867,7 @@ describe('order', () => {
         const { iexec } = await getTestConfig(testChain)();
         const datasetorder = await deployAndGetDatasetorder(iexec, {
           tag: ['tee'],
+          pushDatasetSecret: false,
         });
         const datasetAddress = datasetorder.dataset;
         await expect(
@@ -1694,42 +1686,21 @@ describe('order', () => {
       const requestorderTagTeeGpu = await iexecRequester.order.signRequestorder(
         {
           ...requestorderTemplate,
-          tag: ['tee', 'tdx', 'gpu'],
+          tag: ['gpu'],
         },
         { preflightCheck: false },
       );
-      const workerpoolorderTagGpu =
+      const workerpoolorderTagNonGpu =
         await iexecPoolManager.order.signWorkerpoolorder({
           ...workerpoolorderTemplate,
-          tag: ['gpu'],
-        });
-      const workerpoolorderTagTee =
-        await iexecPoolManager.order.signWorkerpoolorder({
-          ...workerpoolorderTemplate,
-          tag: ['tee', 'tdx'],
         });
       await expect(
         iexecBroker.order.matchOrders(
           {
             apporder: apporderTemplate,
             datasetorder: datasetorderTemplate,
-            workerpoolorder: workerpoolorderTagGpu,
+            workerpoolorder: workerpoolorderTagNonGpu,
             requestorder: requestorderTagTeeGpu,
-          },
-          { preflightCheck: false },
-        ),
-      ).rejects.toThrow(Error('Missing tags [tee,tdx] in workerpoolorder'));
-      const apporderTagGpu = await iexecAppProvider.order.signApporder({
-        ...apporderTemplate,
-        tag: ['gpu'],
-      });
-      await expect(
-        iexecBroker.order.matchOrders(
-          {
-            apporder: apporderTagGpu,
-            datasetorder: datasetorderTemplate,
-            workerpoolorder: workerpoolorderTagTee,
-            requestorder: requestorderTemplate,
           },
           { preflightCheck: false },
         ),
@@ -1747,31 +1718,12 @@ describe('order', () => {
           {
             apporder: apporderTemplate,
             datasetorder: datasetorderTagTeeGpu,
-            workerpoolorder: workerpoolorderTagTee,
+            workerpoolorder: workerpoolorderTagNonGpu,
             requestorder: requestorderTemplate,
           },
           { preflightCheck: false },
         ),
       ).rejects.toThrow(Error('Missing tags [gpu] in workerpoolorder'));
-      // app tag check
-      const requestorderTagTee = await iexecRequester.order.signRequestorder(
-        {
-          ...requestorderTemplate,
-          tag: ['tee', 'tdx'],
-        },
-        { preflightCheck: false },
-      );
-      await expect(
-        iexecBroker.order.matchOrders(
-          {
-            apporder: apporderTemplate,
-            datasetorder: datasetorderTemplate,
-            workerpoolorder: workerpoolorderTagTee,
-            requestorder: requestorderTagTee,
-          },
-          { preflightCheck: false },
-        ),
-      ).rejects.toThrow(Error('Missing tag [tee] in apporder'));
       // price check
       const apporderTooExpensive = await iexecAppProvider.order.signApporder({
         ...apporderTemplate,
@@ -2057,26 +2009,12 @@ describe('order', () => {
       const { iexec: iexecRequester } = await getTestConfig(testChain)();
       const { iexec: iexecResourcesProvider } =
         await getTestConfig(testChain)();
-
-      const apporder = await deployAndGetApporder(iexecResourcesProvider);
-      const datasetorder = await deployAndGetDatasetorder(
-        iexecResourcesProvider,
-      );
-      const workerpoolorder = await deployAndGetWorkerpoolorder(
-        iexecResourcesProvider,
-      );
-      const requestorder = await getMatchableRequestorder(iexecRequester, {
-        apporder,
-        datasetorder,
-        workerpoolorder,
-      });
-
       const teeApporder = await deployAndGetApporder(iexecResourcesProvider, {
         tag: ['tee', 'tdx'],
       });
       const teeDatasetorder = await deployAndGetDatasetorder(
         iexecResourcesProvider,
-        { tag: ['tee'] },
+        { tag: ['tee'], pushDatasetSecret: false },
       );
       const teeWorkerpoolorder = await deployAndGetWorkerpoolorder(
         iexecResourcesProvider,
@@ -2084,17 +2022,6 @@ describe('order', () => {
           tag: ['tee', 'tdx'],
         },
       );
-      const res = await iexecRequester.order.matchOrders({
-        apporder,
-        datasetorder,
-        workerpoolorder,
-        requestorder,
-      });
-      expect(res.txHash).toBeTxHash();
-      expect(res.volume).toBeInstanceOf(BN);
-      expect(res.volume.eq(new BN(1))).toBe(true);
-      expect(res.dealid).toBeTxHash();
-
       // trigger dataset check
       await expect(
         iexecRequester.order.matchOrders({
@@ -2123,10 +2050,6 @@ describe('order', () => {
         {
           tag: ['tee', 'gramine'],
         },
-      );
-      await iexecResourcesProvider.dataset.pushDatasetSecret(
-        datasetorder.dataset,
-        'foo',
       );
       const workerpoolorder = await deployAndGetWorkerpoolorder(
         iexecResourcesProvider,
@@ -2160,12 +2083,6 @@ describe('order', () => {
       });
       const datasetorder = await deployAndGetDatasetorder(
         iexecResourcesProvider,
-        {},
-      );
-      await iexecResourcesProvider.dataset.pushDatasetSecret(
-        datasetorder.dataset,
-        'foo',
-        { teeFramework: TEE_FRAMEWORKS.TDX },
       );
       const workerpoolorder = await deployAndGetWorkerpoolorder(
         iexecResourcesProvider,
@@ -2192,6 +2109,48 @@ describe('order', () => {
           expect(res.volume.eq(new BN(1))).toBe(true);
           expect(res.dealid).toBeTxHash();
         });
+    });
+
+    test('default tag (no tag provided) produces a TDX deal', async () => {
+      const { iexec: iexecRequester, wallet: requesterWallet } =
+        await getTestConfig(testChain)();
+      const { iexec: iexecResourcesProvider, wallet: poolManagerWallet } =
+        await getTestConfig(testChain)();
+
+      await setNRlcBalance(testChain)(requesterWallet.address, 10n * ONE_RLC);
+      await setNRlcBalance(testChain)(poolManagerWallet.address, 10n * ONE_RLC);
+
+      // no tag passed — all orders default to TDX_DEFAULT_TAG
+      const apporder = await deployAndGetApporder(iexecResourcesProvider);
+      const datasetorder = await deployAndGetDatasetorder(
+        iexecResourcesProvider,
+      );
+      const workerpoolorder = await deployAndGetWorkerpoolorder(
+        iexecResourcesProvider,
+      );
+      const requestorder = await getMatchableRequestorder(iexecRequester, {
+        apporder,
+        datasetorder,
+        workerpoolorder,
+      });
+
+      expect(apporder.tag).toBe(TDX_DEFAULT_TAG);
+      expect(datasetorder.tag).toBe(TDX_DEFAULT_TAG);
+      expect(workerpoolorder.tag).toBe(TDX_DEFAULT_TAG);
+      expect(requestorder.tag).toBe(TDX_DEFAULT_TAG);
+
+      const { dealid } = await iexecRequester.order.matchOrders(
+        {
+          apporder,
+          datasetorder,
+          workerpoolorder,
+          requestorder,
+        },
+        { preflightCheck: false },
+      );
+
+      const deal = await iexecRequester.deal.show(dealid);
+      expect(deal.tag).toEqual(encodeTag(['tee', 'tdx']));
     });
   });
 });

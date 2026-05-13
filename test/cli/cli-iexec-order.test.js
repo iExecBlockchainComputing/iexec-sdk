@@ -9,6 +9,7 @@ import {
   globalTeardown,
   iexecPath,
   setChain,
+  setDatasetUniqueName,
   setRandomWallet,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
@@ -19,6 +20,7 @@ describe('iexec order', () => {
   let userWallet;
   let userApp;
   let userDataset;
+  let userDatasetMissingSecret;
   let userWorkerpool;
 
   beforeAll(async () => {
@@ -33,8 +35,16 @@ describe('iexec order', () => {
     userApp = await execAsync(`${iexecPath} app deploy --raw`).then(
       (res) => JSON.parse(res).address,
     );
+    await setDatasetUniqueName();
+    userDatasetMissingSecret = await execAsync(
+      `${iexecPath} dataset deploy --raw`,
+    ).then((res) => JSON.parse(res).address);
+    await setDatasetUniqueName();
     userDataset = await execAsync(`${iexecPath} dataset deploy --raw`).then(
       (res) => JSON.parse(res).address,
+    );
+    await execAsync(
+      `echo "foo" > secret.txt && ${iexecPath} dataset push-secret ${userDataset} --secret-path secret.txt`,
     );
     userWorkerpool = await execAsync(
       `${iexecPath} workerpool deploy --raw`,
@@ -129,22 +139,26 @@ describe('iexec order', () => {
     expect(res.requestorder.app).toBeDefined();
 
     await editRequestorder({
+      dataset: userDatasetMissingSecret,
       tag: ['tee', 'tdx'],
     });
     await editWorkerpoolorder({
       tag: ['tee'],
     });
     await editApporder({ tag: ['tdx'] });
-    await editDatasetorder({ tag: ['tee', 'tdx'] });
+    await editDatasetorder({
+      dataset: userDatasetMissingSecret,
+      tag: ['tee', 'tdx'],
+    });
     const failRes = await execAsync(`${iexecPath} order sign --raw`).then(
       JSON.parse,
     );
     expect(failRes.ok).toBe(false);
     expect(failRes.fail).toStrictEqual([
       "apporder: 'tdx' tag must be used with 'tee' tag",
-      `datasetorder: Dataset requirements check failed: Dataset encryption key is not set for dataset ${userDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
+      `datasetorder: Dataset requirements check failed: Dataset encryption key is not set for dataset ${userDatasetMissingSecret} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
       "workerpoolorder: 'tee' tag must be used with a tee framework ('tdx')",
-      `requestorder: Request requirements check failed: Dataset encryption key is not set for dataset ${userDataset} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
+      `requestorder: Request requirements check failed: Dataset encryption key is not set for dataset ${userDatasetMissingSecret} in the SMS. Dataset decryption will fail. (If you consider this is not an issue, use --skip-preflight-check to skip preflight requirement check)`,
     ]);
   });
 

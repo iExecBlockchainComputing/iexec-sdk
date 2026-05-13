@@ -151,8 +151,9 @@ export const editApporder = async ({ tag }) =>
     tag,
   });
 
-export const editDatasetorder = async ({ tag }) =>
+export const editDatasetorder = async ({ dataset, tag }) =>
   editOrder('datasetorder')({
+    dataset,
     tag,
   });
 

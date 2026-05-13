@@ -1,7 +1,6 @@
 import { describe, test, expect } from '@jest/globals';
 import {
   NULL_ADDRESS,
-  NULL_BYTES32,
   TEST_CHAINS,
   execAsync,
   getRandomAddress,
@@ -17,12 +16,15 @@ import {
   checkExists,
 } from './cli-test-utils.js';
 import '../jest-setup.js';
+import { TDX_DEFAULT_TAG } from '../../src/common/utils/constant.js';
+import { sumTags } from '../../src/lib/utils.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
 describe('iexec dataset', () => {
   let userWallet;
   let userFirstDeployedDatasetAddress;
+  let userDatasetMissingSecret;
 
   beforeAll(async () => {
     await globalSetup('cli-iexec-dataset');
@@ -33,7 +35,15 @@ describe('iexec dataset', () => {
     await execAsync(`${iexecPath} dataset init`);
     await setDatasetUniqueName();
     const deployed = await runIExecCliRaw(`${iexecPath} dataset deploy`);
+    await execAsync(
+      `echo "foo" > secret.txt && ${iexecPath} dataset push-secret --secret-path secret.txt`,
+    );
     userFirstDeployedDatasetAddress = deployed.address;
+    await setDatasetUniqueName();
+    const deployedMissingSecret = await runIExecCliRaw(
+      `${iexecPath} dataset deploy`,
+    );
+    userDatasetMissingSecret = deployedMissingSecret.address;
   });
 
   afterAll(async () => {
@@ -271,6 +281,9 @@ describe('iexec dataset', () => {
     test('from deployed', async () => {
       await setDatasetUniqueName();
       const { address } = await runIExecCliRaw(`${iexecPath} dataset deploy`);
+      await execAsync(
+        `echo "foo" > secret.txt && ${iexecPath} dataset push-secret --secret-path secret.txt`,
+      );
       const res = await runIExecCliRaw(`${iexecPath} dataset publish --force`);
       expect(res.ok).toBe(true);
       expect(res.orderHash).toBeDefined();
@@ -283,7 +296,7 @@ describe('iexec dataset', () => {
         dataset: address,
         datasetprice: 0,
         volume: 1000000,
-        tag: NULL_BYTES32,
+        tag: TDX_DEFAULT_TAG,
         apprestrict: NULL_ADDRESS,
         workerpoolrestrict: NULL_ADDRESS,
         requesterrestrict: NULL_ADDRESS,
@@ -296,13 +309,13 @@ describe('iexec dataset', () => {
       const appAddress = getRandomAddress();
       await expect(
         execAsync(
-          `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --tag tee,tdx --app-restrict ${appAddress} --force`,
+          `${iexecPath} dataset publish ${userDatasetMissingSecret} --price 0.1 RLC --volume 100 --tag 0x1000000000000000000000000000000000000000000000000000000000000000 --app-restrict ${appAddress} --force`,
         ),
       ).rejects.toThrow(
-        `Dataset encryption key is not set for dataset ${userFirstDeployedDatasetAddress} in the SMS. Dataset decryption will fail.`,
+        `Dataset encryption key is not set for dataset ${userDatasetMissingSecret} in the SMS. Dataset decryption will fail.`,
       );
       const res = await runIExecCliRaw(
-        `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --app-restrict ${appAddress} --force`,
+        `${iexecPath} dataset publish ${userFirstDeployedDatasetAddress} --price 0.1 RLC --volume 100 --tag 0x1000000000000000000000000000000000000000000000000000000000000000 --app-restrict ${appAddress} --force`,
       );
       expect(res.ok).toBe(true);
       expect(res.orderHash).toBeDefined();
@@ -315,7 +328,10 @@ describe('iexec dataset', () => {
         dataset: userFirstDeployedDatasetAddress,
         datasetprice: 100000000,
         volume: 100,
-        tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
+        tag: sumTags([
+          '0x1000000000000000000000000000000000000000000000000000000000000000',
+          TDX_DEFAULT_TAG,
+        ]),
         apprestrict: appAddress,
         workerpoolrestrict: NULL_ADDRESS,
         requesterrestrict: NULL_ADDRESS,
@@ -329,6 +345,9 @@ describe('iexec dataset', () => {
     test('latest from deployed', async () => {
       await setDatasetUniqueName();
       await runIExecCliRaw(`${iexecPath} dataset deploy`);
+      await execAsync(
+        `echo "foo" > secret.txt && ${iexecPath} dataset push-secret --secret-path secret.txt`,
+      );
       await runIExecCliRaw(`${iexecPath} dataset publish --force`);
       const { orderHash: lastOrderHash } = await runIExecCliRaw(
         `${iexecPath} dataset publish --force`,
