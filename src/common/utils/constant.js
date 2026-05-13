@@ -30,6 +30,10 @@ export const TEE_FRAMEWORKS = {
   TDX: 'tdx',
 };
 
+// TDX default tag: bit 0 (tee) + bit 3 (tdx) = 0x9
+export const TDX_DEFAULT_TAG =
+  '0x0000000000000000000000000000000000000000000000000000000000000009';
+
 export const STORAGE_PROVIDERS = {
   DROPBOX: 'dropbox',
   IPFS: 'ipfs',

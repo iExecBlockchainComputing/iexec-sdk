@@ -27,8 +27,9 @@ import {
 import { hashEIP712 } from '../utils/sig-utils.js';
 import {
   NULL_BYTES,
-  NULL_BYTES32,
   NULL_ADDRESS,
+  NULL_BYTES32,
+  TDX_DEFAULT_TAG,
   APP_ORDER,
   DATASET_ORDER,
   WORKERPOOL_ORDER,
@@ -333,7 +334,15 @@ const signOrder = async (
 export const signApporder = async (
   contracts = throwIfMissing(),
   apporder = throwIfMissing(),
-) => signOrder(contracts, APP_ORDER, await apporderSchema().validate(apporder));
+) =>
+  signOrder(
+    contracts,
+    APP_ORDER,
+    await apporderSchema().validate({
+      ...apporder,
+      tag: sumTags([await tagSchema().validate(apporder.tag), TDX_DEFAULT_TAG]),
+    }),
+  );
 
 export const signDatasetorder = async (
   contracts = throwIfMissing(),
@@ -342,7 +351,16 @@ export const signDatasetorder = async (
   signOrder(
     contracts,
     DATASET_ORDER,
-    await datasetorderSchema().validate(datasetorder),
+    await datasetorderSchema().validate({
+      ...datasetorder,
+      tag: sumTags([
+        await tagSchema({
+          allowAgnosticTee: true,
+          ignoreLegacyTeeFramework: true,
+        }).validate(datasetorder.tag),
+        TDX_DEFAULT_TAG,
+      ]),
+    }),
   );
 
 export const signWorkerpoolorder = async (
@@ -352,7 +370,13 @@ export const signWorkerpoolorder = async (
   signOrder(
     contracts,
     WORKERPOOL_ORDER,
-    await workerpoolorderSchema().validate(workerpoolorder),
+    await workerpoolorderSchema().validate({
+      ...workerpoolorder,
+      tag: sumTags([
+        await tagSchema().validate(workerpoolorder.tag),
+        TDX_DEFAULT_TAG,
+      ]),
+    }),
   );
 
 export const signRequestorder = async (
@@ -362,7 +386,13 @@ export const signRequestorder = async (
   signOrder(
     contracts,
     REQUEST_ORDER,
-    await requestorderSchema().validate(requestorder),
+    await requestorderSchema().validate({
+      ...requestorder,
+      tag: sumTags([
+        await tagSchema().validate(requestorder.tag),
+        TDX_DEFAULT_TAG,
+      ]),
+    }),
   );
 
 const cancelOrder = async (
@@ -462,6 +492,28 @@ const getMatchableVolume = async (
         signedWorkerpoolorderSchema().validate(workerpoolOrder),
         signedRequestorderSchema().validate(requestOrder),
       ]);
+
+    // check resulting tag
+    const resultingTag = await tagSchema()
+      .validate(
+        sumTags([
+          vAppOrder.tag,
+          stripTeeFrameworkFromTag(vDatasetOrder.tag),
+          vRequestOrder.tag,
+        ]),
+      )
+      .catch((e) => {
+        throw new Error(
+          `Matching order would produce an invalid deal tag. ${e.message}`,
+        );
+      });
+    const isTee = checkActiveBitInTag(resultingTag, TAG_MAP.tee);
+    const isTdx = checkActiveBitInTag(resultingTag, TAG_MAP.tdx);
+    if (!isTee || !isTdx) {
+      throw new Error(
+        'Resulting deal tag must have both [tee] and [tdx] tags active. Matching orders have incompatible tags.',
+      );
+    }
 
     // deployment checks
     const checkAppDeployedAsync = async () => {
@@ -793,21 +845,6 @@ export const matchOrders = async ({
           .validate(requestorder),
       ]);
 
-    // check resulting tag
-    await tagSchema()
-      .validate(
-        sumTags([
-          vAppOrder.tag,
-          stripTeeFrameworkFromTag(vDatasetOrder.tag),
-          vRequestOrder.tag,
-        ]),
-      )
-      .catch((e) => {
-        throw new Error(
-          `Matching order would produce an invalid deal tag. ${e.message}`,
-        );
-      });
-
     // check matchability
     const matchableVolume = await getMatchableVolume(
       contracts,
@@ -892,7 +929,9 @@ export const createApporder = async ({
   app: await addressSchema().required().label('app').validate(app),
   appprice: await nRlcAmountSchema().validate(appprice),
   volume: await uint256Schema().validate(volume),
-  tag: await tagSchema().validate(tag),
+  tag: await tagSchema().validate(
+    sumTags([await tagSchema().validate(tag), TDX_DEFAULT_TAG]),
+  ),
   datasetrestrict: await addressSchema().validate(datasetrestrict),
   workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
   requesterrestrict: await addressSchema().validate(requesterrestrict),
@@ -911,9 +950,16 @@ export const createDatasetorder = async ({
   datasetprice: await nRlcAmountSchema().validate(datasetprice),
   volume: await uint256Schema().validate(volume),
   tag: await tagSchema({
-    allowAgnosticTee: true,
     ignoreLegacyTeeFramework: true,
-  }).validate(tag),
+  }).validate(
+    sumTags([
+      await tagSchema({
+        allowAgnosticTee: true,
+        ignoreLegacyTeeFramework: true,
+      }).validate(tag),
+      TDX_DEFAULT_TAG,
+    ]),
+  ),
   apprestrict: await addressSchema().validate(apprestrict),
   workerpoolrestrict: await addressSchema().validate(workerpoolrestrict),
   requesterrestrict: await addressSchema().validate(requesterrestrict),
@@ -935,7 +981,9 @@ export const createWorkerpoolorder = async ({
   volume: await uint256Schema().validate(volume),
   category: await uint256Schema().validate(category),
   trust: await uint256Schema().validate(trust),
-  tag: await tagSchema().validate(tag),
+  tag: await tagSchema().validate(
+    sumTags([await tagSchema().validate(tag), TDX_DEFAULT_TAG]),
+  ),
   apprestrict: await addressSchema().validate(apprestrict),
   datasetrestrict: await addressSchema().validate(datasetrestrict),
   requesterrestrict: await addressSchema().validate(requesterrestrict),
@@ -961,7 +1009,12 @@ export const createRequestorder = async (
   } = {},
 ) => {
   const requesterOrUser = requester || (await getAddress(contracts));
-  const vTag = await tagSchema({ allowAgnosticTee: true }).validate(tag);
+  const vTag = await tagSchema().validate(
+    sumTags([
+      await tagSchema({ allowAgnosticTee: true }).validate(tag),
+      TDX_DEFAULT_TAG,
+    ]),
+  );
   return {
     app: await addressSchema().required().label('app').validate(app),
     appmaxprice: await nRlcAmountSchema().validate(appmaxprice),

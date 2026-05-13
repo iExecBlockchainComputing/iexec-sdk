@@ -42,6 +42,9 @@ describe('iexec task', () => {
     await execAsync(`${iexecPath} workerpool init`);
     userApp = await runIExecCliRaw(`${iexecPath} app deploy`);
     userDataset = await runIExecCliRaw(`${iexecPath} dataset deploy`);
+    await execAsync(
+      `echo 'foo' > secret.txt && ${iexecPath} dataset push-secret ${userDataset.address} --secret-path secret.txt`,
+    );
     userWorkerpool = await runIExecCliRaw(`${iexecPath} workerpool deploy`);
   });
 

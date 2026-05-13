@@ -1,5 +1,6 @@
 services:
   arbitrum-sepolia-fork:
+    platform: linux/amd64
     restart: 'no'
     image: ghcr.io/foundry-rs/foundry:v1.0.0
     entrypoint: anvil
@@ -17,6 +18,7 @@ services:
       start_period: 30s
 
   unknown-chain-fork:
+    platform: linux/amd64
     restart: 'no'
     image: ghcr.io/foundry-rs/foundry:v1.0.0
     entrypoint: anvil
@@ -34,6 +36,7 @@ services:
       start_period: 30s
 
   service-internal-error:
+    platform: linux/amd64
     image: nginx:alpine
     volumes:
       - $PWD/mock/server/http500.nginx.conf:/etc/nginx/conf.d/default.conf:ro
@@ -43,6 +46,7 @@ services:
       - 5500:80
 
   sms-arbitrum-sepolia:
+    platform: linux/amd64
     image: iexechub/iexec-sms:8.7.0
     restart: unless-stopped
     environment:
@@ -63,6 +67,7 @@ services:
       arbitrum-sepolia-fork:
         condition: service_healthy
   ipfs:
+    platform: linux/amd64
     restart: unless-stopped
     image: ipfs/go-ipfs:v0.9.1
     expose:
@@ -79,6 +84,7 @@ services:
       start_period: 30s
 
   market-mongo:
+    platform: linux/amd64
     image: mongo:6.0.3
     restart: unless-stopped
     expose:
@@ -87,6 +93,7 @@ services:
       - 27017:27017
 
   market-redis:
+    platform: linux/amd64
     image: redis:7.0.7-alpine
     restart: unless-stopped
     command: redis-server --appendonly yes
@@ -102,6 +109,7 @@ services:
       start_period: 30s
 
   market-watcher-arbitrum-sepolia:
+    platform: linux/amd64
     image: iexechub/iexec-market-watcher:7.0.1
     restart: unless-stopped
     environment:
@@ -122,6 +130,7 @@ services:
         condition: service_started
 
   market-api-arbitrum-sepolia:
+    platform: linux/amd64
     image: iexechub/iexec-market-api:7.1.2
     restart: unless-stopped
     ports:
@@ -147,6 +156,7 @@ services:
         condition: service_started
 
   compass-arbitrum-sepolia:
+    platform: linux/amd64
     image: iexechub/compass:v0.1.1
     restart: unless-stopped
     environment:
@@ -159,6 +169,7 @@ services:
       test: nc -w 1 0.0.0.0 3000
 
   stack-ready:
+    platform: linux/amd64
     image: bash
     command:
       - echo "all services ready"

@@ -2,7 +2,6 @@ import { describe, test, expect } from '@jest/globals';
 import {
   TEST_CHAINS,
   NULL_ADDRESS,
-  NULL_BYTES32,
   execAsync,
   getRandomAddress,
 } from '../test-utils.js';
@@ -17,6 +16,7 @@ import {
 } from './cli-test-utils.js';
 import '../jest-setup.js';
 import { encodeTag } from '../../src/lib/utils.js';
+import { TDX_DEFAULT_TAG } from '../../src/common/utils/constant.js';
 
 const testChain = TEST_CHAINS['arbitrum-sepolia-fork'];
 
@@ -152,7 +152,7 @@ describe('iexec workerpool', () => {
         workerpool: address,
         workerpoolprice: 0,
         volume: 1,
-        tag: NULL_BYTES32,
+        tag: TDX_DEFAULT_TAG,
         trust: 0,
         category: 0,
         apprestrict: NULL_ADDRESS,

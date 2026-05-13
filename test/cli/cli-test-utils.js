@@ -7,7 +7,10 @@ import { execAsync, getId, setBalance } from '../test-utils.js';
 const IEXEC_JSON = 'iexec.json';
 const CHAIN_JSON = 'chain.json';
 
-export const iexecPath = 'iexec';
+export const iexecPath =
+  process.env.USE_LOCAL_CLI === 'true'
+    ? 'iexec' // use installed iexec cli
+    : '../../../src/cli/cmd/iexec.js';
 
 export const globalSetup = async (testid = 'shared') => {
   const testDir = `test/tests-working-dir/${testid}`;
@@ -151,8 +154,9 @@ export const editApporder = async ({ tag }) =>
     tag,
   });
 
-export const editDatasetorder = async ({ tag }) =>
+export const editDatasetorder = async ({ dataset, tag }) =>
   editOrder('datasetorder')({
+    dataset,
     tag,
   });
 
