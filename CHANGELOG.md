@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [9.0.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v9.0.0...v9.0.1) (2026-05-19)
+
+
+### Changed
+
+* set TDX as default tag for all order creation ([#562](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/562)) ([da4a8b7](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/da4a8b78794ba1205d62897deff63ef3ca787c1b))
+
 ## [9.0.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v8.24.0...v9.0.0) (2026-04-29)
 
 
