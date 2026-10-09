@@ -1,5 +1,5 @@
 name: docker publish latest
-description: Publish on docker registry when a release is published
+# Publish on docker registry when a release is published
 
 on:
   release:

@@ -1,5 +1,5 @@
 name: docker publish staging
-description: Publish a staging version on docker registry
+# Publish a staging version on docker registry
 
 on:
   workflow_dispatch:
