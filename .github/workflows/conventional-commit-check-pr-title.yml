@@ -2,11 +2,18 @@ name: Conventional Commit Check PR Title
 # checks the PR title respects the conventional commit
 
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
       - reopened
+      - synchronize
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint-pr-title:
