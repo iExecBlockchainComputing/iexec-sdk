@@ -4,28 +4,18 @@ on:
   workflow_call:
     inputs:
       node-version:
-        description: 'Node version to use as specified in actions/setup-node@v6'
+        description: 'Node version to use as specified in actions/setup-node'
         default: '20'
         type: string
-      upload-coverage:
-        description: 'Upload coverage data for later reuse'
-        type: boolean
-        default: false
-    outputs:
-      coverage-artifact-id:
-        description: 'Coverage artifact id (if `upload-coverage: true`)'
-        value: ${{ jobs.test.outputs.coverage-artifact-id }}
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    outputs:
-      coverage-artifact-id: ${{ steps.upload-coverage.outputs.artifact-id }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ inputs.node-version }}
           cache: 'npm'
@@ -50,12 +40,3 @@ jobs:
       - name: Stop e2e test stack
         if: always()
         run: npm run stop-test-stack
-
-      - name: Upload coverage
-        id: upload-coverage
-        if: ${{ inputs.upload-coverage }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: coverage
-          path: coverage
-          overwrite: true

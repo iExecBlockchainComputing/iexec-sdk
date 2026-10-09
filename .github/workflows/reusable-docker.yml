@@ -18,10 +18,16 @@ on:
       docker-password:
         description: 'Docker registry password or PAT (required unless `dry-run: true`)'
         required: false
+      dockerhub-username:
+        description: 'DockerHub username (required for authenticated pulls)'
+        required: true
+      dockerhub-password:
+        description: 'DockerHub password or PAT (required for authenticated pulls)'
+        required: true
 
 jobs:
   docker-publish:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v3.2.0
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@fc54a889aaabffc2acf96451d54592a90d068af9 # docker-build-v3.7.0
     with:
       image-name: 'iexechub/iexec-sdk'
       registry: 'docker.io'
@@ -34,3 +40,5 @@ jobs:
     secrets:
       username: ${{ secrets.docker-username }}
       password: ${{ secrets.docker-password }}
+      dockerhub-username: ${{ secrets.dockerhub-username }}
+      dockerhub-password: ${{ secrets.dockerhub-password }}

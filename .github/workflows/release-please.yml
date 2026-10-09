@@ -13,5 +13,5 @@ permissions:
 
 jobs:
   release-please:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/release-please.yml@release-please-v2.1.0
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/release-please.yml@8bf223e4a6b5e88d42f9c91e57dcfd31d1cb0e5a # release-please-v2.2.2
     secrets: inherit
