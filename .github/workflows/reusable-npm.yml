@@ -21,6 +21,7 @@ jobs:
   npm-publish:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@c180a865f53d525d94e5ea7662892e60d66369f3 # publish-npm-v2.0.0
     with:
+      node-version: '26'
       install-command: npm ci
       build-command: npm run build
       dry-run: ${{ inputs.dry-run }}
