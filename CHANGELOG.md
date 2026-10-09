@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [9.1.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v9.0.1...v9.1.0) (2026-10-09)
+
+
+### Added
+
+* require node.js &gt;= 22.19.0 ([ad75ee6](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/ad75ee6ece7e4825ecf027ceb7fd98805572636a))
+
+
+### Changed
+
+* **deps:** update dependancies ([#570](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/570)) ([5bee57e](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/5bee57eb0219b3785ee97e5b1c970c77996fc1ee))
+* require node.js &gt;= 22.19.0 ([#572](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/572)) ([ad75ee6](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/ad75ee6ece7e4825ecf027ceb7fd98805572636a))
+
 ## [9.0.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v9.0.0...v9.0.1) (2026-05-19)
 
 
