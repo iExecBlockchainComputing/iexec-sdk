@@ -37,6 +37,7 @@ jobs:
       hadolint: true
       push: ${{ !inputs.dry-run }}
       image-tag: ${{ inputs.tag }}
+      attest: true
     secrets:
       username: ${{ secrets.docker-username }}
       password: ${{ secrets.docker-password }}

@@ -2,14 +2,7 @@ name: PR test
 
 on: [pull_request]
 
-permissions:
-  # Allows the workflow to write pull request comments (required for dependabot in docker-dry-run job)
-  # https://docs.github.com/en/code-security/dependabot/troubleshooting-dependabot/troubleshooting-dependabot-on-github-actions#changing-github_token-permissions
-  pull-requests: write
-  # permissions for build
-  contents: read
-  packages: write
-  id-token: write
+permissions: {}
 
 concurrency:
   group: ${{ github.ref }}-pr-test
@@ -18,6 +11,8 @@ concurrency:
 jobs:
   check-code:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -40,11 +35,15 @@ jobs:
 
   test:
     uses: ./.github/workflows/reusable-test.yml
+    permissions:
+      contents: read
     with:
       node-version: '20'
 
   test-supported-node-versions:
     uses: ./.github/workflows/reusable-test.yml
+    permissions:
+      contents: read
     # for release PR run tests on all supported node versions
     if: startsWith(github.head_ref,'release-please--')
     strategy:
@@ -55,11 +54,19 @@ jobs:
 
   npm-dry-run:
     uses: ./.github/workflows/reusable-npm.yml
+    # publish-npm requests these permissions statically, even in dry-run
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     with:
       dry-run: true
 
   docker-dry-run:
     uses: ./.github/workflows/reusable-docker.yml
+    permissions:
+      pull-requests: write
+      contents: read
     with:
       dry-run: true
     secrets:

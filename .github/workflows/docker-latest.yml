@@ -5,8 +5,12 @@ on:
   release:
     types: [published]
 
+permissions: {}
+
 jobs:
   get-version:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,6 +32,10 @@ jobs:
 
   docker-publish:
     uses: ./.github/workflows/reusable-docker.yml
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     needs: get-version
     with:
       tag: ${{ needs.get-version.outputs.version }}

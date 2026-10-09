@@ -4,12 +4,20 @@ name: docker publish staging
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   compute-staging-version:
     uses: ./.github/workflows/reusable-compute-staging-version.yml
+    permissions:
+      contents: read
 
   docker-publish:
     uses: ./.github/workflows/reusable-docker.yml
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     needs: compute-staging-version
     with:
       tag: ${{ needs.compute-staging-version.outputs.version }}
