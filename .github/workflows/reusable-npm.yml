@@ -1,5 +1,5 @@
 name: npm publish
-description: reusable npm workflow for this project
+# reusable npm workflow for this project
 
 on:
   workflow_call:
@@ -19,12 +19,12 @@ on:
 
 jobs:
   npm-publish:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@publish-npm-v1.6.0
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/publish-npm.yml@c180a865f53d525d94e5ea7662892e60d66369f3 # publish-npm-v2.0.0
     with:
       install-command: npm ci
       build-command: npm run build
       dry-run: ${{ inputs.dry-run }}
       tag: ${{ inputs.tag }}
       version: ${{ inputs.version }}
-      environment: ${{ (inputs.dry-run && '') || inputs.tag }}
+      environment: ${{ (!inputs.dry-run && inputs.tag) || '' }}
       provenance: ${{ !inputs.dry-run }}

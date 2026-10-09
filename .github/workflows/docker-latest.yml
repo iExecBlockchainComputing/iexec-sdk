@@ -1,33 +1,46 @@
 name: docker publish latest
-description: Publish on docker registry when a release is published
+# Publish on docker registry when a release is published
 
 on:
   release:
     types: [published]
 
+permissions: {}
+
 jobs:
   get-version:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '20'
+          package-manager-cache: false
       - name: Set publish version
         id: set-publish-version
         run: |
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
-          echo "VERSION=${CURRENT_VERSION}" | tee -a $GITHUB_OUTPUT
+          echo "VERSION=${CURRENT_VERSION}" | tee -a "$GITHUB_OUTPUT"
     outputs:
       version: ${{ steps.set-publish-version.outputs.VERSION }}
 
   docker-publish:
     uses: ./.github/workflows/reusable-docker.yml
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     needs: get-version
     with:
       tag: ${{ needs.get-version.outputs.version }}
     secrets:
       docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
       docker-password: ${{ secrets.DOCKERHUB_PAT }}
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-password: ${{ secrets.DOCKERHUB_PAT }}

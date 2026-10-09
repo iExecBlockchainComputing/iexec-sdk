@@ -1,5 +1,5 @@
 name: Compute staging version
-description: compute a staging version from the current version, branch name and commit
+# compute a staging version from the current version, branch name and commit
 
 on:
   workflow_call:
@@ -14,20 +14,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '20'
       - name: Set publish version
         id: set-publish-version
         run: |
-          BRANCH=$(echo "${{ github.ref_name }}" | sed 's|/|-|g')
-          COMMIT_SHA="${{ github.sha }}"
+          BRANCH="${GITHUB_REF_NAME//\//-}"
+          COMMIT_SHA="${GITHUB_SHA}"
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
           STAGING_VERSION="${CURRENT_VERSION}-${BRANCH}-${COMMIT_SHA::7}"
-          echo "VERSION=${STAGING_VERSION}" | tee -a $GITHUB_OUTPUT
-          echo "DIST_TAG=${BRANCH}" | tee -a $GITHUB_OUTPUT
+          echo "VERSION=${STAGING_VERSION}" | tee -a "$GITHUB_OUTPUT"
+          echo "DIST_TAG=${BRANCH}" | tee -a "$GITHUB_OUTPUT"
     outputs:
       version: ${{ steps.set-publish-version.outputs.VERSION }}
       dist-tag: ${{ steps.set-publish-version.outputs.DIST_TAG }}

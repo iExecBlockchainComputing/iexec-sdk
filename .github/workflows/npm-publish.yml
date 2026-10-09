@@ -8,21 +8,24 @@ on:
   release:
     types: [published]
 
-permissions:
-  id-token: write # Required for OIDC
-  packages: write
-  contents: read
+permissions: {}
 
 jobs:
   compute-staging-version:
     # Only run for manual dispatch (staging)
     if: github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/reusable-compute-staging-version.yml
+    permissions:
+      contents: read
 
   npm-publish-staging:
     # Only run for manual dispatch (staging)
     if: github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/reusable-npm.yml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     needs: [compute-staging-version]
     with:
       version: ${{ needs.compute-staging-version.outputs.version }}
@@ -32,5 +35,9 @@ jobs:
     # Only run for release published (latest)
     if: github.event_name == 'release'
     uses: ./.github/workflows/reusable-npm.yml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     with:
       tag: latest
