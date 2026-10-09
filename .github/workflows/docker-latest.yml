@@ -22,7 +22,7 @@ jobs:
         id: set-publish-version
         run: |
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
-          echo "VERSION=${CURRENT_VERSION}" | tee -a $GITHUB_OUTPUT
+          echo "VERSION=${CURRENT_VERSION}" | tee -a "$GITHUB_OUTPUT"
     outputs:
       version: ${{ steps.set-publish-version.outputs.VERSION }}
 

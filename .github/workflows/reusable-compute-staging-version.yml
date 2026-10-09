@@ -24,12 +24,12 @@ jobs:
       - name: Set publish version
         id: set-publish-version
         run: |
-          BRANCH=$(echo "${GITHUB_REF_NAME}" | sed 's|/|-|g')
+          BRANCH="${GITHUB_REF_NAME//\//-}"
           COMMIT_SHA="${GITHUB_SHA}"
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
           STAGING_VERSION="${CURRENT_VERSION}-${BRANCH}-${COMMIT_SHA::7}"
-          echo "VERSION=${STAGING_VERSION}" | tee -a $GITHUB_OUTPUT
-          echo "DIST_TAG=${BRANCH}" | tee -a $GITHUB_OUTPUT
+          echo "VERSION=${STAGING_VERSION}" | tee -a "$GITHUB_OUTPUT"
+          echo "DIST_TAG=${BRANCH}" | tee -a "$GITHUB_OUTPUT"
     outputs:
       version: ${{ steps.set-publish-version.outputs.VERSION }}
       dist-tag: ${{ steps.set-publish-version.outputs.DIST_TAG }}
