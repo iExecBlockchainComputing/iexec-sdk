@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [9.1.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v9.1.0...v9.1.1) (2026-10-12)
+
+
+### Changed
+
+* **deps:** bump the production-dependencies group with 13 updates ([#576](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/576)) ([75c533a](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/75c533a290b987233fda646d8c5ea33a9b35b4d6))
+
 ## [9.1.0](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v9.0.1...v9.1.0) (2026-10-09)
 
 
