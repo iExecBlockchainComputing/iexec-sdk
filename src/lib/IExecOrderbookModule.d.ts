@@ -408,7 +408,7 @@ export default class IExecOrderbookModule extends IExecModule {
      * filters out orders allowing “any” workerpool (default: `false`)
      */
     isWorkerpoolStrict?: boolean;
-  }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
+  }): Promise<PaginableOrders<PublishedRequestorder>>;
   /**
    * find a published apporder by orderHash.
    *

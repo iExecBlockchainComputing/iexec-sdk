@@ -341,7 +341,7 @@ console.log('remaining volume:', remaining);
 
 ### fetchRequestOrderbook()
 
-> **fetchRequestOrderbook**(`options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>\>
+> **fetchRequestOrderbook**(`options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedRequestorder`](../-internal-/interfaces/PublishedRequestorder.md)\>\>
 
 find the best paying request orders for computing resource.
 
@@ -432,7 +432,7 @@ include orders restricted to specified workerpool (use `'any'` to include any wo
 
 #### Returns
 
-`Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>\>
+`Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedRequestorder`](../-internal-/interfaces/PublishedRequestorder.md)\>\>
 
 ***
 
