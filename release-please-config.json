@@ -1,6 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "always-update": true,
   "include-component-in-tag": false,
+  "include-v-in-tag": true,
   "changelog-sections": [
     { "type": "feat", "section": "Added", "hidden": false },
 
@@ -25,8 +27,7 @@
   "packages": {
     ".": {
       "release-type": "node",
-      "changelog-path": "CHANGELOG.md",
-      "include-v-in-tag": true
+      "changelog-path": "CHANGELOG.md"
     }
   }
 }
