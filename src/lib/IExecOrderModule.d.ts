@@ -1050,7 +1050,7 @@ export default class IExecOrderModule extends IExecModule {
     datasetorder?: ConsumableDatasetorder;
     workerpoolorder: ConsumableWorkerpoolorder;
     requestorder: ConsumableRequestorder;
-  }): Promise<{ volume: BN; total: BN; sponsored: BN }>;
+  }): Promise<{ volume: BN; total: BN }>;
   /**
    * Prepare a bulk from datasetorders to process multiple datasets with a single requestorder
    *

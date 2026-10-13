@@ -520,7 +520,7 @@ default `0`
 
 ### estimateMatchOrders()
 
-> **estimateMatchOrders**(`orders`): `Promise`\<\{ `sponsored`: [`BN`](../interfaces/BN.md); `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
+> **estimateMatchOrders**(`orders`): `Promise`\<\{ `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
 
 estimates the cost of matching the provided orders
 
@@ -559,7 +559,7 @@ console.log(`total cost for matching orders: ${result.total} nRLC`);
 
 #### Returns
 
-`Promise`\<\{ `sponsored`: [`BN`](../interfaces/BN.md); `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
+`Promise`\<\{ `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
 
 ***
 
