@@ -140,15 +140,9 @@ fetch the IExec registry Contract instance of specified resource
 
 ### fetchTokenAddress()
 
-> **fetchTokenAddress**(`resourceName`): `Promise`\<`string`\>
+> **fetchTokenAddress**(): `Promise`\<`string`\>
 
 fetch the IExec token contract address
-
-#### Parameters
-
-##### resourceName
-
-`string`
 
 #### Returns
 
@@ -156,17 +150,11 @@ fetch the IExec token contract address
 
 ***
 
-### fetchTokenContract()?
+### fetchTokenContract()
 
-> `optional` **fetchTokenContract**(`resourceName`): `Promise`\<`Contract`\>
+> **fetchTokenContract**(): `Promise`\<`Contract`\>
 
 fetch the IExec token Contract instance
-
-#### Parameters
-
-##### resourceName
-
-`string`
 
 #### Returns
 
