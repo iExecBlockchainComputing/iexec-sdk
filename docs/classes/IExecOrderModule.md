@@ -903,7 +903,7 @@ console.log('published order hash:', orderHash);
 
 > **signApporder**(`apporder`, `options?`): `Promise`\<[`SignedApporder`](../-internal-/interfaces/SignedApporder.md)\>
 
-**ONLY APP OWNER**
+**SIGNER REQUIRED, ONLY APP OWNER**
 
 sign an apporder template to create a valid order
 
@@ -1282,7 +1282,7 @@ console.log('unpublished order hash:', orderHash);
 
 > **unpublishLastWorkerpoolorder**(`workerpoolAddress`): `Promise`\<`string`\>
 
-****SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
+**SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
 
 unpublish the last published workerpool's workerpoolorder from the off-chain marketplace
 
