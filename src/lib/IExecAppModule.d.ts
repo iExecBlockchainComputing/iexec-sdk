@@ -191,7 +191,7 @@ export default class IExecAppModule extends IExecModule {
    * example:
    * ```js
    * const { address, to, txHash } = await transferApp(appAddress, receiverAddress);
-   * console.log(`app ${address} ownership transferred to ${address} in tx ${txHash}`);
+   * console.log(`app ${address} ownership transferred to ${to} in tx ${txHash}`);
    * ```
    */
   transferApp(

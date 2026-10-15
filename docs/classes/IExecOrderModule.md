@@ -540,7 +540,7 @@ example:
 ```js
 const orders = {
   apporder,
-  datasetorder
+  datasetorder,
   workerpoolorder,
   requestorder,
 };
@@ -1051,7 +1051,7 @@ _NB_: this is a transaction free off-chain operation, unpublished orders are no 
 example:
 ```js
 const orderHashes = await unpublishAllApporders(appAddress);
-console.log('published orders count:', orderHashes.length);
+console.log('unpublished orders count:', orderHashes.length);
 ```
 
 #### Parameters
@@ -1157,7 +1157,7 @@ _NB_: this is a transaction free off-chain operation, unpublished orders are no 
 example:
 ```js
 const orderHash = await unpublishApporder(apporderHash);
-console.log(unpublished order hash:', orderHash);
+console.log('unpublished order hash:', orderHash);
 ```
 
 #### Parameters
@@ -1213,7 +1213,7 @@ _NB_: this is a transaction free off-chain operation, unpublished orders are no 
 example:
 ```js
 const orderHash = await unpublishLastApporder(appAddress);
-console.log('published order hash:', orderHash);
+console.log('unpublished order hash:', orderHash);
 ```
 
 #### Parameters

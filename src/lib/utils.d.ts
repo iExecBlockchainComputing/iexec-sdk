@@ -81,7 +81,7 @@ export const parseRLC: (value: string | number, defaultUnit?: string) => BN;
  *
  * example:
  * ```js
- * console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
+ * console.log('500000000 wei =' + formatEth('500000000') + 'ether');
  * ```
  */
 export const formatEth: (wei: BNish) => string;

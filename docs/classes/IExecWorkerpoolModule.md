@@ -259,7 +259,7 @@ _NB_: when transferring the ownership to a contract, the receiver contract must 
 example:
 ```js
 const { address, to, txHash } = await transferWorkerpool(workerpoolAddress, receiverAddress);
-console.log(`workerpool ${address} ownership transferred to ${address} in tx ${txHash}`);
+console.log(`workerpool ${address} ownership transferred to ${to} in tx ${txHash}`);
 ```
 
 #### Parameters

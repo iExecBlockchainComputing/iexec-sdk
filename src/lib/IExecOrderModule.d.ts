@@ -850,7 +850,7 @@ export default class IExecOrderModule extends IExecModule {
    * example:
    * ```js
    * const orderHash = await unpublishApporder(apporderHash);
-   * console.log(unpublished order hash:', orderHash);
+   * console.log('unpublished order hash:', orderHash);
    * ```
    */
   unpublishApporder(apporderHash: OrderHash): Promise<OrderHash>;
@@ -906,7 +906,7 @@ export default class IExecOrderModule extends IExecModule {
    * example:
    * ```js
    * const orderHash = await unpublishLastApporder(appAddress);
-   * console.log('published order hash:', orderHash);
+   * console.log('unpublished order hash:', orderHash);
    * ```
    */
   unpublishLastApporder(appAddress: Address): Promise<OrderHash>;
@@ -962,7 +962,7 @@ export default class IExecOrderModule extends IExecModule {
    * example:
    * ```js
    * const orderHashes = await unpublishAllApporders(appAddress);
-   * console.log('published orders count:', orderHashes.length);
+   * console.log('unpublished orders count:', orderHashes.length);
    * ```
    */
   unpublishAllApporders(appAddress: Address): Promise<OrderHash[]>;
@@ -1044,7 +1044,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```js
    * const orders = {
    *   apporder,
-   *   datasetorder
+   *   datasetorder,
    *   workerpoolorder,
    *   requestorder,
    * };

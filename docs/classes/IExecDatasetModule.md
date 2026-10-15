@@ -389,7 +389,7 @@ _NB_: when transferring the ownership to a contract, the receiver contract must 
 example:
 ```js
 const { address, to, txHash } = await transferDataset(datasetAddress, receiverAddress);
-console.log(`dataset ${address} ownership transferred to ${address} in tx ${txHash}`);
+console.log(`dataset ${address} ownership transferred to ${to} in tx ${txHash}`);
 ```
 
 #### Parameters

@@ -14,7 +14,7 @@ _NB_: units are not supported, the amount must be expressed in wei
 
 example:
 ```js
-console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
+console.log('500000000 wei =' + formatEth('500000000') + 'ether');
 ```
 
 ## Parameters

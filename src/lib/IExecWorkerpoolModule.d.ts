@@ -139,7 +139,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * example:
    * ```js
    * const { address, to, txHash } = await transferWorkerpool(workerpoolAddress, receiverAddress);
-   * console.log(`workerpool ${address} ownership transferred to ${address} in tx ${txHash}`);
+   * console.log(`workerpool ${address} ownership transferred to ${to} in tx ${txHash}`);
    * ```
    */
   transferWorkerpool(

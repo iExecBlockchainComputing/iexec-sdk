@@ -297,7 +297,7 @@ _NB_: when transferring the ownership to a contract, the receiver contract must 
 example:
 ```js
 const { address, to, txHash } = await transferApp(appAddress, receiverAddress);
-console.log(`app ${address} ownership transferred to ${address} in tx ${txHash}`);
+console.log(`app ${address} ownership transferred to ${to} in tx ${txHash}`);
 ```
 
 #### Parameters
