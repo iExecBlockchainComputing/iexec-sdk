@@ -67,25 +67,35 @@ declare class DealObservable extends Observable {
         deadlineReached: boolean;
         tasks: Taskid[];
       };
-      tasks: {
-        taskid: Taskid;
-        idx: BN;
-        dealid?: Dealid;
-        status?: number;
-        statusName?: string;
-        taskTimedOut?: boolean;
-        contributionDeadline?: BN;
-        revealDeadline?: BN;
-        finalDeadline?: BN;
-        consensusValue?: Bytes32 | Bytes;
-        revealCounter?: BN;
-        winnerCounter?: BN;
-        contributors?: Address[];
-        resultDigest?: Bytes32 | Bytes;
-        results?: { storage: string; location?: string } | Bytes;
-        resultsTimestamp?: BN;
-        resultsCallback?: Bytes;
-      }[];
+      /**
+       * tasks details indexed by position in the deal (`0` is the task at index `deal.botFirst`)
+       */
+      tasks: Record<
+        string,
+        {
+          taskid: Taskid;
+          /**
+           * task index (position in the deal as a string until the task is initialized)
+           */
+          idx: BN | string;
+          dealid?: Dealid;
+          status?: number;
+          statusName?: string;
+          taskTimedOut?: boolean;
+          timeref?: BN;
+          contributionDeadline?: BN;
+          revealDeadline?: BN;
+          finalDeadline?: BN;
+          consensusValue?: Bytes32 | Bytes;
+          revealCounter?: BN;
+          winnerCounter?: BN;
+          contributors?: Address[];
+          resultDigest?: Bytes32 | Bytes;
+          results?: { storage: string; location?: string } | Bytes;
+          resultsTimestamp?: BN;
+          resultsCallback?: Bytes;
+        }
+      >;
     }) => any;
     /**
      * callback fired once when all the tasks are completed or when the deadline is reached
