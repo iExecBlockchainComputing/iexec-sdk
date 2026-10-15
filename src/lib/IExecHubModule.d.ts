@@ -20,7 +20,7 @@ export interface Category {
   /**
    * time base (in sec) for the category (tasks of this category must be completed under 10 * workClockTimeRef)
    */
-  workClockTimeRef: BNish;
+  workClockTimeRef: BN;
 }
 
 /**
