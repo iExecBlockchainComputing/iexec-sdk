@@ -1068,14 +1068,14 @@ export default class IExecOrderModule extends IExecModule {
    *
    * example:
    * ```js
-   * const { bulkCid, volume } = await prepareDatasetBulk(datasetorders, { maxDatasetPerTask: 5 });
-   * console.log(`bulk_cid: ${bulkCid}, volume: ${volume}`);
+   * const { cid, volume } = await prepareDatasetBulk(datasetorders, { maxDatasetPerTask: 5 });
+   * console.log(`bulk_cid: ${cid}, volume: ${volume}`);
    *
    * const requestorderTemplate = await createRequestorder({
    *   app: appAddress,
    *   category: 0,
    *   volume: volume, // set the volume
-   *   params: { bulk_cid: bulkCid } // set the bulk cid in the requestorder params
+   *   params: { bulk_cid: cid } // set the bulk cid in the requestorder params
    * });
    * ```
    */
