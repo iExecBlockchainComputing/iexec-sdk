@@ -67,7 +67,17 @@ declare class TaskObservable extends Observable {
         | 'TASK_COMPLETED'
         | 'TASK_TIMEDOUT'
         | 'TASK_FAILED';
-      task: Task;
+      /**
+       * task details
+       *
+       * _NB_: when the task is not initialized yet and `dealid` is specified, only `taskid`, `dealid`, `status`, `statusName` and `taskTimedOut` are available
+       */
+      task:
+        | Task
+        | Pick<
+            Task,
+            'taskid' | 'dealid' | 'status' | 'statusName' | 'taskTimedOut'
+          >;
     }) => any;
     /**
      * callback fired once when the task is completed or when the deadline is reached
