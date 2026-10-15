@@ -129,7 +129,7 @@ console.log('taskid:', taskid)
 
 fetch the latest deals sealed with a specified apporder.
 
-_NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+_NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
 
 example:
 ```js
@@ -170,7 +170,7 @@ size of the page to fetch
 
 fetch the latest deals sealed with a specified datasetorder.
 
-_NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+_NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
 
 example:
 ```js
@@ -211,7 +211,7 @@ size of the page to fetch
 
 fetch the latest deals sealed with a specified requestorder.
 
-_NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+_NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
 
 example:
 ```js
@@ -252,7 +252,7 @@ size of the page to fetch
 
 fetch the latest deals sealed with a specified workerpoolorder.
 
-_NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+_NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
 
 example:
 ```js
