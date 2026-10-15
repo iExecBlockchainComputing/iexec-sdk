@@ -10,7 +10,9 @@
 
 format a nRLC amount in RLC
 
- * example:
+_NB_: units are not supported, the amount must be expressed in nRLC
+
+example:
 ```js
 console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
 ```
@@ -19,7 +21,7 @@ console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
 
 ### nRLC
 
-[`NRLCAmount`](../../../../type-aliases/NRLCAmount.md)
+[`BNish`](../../../../type-aliases/BNish.md)
 
 ## Returns
 
