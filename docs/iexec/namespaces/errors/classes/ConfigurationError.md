@@ -6,7 +6,7 @@
 
 # Class: ConfigurationError
 
-ValidationError is thrown when the current configuration does not allow to perform a specific operation
+ConfigurationError is thrown when the current configuration does not allow to perform a specific operation
 
 ## Extends
 
