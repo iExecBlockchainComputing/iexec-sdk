@@ -111,7 +111,7 @@ console.log('user address:', userAddress);
 
 ### sendETH()
 
-> **sendETH**(`WeiAmount`, `to`): `Promise`\<`string`\>
+> **sendETH**(`weiAmount`, `to`): `Promise`\<`string`\>
 
 **SIGNER REQUIRED**
 
@@ -125,7 +125,7 @@ console.log('transaction hash:', txHash);
 
 #### Parameters
 
-##### WeiAmount
+##### weiAmount
 
 [`WeiAmount`](../type-aliases/WeiAmount.md)
 

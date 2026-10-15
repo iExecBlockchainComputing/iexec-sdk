@@ -46,7 +46,7 @@ export default class IExecWalletModule extends IExecModule {
    * console.log('transaction hash:', txHash);
    * ```
    */
-  sendETH(WeiAmount: WeiAmount, to: Address): Promise<TxHash>;
+  sendETH(weiAmount: WeiAmount, to: Address): Promise<TxHash>;
   /**
    * **SIGNER REQUIRED**
    *
