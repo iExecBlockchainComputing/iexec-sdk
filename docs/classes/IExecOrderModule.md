@@ -217,7 +217,7 @@ default no restrict
 
 restrict usage to runtime with specified tags
 
-default `[]`
+default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
 
 ###### volume?
 
@@ -290,7 +290,7 @@ default no restrict
 
 restrict usage to runtime with specified tags
 
-default `[]`
+default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
 
 ###### volume?
 
@@ -403,7 +403,7 @@ default connected wallet address
 
 restrict usage to runtime with specified tags
 
-default `[]`
+default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
 
 ###### trust?
 
@@ -494,7 +494,7 @@ default no restrict
 
 proposed tags
 
-default `[]`
+default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
 
 ###### trust?
 
@@ -907,6 +907,8 @@ console.log('published order hash:', orderHash);
 
 sign an apporder template to create a valid order
 
+_NB_: `tee` and `tdx` tags are always added to the order tag before signing
+
 _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
@@ -941,6 +943,8 @@ const apporder = await signApporder(apporderTemplate);
 
 sign a datasetorder template to create a valid order
 
+_NB_: `tee` and `tdx` tags are always added to the order tag before signing
+
 _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
@@ -974,6 +978,8 @@ const datasetorder = await signDatasetorder(datasetorderTemplate);
 **SIGNER REQUIRED, ONLY REQUESTER**
 
 sign a requestorder template to create a valid order
+
+_NB_: `tee` and `tdx` tags are always added to the order tag before signing
 
 _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
@@ -1012,6 +1018,8 @@ const requestorder = await signRequestorder(requestorderTemplate);
 **SIGNER REQUIRED, ONLY WORKERPOOL OWNER**
 
 sign a workerpoolorder template to create a valid order
+
+_NB_: `tee` and `tdx` tags are always added to the order tag before signing
 
 ```js
 const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerpoolAddress, category: 0});

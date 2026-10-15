@@ -233,7 +233,7 @@ export interface RequestorderParams {
    * };
    * ```
    *
-   * _NB_: `iexec_secrets` are only available for TEE tasks, use with `tag: ["tee"]`
+   * _NB_: `iexec_secrets` are only available for TEE tasks
    */
   iexec_secrets?: Record<number, string>;
   /**
@@ -241,7 +241,7 @@ export interface RequestorderParams {
    *
    * default `false`
    *
-   * _NB_: `iexec_result_encryption: true` is only available for TEE tasks, use with `tag: ["tee"]`
+   * _NB_: `iexec_result_encryption: true` is only available for TEE tasks
    */
   iexec_result_encryption?: boolean;
   /**
@@ -380,7 +380,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * restrict usage to runtime with specified tags
      *
-     * default `[]`
+     * default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
      */
     tag?: Tag | HumanSingleTag[];
     /**
@@ -427,7 +427,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * restrict usage to runtime with specified tags
      *
-     * default `[]`
+     * default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
      */
     tag?: Tag | HumanSingleTag[];
     /**
@@ -484,7 +484,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * proposed tags
      *
-     * default `[]`
+     * default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
      */
     tag?: Tag | HumanSingleTag[];
     /**
@@ -575,7 +575,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * restrict usage to runtime with specified tags
      *
-     * default `[]`
+     * default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
      */
     tag?: Tag | HumanSingleTag[];
     /**
@@ -602,6 +602,8 @@ export default class IExecOrderModule extends IExecModule {
    *
    * sign an apporder template to create a valid order
    *
+   * _NB_: `tee` and `tdx` tags are always added to the order tag before signing
+   *
    * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
@@ -618,6 +620,8 @@ export default class IExecOrderModule extends IExecModule {
    * **SIGNER REQUIRED, ONLY DATASET OWNER**
    *
    * sign a datasetorder template to create a valid order
+   *
+   * _NB_: `tee` and `tdx` tags are always added to the order tag before signing
    *
    * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
@@ -636,6 +640,8 @@ export default class IExecOrderModule extends IExecModule {
    *
    * sign a workerpoolorder template to create a valid order
    *
+   * _NB_: `tee` and `tdx` tags are always added to the order tag before signing
+   *
    * ```js
    * const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerpoolAddress, category: 0});
    * const workerpoolorder = await signWorkerpoolorder(workerpoolorderTemplate);
@@ -648,6 +654,8 @@ export default class IExecOrderModule extends IExecModule {
    * **SIGNER REQUIRED, ONLY REQUESTER**
    *
    * sign a requestorder template to create a valid order
+   *
+   * _NB_: `tee` and `tdx` tags are always added to the order tag before signing
    *
    * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *

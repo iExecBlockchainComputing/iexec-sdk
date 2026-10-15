@@ -42,7 +42,7 @@ encrypt results
 
 default `false`
 
-_NB_: `iexec_result_encryption: true` is only available for TEE tasks, use with `tag: ["tee"]`
+_NB_: `iexec_result_encryption: true` is only available for TEE tasks
 
 ***
 
@@ -71,4 +71,4 @@ const secret = {
 };
 ```
 
-_NB_: `iexec_secrets` are only available for TEE tasks, use with `tag: ["tee"]`
+_NB_: `iexec_secrets` are only available for TEE tasks
