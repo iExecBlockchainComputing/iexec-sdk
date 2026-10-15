@@ -163,9 +163,6 @@ export default class IExecAppModule extends IExecModule {
    * const isSecretSet = await checkAppSecretExists(appAddress);
    * console.log('app secret set:', isSecretSet);
    * ```
-   * _NB_:
-   * - each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
-   *
    */
   checkAppSecretExists(appAddress: Address): Promise<boolean>;
   /**
@@ -176,7 +173,6 @@ export default class IExecAppModule extends IExecModule {
    * _NB_:
    * - pushed secret will be available for the app in `tee` tasks.
    * - once pushed a secret can not be updated
-   * - each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
    *
    * example:
    * ```js
