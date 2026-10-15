@@ -50,6 +50,18 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### checkDatasetSecretExists()
@@ -78,7 +90,7 @@ console.log('secret exists:', isSecretSet);
 
 ### checkDeployedDataset()
 
-> **checkDeployedDataset**(`datasetAddress`): `Promise`\<`Boolean`\>
+> **checkDeployedDataset**(`datasetAddress`): `Promise`\<`boolean`\>
 
 check if an dataset is deployed at a given address
 
@@ -96,7 +108,7 @@ console.log('dataset deployed', isDeployed);
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`\<`boolean`\>
 
 ***
 
@@ -377,7 +389,7 @@ _NB_: when transferring the ownership to a contract, the receiver contract must 
 example:
 ```js
 const { address, to, txHash } = await transferDataset(datasetAddress, receiverAddress);
-console.log(`dataset ${address} ownership transferred to ${address} in tx ${txHash}`);
+console.log(`dataset ${address} ownership transferred to ${to} in tx ${txHash}`);
 ```
 
 #### Parameters

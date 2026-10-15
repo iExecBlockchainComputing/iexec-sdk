@@ -43,9 +43,9 @@ declare class DealObservable extends Observable {
      */
     next?: (data: {
       message: 'DEAL_UPDATED' | 'DEAL_COMPLETED' | 'DEAL_TIMEDOUT';
-      taskCount: number;
+      tasksCount: number;
       completedTasksCount: number;
-      failedTaksCount: number;
+      failedTasksCount: number;
       deal: {
         dealid: Dealid;
         app: { pointer: Address; owner: Address; price: BN };
@@ -63,29 +63,40 @@ declare class DealObservable extends Observable {
         botSize: BN;
         workerStake: BN;
         schedulerRewardRatio: BN;
+        sponsor: Address;
         finalTime: BN;
         deadlineReached: boolean;
         tasks: Taskid[];
       };
-      tasks: {
-        taskid: Taskid;
-        idx: BN;
-        dealid?: Dealid;
-        status?: number;
-        statusName?: string;
-        taskTimedOut?: boolean;
-        contributionDeadline?: BN;
-        revealDeadline?: BN;
-        finalDeadline?: BN;
-        consensusValue?: Bytes32 | Bytes;
-        revealCounter?: BN;
-        winnerCounter?: BN;
-        contributors?: Address[];
-        resultDigest?: Bytes32 | Bytes;
-        results?: { storage: string; location?: string } | Bytes;
-        resultsTimestamp?: BN;
-        resultsCallback?: Bytes;
-      }[];
+      /**
+       * tasks details indexed by position in the deal (`0` is the task at index `deal.botFirst`)
+       */
+      tasks: Record<
+        string,
+        {
+          taskid: Taskid;
+          /**
+           * task index (position in the deal as a string until the task is initialized)
+           */
+          idx: BN | string;
+          dealid?: Dealid;
+          status?: number;
+          statusName?: string;
+          taskTimedOut?: boolean;
+          timeref?: BN;
+          contributionDeadline?: BN;
+          revealDeadline?: BN;
+          finalDeadline?: BN;
+          consensusValue?: Bytes32 | Bytes;
+          revealCounter?: BN;
+          winnerCounter?: BN;
+          contributors?: Address[];
+          resultDigest?: Bytes32 | Bytes;
+          results?: { storage: string; location?: string } | Bytes;
+          resultsTimestamp?: BN;
+          resultsCallback?: Bytes;
+        }
+      >;
     }) => any;
     /**
      * callback fired once when all the tasks are completed or when the deadline is reached
@@ -175,9 +186,13 @@ export default class IExecDealModule extends IExecModule {
     botSize: BN;
     workerStake: BN;
     schedulerRewardRatio: BN;
+    sponsor: Address;
     finalTime: BN;
     deadlineReached: boolean;
-    tasks: Record<TaskIndex, Taskid>;
+    /**
+     * deal's tasks ids (`tasks[0]` is the task at index `botFirst`)
+     */
+    tasks: Taskid[];
   }>;
   /**
    * return an Observable with a `subscribe` method to monitor the deal status changes.
@@ -271,7 +286,7 @@ export default class IExecDealModule extends IExecModule {
   /**
    * fetch the latest deals sealed with a specified apporder.
    *
-   * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+   * _NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
    *
    * example:
    * ```js
@@ -296,7 +311,7 @@ export default class IExecDealModule extends IExecModule {
   /**
    * fetch the latest deals sealed with a specified datasetorder.
    *
-   * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+   * _NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
    *
    * example:
    * ```js
@@ -321,7 +336,7 @@ export default class IExecDealModule extends IExecModule {
   /**
    * fetch the latest deals sealed with a specified workerpoolorder.
    *
-   * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+   * _NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
    *
    * example:
    * ```js
@@ -346,7 +361,7 @@ export default class IExecDealModule extends IExecModule {
   /**
    * fetch the latest deals sealed with a specified requestorder.
    *
-   * _NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+   * _NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
    *
    * example:
    * ```js

@@ -50,6 +50,18 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### approve()
@@ -84,7 +96,7 @@ console.log('tx:', txHash);
 
 ### checkAllowance()
 
-> **checkAllowance**(`ownerAddress`, `spenderAddress`): `Promise`\<[`NRLCAmount`](../type-aliases/NRLCAmount.md)\>
+> **checkAllowance**(`ownerAddress`, `spenderAddress`): `Promise`\<[`BN`](../interfaces/BN.md)\>
 
 checks the amount of allowance approved for the specified spender to use the account of the owner.
 
@@ -106,7 +118,7 @@ console.log('allowance amount:', allowanceAmount);
 
 #### Returns
 
-`Promise`\<[`NRLCAmount`](../type-aliases/NRLCAmount.md)\>
+`Promise`\<[`BN`](../interfaces/BN.md)\>
 
 ***
 
@@ -137,7 +149,7 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 ### deposit()
 
-> **deposit**(`amount`): `Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+> **deposit**(`amount`): `Promise`\<\{ `amount`: `string`; `txHash`: `string`; \}\>
 
 **SIGNER REQUIRED**
 
@@ -158,7 +170,7 @@ console.log('tx:', txHash);
 
 #### Returns
 
-`Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+`Promise`\<\{ `amount`: `string`; `txHash`: `string`; \}\>
 
 ***
 
@@ -190,7 +202,7 @@ console.log('tx:', txHash);
 
 ### withdraw()
 
-> **withdraw**(`amount`): `Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+> **withdraw**(`amount`): `Promise`\<\{ `amount`: `string`; `txHash`: `string`; \}\>
 
 **SIGNER REQUIRED**
 
@@ -211,7 +223,7 @@ console.log('tx:', txHash);
 
 #### Returns
 
-`Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+`Promise`\<\{ `amount`: `string`; `txHash`: `string`; \}\>
 
 ***
 

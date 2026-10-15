@@ -81,7 +81,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * console.log('workerpool deployed', isDeployed);
    * ```
    */
-  checkDeployedWorkerpool(workerpoolAddress: Address): Promise<Boolean>;
+  checkDeployedWorkerpool(workerpoolAddress: Address): Promise<boolean>;
   /**
    * show a deployed workerpool details
    *
@@ -118,9 +118,9 @@ export default class IExecWorkerpoolModule extends IExecModule {
     address: Address,
   ): Promise<{ objAddress: Address; workerpool: Workerpool }>;
   /**
-   * read the workerpool API url on the blockchain
+   * get the workerpool API url from the Compass service
    *
-   * _NB_: resolve to `undefined` if the workerpool API url was not declared.
+   * _NB_: resolve to `undefined` if Compass is not configured for the current chain or if the workerpool is not known by Compass.
    *
    * example:
    * ```js
@@ -139,7 +139,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * example:
    * ```js
    * const { address, to, txHash } = await transferWorkerpool(workerpoolAddress, receiverAddress);
-   * console.log(`workerpool ${address} ownership transferred to ${address} in tx ${txHash}`);
+   * console.log(`workerpool ${address} ownership transferred to ${to} in tx ${txHash}`);
    * ```
    */
   transferWorkerpool(

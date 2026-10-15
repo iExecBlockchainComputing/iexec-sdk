@@ -38,8 +38,8 @@ export default class IExecSecretsModule extends IExecModule {
    * ```
    */
   pushRequesterSecret(
-    secretName: String,
-    secretValue: String,
+    secretName: string,
+    secretValue: string,
   ): Promise<{ isPushed: boolean }>;
   /**
    * Create an IExecSecretsModule instance using an IExecConfig instance

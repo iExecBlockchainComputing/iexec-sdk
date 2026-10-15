@@ -21,6 +21,7 @@ interface Task {
   status: number;
   statusName: string;
   taskTimedOut: boolean;
+  timeref: BN;
   contributionDeadline: BN;
   revealDeadline: BN;
   finalDeadline: BN;
@@ -66,7 +67,17 @@ declare class TaskObservable extends Observable {
         | 'TASK_COMPLETED'
         | 'TASK_TIMEDOUT'
         | 'TASK_FAILED';
-      task: Task;
+      /**
+       * task details
+       *
+       * _NB_: when the task is not initialized yet and `dealid` is specified, only `taskid`, `dealid`, `status`, `statusName` and `taskTimedOut` are available
+       */
+      task:
+        | Task
+        | Pick<
+            Task,
+            'taskid' | 'dealid' | 'status' | 'statusName' | 'taskTimedOut'
+          >;
     }) => any;
     /**
      * callback fired once when the task is completed or when the deadline is reached
@@ -126,7 +137,7 @@ export default class IExecTaskModule extends IExecModule {
    *   new Promise((resolve, reject) => {
    *     let taskState;
    *     iexec.task.obsTask(taskid, { dealid }).subscribe({
-   *       next ({task}) => taskState = task,
+   *       next: ({ task }) => (taskState = task),
    *       error: e => reject(e),
    *       complete: () => resolve(taskState),
    *     });
@@ -174,7 +185,7 @@ export default class IExecTaskModule extends IExecModule {
    *
    * example:
    * ```js
-   * const logArray = await fetchLogs('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
+   * const logsArray = await fetchLogs('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
    * logsArray.forEach(({ worker, stdout, stderr }) => {
    *   console.log(`----- worker ${worker} -----`);
    *   console.log(`stdout:\n${stdout}`);

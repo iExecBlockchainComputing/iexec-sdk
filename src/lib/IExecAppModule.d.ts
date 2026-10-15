@@ -121,7 +121,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('app deployed', isDeployed);
    * ```
    */
-  checkDeployedApp(appAddress: Address): Promise<Boolean>;
+  checkDeployedApp(appAddress: Address): Promise<boolean>;
   /**
    * show a deployed app details
    *
@@ -163,9 +163,6 @@ export default class IExecAppModule extends IExecModule {
    * const isSecretSet = await checkAppSecretExists(appAddress);
    * console.log('app secret set:', isSecretSet);
    * ```
-   * _NB_:
-   * - each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
-   *
    */
   checkAppSecretExists(appAddress: Address): Promise<boolean>;
   /**
@@ -176,7 +173,6 @@ export default class IExecAppModule extends IExecModule {
    * _NB_:
    * - pushed secret will be available for the app in `tee` tasks.
    * - once pushed a secret can not be updated
-   * - each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
    *
    * example:
    * ```js
@@ -184,7 +180,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('pushed App secret:', isPushed);
    * ```
    */
-  pushAppSecret(appAddress: Address, secretValue: String): Promise<boolean>;
+  pushAppSecret(appAddress: Address, secretValue: string): Promise<boolean>;
   /**
    * **ONLY APP OWNER**
    *
@@ -195,7 +191,7 @@ export default class IExecAppModule extends IExecModule {
    * example:
    * ```js
    * const { address, to, txHash } = await transferApp(appAddress, receiverAddress);
-   * console.log(`app ${address} ownership transferred to ${address} in tx ${txHash}`);
+   * console.log(`app ${address} ownership transferred to ${to} in tx ${txHash}`);
    * ```
    */
   transferApp(

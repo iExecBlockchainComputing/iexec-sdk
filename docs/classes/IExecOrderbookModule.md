@@ -50,6 +50,18 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### fetchApporder()
@@ -87,7 +99,7 @@ _NB_: use `options` to include restricted orders or filter results.
 
 example:
 ```js
-const { count, orders } = await fetchAppOrderbook(appAddress);
+const { count, orders } = await fetchAppOrderbook({ app: appAddress });
 console.log('best order:', orders[0]?.order);
 console.log('total orders:', count);
 ```
@@ -134,13 +146,13 @@ filters out orders allowing “any” workerpool (default: `false`)
 
 ###### maxTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by maximum tag accepted
 
 ###### minTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by minimum tag required
 
@@ -215,7 +227,9 @@ _NB_: use `options` to include restricted orders or filter results.
 
 example:
 ```js
-const { count, orders } = await fetchDatasetOrderbook(datasetAddress);
+const { count, orders } = await fetchDatasetOrderbook({
+  dataset: datasetAddress,
+});
 console.log('best order:', orders[0]?.order);
 console.log('total orders:', count);
 ```
@@ -268,13 +282,13 @@ filters out orders allowing “any” workerpool (default: `false`)
 
 ###### maxTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by maximum tag accepted
 
 ###### minTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by minimum tag required
 
@@ -341,7 +355,7 @@ console.log('remaining volume:', remaining);
 
 ### fetchRequestOrderbook()
 
-> **fetchRequestOrderbook**(`options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>\>
+> **fetchRequestOrderbook**(`options?`): `Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedRequestorder`](../-internal-/interfaces/PublishedRequestorder.md)\>\>
 
 find the best paying request orders for computing resource.
 
@@ -364,6 +378,12 @@ console.log('total orders:', count);
 
 filter by specified app
 
+###### beneficiary?
+
+`string`
+
+filter by beneficiary
+
 ###### category?
 
 [`BNish`](../type-aliases/BNish.md)
@@ -384,7 +404,7 @@ filters out orders allowing “any” workerpool (default: `false`)
 
 ###### maxTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by maximum tag accepted
 
@@ -396,7 +416,7 @@ filter by maximum trust required
 
 ###### minTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by minimum tag required
 
@@ -432,7 +452,7 @@ include orders restricted to specified workerpool (use `'any'` to include any wo
 
 #### Returns
 
-`Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedWorkerpoolorder`](../-internal-/interfaces/PublishedWorkerpoolorder.md)\>\>
+`Promise`\<[`PaginableOrders`](../-internal-/interfaces/PaginableOrders.md)\<[`PublishedRequestorder`](../-internal-/interfaces/PublishedRequestorder.md)\>\>
 
 ***
 
@@ -518,13 +538,13 @@ filters out orders allowing “any” requester (default: `false`)
 
 ###### maxTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by maximum tag offered
 
 ###### minTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by minimum tag required
 

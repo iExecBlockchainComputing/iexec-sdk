@@ -10,7 +10,7 @@
 
 parse a string formatted Eht value in wei big number
 
-supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' (or 'eth') default unit 'wei'
+supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' (or 'eth') default unit 'ether'
 
 example:
 ```js
@@ -22,7 +22,7 @@ console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
 
 ### value
 
-`string`
+`string` | `number`
 
 ### defaultUnit?
 

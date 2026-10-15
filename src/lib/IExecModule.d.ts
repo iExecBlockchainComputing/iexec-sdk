@@ -22,6 +22,10 @@ export default class IExecModule {
    */
   config: IExecConfig;
   /**
+   * iexec sdk version
+   */
+  version: string;
+  /**
    * Create an IExecModule instance using an IExecConfig instance
    */
   static fromConfig(config: IExecConfig): IExecModule;

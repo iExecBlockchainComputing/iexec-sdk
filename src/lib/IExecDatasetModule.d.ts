@@ -104,7 +104,7 @@ export default class IExecDatasetModule extends IExecModule {
    * console.log('dataset deployed', isDeployed);
    * ```
    */
-  checkDeployedDataset(datasetAddress: Address): Promise<Boolean>;
+  checkDeployedDataset(datasetAddress: Address): Promise<boolean>;
   /**
    * show a deployed dataset details
    *
@@ -238,7 +238,7 @@ export default class IExecDatasetModule extends IExecModule {
    * example:
    * ```js
    * const { address, to, txHash } = await transferDataset(datasetAddress, receiverAddress);
-   * console.log(`dataset ${address} ownership transferred to ${address} in tx ${txHash}`);
+   * console.log(`dataset ${address} ownership transferred to ${to} in tx ${txHash}`);
    * ```
    */
   transferDataset(

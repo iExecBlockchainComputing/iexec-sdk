@@ -73,9 +73,9 @@ export default class IExecContractsClient {
   /**
    * fetch the IExec token Contract instance
    */
-  fetchTokenContract?(resourceName: string): Promise<Contract>;
+  fetchTokenContract(): Promise<Contract>;
   /**
    * fetch the IExec token contract address
    */
-  fetchTokenAddress(resourceName: string): Promise<string>;
+  fetchTokenAddress(): Promise<string>;
 }

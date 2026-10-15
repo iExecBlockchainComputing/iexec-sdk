@@ -50,6 +50,18 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### checkRequesterSecretExists()
@@ -102,11 +114,11 @@ console.log('pushed secret "my-password":', isPushed);
 
 ##### secretName
 
-`String`
+`string`
 
 ##### secretValue
 
-`String`
+`string`
 
 #### Returns
 

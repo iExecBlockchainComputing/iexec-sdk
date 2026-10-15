@@ -50,6 +50,18 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### claim()
@@ -117,7 +129,7 @@ console.log('taskid:', taskid)
 
 fetch the latest deals sealed with a specified apporder.
 
-_NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+_NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
 
 example:
 ```js
@@ -158,7 +170,7 @@ size of the page to fetch
 
 fetch the latest deals sealed with a specified datasetorder.
 
-_NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+_NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
 
 example:
 ```js
@@ -199,7 +211,7 @@ size of the page to fetch
 
 fetch the latest deals sealed with a specified requestorder.
 
-_NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+_NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
 
 example:
 ```js
@@ -240,7 +252,7 @@ size of the page to fetch
 
 fetch the latest deals sealed with a specified workerpoolorder.
 
-_NB_: this method can return a subset of the complete result set, in this case, a `more()` method is also returned and enable getting the next subset.
+_NB_: this method returns a page of the complete result set, use `page` and `pageSize` options to get other pages.
 
 example:
 ```js
@@ -369,7 +381,7 @@ const unsubscribe = dealObservable.subscribe({
 
 ### show()
 
-> **show**(`dealid`): `Promise`\<\{ `app`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `beneficiary`: `string`; `botFirst`: [`BN`](../interfaces/BN.md); `botSize`: [`BN`](../interfaces/BN.md); `callback`: `string`; `category`: [`BN`](../interfaces/BN.md); `dataset`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `deadlineReached`: `boolean`; `dealid`: `string`; `finalTime`: [`BN`](../interfaces/BN.md); `params`: `string`; `requester`: `string`; `schedulerRewardRatio`: [`BN`](../interfaces/BN.md); `startTime`: [`BN`](../interfaces/BN.md); `tag`: `string`; `tasks`: `Record`\<[`TaskIndex`](../type-aliases/TaskIndex.md), [`Taskid`](../type-aliases/Taskid.md)\>; `trust`: [`BN`](../interfaces/BN.md); `workerpool`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `workerStake`: [`BN`](../interfaces/BN.md); \}\>
+> **show**(`dealid`): `Promise`\<\{ `app`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `beneficiary`: `string`; `botFirst`: [`BN`](../interfaces/BN.md); `botSize`: [`BN`](../interfaces/BN.md); `callback`: `string`; `category`: [`BN`](../interfaces/BN.md); `dataset`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `deadlineReached`: `boolean`; `dealid`: `string`; `finalTime`: [`BN`](../interfaces/BN.md); `params`: `string`; `requester`: `string`; `schedulerRewardRatio`: [`BN`](../interfaces/BN.md); `sponsor`: `string`; `startTime`: [`BN`](../interfaces/BN.md); `tag`: `string`; `tasks`: `string`[]; `trust`: [`BN`](../interfaces/BN.md); `workerpool`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `workerStake`: [`BN`](../interfaces/BN.md); \}\>
 
 show the details of a deal.
 
@@ -389,7 +401,7 @@ console.log('deal:', deal);
 
 #### Returns
 
-`Promise`\<\{ `app`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `beneficiary`: `string`; `botFirst`: [`BN`](../interfaces/BN.md); `botSize`: [`BN`](../interfaces/BN.md); `callback`: `string`; `category`: [`BN`](../interfaces/BN.md); `dataset`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `deadlineReached`: `boolean`; `dealid`: `string`; `finalTime`: [`BN`](../interfaces/BN.md); `params`: `string`; `requester`: `string`; `schedulerRewardRatio`: [`BN`](../interfaces/BN.md); `startTime`: [`BN`](../interfaces/BN.md); `tag`: `string`; `tasks`: `Record`\<[`TaskIndex`](../type-aliases/TaskIndex.md), [`Taskid`](../type-aliases/Taskid.md)\>; `trust`: [`BN`](../interfaces/BN.md); `workerpool`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `workerStake`: [`BN`](../interfaces/BN.md); \}\>
+`Promise`\<\{ `app`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `beneficiary`: `string`; `botFirst`: [`BN`](../interfaces/BN.md); `botSize`: [`BN`](../interfaces/BN.md); `callback`: `string`; `category`: [`BN`](../interfaces/BN.md); `dataset`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `deadlineReached`: `boolean`; `dealid`: `string`; `finalTime`: [`BN`](../interfaces/BN.md); `params`: `string`; `requester`: `string`; `schedulerRewardRatio`: [`BN`](../interfaces/BN.md); `sponsor`: `string`; `startTime`: [`BN`](../interfaces/BN.md); `tag`: `string`; `tasks`: `string`[]; `trust`: [`BN`](../interfaces/BN.md); `workerpool`: \{ `owner`: `string`; `pointer`: `string`; `price`: [`BN`](../interfaces/BN.md); \}; `workerStake`: [`BN`](../interfaces/BN.md); \}\>
 
 ***
 

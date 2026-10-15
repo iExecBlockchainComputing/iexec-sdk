@@ -233,7 +233,7 @@ export interface RequestorderParams {
    * };
    * ```
    *
-   * _NB_: `iexec_secrets` are only available for TEE tasks, use with `tag: ["tee"]`
+   * _NB_: `iexec_secrets` are only available for TEE tasks
    */
   iexec_secrets?: Record<number, string>;
   /**
@@ -241,7 +241,7 @@ export interface RequestorderParams {
    *
    * default `false`
    *
-   * _NB_: `iexec_result_encryption: true` is only available for TEE tasks, use with `tag: ["tee"]`
+   * _NB_: `iexec_result_encryption: true` is only available for TEE tasks
    */
   iexec_result_encryption?: boolean;
   /**
@@ -380,7 +380,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * restrict usage to runtime with specified tags
      *
-     * default `[]`
+     * default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
      */
     tag?: Tag | HumanSingleTag[];
     /**
@@ -427,7 +427,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * restrict usage to runtime with specified tags
      *
-     * default `[]`
+     * default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
      */
     tag?: Tag | HumanSingleTag[];
     /**
@@ -484,7 +484,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * proposed tags
      *
-     * default `[]`
+     * default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
      */
     tag?: Tag | HumanSingleTag[];
     /**
@@ -575,7 +575,7 @@ export default class IExecOrderModule extends IExecModule {
     /**
      * restrict usage to runtime with specified tags
      *
-     * default `[]`
+     * default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
      */
     tag?: Tag | HumanSingleTag[];
     /**
@@ -598,9 +598,11 @@ export default class IExecOrderModule extends IExecModule {
     beneficiary?: Address;
   }): Promise<RequestorderTemplate>;
   /**
-   * **ONLY APP OWNER**
+   * **SIGNER REQUIRED, ONLY APP OWNER**
    *
    * sign an apporder template to create a valid order
+   *
+   * _NB_: `tee` and `tdx` tags are always added to the order tag before signing
    *
    * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
@@ -619,6 +621,8 @@ export default class IExecOrderModule extends IExecModule {
    *
    * sign a datasetorder template to create a valid order
    *
+   * _NB_: `tee` and `tdx` tags are always added to the order tag before signing
+   *
    * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
@@ -636,6 +640,8 @@ export default class IExecOrderModule extends IExecModule {
    *
    * sign a workerpoolorder template to create a valid order
    *
+   * _NB_: `tee` and `tdx` tags are always added to the order tag before signing
+   *
    * ```js
    * const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerpoolAddress, category: 0});
    * const workerpoolorder = await signWorkerpoolorder(workerpoolorderTemplate);
@@ -648,6 +654,8 @@ export default class IExecOrderModule extends IExecModule {
    * **SIGNER REQUIRED, ONLY REQUESTER**
    *
    * sign a requestorder template to create a valid order
+   *
+   * _NB_: `tee` and `tdx` tags are always added to the order tag before signing
    *
    * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
@@ -768,7 +776,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish an apporder on the off-chain marketplace making it available for other users
    *
-   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+   * _NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -787,7 +795,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish a datasetorder on the off-chain marketplace making it available for other users
    *
-   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+   * _NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -820,7 +828,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish a requestorder on the off-chain marketplace making it available for other users
    *
-   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+   * _NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -842,7 +850,7 @@ export default class IExecOrderModule extends IExecModule {
    * example:
    * ```js
    * const orderHash = await unpublishApporder(apporderHash);
-   * console.log(unpublished order hash:', orderHash);
+   * console.log('unpublished order hash:', orderHash);
    * ```
    */
   unpublishApporder(apporderHash: OrderHash): Promise<OrderHash>;
@@ -898,7 +906,7 @@ export default class IExecOrderModule extends IExecModule {
    * example:
    * ```js
    * const orderHash = await unpublishLastApporder(appAddress);
-   * console.log('published order hash:', orderHash);
+   * console.log('unpublished order hash:', orderHash);
    * ```
    */
   unpublishLastApporder(appAddress: Address): Promise<OrderHash>;
@@ -917,7 +925,7 @@ export default class IExecOrderModule extends IExecModule {
    */
   unpublishLastDatasetorder(datasetAddress: Address): Promise<OrderHash>;
   /**
-   * ****SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
+   * **SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
    *
    * unpublish the last published workerpool's workerpoolorder from the off-chain marketplace
    *
@@ -954,7 +962,7 @@ export default class IExecOrderModule extends IExecModule {
    * example:
    * ```js
    * const orderHashes = await unpublishAllApporders(appAddress);
-   * console.log('published orders count:', orderHashes.length);
+   * console.log('unpublished orders count:', orderHashes.length);
    * ```
    */
   unpublishAllApporders(appAddress: Address): Promise<OrderHash[]>;
@@ -1036,7 +1044,7 @@ export default class IExecOrderModule extends IExecModule {
    * ```js
    * const orders = {
    *   apporder,
-   *   datasetorder
+   *   datasetorder,
    *   workerpoolorder,
    *   requestorder,
    * };
@@ -1050,7 +1058,7 @@ export default class IExecOrderModule extends IExecModule {
     datasetorder?: ConsumableDatasetorder;
     workerpoolorder: ConsumableWorkerpoolorder;
     requestorder: ConsumableRequestorder;
-  }): Promise<{ volume: BN; total: BN; sponsored: BN }>;
+  }): Promise<{ volume: BN; total: BN }>;
   /**
    * Prepare a bulk from datasetorders to process multiple datasets with a single requestorder
    *
@@ -1060,14 +1068,14 @@ export default class IExecOrderModule extends IExecModule {
    *
    * example:
    * ```js
-   * const { bulkCid, volume } = await prepareDatasetBulk(datasetorders, { maxDatasetPerTask: 5 });
-   * console.log(`bulk_cid: ${bulkCid}, volume: ${volume}`);
+   * const { cid, volume } = await prepareDatasetBulk(datasetorders, { maxDatasetPerTask: 5 });
+   * console.log(`bulk_cid: ${cid}, volume: ${volume}`);
    *
    * const requestorderTemplate = await createRequestorder({
    *   app: appAddress,
    *   category: 0,
    *   volume: volume, // set the volume
-   *   params: { bulk_cid: bulkCid } // set the bulk cid in the requestorder params
+   *   params: { bulk_cid: cid } // set the bulk cid in the requestorder params
    * });
    * ```
    */

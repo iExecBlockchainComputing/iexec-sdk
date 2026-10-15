@@ -50,6 +50,18 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### checkAppSecretExists()
@@ -63,8 +75,6 @@ example:
 const isSecretSet = await checkAppSecretExists(appAddress);
 console.log('app secret set:', isSecretSet);
 ```
-_NB_:
-- each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
 
 #### Parameters
 
@@ -80,7 +90,7 @@ _NB_:
 
 ### checkDeployedApp()
 
-> **checkDeployedApp**(`appAddress`): `Promise`\<`Boolean`\>
+> **checkDeployedApp**(`appAddress`): `Promise`\<`boolean`\>
 
 check if an app is deployed at a given address
 
@@ -98,7 +108,7 @@ console.log('app deployed', isDeployed);
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`\<`boolean`\>
 
 ***
 
@@ -199,7 +209,6 @@ push an application secret to the Secret Management Service
 _NB_:
 - pushed secret will be available for the app in `tee` tasks.
 - once pushed a secret can not be updated
-- each TEE framework comes with a distinct Secret Management Service, if not specified the TEE framework is inferred from the app
 
 example:
 ```js
@@ -215,7 +224,7 @@ console.log('pushed App secret:', isPushed);
 
 ##### secretValue
 
-`String`
+`string`
 
 #### Returns
 
@@ -288,7 +297,7 @@ _NB_: when transferring the ownership to a contract, the receiver contract must 
 example:
 ```js
 const { address, to, txHash } = await transferApp(appAddress, receiverAddress);
-console.log(`app ${address} ownership transferred to ${address} in tx ${txHash}`);
+console.log(`app ${address} ownership transferred to ${to} in tx ${txHash}`);
 ```
 
 #### Parameters

@@ -4,7 +4,7 @@ import { ValidationError as YupValidationError } from 'yup';
  */
 export class ValidationError extends YupValidationError {}
 /**
- * ValidationError is thrown when the current configuration does not allow to perform a specific operation
+ * ConfigurationError is thrown when the current configuration does not allow to perform a specific operation
  */
 export class ConfigurationError extends Error {}
 /**
@@ -69,7 +69,7 @@ export class ObjectNotFoundError extends Error {
   /**
    * Id or address of the resource.
    */
-  objId: string;
+  objectId: string;
   /**
    * Chain id of the blockchain.
    */

@@ -50,11 +50,23 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### checkDeployedWorkerpool()
 
-> **checkDeployedWorkerpool**(`workerpoolAddress`): `Promise`\<`Boolean`\>
+> **checkDeployedWorkerpool**(`workerpoolAddress`): `Promise`\<`boolean`\>
 
 check if an workerpool is deployed at a given address
 
@@ -72,7 +84,7 @@ console.log('workerpool deployed', isDeployed);
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`\<`boolean`\>
 
 ***
 
@@ -133,9 +145,9 @@ console.log('deployed at', address);
 
 > **getWorkerpoolApiUrl**(`workerpoolAddress`): `Promise`\<`string` \| `undefined`\>
 
-read the workerpool API url on the blockchain
+get the workerpool API url from the Compass service
 
-_NB_: resolve to `undefined` if the workerpool API url was not declared.
+_NB_: resolve to `undefined` if Compass is not configured for the current chain or if the workerpool is not known by Compass.
 
 example:
 ```js
@@ -247,7 +259,7 @@ _NB_: when transferring the ownership to a contract, the receiver contract must 
 example:
 ```js
 const { address, to, txHash } = await transferWorkerpool(workerpoolAddress, receiverAddress);
-console.log(`workerpool ${address} ownership transferred to ${address} in tx ${txHash}`);
+console.log(`workerpool ${address} ownership transferred to ${to} in tx ${txHash}`);
 ```
 
 #### Parameters

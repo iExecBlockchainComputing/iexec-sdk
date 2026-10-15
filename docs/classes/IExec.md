@@ -148,6 +148,18 @@ task module
 
 ***
 
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
+***
+
 ### wallet
 
 > **wallet**: [`IExecWalletModule`](IExecWalletModule.md)

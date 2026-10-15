@@ -50,6 +50,18 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### claim()
@@ -90,7 +102,7 @@ _NB_: the workerpool must declare it's API url to enable this feature, check dec
 
 example:
 ```js
-const logArray = await fetchLogs('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
+const logsArray = await fetchLogs('0x668cb3e53ebbcc9999997709586c5af07f502f6120906fa3506ce1f531cedc81');
 logsArray.forEach(({ worker, stdout, stderr }) => {
   console.log(`----- worker ${worker} -----`);
   console.log(`stdout:\n${stdout}`);
@@ -191,7 +203,7 @@ const waitFinalState = (taskid, dealid) =>
   new Promise((resolve, reject) => {
     let taskState;
     iexec.task.obsTask(taskid, { dealid }).subscribe({
-      next ({task}) => taskState = task,
+      next: ({ task }) => (taskState = task),
       error: e => reject(e),
       complete: () => resolve(taskState),
     });

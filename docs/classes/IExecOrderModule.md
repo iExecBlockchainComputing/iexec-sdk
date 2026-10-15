@@ -50,6 +50,18 @@ current IExecConfig
 
 [`IExecModule`](IExecModule.md).[`config`](IExecModule.md#config)
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
+#### Inherited from
+
+[`IExecModule`](IExecModule.md).[`version`](IExecModule.md#version)
+
 ## Methods
 
 ### cancelApporder()
@@ -201,11 +213,11 @@ default no restrict
 
 ###### tag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 restrict usage to runtime with specified tags
 
-default `[]`
+default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
 
 ###### volume?
 
@@ -274,11 +286,11 @@ default no restrict
 
 ###### tag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 restrict usage to runtime with specified tags
 
-default `[]`
+default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
 
 ###### volume?
 
@@ -387,11 +399,11 @@ default connected wallet address
 
 ###### tag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 restrict usage to runtime with specified tags
 
-default `[]`
+default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
 
 ###### trust?
 
@@ -478,11 +490,11 @@ default no restrict
 
 ###### tag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 proposed tags
 
-default `[]`
+default `['tee', 'tdx']` (`tee` and `tdx` tags are always added to the specified tags)
 
 ###### trust?
 
@@ -520,7 +532,7 @@ default `0`
 
 ### estimateMatchOrders()
 
-> **estimateMatchOrders**(`orders`): `Promise`\<\{ `sponsored`: [`BN`](../interfaces/BN.md); `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
+> **estimateMatchOrders**(`orders`): `Promise`\<\{ `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
 
 estimates the cost of matching the provided orders
 
@@ -528,7 +540,7 @@ example:
 ```js
 const orders = {
   apporder,
-  datasetorder
+  datasetorder,
   workerpoolorder,
   requestorder,
 };
@@ -559,7 +571,7 @@ console.log(`total cost for matching orders: ${result.total} nRLC`);
 
 #### Returns
 
-`Promise`\<\{ `sponsored`: [`BN`](../interfaces/BN.md); `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
+`Promise`\<\{ `total`: [`BN`](../interfaces/BN.md); `volume`: [`BN`](../interfaces/BN.md); \}\>
 
 ***
 
@@ -722,14 +734,14 @@ NB:
 
 example:
 ```js
-const { bulkCid, volume } = await prepareDatasetBulk(datasetorders, { maxDatasetPerTask: 5 });
-console.log(`bulk_cid: ${bulkCid}, volume: ${volume}`);
+const { cid, volume } = await prepareDatasetBulk(datasetorders, { maxDatasetPerTask: 5 });
+console.log(`bulk_cid: ${cid}, volume: ${volume}`);
 
 const requestorderTemplate = await createRequestorder({
   app: appAddress,
   category: 0,
   volume: volume, // set the volume
-  params: { bulk_cid: bulkCid } // set the bulk cid in the requestorder params
+  params: { bulk_cid: cid } // set the bulk cid in the requestorder params
 });
 ```
 
@@ -767,7 +779,7 @@ Maximum number of datasets to include in a single task
 
 publish an apporder on the off-chain marketplace making it available for other users
 
-_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+_NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -801,7 +813,7 @@ console.log('published order hash:', orderHash);
 
 publish a datasetorder on the off-chain marketplace making it available for other users
 
-_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+_NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -835,7 +847,7 @@ console.log('published order hash:', orderHash);
 
 publish a requestorder on the off-chain marketplace making it available for other users
 
-_NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+_NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
 ```js
@@ -891,9 +903,11 @@ console.log('published order hash:', orderHash);
 
 > **signApporder**(`apporder`, `options?`): `Promise`\<[`SignedApporder`](../-internal-/interfaces/SignedApporder.md)\>
 
-**ONLY APP OWNER**
+**SIGNER REQUIRED, ONLY APP OWNER**
 
 sign an apporder template to create a valid order
+
+_NB_: `tee` and `tdx` tags are always added to the order tag before signing
 
 _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
@@ -929,6 +943,8 @@ const apporder = await signApporder(apporderTemplate);
 
 sign a datasetorder template to create a valid order
 
+_NB_: `tee` and `tdx` tags are always added to the order tag before signing
+
 _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
 example:
@@ -962,6 +978,8 @@ const datasetorder = await signDatasetorder(datasetorderTemplate);
 **SIGNER REQUIRED, ONLY REQUESTER**
 
 sign a requestorder template to create a valid order
+
+_NB_: `tee` and `tdx` tags are always added to the order tag before signing
 
 _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
 
@@ -1001,6 +1019,8 @@ const requestorder = await signRequestorder(requestorderTemplate);
 
 sign a workerpoolorder template to create a valid order
 
+_NB_: `tee` and `tdx` tags are always added to the order tag before signing
+
 ```js
 const workerpoolorderTemplate = await createWorkerpoolorder({workerpool: workerpoolAddress, category: 0});
 const workerpoolorder = await signWorkerpoolorder(workerpoolorderTemplate);
@@ -1031,7 +1051,7 @@ _NB_: this is a transaction free off-chain operation, unpublished orders are no 
 example:
 ```js
 const orderHashes = await unpublishAllApporders(appAddress);
-console.log('published orders count:', orderHashes.length);
+console.log('unpublished orders count:', orderHashes.length);
 ```
 
 #### Parameters
@@ -1137,7 +1157,7 @@ _NB_: this is a transaction free off-chain operation, unpublished orders are no 
 example:
 ```js
 const orderHash = await unpublishApporder(apporderHash);
-console.log(unpublished order hash:', orderHash);
+console.log('unpublished order hash:', orderHash);
 ```
 
 #### Parameters
@@ -1193,7 +1213,7 @@ _NB_: this is a transaction free off-chain operation, unpublished orders are no 
 example:
 ```js
 const orderHash = await unpublishLastApporder(appAddress);
-console.log('published order hash:', orderHash);
+console.log('unpublished order hash:', orderHash);
 ```
 
 #### Parameters
@@ -1262,7 +1282,7 @@ console.log('unpublished order hash:', orderHash);
 
 > **unpublishLastWorkerpoolorder**(`workerpoolAddress`): `Promise`\<`string`\>
 
-****SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
+**SIGNER REQUIRED, ONLY WORKERPOOLORDER SIGNER**
 
 unpublish the last published workerpool's workerpoolorder from the off-chain marketplace
 

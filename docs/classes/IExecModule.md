@@ -56,6 +56,14 @@ Create an IExecModule instance
 
 current IExecConfig
 
+***
+
+### version
+
+> **version**: `string`
+
+iexec sdk version
+
 ## Methods
 
 ### fromConfig()

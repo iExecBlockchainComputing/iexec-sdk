@@ -144,7 +144,7 @@ export default class IExecOrderbookModule extends IExecModule {
    *
    * example:
    * ```js
-   * const { count, orders } = await fetchAppOrderbook(appAddress);
+   * const { count, orders } = await fetchAppOrderbook({ app: appAddress });
    * console.log('best order:', orders[0]?.order);
    * console.log('total orders:', count);
    * ```
@@ -210,7 +210,9 @@ export default class IExecOrderbookModule extends IExecModule {
    *
    * example:
    * ```js
-   * const { count, orders } = await fetchDatasetOrderbook(datasetAddress);
+   * const { count, orders } = await fetchDatasetOrderbook({
+   *   dataset: datasetAddress,
+   * });
    * console.log('best order:', orders[0]?.order);
    * console.log('total orders:', count);
    * ```
@@ -365,6 +367,10 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     requester?: Address;
     /**
+     * filter by beneficiary
+     */
+    beneficiary?: Address;
+    /**
      * filter by category
      */
     category?: BNish;
@@ -408,7 +414,7 @@ export default class IExecOrderbookModule extends IExecModule {
      * filters out orders allowing “any” workerpool (default: `false`)
      */
     isWorkerpoolStrict?: boolean;
-  }): Promise<PaginableOrders<PublishedWorkerpoolorder>>;
+  }): Promise<PaginableOrders<PublishedRequestorder>>;
   /**
    * find a published apporder by orderHash.
    *

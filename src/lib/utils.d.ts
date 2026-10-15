@@ -1,11 +1,5 @@
 import { AbstractSigner, Provider } from 'ethers';
-import {
-  BN,
-  WeiAmount,
-  NRLCAmount,
-  HumanSingleTag,
-  Bytes32,
-} from '../common/types.js';
+import { BN, BNish, HumanSingleTag, Bytes32 } from '../common/types.js';
 
 export { BN } from '../common/bn.js';
 
@@ -59,7 +53,7 @@ export const DATASET_INFINITE_VOLUME: number;
 /**
  * parse a string formatted Eht value in wei big number
  *
- * supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' (or 'eth') default unit 'wei'
+ * supported units: 'wei', 'kwei', 'mwei', 'gwei', 'szabo', 'finney', 'ether' (or 'eth') default unit 'ether'
  *
  * example:
  * ```js
@@ -67,37 +61,41 @@ export const DATASET_INFINITE_VOLUME: number;
  * console.log('5 gwei =' + parseEth(5, 'gwei') + 'wei');
  * ```
  */
-export const parseEth: (value: string, defaultUnit?: string) => BN;
+export const parseEth: (value: string | number, defaultUnit?: string) => BN;
 /**
  * parse a string formatted RLC value in nRLC big number
  *
- * supported units: 'nRLC', 'RLC' default unit 'nRLC'
+ * supported units: 'nRLC', 'RLC' default unit 'RLC'
  *
  * example:
  * ```js
- * console.log('5 RLC =' + parseEth('5 RLC') + 'nRLC');
- * console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
+ * console.log('5 RLC =' + parseRLC('5 RLC') + 'nRLC');
+ * console.log('5 RLC =' + parseRLC(5, 'RLC') + 'nRLC');
  * ```
  */
-export const parseRLC: (value: string, defaultUnit?: string) => BN;
+export const parseRLC: (value: string | number, defaultUnit?: string) => BN;
 /**
  * format a wei amount in Eth
  *
+ * _NB_: units are not supported, the amount must be expressed in wei
+ *
  * example:
  * ```js
- * console.log('500000000 wei =' + formatEth('500000000')) + 'ether');
+ * console.log('500000000 wei =' + formatEth('500000000') + 'ether');
  * ```
  */
-export const formatEth: (wei: WeiAmount) => string;
+export const formatEth: (wei: BNish) => string;
 /**
  * format a nRLC amount in RLC
  *
- *  * example:
+ * _NB_: units are not supported, the amount must be expressed in nRLC
+ *
+ * example:
  * ```js
  * console.log('500000000 nRLC =' + formatRLC('500000000') + 'RLC');
  * ```
  */
-export const formatRLC: (nRLC: NRLCAmount) => string;
+export const formatRLC: (nRLC: BNish) => string;
 /**
  * encode an array of human readable tags in a bytes32 tag readable by iExec's smart contracts
  *

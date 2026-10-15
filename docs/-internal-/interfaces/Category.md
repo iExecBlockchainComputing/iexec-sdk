@@ -28,6 +28,6 @@ a name for the category
 
 ### workClockTimeRef
 
-> **workClockTimeRef**: [`BNish`](../../type-aliases/BNish.md)
+> **workClockTimeRef**: [`BN`](../../interfaces/BN.md)
 
 time base (in sec) for the category (tasks of this category must be completed under 10 * workClockTimeRef)

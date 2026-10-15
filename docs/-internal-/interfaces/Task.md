@@ -104,6 +104,12 @@
 
 ***
 
+### timeref
+
+> **timeref**: [`BN`](../../interfaces/BN.md)
+
+***
+
 ### winnerCounter
 
 > **winnerCounter**: [`BN`](../../interfaces/BN.md)
