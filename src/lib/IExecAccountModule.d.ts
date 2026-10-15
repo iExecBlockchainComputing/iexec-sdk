@@ -58,7 +58,13 @@ export default class IExecAccountModule extends IExecModule {
    * console.log('tx:', txHash);
    * ```
    */
-  deposit(amount: NRLCAmount): Promise<{ amount: BN; txHash: TxHash }>;
+  deposit(amount: NRLCAmount): Promise<{
+    /**
+     * deposited amount in nRLC (decimal string)
+     */
+    amount: string;
+    txHash: TxHash;
+  }>;
   /**
    * **SIGNER REQUIRED**
    *
@@ -71,7 +77,13 @@ export default class IExecAccountModule extends IExecModule {
    * console.log('tx:', txHash);
    * ```
    */
-  withdraw(amount: NRLCAmount): Promise<{ amount: BN; txHash: TxHash }>;
+  withdraw(amount: NRLCAmount): Promise<{
+    /**
+     * withdrawn amount in nRLC (decimal string)
+     */
+    amount: string;
+    txHash: TxHash;
+  }>;
   /**
    * check the account balance of specified address (stake is available nRLC, locked is escrowed nRLC)
    *

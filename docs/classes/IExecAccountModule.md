@@ -137,7 +137,7 @@ console.log('Nano RLC locked:', balance.locked.toString());
 
 ### deposit()
 
-> **deposit**(`amount`): `Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+> **deposit**(`amount`): `Promise`\<\{ `amount`: `string`; `txHash`: `string`; \}\>
 
 **SIGNER REQUIRED**
 
@@ -158,7 +158,7 @@ console.log('tx:', txHash);
 
 #### Returns
 
-`Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+`Promise`\<\{ `amount`: `string`; `txHash`: `string`; \}\>
 
 ***
 
@@ -190,7 +190,7 @@ console.log('tx:', txHash);
 
 ### withdraw()
 
-> **withdraw**(`amount`): `Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+> **withdraw**(`amount`): `Promise`\<\{ `amount`: `string`; `txHash`: `string`; \}\>
 
 **SIGNER REQUIRED**
 
@@ -211,7 +211,7 @@ console.log('tx:', txHash);
 
 #### Returns
 
-`Promise`\<\{ `amount`: [`BN`](../interfaces/BN.md); `txHash`: `string`; \}\>
+`Promise`\<\{ `amount`: `string`; `txHash`: `string`; \}\>
 
 ***
 
