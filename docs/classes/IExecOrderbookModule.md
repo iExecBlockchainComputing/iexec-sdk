@@ -364,6 +364,12 @@ console.log('total orders:', count);
 
 filter by specified app
 
+###### beneficiary?
+
+`string`
+
+filter by beneficiary
+
 ###### category?
 
 [`BNish`](../type-aliases/BNish.md)

@@ -365,6 +365,10 @@ export default class IExecOrderbookModule extends IExecModule {
      */
     requester?: Address;
     /**
+     * filter by beneficiary
+     */
+    beneficiary?: Address;
+    /**
      * filter by category
      */
     category?: BNish;
