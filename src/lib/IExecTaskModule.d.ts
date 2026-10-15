@@ -21,6 +21,7 @@ interface Task {
   status: number;
   statusName: string;
   taskTimedOut: boolean;
+  timeref: BN;
   contributionDeadline: BN;
   revealDeadline: BN;
   finalDeadline: BN;
