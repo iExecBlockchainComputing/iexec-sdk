@@ -90,7 +90,7 @@ console.log('secret exists:', isSecretSet);
 
 ### checkDeployedDataset()
 
-> **checkDeployedDataset**(`datasetAddress`): `Promise`\<`Boolean`\>
+> **checkDeployedDataset**(`datasetAddress`): `Promise`\<`boolean`\>
 
 check if an dataset is deployed at a given address
 
@@ -108,7 +108,7 @@ console.log('dataset deployed', isDeployed);
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`\<`boolean`\>
 
 ***
 

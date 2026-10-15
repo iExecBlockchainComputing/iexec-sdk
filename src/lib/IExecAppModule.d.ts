@@ -121,7 +121,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('app deployed', isDeployed);
    * ```
    */
-  checkDeployedApp(appAddress: Address): Promise<Boolean>;
+  checkDeployedApp(appAddress: Address): Promise<boolean>;
   /**
    * show a deployed app details
    *
@@ -184,7 +184,7 @@ export default class IExecAppModule extends IExecModule {
    * console.log('pushed App secret:', isPushed);
    * ```
    */
-  pushAppSecret(appAddress: Address, secretValue: String): Promise<boolean>;
+  pushAppSecret(appAddress: Address, secretValue: string): Promise<boolean>;
   /**
    * **ONLY APP OWNER**
    *

@@ -104,7 +104,7 @@ export default class IExecDatasetModule extends IExecModule {
    * console.log('dataset deployed', isDeployed);
    * ```
    */
-  checkDeployedDataset(datasetAddress: Address): Promise<Boolean>;
+  checkDeployedDataset(datasetAddress: Address): Promise<boolean>;
   /**
    * show a deployed dataset details
    *

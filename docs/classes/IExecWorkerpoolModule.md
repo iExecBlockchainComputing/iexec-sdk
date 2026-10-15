@@ -66,7 +66,7 @@ iexec sdk version
 
 ### checkDeployedWorkerpool()
 
-> **checkDeployedWorkerpool**(`workerpoolAddress`): `Promise`\<`Boolean`\>
+> **checkDeployedWorkerpool**(`workerpoolAddress`): `Promise`\<`boolean`\>
 
 check if an workerpool is deployed at a given address
 
@@ -84,7 +84,7 @@ console.log('workerpool deployed', isDeployed);
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`\<`boolean`\>
 
 ***
 

@@ -81,7 +81,7 @@ export default class IExecWorkerpoolModule extends IExecModule {
    * console.log('workerpool deployed', isDeployed);
    * ```
    */
-  checkDeployedWorkerpool(workerpoolAddress: Address): Promise<Boolean>;
+  checkDeployedWorkerpool(workerpoolAddress: Address): Promise<boolean>;
   /**
    * show a deployed workerpool details
    *

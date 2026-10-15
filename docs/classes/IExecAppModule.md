@@ -92,7 +92,7 @@ _NB_:
 
 ### checkDeployedApp()
 
-> **checkDeployedApp**(`appAddress`): `Promise`\<`Boolean`\>
+> **checkDeployedApp**(`appAddress`): `Promise`\<`boolean`\>
 
 check if an app is deployed at a given address
 
@@ -110,7 +110,7 @@ console.log('app deployed', isDeployed);
 
 #### Returns
 
-`Promise`\<`Boolean`\>
+`Promise`\<`boolean`\>
 
 ***
 
@@ -227,7 +227,7 @@ console.log('pushed App secret:', isPushed);
 
 ##### secretValue
 
-`String`
+`string`
 
 #### Returns
 

@@ -114,11 +114,11 @@ console.log('pushed secret "my-password":', isPushed);
 
 ##### secretName
 
-`String`
+`string`
 
 ##### secretValue
 
-`String`
+`string`
 
 #### Returns
 
