@@ -144,7 +144,7 @@ export default class IExecOrderbookModule extends IExecModule {
    *
    * example:
    * ```js
-   * const { count, orders } = await fetchAppOrderbook(appAddress);
+   * const { count, orders } = await fetchAppOrderbook({ app: appAddress });
    * console.log('best order:', orders[0]?.order);
    * console.log('total orders:', count);
    * ```
@@ -210,7 +210,9 @@ export default class IExecOrderbookModule extends IExecModule {
    *
    * example:
    * ```js
-   * const { count, orders } = await fetchDatasetOrderbook(datasetAddress);
+   * const { count, orders } = await fetchDatasetOrderbook({
+   *   dataset: datasetAddress,
+   * });
    * console.log('best order:', orders[0]?.order);
    * console.log('total orders:', count);
    * ```

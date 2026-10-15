@@ -87,7 +87,7 @@ _NB_: use `options` to include restricted orders or filter results.
 
 example:
 ```js
-const { count, orders } = await fetchAppOrderbook(appAddress);
+const { count, orders } = await fetchAppOrderbook({ app: appAddress });
 console.log('best order:', orders[0]?.order);
 console.log('total orders:', count);
 ```
@@ -215,7 +215,9 @@ _NB_: use `options` to include restricted orders or filter results.
 
 example:
 ```js
-const { count, orders } = await fetchDatasetOrderbook(datasetAddress);
+const { count, orders } = await fetchDatasetOrderbook({
+  dataset: datasetAddress,
+});
 console.log('best order:', orders[0]?.order);
 console.log('total orders:', count);
 ```
