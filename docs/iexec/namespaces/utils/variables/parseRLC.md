@@ -10,19 +10,19 @@
 
 parse a string formatted RLC value in nRLC big number
 
-supported units: 'nRLC', 'RLC' default unit 'nRLC'
+supported units: 'nRLC', 'RLC' default unit 'RLC'
 
 example:
 ```js
-console.log('5 RLC =' + parseEth('5 RLC') + 'nRLC');
-console.log('5 RLC =' + parseEth(5, 'RLC') + 'nRLC');
+console.log('5 RLC =' + parseRLC('5 RLC') + 'nRLC');
+console.log('5 RLC =' + parseRLC(5, 'RLC') + 'nRLC');
 ```
 
 ## Parameters
 
 ### value
 
-`string`
+`string` | `number`
 
 ### defaultUnit?
 
