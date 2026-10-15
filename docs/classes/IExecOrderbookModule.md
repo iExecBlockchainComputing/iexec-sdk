@@ -134,13 +134,13 @@ filters out orders allowing “any” workerpool (default: `false`)
 
 ###### maxTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by maximum tag accepted
 
 ###### minTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by minimum tag required
 
@@ -270,13 +270,13 @@ filters out orders allowing “any” workerpool (default: `false`)
 
 ###### maxTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by maximum tag accepted
 
 ###### minTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by minimum tag required
 
@@ -392,7 +392,7 @@ filters out orders allowing “any” workerpool (default: `false`)
 
 ###### maxTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by maximum tag accepted
 
@@ -404,7 +404,7 @@ filter by maximum trust required
 
 ###### minTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by minimum tag required
 
@@ -526,13 +526,13 @@ filters out orders allowing “any” requester (default: `false`)
 
 ###### maxTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by maximum tag offered
 
 ###### minTag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 filter by minimum tag required
 

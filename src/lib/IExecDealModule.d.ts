@@ -187,7 +187,10 @@ export default class IExecDealModule extends IExecModule {
     schedulerRewardRatio: BN;
     finalTime: BN;
     deadlineReached: boolean;
-    tasks: Record<TaskIndex, Taskid>;
+    /**
+     * deal's tasks ids (`tasks[0]` is the task at index `botFirst`)
+     */
+    tasks: Taskid[];
   }>;
   /**
    * return an Observable with a `subscribe` method to monitor the deal status changes.

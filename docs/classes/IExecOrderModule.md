@@ -201,7 +201,7 @@ default no restrict
 
 ###### tag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 restrict usage to runtime with specified tags
 
@@ -274,7 +274,7 @@ default no restrict
 
 ###### tag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 restrict usage to runtime with specified tags
 
@@ -387,7 +387,7 @@ default connected wallet address
 
 ###### tag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 restrict usage to runtime with specified tags
 
@@ -478,7 +478,7 @@ default no restrict
 
 ###### tag?
 
-[`Tag`](../type-aliases/Tag.md) \| `string`[]
+`string`[] \| [`Tag`](../type-aliases/Tag.md)
 
 proposed tags
 
