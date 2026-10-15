@@ -63,6 +63,7 @@ declare class DealObservable extends Observable {
         botSize: BN;
         workerStake: BN;
         schedulerRewardRatio: BN;
+        sponsor: Address;
         finalTime: BN;
         deadlineReached: boolean;
         tasks: Taskid[];
@@ -185,6 +186,7 @@ export default class IExecDealModule extends IExecModule {
     botSize: BN;
     workerStake: BN;
     schedulerRewardRatio: BN;
+    sponsor: Address;
     finalTime: BN;
     deadlineReached: boolean;
     /**
