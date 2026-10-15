@@ -776,7 +776,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish an apporder on the off-chain marketplace making it available for other users
    *
-   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+   * _NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -795,7 +795,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish a datasetorder on the off-chain marketplace making it available for other users
    *
-   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+   * _NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
@@ -828,7 +828,7 @@ export default class IExecOrderModule extends IExecModule {
    *
    * publish a requestorder on the off-chain marketplace making it available for other users
    *
-   * _NB_: preflight checks are performed on the order before signing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
+   * _NB_: preflight checks are performed on the order before publishing (this helps detecting inconsistencies and prevent creating always failing tasks). these checks can be disabled by passing the option `preflightCheck: false`
    *
    * example:
    * ```js
