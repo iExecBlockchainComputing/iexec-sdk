@@ -43,9 +43,9 @@ declare class DealObservable extends Observable {
      */
     next?: (data: {
       message: 'DEAL_UPDATED' | 'DEAL_COMPLETED' | 'DEAL_TIMEDOUT';
-      taskCount: number;
+      tasksCount: number;
       completedTasksCount: number;
-      failedTaksCount: number;
+      failedTasksCount: number;
       deal: {
         dealid: Dealid;
         app: { pointer: Address; owner: Address; price: BN };
