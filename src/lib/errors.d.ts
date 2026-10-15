@@ -69,7 +69,7 @@ export class ObjectNotFoundError extends Error {
   /**
    * Id or address of the resource.
    */
-  objId: string;
+  objectId: string;
   /**
    * Chain id of the blockchain.
    */

@@ -56,9 +56,9 @@ Chain id of the blockchain.
 
 ***
 
-### objId
+### objectId
 
-> **objId**: `string`
+> **objectId**: `string`
 
 Id or address of the resource.
 
