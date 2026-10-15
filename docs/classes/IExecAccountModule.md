@@ -84,7 +84,7 @@ console.log('tx:', txHash);
 
 ### checkAllowance()
 
-> **checkAllowance**(`ownerAddress`, `spenderAddress`): `Promise`\<[`NRLCAmount`](../type-aliases/NRLCAmount.md)\>
+> **checkAllowance**(`ownerAddress`, `spenderAddress`): `Promise`\<[`BN`](../interfaces/BN.md)\>
 
 checks the amount of allowance approved for the specified spender to use the account of the owner.
 
@@ -106,7 +106,7 @@ console.log('allowance amount:', allowanceAmount);
 
 #### Returns
 
-`Promise`\<[`NRLCAmount`](../type-aliases/NRLCAmount.md)\>
+`Promise`\<[`BN`](../interfaces/BN.md)\>
 
 ***
 

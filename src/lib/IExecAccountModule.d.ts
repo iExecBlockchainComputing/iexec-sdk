@@ -30,10 +30,7 @@ export default class IExecAccountModule extends IExecModule {
    * console.log('allowance amount:', allowanceAmount);
    * ```
    */
-  checkAllowance(
-    ownerAddress: Address,
-    spenderAddress: Address,
-  ): Promise<NRLCAmount>;
+  checkAllowance(ownerAddress: Address, spenderAddress: Address): Promise<BN>;
   /**
    * **SIGNER REQUIRED**
    *
