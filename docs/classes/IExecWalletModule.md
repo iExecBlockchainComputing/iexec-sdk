@@ -159,17 +159,21 @@ console.log('transaction hash:', txHash);
 
 ### sweep()
 
-> **sweep**(`to`): `Promise`\<\{ `sendERC20TxHash`: `string`; `sendNativeTxHash`: `string`; \}\>
+> **sweep**(`to`): `Promise`\<\{ `errors?`: `string`[]; `sendERC20TxHash?`: `string`; `sendNativeTxHash?`: `string`; \}\>
 
 **SIGNER REQUIRED**
 
 send all the iExec token and the native token owned by the wallet to the specified address
 
+_NB_: if the native token transfer fails, the method does not throw, the failure is reported in `errors` instead
+
 example:
 ```js
-const { sendERC20TxHash, sendNativeTxHash } = await sweep(receiverAddress);
+const { sendERC20TxHash, sendNativeTxHash, errors } =
+  await sweep(receiverAddress);
 console.log('sweep RLC transaction hash:', sendERC20TxHash);
 console.log('sweep ether transaction hash:', sendNativeTxHash);
+if (errors) console.warn('sweep errors:', errors);
 ```
 
 #### Parameters
@@ -180,7 +184,7 @@ console.log('sweep ether transaction hash:', sendNativeTxHash);
 
 #### Returns
 
-`Promise`\<\{ `sendERC20TxHash`: `string`; `sendNativeTxHash`: `string`; \}\>
+`Promise`\<\{ `errors?`: `string`[]; `sendERC20TxHash?`: `string`; `sendNativeTxHash?`: `string`; \}\>
 
 ***
 

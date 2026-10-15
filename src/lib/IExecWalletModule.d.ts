@@ -64,16 +64,31 @@ export default class IExecWalletModule extends IExecModule {
    *
    * send all the iExec token and the native token owned by the wallet to the specified address
    *
+   * _NB_: if the native token transfer fails, the method does not throw, the failure is reported in `errors` instead
+   *
    * example:
    * ```js
-   * const { sendERC20TxHash, sendNativeTxHash } = await sweep(receiverAddress);
+   * const { sendERC20TxHash, sendNativeTxHash, errors } =
+   *   await sweep(receiverAddress);
    * console.log('sweep RLC transaction hash:', sendERC20TxHash);
    * console.log('sweep ether transaction hash:', sendNativeTxHash);
+   * if (errors) console.warn('sweep errors:', errors);
    * ```
    */
-  sweep(
-    to: Address,
-  ): Promise<{ sendERC20TxHash: TxHash; sendNativeTxHash: TxHash }>;
+  sweep(to: Address): Promise<{
+    /**
+     * iExec token transfer tx hash (not set when the wallet has no iExec token)
+     */
+    sendERC20TxHash?: TxHash;
+    /**
+     * native token transfer tx hash (not set when the native token transfer failed)
+     */
+    sendNativeTxHash?: TxHash;
+    /**
+     * errors encountered during the sweep (not set when no error occurred)
+     */
+    errors?: string[];
+  }>;
   /**
    * Create an IExecWalletModule instance using an IExecConfig instance
    */
