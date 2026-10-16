@@ -110,7 +110,7 @@ services:
 
   market-watcher-arbitrum-sepolia:
     platform: linux/amd64
-    image: iexechub/iexec-market-watcher:7.0.1
+    image: iexechub/iexec-market-watcher:8.0.0
     restart: unless-stopped
     environment:
       CHAIN: ARBITRUM_SEPOLIA
@@ -131,7 +131,7 @@ services:
 
   market-api-arbitrum-sepolia:
     platform: linux/amd64
-    image: iexechub/iexec-market-api:7.1.2
+    image: iexechub/iexec-market-api:8.0.0
     restart: unless-stopped
     ports:
       - 3050:3000
