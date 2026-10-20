@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [9.1.2](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v9.1.1...v9.1.2) (2026-10-20)
+
+
+### Changed
+
+* fix stale typescript definitions ([#579](https://github.com/iExecBlockchainComputing/iexec-sdk/issues/579)) ([bfa99a9](https://github.com/iExecBlockchainComputing/iexec-sdk/commit/bfa99a96c743a98663d3aea761cbc600c9aa5609))
+
 ## [9.1.1](https://github.com/iExecBlockchainComputing/iexec-sdk/compare/v9.1.0...v9.1.1) (2026-10-12)
 
 
